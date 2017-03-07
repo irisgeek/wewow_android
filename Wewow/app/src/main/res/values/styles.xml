@@ -6,7 +6,7 @@
     </style>
 
     <style name="ButtonStyle">
-        <item name="android:background">@drawable/button_background</item>
+        <item name="android:background">@drawable/selector_btn_menu</item>
         <item name="android:textColor">#ffffff</item>
     </style>
 

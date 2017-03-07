@@ -39,8 +39,10 @@ import android.view.MenuItem;
 
 import com.wewow.R;
 
-
-public class MainActivity extends ActionBarActivity {
+/**
+ * Created by iris on 17/3/3.
+ */
+public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
