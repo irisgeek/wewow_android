@@ -32,23 +32,114 @@
 //
 package com.wewow;
 
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.ImageView;
 
 import com.wewow.R;
+
+import java.util.ArrayList;
 
 /**
  * Created by iris on 17/3/3.
  */
 public class MainActivity extends BaseActivity {
+
+
+    private ViewPager viewPager;
+    private ArrayList<View> pageview;
+    private ImageView imageView;
+    private ImageView[] imageViews;
+
+    private ViewGroup group;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
+        setUpViewPager();
 
 
+    }
+
+    private void setUpViewPager() {
+
+
+        group = (ViewGroup)findViewById(R.id.viewGroup);
+
+
+        viewPager = (ViewPager) findViewById(R.id.viewPager);
+        LayoutInflater inflater =getLayoutInflater();
+
+        pageview=new ArrayList<View>();
+        for(int i=0;i<3;i++)
+        {
+
+            View view=inflater.inflate(R.layout.banner_item,null);
+            pageview.add(view);
+        }
+
+        //
+        imageViews = new ImageView[pageview.size()];
+        for(int i =0;i<pageview.size();i++){
+            imageView = new ImageView(MainActivity.this);
+            imageView.setLayoutParams(new ViewGroup.LayoutParams(20,20));
+            imageView.setPadding(20, 0, 20, 0);
+            imageViews[i] = imageView;
+
+            //
+            if (i == 0) {
+                imageViews[i].setBackgroundResource(R.drawable.setting);
+            } else {
+                imageViews[i].setBackgroundResource(R.drawable.setting);
+            }
+
+            group.addView(imageViews[i]);
+        }
+
+
+        PagerAdapter mPagerAdapter = new PagerAdapter(){
+
+            @Override
+
+            public int getCount() {
+                // TODO Auto-generated method stub
+                return pageview.size();
+            }
+
+            @Override
+
+            public boolean isViewFromObject(View arg0, Object arg1) {
+                // TODO Auto-generated method stub
+                return arg0==arg1;
+            }
+
+            public void destroyItem(View arg0, int arg1, Object arg2) {
+                ((ViewPager) arg0).removeView(pageview.get(arg1));
+            }
+
+            public Object instantiateItem(View arg0, int arg1){
+                ((ViewPager)arg0).addView(pageview.get(arg1));
+                return pageview.get(arg1);
+            }
+
+
+        };
+
+        //set adapter
+        viewPager.setAdapter(mPagerAdapter);
+
+        //set page change listener
+        viewPager.setOnPageChangeListener(new GuidePageChangeListener());
 
     }
 
@@ -58,7 +149,6 @@ public class MainActivity extends BaseActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
-
 
 
     @Override
@@ -74,5 +164,34 @@ public class MainActivity extends BaseActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    class GuidePageChangeListener implements ViewPager.OnPageChangeListener {
+
+        @Override
+        public void onPageScrollStateChanged(int arg0) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void onPageScrolled(int arg0, float arg1, int arg2) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        //
+        public void onPageSelected(int arg0) {
+            // TODO Auto-generated method stub
+            for(int i=0;i<imageViews.length;i++){
+                imageViews[arg0].setBackgroundResource(R.drawable.setting);
+                if (arg0 != i) {
+                    imageViews[i].setBackgroundResource(R.drawable.setting);
+                }
+            }
+
+        }
+
     }
 }
