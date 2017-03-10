@@ -43,6 +43,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
@@ -63,9 +64,9 @@ public class BaseActivity extends ActionBarActivity {
     protected ListView drawerList;
     protected FrameLayout frameLayout;
     private Toolbar toolbar;
-    private int[] iconResIcon={R.drawable.home,R.drawable.lover_of_life,R.drawable.life_institue,R.drawable.chat,
-                          R.drawable.my_favorites,R.drawable.lover_of_life_subscribed,R.drawable.about,
-                          R.drawable.share_menu,R.drawable.clear_cache,R.drawable.logout};
+    private int[] iconResIcon = {R.drawable.home, R.drawable.lover_of_life, R.drawable.life_institue, R.drawable.chat,
+            R.drawable.my_favorites, R.drawable.lover_of_life_subscribed, R.drawable.about,
+            R.drawable.share_menu, R.drawable.clear_cache, R.drawable.logout};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +80,7 @@ public class BaseActivity extends ActionBarActivity {
         frameLayout = (FrameLayout) drawerLayout.findViewById(R.id.content_frame);
 
         getLayoutInflater().inflate(layoutResID, frameLayout, true);
+
         super.setContentView(drawerLayout);
 
         setUpNavigation();
@@ -86,37 +88,36 @@ public class BaseActivity extends ActionBarActivity {
 
     }
 
+
     private void setUpNavigation() {
         planetTitles = getResources().getStringArray(R.array.planets_array);
         drawerList = (ListView) findViewById(R.id.left_drawer);
 
         ArrayList<HashMap<String, Object>> listItem = new ArrayList<HashMap<String, Object>>();
 
-        for(int i=0;i<10;i++)
-        {
-            HashMap<String,Object> map= new HashMap<String,Object>();
+        for (int i = 0; i < 10; i++) {
+            HashMap<String, Object> map = new HashMap<String, Object>();
 
             //
-            if(i==4||i==7)
-            {
+            if (i == 4 || i == 7) {
                 map.put("icon", 0);
                 map.put("menuText", "");
                 listItem.add(map);
-                map= new HashMap<String,Object>();
+                map = new HashMap<String, Object>();
             }
 
-                map.put("icon", iconResIcon[i]);
-                map.put("menuText", planetTitles[i]);
+            map.put("icon", iconResIcon[i]);
+            map.put("menuText", planetTitles[i]);
 
             listItem.add(map);
         }
 
-        SimpleAdapter listItemAdapter = new SimpleAdapter(this,listItem,//数据源
+        SimpleAdapter listItemAdapter = new SimpleAdapter(this, listItem,//data source
                 R.layout.list_item_drawer,
 
-                new String[] {"icon","menuText"},
+                new String[]{"icon", "menuText"},
                 //ids
-                new int[] {R.id.imageViewIcon,R.id.textViewMenuItem}
+                new int[]{R.id.imageViewIcon, R.id.textViewMenuItem}
         );
         drawerList.setAdapter(listItemAdapter);
 
@@ -130,6 +131,8 @@ public class BaseActivity extends ActionBarActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.selector_btn_menu);
+        getSupportActionBar().setTitle(" ");
+
     }
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
@@ -153,6 +156,15 @@ public class BaseActivity extends ActionBarActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.toolbar, menu);
+        MenuItem menuItem = menu.findItem(R.id.search);
+        menuItem.setVisible(false);
+        return true;
     }
 
 }

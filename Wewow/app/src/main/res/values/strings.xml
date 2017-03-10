@@ -5,12 +5,20 @@
     <string name="action_settings">Settings</string>
 
 
+    <!-- Home page -->
     <!-- naivgation title -->
     <string name="home">首页</string>
     <string name="test1">个人养成</string>
     <string name="test2">日常生活</string>
     <string name="test3">家的管理</string>
     <string name="test4">家的升级</string>
+
+    <!--home page content -->
+    <string name="popularLoverOfLife">热门生活家</string>
+    <string name="latestUpdates">最近更新</string>
+    <string name="selectedInstitute">精选研究所</string>
+    <string name="read">阅读</string>
+    <string name="collection">收藏</string>
 
 
 </resources>
