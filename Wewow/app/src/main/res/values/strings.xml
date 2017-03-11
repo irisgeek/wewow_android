@@ -20,5 +20,7 @@
     <string name="read">阅读</string>
     <string name="collection">收藏</string>
 
+    <string name="articles">文章</string>
+    <string name="followers">关注者</string>
 
 </resources>

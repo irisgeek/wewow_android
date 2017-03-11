@@ -234,6 +234,7 @@ public class MainActivity extends BaseActivity {
         viewPagerLoverOfLife.setCurrentItem(1);
         viewPagerLoverOfLife.setOnPageChangeListener(new BouncePageChangeListener(
                 viewPagerLoverOfLife, mListViews));
+        viewPagerLoverOfLife.setPageMargin(getResources().getDimensionPixelSize(R.dimen.life_lover_recommended_page_margin));
 
 
     }
@@ -391,7 +392,7 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public float getPageWidth(int position) {
-            float width = (float) 1;
+            float width = (float) 0.7;
 //            if (position == 0) {
 //                width = (float) 1;
 //            } else {
