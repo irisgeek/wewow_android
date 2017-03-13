@@ -39,6 +39,11 @@ public class LoginActivity extends ActionBarActivity {
 
     public static final int REQUEST_CODE_LOGIN = 1;
 
+    public static final int RESPONSE_CODE_MOILE = 1;
+    public static final int RESPONSE_CODE_WECHAT= 2;
+    public static final int RESPONSE_CODE_WEIBO = 3;
+    public static final int RESPONSE_CODE_HUAWEI = 4;
+
     private Button btnSendVerifyCode;
     private TextView btnSendVerifyCode2;
     private EditText edtPhoneNo;
@@ -120,6 +125,9 @@ public class LoginActivity extends ActionBarActivity {
         this.setupLogin();
     }
 
+    /**
+     * set up login button of mobile method
+     */
     private void setupLogin() {
         this.btnlogin = (Button) this.findViewById(R.id.login_btn_login);
         this.btnlogin.setOnClickListener(new OnClickListener() {
@@ -146,9 +154,13 @@ public class LoginActivity extends ActionBarActivity {
                                     String x = new String(result, "utf-8");
                                     Log.d(TAG, String.format("login returns: %s", x));
                                     JSONObject jobj = new JSONObject(x).getJSONObject("result");
-                                    if (jobj.getInt("code")==0) {
-
-                                    } else{
+                                    Toast.makeText(LoginActivity.this, jobj.getString("message"), Toast.LENGTH_LONG).show();
+                                    if (jobj.getInt("code") == 0) {
+                                        UserInfo user = UserInfo.getUserInfo(jobj.getJSONObject("user_info"));
+                                        user.saveUserInfo(LoginActivity.this);
+                                        LoginActivity.this.setResult(RESPONSE_CODE_MOILE);
+                                        LoginActivity.this.finish();
+                                    } else {
                                         Toast.makeText(LoginActivity.this, jobj.getString("message"), Toast.LENGTH_LONG).show();
                                     }
                                 } catch (UnsupportedEncodingException e) {
@@ -165,6 +177,9 @@ public class LoginActivity extends ActionBarActivity {
         });
     }
 
+    /**
+     * set up the 4 number input controls for text verification code
+     */
     private void setupInputVerifyCode() {
         this.edtvcodes.add((EditText) this.findViewById(R.id.login_txt_code_1));
         this.edtvcodes.add((EditText) this.findViewById(R.id.login_txt_code_2));
@@ -218,6 +233,9 @@ public class LoginActivity extends ActionBarActivity {
         }
     }
 
+    /**
+     * set up the button of requesting text verification code
+     */
     private void setupReqVerifyCode() {
         this.btnSendVerifyCode = (Button) this.findViewById(R.id.login_btn_send_verify_code);
         this.btnSendVerifyCode.setOnClickListener(new OnClickListener() {
@@ -261,6 +279,7 @@ public class LoginActivity extends ActionBarActivity {
         if (!showStart) {
             this.tvNumberSent.setText(String.format(this.getString(R.string.login_verifycode_sent), this.edtPhoneNo.getText().toString()));
             this.verifyTimer.start();
+            this.findViewById(R.id.login_txt_code_1).requestFocus();
         } else {
             this.verifyTimer.cancel();
             this.btnSendVerifyCode2.setVisibility(View.INVISIBLE);

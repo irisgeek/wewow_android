@@ -40,6 +40,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -132,15 +133,25 @@ public class BaseActivity extends ActionBarActivity {
          * 这里是登录页入口代码sample，登录结果见void onActivityResult 的resultcode，RESULT_CANCELED or  RESULT_OK
          * 登录名，token从UserUtils对象获取
          */
-        TextView usertv = (TextView)this.findViewById(R.id.textViewUsername);
+        TextView usertv = (TextView) this.findViewById(R.id.textViewUsername);
+        usertv.setText("Anonymous");
         usertv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i =  new Intent();
+                Intent i = new Intent();
                 i.setClass(BaseActivity.this, LoginActivity.class);
                 BaseActivity.this.startActivityForResult(i, LoginActivity.REQUEST_CODE_LOGIN);
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode,
+                                    int resultCode,
+                                    Intent data) {
+        Log.d("BaseActivity", "login return");
+        UserInfo ui = UserInfo.getCurrentUser(this);
+        Log.d("BaseActivity", String.format("%s %s", ui.getOpen_id(), ui.getToken()));
     }
 
     private void setUpToolBar() {
