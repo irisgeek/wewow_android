@@ -63,6 +63,7 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Scroller;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -233,12 +234,14 @@ public class MainActivity extends BaseActivity {
         LayoutInflater inflater = getLayoutInflater();
 
         pageview = new ArrayList<View>();
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < banners.size(); i++) {
 
             View view = inflater.inflate(R.layout.banner_item, null);
-            ImageView imageBanner=(ImageView)findViewById(R.id.imageViewIcon);
+            ImageView imageBanner=(ImageView)view.findViewById(R.id.imageViewIcon);
+            TextView textViewBannerTitle=(TextView)view.findViewById(R.id.textViewBannerTitle);
+            textViewBannerTitle.setText(banners.get(i).getTitle());
             Glide.with(context)
-                    .load(banners.get(i).getId())
+                    .load(banners.get(i).getImage())
                     .placeholder(R.drawable.banner_loading_spinner)
                     .crossFade()
                     .into(imageBanner);
