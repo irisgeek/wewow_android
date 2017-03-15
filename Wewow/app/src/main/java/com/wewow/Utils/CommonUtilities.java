@@ -1,4 +1,4 @@
-package com.wewow.Utils;
+package com.wewow.utils;
 
 /**
  * Created by iris on 17/3/3.
@@ -6,6 +6,8 @@ package com.wewow.Utils;
 public class CommonUtilities {
     public static final String WS_HOST ="https://api-tw.wewow.com.cn";
     public static final String REQUEST_KEY="";
+    public static final String REQUEST_HEADER_PREFIX="Wewow/";
+    public static final String SUCCESS="success";
 
 
 }

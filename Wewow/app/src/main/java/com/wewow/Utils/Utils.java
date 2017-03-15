@@ -1,22 +1,32 @@
-package com.wewow.Utils;
+package com.wewow.utils;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
 
+import com.squareup.okhttp.OkHttpClient;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.MessageDigest;
+import com.wewow.netTask.ITask;
+import java.util.concurrent.TimeUnit;
+
+import retrofit.RestAdapter;
+import retrofit.client.OkClient;
 
 /**
  * Created by iris on 17/3/2.
@@ -152,6 +162,38 @@ public class Utils {
             return uri.getPath();
         }
 
+
         return null;
+    }
+
+    public static ITask getItask(String apiUrl) {
+
+
+        final OkHttpClient okHttpClient = new OkHttpClient();
+        okHttpClient.setReadTimeout(60, TimeUnit.SECONDS);
+        okHttpClient.setConnectTimeout(60, TimeUnit.SECONDS);
+        RestAdapter restAdapter = new RestAdapter.Builder()
+                .setEndpoint(apiUrl)
+                .setLogLevel(RestAdapter.LogLevel.FULL)
+                .setClient(new OkClient(okHttpClient)).build();
+
+        ITask task = restAdapter.create(ITask.class);
+        return task;
+    }
+
+    public static String getAppVersionName(Context context) {
+        String versionName = "";
+        try {
+            // ---get the package info---
+            PackageManager pm = context.getPackageManager();
+            PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
+            versionName = pi.versionName;
+            if (versionName == null || versionName.length() <= 0) {
+                return "";
+            }
+        } catch (Exception e) {
+            Log.e("VersionInfo", "Exception", e);
+        }
+        return versionName;
     }
 }
