@@ -33,12 +33,18 @@
 package com.wewow;
 
 import android.app.ActionBar;
+import android.content.Context;
 import android.os.Parcelable;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -57,13 +63,34 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Scroller;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
 import com.wewow.R;
+import com.wewow.dto.Banner;
+import com.wewow.fragment.categaryFragment;
+import com.wewow.fragment.homeFragment;
+import com.wewow.netTask.ITask;
+import com.wewow.utils.CommonUtilities;
+import com.wewow.utils.Utils;
 import com.wewow.view.BounceScrollView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+import retrofit.converter.GsonConverter;
 
 /**
  * Created by iris on 17/3/3.
@@ -88,21 +115,71 @@ public class MainActivity extends BaseActivity {
     private String[] dummyTitles = {"猫奴养成计划", "手帐记录生活"};
     private String[] dummyReadCount = {"8121", "7231"};
     private String[] dummyCollectionCount = {"1203", "1232"};
+    private TabLayout mTabLayout;
+    private MyAdapter adapter;
+    private RelativeLayout loadingLayout;
+    private Context context;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
+
         setContentView(R.layout.activity_main);
+        context=this;
+        hideProgressBar();
 
 
-        setUpViewPagerBanner();
-        setUpViewPagerLoverOfLife();
-        setUpListViewInstituteRecommend();
+        setUpNavigationTab();
+        getBannerInfoFromServer();
+
 //        setUpScrollView();
 
+
+    }
+
+    private void hideProgressBar() {
+        loadingLayout = (RelativeLayout) findViewById(R.id.loading);
+        loadingLayout.setVisibility(View.GONE);
+    }
+
+    private void showProgressBar() {
+        loadingLayout = (RelativeLayout) findViewById(R.id.loading);
+        loadingLayout.setVisibility(View.VISIBLE);
+    }
+
+
+    private void setUpNavigationTab() {
+        mTabLayout = (TabLayout) findViewById(R.id.tabs);
+        List<String> titles = new ArrayList<>();
+        titles.add(getResources().getString(R.string.home));
+        titles.add(getResources().getString(R.string.test1));
+        titles.add(getResources().getString(R.string.test2));
+        titles.add(getResources().getString(R.string.test3));
+        titles.add(getResources().getString(R.string.test4));
+
+
+        for (int i = 0; i < titles.size(); i++) {
+            mTabLayout.addTab(mTabLayout.newTab().setText(titles.get(i)));
+        }
+
+        setUpTabs(titles);
+
+    }
+
+    private void setUpTabs(List<String> titles) {
+        viewPager = (ViewPager) findViewById(R.id.viewPager);
+
+        ViewPager viewPagerTabs = (ViewPager) findViewById(R.id.pagerTabs);
+        adapter = new MyAdapter(getSupportFragmentManager(), titles);
+        viewPagerTabs.setAdapter(adapter);
+        viewPagerTabs.setOffscreenPageLimit(5);
+        mTabLayout.setupWithViewPager(viewPagerTabs);
+
+        viewPager.setFocusable(true);
+        viewPager.setFocusableInTouchMode(true);
+        viewPager.requestFocus();
 
     }
 
@@ -120,40 +197,6 @@ public class MainActivity extends BaseActivity {
         });
     }
 
-
-    private void setUpListViewInstituteRecommend() {
-
-        listViewInstituteRecommended = (ListView) findViewById(R.id.listViewSelectedInstitute);
-
-        ArrayList<HashMap<String, Object>> listItem = new ArrayList<HashMap<String, Object>>();
-
-        for (int i = 0; i < 2; i++) {
-            HashMap<String, Object> map = new HashMap<String, Object>();
-
-            //
-
-
-            map.put("textVol", dummyVols[i]);
-            map.put("textTitle", dummyTitles[i]);
-            map.put("textReadCount", dummyReadCount[i]);
-            map.put("textCollectionCount", dummyCollectionCount[i]);
-
-            listItem.add(map);
-        }
-
-        SimpleAdapter listItemAdapter = new SimpleAdapter(this, listItem,//data source
-                R.layout.list_item_life_institue_recommended,
-
-                new String[]{"textVol", "textTitle", "textReadCount", "textCollectionCount"},
-                //ids
-                new int[]{R.id.textViewNum, R.id.textViewTitle, R.id.textViewRead, R.id.textViewCollection}
-        );
-        listViewInstituteRecommended.setAdapter(listItemAdapter);
-
-        //fix bug created by scrollview
-        fixListViewHeight(listViewInstituteRecommended);
-
-    }
 
     public void fixListViewHeight(ListView listView) {
         // 如果没有设置数据适配器，则ListView没有子项，返回。
@@ -181,77 +224,27 @@ public class MainActivity extends BaseActivity {
     }
 
 
-    private void setUpViewPagerLoverOfLife() {
-
-        //blank view for bounce effect
-        View left = new View(MainActivity.this);
-        mListViews.add(left);
-
-        for (int i = 0; i < 3; i++) {
-            View view = getLayoutInflater().inflate(R.layout.list_item_lover_of_life_recommended, null);
-
-            //to set data
-
-
-            mListViews.add(view);
-        }
-
-        View right = new View(MainActivity.this);
-        mListViews.add(right);
-        MyPagerAdapter myAdapter = new MyPagerAdapter();
-//        PagerAdapter myAdapter = new PagerAdapter() {
-//
-//            @Override
-//
-//            public int getCount() {
-//                // TODO Auto-generated method stub
-//                return mListViews.size();
-//            }
-//
-//            @Override
-//
-//            public boolean isViewFromObject(View arg0, Object arg1) {
-//                // TODO Auto-generated method stub
-//                return arg0 == arg1;
-//            }
-//
-//            public void destroyItem(View arg0, int arg1, Object arg2) {
-//                ((ViewPager) arg0).removeView(mListViews.get(arg1));
-//            }
-//
-//            public Object instantiateItem(View arg0, int arg1) {
-//                ((ViewPager) arg0).addView(mListViews.get(arg1));
-//                return mListViews.get(arg1);
-//            }
-//
-//
-//        };
-        myAdapter.setList(mListViews);
-
-        viewPagerLoverOfLife = (ViewPager) findViewById(R.id.viewpagerLayout);
-
-        viewPagerLoverOfLife.setAdapter(myAdapter);
-        viewPagerLoverOfLife.setCurrentItem(1);
-        viewPagerLoverOfLife.setOnPageChangeListener(new BouncePageChangeListener(
-                viewPagerLoverOfLife, mListViews));
-        viewPagerLoverOfLife.setPageMargin(getResources().getDimensionPixelSize(R.dimen.life_lover_recommended_page_margin));
-
-
-    }
-
-    private void setUpViewPagerBanner() {
+    private void setUpViewPagerBanner(List<Banner>  banners) {
 
 
         group = (ViewGroup) findViewById(R.id.viewGroup);
 
 
-        viewPager = (ViewPager) findViewById(R.id.viewPager);
+
         LayoutInflater inflater = getLayoutInflater();
 
         pageview = new ArrayList<View>();
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < banners.size(); i++) {
 
             View view = inflater.inflate(R.layout.banner_item, null);
+            ImageView imageBanner=(ImageView)view.findViewById(R.id.imageViewIcon);
+            TextView textViewBannerTitle=(TextView)view.findViewById(R.id.textViewBannerTitle);
+            textViewBannerTitle.setText(banners.get(i).getTitle());
+            Glide.with(context)
+                    .load(banners.get(i).getImage())
+                    .placeholder(R.drawable.banner_loading_spinner)
+                    .crossFade()
+                    .into(imageBanner);
             pageview.add(view);
         }
 
@@ -310,6 +303,58 @@ public class MainActivity extends BaseActivity {
 
     }
 
+    private void getBannerInfoFromServer() {
+        showProgressBar();
+        ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
+     iTask.banner(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), new Callback<JSONObject>() {
+
+            @Override
+            public void success(JSONObject object, Response response) {
+               List<Banner> banners=new ArrayList<Banner>();
+
+                try {
+                    String realData = Utils.convertStreamToString(response.getBody().in());
+                    if(!realData.contains(CommonUtilities.SUCCESS))
+                    {
+                        Toast.makeText(context,"Error",Toast.LENGTH_SHORT).show();
+
+                    }
+                    else
+                    {
+                        JSONObject jsonObject=new JSONObject(realData);
+                        JSONArray results = jsonObject.getJSONObject("result").getJSONArray("data");
+                        for (int i = 0; i < results.length(); i++) {
+                            Banner banner=new Banner();
+                            JSONObject result = results.getJSONObject(i);
+                            System.out.println(result.getString("image")+" "+result.getString("type")+" "
+                                    +result.getString("id")+" "+result.getString("title"));
+                            banner.setId(result.getString("id"));
+                            banner.setImage(result.getString("image"));
+                            banner.setType(result.getString("type"));
+                            banner.setTitle(result.getString("title"));
+                            banners.add(banner);
+                        }
+                        hideProgressBar();
+                        setUpViewPagerBanner(banners);
+
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.i("MainActivity", "request banner failed: " + error.toString());
+
+            }
+        });
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -363,125 +408,6 @@ public class MainActivity extends BaseActivity {
 
     }
 
-    //page adapter for navigation bar
-    private class MyPagerAdapter extends PagerAdapter {
-
-        private List<View> mListViews;
-
-        public void setList(List<View> listViews) {
-            mListViews = listViews;
-        }
-
-        @Override
-        public void destroyItem(View arg0, int arg1, Object arg2) {
-
-            if (getCount() > 1) {
-                ((ViewPager) arg0).removeView(mListViews.get(arg1));
-            }
-
-        }
-
-        @Override
-        public int getItemPosition(Object object) {
-            return POSITION_NONE;
-        }
-
-        @Override
-        public void finishUpdate(View arg0) {
-        }
-
-        @Override
-        public float getPageWidth(int position) {
-            float width = (float) 0.7;
-//            if (position == 0) {
-//                width = (float) 1;
-//            } else {
-//                int last = mListViews.size() - 1;
-//                if (position == last) {
-//                    width = (float) 1;
-//
-//                } else {
-//                    width = (float) 0.33;
-//                }
-//            }
-            return width;
-        }
-
-        @Override
-        public int getCount() {
-
-            return mListViews.size();
-
-        }
-
-        @Override
-        public Object instantiateItem(View arg0, int arg1) {
-
-            ((ViewPager) arg0).addView(mListViews.get(arg1), 0);
-
-            return mListViews.get(arg1);
-
-        }
-
-        @Override
-        public boolean isViewFromObject(View arg0, Object arg1) {
-
-            return arg0 == (arg1);
-
-        }
-
-        @Override
-        public void restoreState(Parcelable arg0, ClassLoader arg1) {
-
-        }
-
-        @Override
-        public Parcelable saveState() {
-
-            return null;
-
-        }
-
-
-    }
-
-    private class BouncePageChangeListener implements ViewPager.OnPageChangeListener {
-
-        private ViewPager myViewPager;
-        private List<View> mListView;
-
-        public BouncePageChangeListener(ViewPager viewPager, List<View> listView) {
-            myViewPager = viewPager;
-            mListView = listView;
-        }
-
-        @Override
-        public void onPageScrollStateChanged(int arg0) {
-
-        }
-
-        @Override
-        public void onPageScrolled(int position, float arg1, int arg2) {
-
-            if (position == 0) {
-                myViewPager.setCurrentItem(1);
-            } else if (position >= 3) {
-
-                myViewPager.setCurrentItem(3);
-
-
-            }
-
-        }
-
-        @Override
-        public void onPageSelected(int arg0) {
-
-
-        }
-
-    }
-
 
     class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
 
@@ -506,5 +432,39 @@ public class MainActivity extends BaseActivity {
         }
 
 
+    }
+
+    public class MyAdapter extends FragmentPagerAdapter {
+
+        private List<String> list;
+
+        public MyAdapter(FragmentManager fm, List<String> list) {
+            super(fm);
+            this.list = list;
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            if (position != 0) {
+                return categaryFragment.newInstance(list.get(position));
+
+            }
+            return homeFragment.newInstance(list.get(position));
+        }
+
+        @Override
+        public int getCount() {
+            return list.size();
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return list.get(position);
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            super.destroyItem(container, position, object);
+        }
     }
 }

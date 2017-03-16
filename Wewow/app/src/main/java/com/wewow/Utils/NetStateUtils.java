@@ -1,4 +1,4 @@
-package com.wewow.Utils;
+package com.wewow.utils;
 
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;

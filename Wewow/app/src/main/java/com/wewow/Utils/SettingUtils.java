@@ -1,4 +1,4 @@
-package com.wewow.Utils;
+package com.wewow.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
