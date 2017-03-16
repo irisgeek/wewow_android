@@ -22,8 +22,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.wewow.Utils.CommonUtilities;
-import com.wewow.Utils.WebAPIHelper;
+import com.wewow.utils.CommonUtilities;
+import com.wewow.utils.WebAPIHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
