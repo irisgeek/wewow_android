@@ -37,4 +37,8 @@
     <string name="RelativeLoverOfLife">相关生活家</string>
     <string name="RelativeInstite">生活研究所</string>
 
+    <!--network unavilable-->
+    <string name="networkError">亲，网络不给力哦！</string>
+
+
 </resources>

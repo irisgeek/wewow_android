@@ -7,6 +7,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.widget.Toast;
+
+import com.wewow.R;
 
 /**
  * Created by iris on 17/3/6.
@@ -20,28 +23,22 @@ public class NetStateUtils extends BroadcastReceiver {
         NetworkInfo wifi = manager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         if(!gprs.isConnected() && !wifi.isConnected())
         {
-            AlertDialog.Builder ab = new AlertDialog.Builder(context);
-            ab.setMessage("网络连接断开，请检查网络");
-            ab.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    // TODO Auto-generated method stub
-                    dialog.dismiss();
-                }
-            }).show();
+            if(SettingUtils.get(context, CommonUtilities.NETWORK_STATE, false))
+            {
+//                Toast.makeText(context,context.getResources().getString(R.string.networkError),Toast.LENGTH_LONG).show();
+
+            }
+            SettingUtils.set(context, CommonUtilities.NETWORK_STATE, false);
+
 
         }
         else{
-            AlertDialog.Builder ab = new AlertDialog.Builder(context);
-            ab.setMessage("网络连接成功");
-            ab.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    // TODO Auto-generated method stub
-                    dialog.dismiss();
-                }
-            }).show();
-
+//
+            if(!SettingUtils.get(context,CommonUtilities.NETWORK_STATE,true))
+            {
+              //TO DO send blocked requests
+            }
+            SettingUtils.set(context,CommonUtilities.NETWORK_STATE,true);
         }
     }
 }

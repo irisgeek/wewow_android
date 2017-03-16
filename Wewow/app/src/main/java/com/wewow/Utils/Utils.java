@@ -1,12 +1,14 @@
 package com.wewow.utils;
 
 import android.content.Context;
+import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -196,4 +198,14 @@ public class Utils {
         }
         return versionName;
     }
+
+    public static void regitsterNetSateBroadcastReceiver(Context context)
+    {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        context.registerReceiver(new NetStateUtils(), filter);
+    }
 }
+

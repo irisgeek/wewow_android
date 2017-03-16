@@ -74,6 +74,7 @@ import com.wewow.fragment.categaryFragment;
 import com.wewow.fragment.homeFragment;
 import com.wewow.netTask.ITask;
 import com.wewow.utils.CommonUtilities;
+import com.wewow.utils.SettingUtils;
 import com.wewow.utils.Utils;
 import com.wewow.view.BounceScrollView;
 
@@ -86,6 +87,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -119,6 +121,8 @@ public class MainActivity extends BaseActivity {
     private MyAdapter adapter;
     private RelativeLayout loadingLayout;
     private Context context;
+    private boolean bannerRequestSend=false;
+    private boolean onPauseCalled=false;
 
 
     @Override
@@ -128,15 +132,52 @@ public class MainActivity extends BaseActivity {
 
         setContentView(R.layout.activity_main);
         context=this;
+        Utils.regitsterNetSateBroadcastReceiver(this);
         hideProgressBar();
 
 
         setUpNavigationTab();
-        getBannerInfoFromServer();
+        if(Utils.isNetworkAvailable(this)) {
+            getBannerInfoFromServer();
+        }
+        else
+        {
+            Toast.makeText(this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
+
+            SettingUtils.set(this, CommonUtilities.NETWORK_STATE, false);
+
+        }
 
 //        setUpScrollView();
 
 
+    }
+
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+
+        if(!Utils.isNetworkAvailable(this)&&onPauseCalled)
+        {
+            Toast.makeText(this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
+        }
+
+        //resendQuest
+        if(! bannerRequestSend&& Utils.isNetworkAvailable(this)&&onPauseCalled)
+        {
+
+            getBannerInfoFromServer();
+
+        }
+
+        onPauseCalled=false;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        onPauseCalled=true;
     }
 
     private void hideProgressBar() {
@@ -300,7 +341,7 @@ public class MainActivity extends BaseActivity {
 
         //set page change listener
         viewPager.setOnPageChangeListener(new GuidePageChangeListener());
-
+        bannerRequestSend=true;
     }
 
     private void getBannerInfoFromServer() {
