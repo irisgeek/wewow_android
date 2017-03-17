@@ -36,6 +36,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
+import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -67,9 +68,10 @@ public class BaseActivity extends ActionBarActivity {
     protected ListView drawerList;
     protected FrameLayout frameLayout;
     private Toolbar toolbar;
-    private int[] iconResIcon = {R.drawable.home, R.drawable.lover_of_life, R.drawable.life_institue, R.drawable.chat,
-            R.drawable.my_favorites, R.drawable.lover_of_life_subscribed, R.drawable.about,
-            R.drawable.share_menu, R.drawable.clear_cache, R.drawable.logout};
+    private int[] iconResIcon = {R.drawable.selector_btn_home, R.drawable.selector_btn_all_artists, R.drawable.selector_btn_all_institutes, R.drawable.selector_btn_chat,
+            R.drawable.selector_btn_favourite, R.drawable.selector_btn_lover_of_life_subscribed, R.drawable.selector_btn_life_about,
+            R.drawable.selector_btn_share, R.drawable.selector_btn_clear_cache, R.drawable.selector_btn_logout};
+    private NavigationView mainNavView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,8 +89,19 @@ public class BaseActivity extends ActionBarActivity {
         super.setContentView(drawerLayout);
 
         setUpNavigation();
+//        setUpNavigationView();
         setUpToolBar();
 
+    }
+
+    private void setUpNavigationView() {
+
+//        mainNavView=(NavigationView)findViewById(R.id.navigation_view);
+////        mainNavView.setItemTextColor(getResources().getColorStateList(R.color.nav_menu_item_color));
+////        mainNavView.setItemIconTintList(getResources().getColorStateList(R.color.nav_menu_item_color));
+
+        mainNavView.setItemTextColor(null);
+        mainNavView.setItemIconTintList(null);
     }
 
 
@@ -134,15 +147,25 @@ public class BaseActivity extends ActionBarActivity {
          * 登录名，token从UserUtils对象获取
          */
         TextView usertv = (TextView) this.findViewById(R.id.textViewUsername);
-        usertv.setText("Anonymous");
-        usertv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent();
-                i.setClass(BaseActivity.this, LoginActivity.class);
-                BaseActivity.this.startActivityForResult(i, LoginActivity.REQUEST_CODE_LOGIN);
-            }
-        });
+//        usertv.setText("Anonymous");
+
+        if(UserInfo.isUserLogged(this))
+        {
+
+            usertv.setText(UserInfo.getCurrentUser(this).getNickname());
+            TextView userSignature=(TextView)findViewById(R.id.textViewSignature);
+            userSignature.setText(UserInfo.getCurrentUser(this).getDesc());
+        }
+        else {
+            usertv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent i = new Intent();
+                    i.setClass(BaseActivity.this, LoginActivity.class);
+                    BaseActivity.this.startActivityForResult(i, LoginActivity.REQUEST_CODE_LOGIN);
+                }
+            });
+        }
     }
 
     @Override
@@ -152,6 +175,11 @@ public class BaseActivity extends ActionBarActivity {
         Log.d("BaseActivity", "login return");
         UserInfo ui = UserInfo.getCurrentUser(this);
         Log.d("BaseActivity", String.format("%s %s", ui.getOpen_id(), ui.getToken()));
+
+        TextView usertv = (TextView) this.findViewById(R.id.textViewUsername);
+        usertv.setText(UserInfo.getCurrentUser(this).getNickname());
+        TextView userSignature=(TextView)findViewById(R.id.textViewSignature);
+        userSignature.setText(UserInfo.getCurrentUser(this).getDesc());
     }
 
     private void setUpToolBar() {
@@ -170,6 +198,7 @@ public class BaseActivity extends ActionBarActivity {
     }
 
     private void selectItem(int position) {
+        drawerLayout.closeDrawer(GravityCompat.START);
         Toast.makeText(BaseActivity.this, planetTitles[position], Toast.LENGTH_SHORT).show();
     }
 
@@ -180,6 +209,7 @@ public class BaseActivity extends ActionBarActivity {
                 drawerLayout.openDrawer(GravityCompat.START);
                 return true;
             default:
+
                 break;
         }
         return super.onOptionsItemSelected(item);

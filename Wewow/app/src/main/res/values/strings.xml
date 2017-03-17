@@ -49,8 +49,22 @@
     <string name="dummy_ads_title">Nintendo Switch</string>
     <string name="dummy_ads_content">买买买 不买不是好任豚</string>
 
+    <!--slide menu items -->
 
+    <string name="home_page">首页</string>
+    <string name="all_artists">查看全部生活家</string>
+    <string name="all_institutes">查看全部生活研究所</string>
+    <string name="talk_to_wewow">跟唯物聊一聊</string>
 
+    <string name="my_favourite">我的收藏</string>
+    <string name="my_favourite_artists">我订阅的生活家</string>
+
+    <string name="about">关于唯物</string>
+    <string name="share">分享唯物</string>
+    <string name="clear_cache">清除缓存</string>
+    <string name="logout">退出登录</string>
+
+    <string name="login_to_see_more">登录来收藏和订阅你感兴趣的内容</string>
 
 
 </resources>

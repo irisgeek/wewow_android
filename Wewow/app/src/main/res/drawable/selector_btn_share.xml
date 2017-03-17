@@ -1,0 +1,13 @@
+<!-- Copyright (c) Microsoft. All rights reserved. -->
+
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- pressed state   -->
+    <item android:drawable="@drawable/share_b"
+        android:state_enabled="true"
+        android:state_pressed="true" />
+
+    <!-- normal state  -->
+    <item android:drawable="@drawable/share"
+        android:state_enabled="true" />
+</selector>

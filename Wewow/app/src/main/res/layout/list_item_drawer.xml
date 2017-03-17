@@ -16,7 +16,8 @@
         android:layout_height="wrap_content"
         android:textSize="14sp"
         android:text="首页"
-        android:textColor="#333631"
+        android:duplicateParentState="true"
+        android:textColor="@drawable/nav_menu_item_color"
         android:layout_gravity="left|center_vertical"
         android:layout_marginLeft="32dp"
         android:id="@+id/textViewMenuItem"/>
