@@ -41,4 +41,16 @@
     <string name="networkError">亲，网络不给力哦！</string>
 
 
+    <string name="newVersionAvailable">我们有了新版本！</string>
+
+    <string name="ignore">忽略</string>
+    <string name="download">去下载</string>
+
+    <string name="dummy_ads_title">Nintendo Switch</string>
+    <string name="dummy_ads_content">买买买 不买不是好任豚</string>
+
+
+
+
+
 </resources>
