@@ -349,6 +349,7 @@ public class LoginActivity extends ActionBarActivity {
                     ssohandler.authorize(new WeiboAuthListener() {
                         @Override
                         public void onComplete(Bundle bundle) {
+                            // todo parse login result and login
                             Toast.makeText(LoginActivity.this, R.string.login_weibo_ok, Toast.LENGTH_LONG).show();
                         }
 
