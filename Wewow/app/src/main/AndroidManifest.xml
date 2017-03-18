@@ -5,25 +5,15 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-
-        <meta-data
-            android:name="Weibo_AppKey"
-            android:value="3768596648" />
-        <meta-data
-            android:name="Weibo_AppSecret"
-            android:value="0225c1f9f4b1a9858f64d9a7e865ef23" />
-        <meta-data
-            android:name="Weibo_RedirectURL"
-            android:value="https://api.weibo.com/oauth2/default.html" />
-        <meta-data
-            android:name="Weibo_Scope"
-            android:value="email,direct_messages_read,direct_messages_write,friendships_groups_read,friendships_groups_write,statuses_to_me_read,follow_app_official_microblog,invitation_write" />
 
         <activity
             android:name="com.wewow.MainActivity"
