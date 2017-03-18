@@ -1,5 +1,7 @@
 package com.wewow;
 
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.util.Pair;
 
 import android.app.ProgressDialog;
@@ -22,8 +24,12 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.wewow.Utils.CommonUtilities;
-import com.wewow.Utils.WebAPIHelper;
+import com.sina.weibo.sdk.auth.AuthInfo;
+import com.sina.weibo.sdk.auth.WeiboAuthListener;
+import com.sina.weibo.sdk.auth.sso.SsoHandler;
+import com.sina.weibo.sdk.exception.WeiboException;
+import com.wewow.utils.CommonUtilities;
+import com.wewow.utils.WebAPIHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,9 +46,11 @@ public class LoginActivity extends ActionBarActivity {
     public static final int REQUEST_CODE_LOGIN = 1;
 
     public static final int RESPONSE_CODE_MOILE = 1;
-    public static final int RESPONSE_CODE_WECHAT= 2;
+    public static final int RESPONSE_CODE_WECHAT = 2;
     public static final int RESPONSE_CODE_WEIBO = 3;
     public static final int RESPONSE_CODE_HUAWEI = 4;
+
+    private static final String TAG = "LoginActivity";
 
     private Button btnSendVerifyCode;
     private TextView btnSendVerifyCode2;
@@ -123,6 +131,7 @@ public class LoginActivity extends ActionBarActivity {
 
         this.setupInputVerifyCode();
         this.setupLogin();
+        this.setupWeibo();
     }
 
     /**
@@ -321,6 +330,42 @@ public class LoginActivity extends ActionBarActivity {
         @Override
         protected void onPostExecute(byte[] result) {
             this.delegate.taskCompletionResult(result);
+        }
+    }
+
+    private void setupWeibo() {
+        try {
+            ApplicationInfo ai = this.getPackageManager().getApplicationInfo(this.getPackageName(), PackageManager.GET_META_DATA);
+            Bundle b = ai.metaData;
+            String appkey = b.getString("Weibo_AppKey");
+            //String appsecret = b.getString("Weibo_AppSecret");
+            String redirecturl = b.getString("Weibo_RedirectURL");
+            String scope = b.getString("Weibo_Scope");
+            AuthInfo authInfo = new AuthInfo(this, appkey, redirecturl, scope);
+            final SsoHandler ssohandler = new SsoHandler(this, authInfo);
+            this.imWeibo.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ssohandler.authorize(new WeiboAuthListener() {
+                        @Override
+                        public void onComplete(Bundle bundle) {
+                            Toast.makeText(LoginActivity.this, R.string.login_weibo_ok, Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onWeiboException(WeiboException e) {
+                            Toast.makeText(LoginActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onCancel() {
+                            Toast.makeText(LoginActivity.this, R.string.login_weibo_cancel, Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+            });
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(TAG, "Weibo configuration not found");
         }
     }
 }

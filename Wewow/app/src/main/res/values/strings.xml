@@ -3,6 +3,8 @@
 
 
     <string name="action_settings">Settings</string>
+
+    <!-- Login -->
     <string name="login_title">登录唯物</string>
     <string name="login_phone_country_code">+86</string>
     <string name="login_send_verify_code">发送验证码</string>
@@ -13,7 +15,8 @@
     <string name="login_wait_verify_countdown">%d秒后可再次尝试</string>
     <string name="login_gologin">登录</string>
     <string name="login_verifycode_sent">验证码已发送至%s</string>
-
+    <string name="login_weibo_cancel">微博登录已取消</string>
+    <string name="login_weibo_ok">微博登录已成功</string>
 
     <!-- Home page -->
     <!-- naivgation title -->
