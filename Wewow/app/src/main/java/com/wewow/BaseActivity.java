@@ -150,8 +150,12 @@ public class BaseActivity extends ActionBarActivity {
                                     int resultCode,
                                     Intent data) {
         Log.d("BaseActivity", "login return");
-        UserInfo ui = UserInfo.getCurrentUser(this);
-        Log.d("BaseActivity", String.format("%s %s", ui.getOpen_id(), ui.getToken()));
+        if (UserInfo.isUserLogged(this)) {
+            UserInfo ui = UserInfo.getCurrentUser(this);
+            Log.d("BaseActivity", String.format("%s %s", ui.getOpen_id(), ui.getToken()));
+        } else {
+            Log.d("BaseActivity", "Not logged");
+        }
     }
 
     private void setUpToolBar() {
