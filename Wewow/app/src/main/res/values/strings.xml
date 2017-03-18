@@ -17,6 +17,10 @@
     <string name="login_verifycode_sent">验证码已发送至%s</string>
     <string name="login_weibo_cancel">微博登录已取消</string>
     <string name="login_weibo_ok">微博登录已成功</string>
+    <string name="login_wechat_not_install">请先安装微信</string>
+    <string name="login_wechat_cancel">微信登录已取消</string>
+    <string name="login_wechat_ok">微信登录已成功</string>
+    <string name="login_wechat_deny">微信登录已被用户拒绝</string>
 
     <!-- Home page -->
     <!-- naivgation title -->

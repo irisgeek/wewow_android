@@ -1,5 +1,6 @@
 package com.wewow;
 
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.util.Pair;
@@ -28,6 +29,12 @@ import com.sina.weibo.sdk.auth.AuthInfo;
 import com.sina.weibo.sdk.auth.WeiboAuthListener;
 import com.sina.weibo.sdk.auth.sso.SsoHandler;
 import com.sina.weibo.sdk.exception.WeiboException;
+import com.tencent.mm.opensdk.modelbase.BaseReq;
+import com.tencent.mm.opensdk.modelbase.BaseResp;
+import com.tencent.mm.opensdk.openapi.IWXAPI;
+import com.tencent.mm.opensdk.openapi.IWXAPIEventHandler;
+import com.tencent.mm.opensdk.openapi.WXAPIFactory;
+import com.tencent.mm.opensdk.modelmsg.SendAuth;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.WebAPIHelper;
 
@@ -41,7 +48,7 @@ import java.util.ArrayList;
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends ActionBarActivity {
+public class LoginActivity extends ActionBarActivity implements IWXAPIEventHandler {
 
     public static final int REQUEST_CODE_LOGIN = 1;
 
@@ -132,6 +139,7 @@ public class LoginActivity extends ActionBarActivity {
         this.setupInputVerifyCode();
         this.setupLogin();
         this.setupWeibo();
+        this.setupWechat();
     }
 
     /**
@@ -334,39 +342,70 @@ public class LoginActivity extends ActionBarActivity {
     }
 
     private void setupWeibo() {
-        try {
-            ApplicationInfo ai = this.getPackageManager().getApplicationInfo(this.getPackageName(), PackageManager.GET_META_DATA);
-            Bundle b = ai.metaData;
-            String appkey = b.getString("Weibo_AppKey");
-            //String appsecret = b.getString("Weibo_AppSecret");
-            String redirecturl = b.getString("Weibo_RedirectURL");
-            String scope = b.getString("Weibo_Scope");
-            AuthInfo authInfo = new AuthInfo(this, appkey, redirecturl, scope);
-            final SsoHandler ssohandler = new SsoHandler(this, authInfo);
-            this.imWeibo.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    ssohandler.authorize(new WeiboAuthListener() {
-                        @Override
-                        public void onComplete(Bundle bundle) {
-                            // todo parse login result and login
-                            Toast.makeText(LoginActivity.this, R.string.login_weibo_ok, Toast.LENGTH_LONG).show();
-                        }
+        AuthInfo authInfo = new AuthInfo(this, CommonUtilities.Weibo_AppKey, CommonUtilities.Weibo_AppSecret, CommonUtilities.Weibo_Redirect_URL);
+        final SsoHandler ssohandler = new SsoHandler(this, authInfo);
+        this.imWeibo.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ssohandler.authorize(new WeiboAuthListener() {
+                    @Override
+                    public void onComplete(Bundle bundle) {
+                        // todo parse login result and login
+                        Toast.makeText(LoginActivity.this, R.string.login_weibo_ok, Toast.LENGTH_LONG).show();
+                    }
 
-                        @Override
-                        public void onWeiboException(WeiboException e) {
-                            Toast.makeText(LoginActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-                        }
+                    @Override
+                    public void onWeiboException(WeiboException e) {
+                        Toast.makeText(LoginActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
 
-                        @Override
-                        public void onCancel() {
-                            Toast.makeText(LoginActivity.this, R.string.login_weibo_cancel, Toast.LENGTH_LONG).show();
-                        }
-                    });
+                    @Override
+                    public void onCancel() {
+                        Toast.makeText(LoginActivity.this, R.string.login_weibo_cancel, Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        });
+    }
+
+    private void setupWechat() {
+        this.imWechat.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                IWXAPI api = WXAPIFactory.createWXAPI(LoginActivity.this, CommonUtilities.WX_AppID, false);
+                api.registerApp(CommonUtilities.WX_AppID);
+                if (!api.isWXAppInstalled()) {
+                    Toast.makeText(LoginActivity.this, R.string.login_wechat_not_install, Toast.LENGTH_LONG).show();
+                    return;
                 }
-            });
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.e(TAG, "Weibo configuration not found");
+                final SendAuth.Req req = new SendAuth.Req();
+                req.scope = "snsapi_userinfo";
+                req.state = LoginActivity.this.getPackageName();
+                api.sendReq(req);
+            }
+        });
+    }
+
+    @Override
+    public void onReq(BaseReq baseReq) {
+        Log.d(TAG, String.format("WX req"));
+    }
+
+    @Override
+    public void onResp(BaseResp baseResp) {
+        Log.d(TAG, String.format("WX resp"));
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(TAG, String.format("onActivityResult: %d", requestCode));
+        switch (requestCode) {
+            case 0x101: {
+                break;
+            }
+            default:
+                super.onActivityResult(requestCode, resultCode, data);
+                break;
         }
     }
 }
