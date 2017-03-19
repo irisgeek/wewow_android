@@ -342,7 +342,7 @@ public class LoginActivity extends ActionBarActivity implements IWXAPIEventHandl
     }
 
     private void setupWeibo() {
-        AuthInfo authInfo = new AuthInfo(this, CommonUtilities.Weibo_AppKey, CommonUtilities.Weibo_AppSecret, CommonUtilities.Weibo_Redirect_URL);
+        AuthInfo authInfo = new AuthInfo(this, CommonUtilities.Weibo_AppKey, CommonUtilities.Weibo_Redirect_URL, CommonUtilities.Weibo_Scope);
         final SsoHandler ssohandler = new SsoHandler(this, authInfo);
         this.imWeibo.setOnClickListener(new OnClickListener() {
             @Override
