@@ -67,4 +67,7 @@
     <string name="login_to_see_more">登录来收藏和订阅你感兴趣的内容</string>
 
 
+    <string name="search_hint">输入你感兴趣的内容</string>
+
+
 </resources>

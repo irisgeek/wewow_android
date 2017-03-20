@@ -3,12 +3,18 @@
     android:layout_width="fill_parent"
     android:layout_height="1100dp"
     android:orientation="vertical">
+    <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/swipe_refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
     <LinearLayout
+        android:id="@+id/layoutHome"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#f7f7f7"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
 
 
         <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
@@ -294,4 +300,5 @@
             android:divider="@android:color/transparent"
             android:dividerHeight="12dp" />
     </LinearLayout>
+    </android.support.v4.widget.SwipeRefreshLayout>
 </LinearLayout>

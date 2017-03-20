@@ -32,18 +32,14 @@
 //
 package com.wewow;
 
-import android.app.ActionBar;
+import android.app.SearchManager;
 import android.content.Context;
-import android.os.Parcelable;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -52,31 +48,28 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
-import android.widget.BaseAdapter;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
-import android.widget.Scroller;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.google.gson.Gson;
-import com.wewow.R;
+import com.wewow.adapter.FragmentAdapter;
 import com.wewow.dto.Banner;
-import com.wewow.fragment.categaryFragment;
-import com.wewow.fragment.homeFragment;
+import com.wewow.dto.collectionCategory;
 import com.wewow.netTask.ITask;
 import com.wewow.utils.CommonUtilities;
+import com.wewow.utils.FileCacheUtil;
 import com.wewow.utils.SettingUtils;
 import com.wewow.utils.Utils;
-import com.wewow.view.BounceScrollView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -84,15 +77,11 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Set;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
-import retrofit.converter.GsonConverter;
 
 /**
  * Created by iris on 17/3/3.
@@ -118,10 +107,9 @@ public class MainActivity extends BaseActivity {
     private String[] dummyReadCount = {"8121", "7231"};
     private String[] dummyCollectionCount = {"1203", "1232"};
     private TabLayout mTabLayout;
-    private MyAdapter adapter;
-    private RelativeLayout loadingLayout;
+    private FragmentAdapter adapter;
     private Context context;
-    private boolean bannerRequestSend=false;
+
     private boolean onPauseCalled=false;
 
 
@@ -131,20 +119,72 @@ public class MainActivity extends BaseActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_main);
-        context=this;
+        context = this;
+        viewPager = (ViewPager) findViewById(R.id.viewPager);
         Utils.regitsterNetSateBroadcastReceiver(this);
-        hideProgressBar();
 
 
-        setUpNavigationTab();
-        if(Utils.isNetworkAvailable(this)) {
-            getBannerInfoFromServer();
-        }
-        else
-        {
+
+//        setUpNavigationTab();
+        if (Utils.isNetworkAvailable(this)) {
+            //if banner data never cached or outdated
+            if (FileCacheUtil.isCacheDataFailure(CommonUtilities.CACHE_FILE_BANNER, this, 15 * 60 * 60 * 1000)) {
+                getBannerInfoFromServer();
+            } else {
+                String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_BANNER);
+                List<Banner> banners = new ArrayList<Banner>();
+                try {
+                    banners = parseBannersFromString(fileContent);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                setUpViewPagerBanner(banners);
+
+            }
+
+            // if tab title never cached or outdated
+            if (FileCacheUtil.isCacheDataFailure(CommonUtilities.CACHE_FILE_TAB_TITLE, this, 15 * 60 * 60 * 1000)) {
+                getTabTitlesFromServer();
+            } else {
+                String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_TAB_TITLE);
+                List<collectionCategory> categories = new ArrayList<collectionCategory>();
+                try {
+                    categories = parseCategoriesFromString(fileContent);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                setUpNavigationTab(categories);
+
+            }
+
+
+        } else {
             Toast.makeText(this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
 
             SettingUtils.set(this, CommonUtilities.NETWORK_STATE, false);
+            //if banner data cached
+            if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_BANNER, this)) {
+                String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_BANNER);
+                List<Banner> banners = new ArrayList<Banner>();
+                try {
+                    banners = parseBannersFromString(fileContent);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                setUpViewPagerBanner(banners);
+            }
+
+            //if tab title cached
+            if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_TAB_TITLE, this)) {
+                String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_TAB_TITLE);
+                List<collectionCategory> categories = new ArrayList<collectionCategory>();
+                try {
+                    categories = parseCategoriesFromString(fileContent);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                setUpNavigationTab(categories);
+            }
 
         }
 
@@ -153,67 +193,79 @@ public class MainActivity extends BaseActivity {
 
     }
 
+    private List<collectionCategory> parseCategoriesFromString(String fileContent)  throws JSONException{
+
+
+        List<collectionCategory> categories = new ArrayList<collectionCategory>();
+        JSONObject jsonObject = new JSONObject(fileContent);
+        JSONArray results = jsonObject.getJSONObject("result").getJSONObject("data").getJSONArray("collection_category_list");
+        for (int i = 0; i < results.length(); i++) {
+            collectionCategory category = new collectionCategory();
+            JSONObject result = results.getJSONObject(i);
+            category.setId(result.getString("id"));
+            category.setTitle(result.getString("title"));
+            categories.add(category);
+        }
+        return categories;
+    }
+
+
+
     @Override
     protected void onResume() {
 
         super.onResume();
 
-        if(!Utils.isNetworkAvailable(this)&&onPauseCalled)
-        {
+        if (!Utils.isNetworkAvailable(this) && onPauseCalled) {
             Toast.makeText(this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
         }
 
         //resendQuest
-        if(! bannerRequestSend&& Utils.isNetworkAvailable(this)&&onPauseCalled)
-        {
+        if (!FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_TAB_TITLE,this)&& Utils.isNetworkAvailable(this) && onPauseCalled) {
+
+            getTabTitlesFromServer();
+
+        }
+
+        if (!FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_BANNER,this)&& Utils.isNetworkAvailable(this) && onPauseCalled) {
 
             getBannerInfoFromServer();
 
         }
 
-        onPauseCalled=false;
+        onPauseCalled = false;
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        onPauseCalled=true;
-    }
-
-    private void hideProgressBar() {
-        loadingLayout = (RelativeLayout) findViewById(R.id.loading);
-        loadingLayout.setVisibility(View.GONE);
-    }
-
-    private void showProgressBar() {
-        loadingLayout = (RelativeLayout) findViewById(R.id.loading);
-        loadingLayout.setVisibility(View.VISIBLE);
+        onPauseCalled = true;
     }
 
 
-    private void setUpNavigationTab() {
+    private void setUpNavigationTab(List<collectionCategory> titles) {
         mTabLayout = (TabLayout) findViewById(R.id.tabs);
-        List<String> titles = new ArrayList<>();
-        titles.add(getResources().getString(R.string.home));
-        titles.add(getResources().getString(R.string.test1));
-        titles.add(getResources().getString(R.string.test2));
-        titles.add(getResources().getString(R.string.test3));
-        titles.add(getResources().getString(R.string.test4));
 
-
+        mTabLayout.addTab(mTabLayout.newTab().setText(getResources().getString(R.string.home_page)));
         for (int i = 0; i < titles.size(); i++) {
-            mTabLayout.addTab(mTabLayout.newTab().setText(titles.get(i)));
+            mTabLayout.addTab(mTabLayout.newTab().setText(titles.get(i).getTitle()));
         }
 
-        setUpTabs(titles);
+        ArrayList<String> list = new ArrayList<String>();
+        list.add(getResources().getString(R.string.home_page));
+        for (collectionCategory category : titles) {
+            list.add(category.getTitle());
+        }
+
+        setUpTabs(list);
 
     }
 
     private void setUpTabs(List<String> titles) {
-        viewPager = (ViewPager) findViewById(R.id.viewPager);
+
 
         ViewPager viewPagerTabs = (ViewPager) findViewById(R.id.pagerTabs);
-        adapter = new MyAdapter(getSupportFragmentManager(), titles);
+        adapter = new FragmentAdapter(getSupportFragmentManager(), titles);
         viewPagerTabs.setAdapter(adapter);
         viewPagerTabs.setOffscreenPageLimit(5);
         mTabLayout.setupWithViewPager(viewPagerTabs);
@@ -265,11 +317,10 @@ public class MainActivity extends BaseActivity {
     }
 
 
-    private void setUpViewPagerBanner(List<Banner>  banners) {
+    private void setUpViewPagerBanner(List<Banner> banners) {
 
 
         group = (ViewGroup) findViewById(R.id.viewGroup);
-
 
 
         LayoutInflater inflater = getLayoutInflater();
@@ -278,13 +329,13 @@ public class MainActivity extends BaseActivity {
         for (int i = 0; i < banners.size(); i++) {
 
             View view = inflater.inflate(R.layout.banner_item, null);
-            ImageView imageBanner=(ImageView)view.findViewById(R.id.imageViewIcon);
-            TextView textViewBannerTitle=(TextView)view.findViewById(R.id.textViewBannerTitle);
+            ImageView imageBanner = (ImageView) view.findViewById(R.id.imageViewIcon);
+            TextView textViewBannerTitle = (TextView) view.findViewById(R.id.textViewBannerTitle);
             textViewBannerTitle.setText(banners.get(i).getTitle());
             Glide.with(context)
                     .load(banners.get(i).getImage())
                     .placeholder(R.drawable.banner_loading_spinner)
-                    .crossFade()
+                    .crossFade(300)
                     .into(imageBanner);
             pageview.add(view);
         }
@@ -336,46 +387,71 @@ public class MainActivity extends BaseActivity {
 
         };
 
+
         //set adapter
         viewPager.setAdapter(mPagerAdapter);
 
         //set page change listener
         viewPager.setOnPageChangeListener(new GuidePageChangeListener());
-        bannerRequestSend=true;
+
     }
 
-    private void getBannerInfoFromServer() {
-        showProgressBar();
+    private void getTabTitlesFromServer() {
+
         ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
-     iTask.banner(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), new Callback<JSONObject>() {
+        iTask.indexCollectionCategorys(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), new Callback<JSONObject>() {
 
             @Override
             public void success(JSONObject object, Response response) {
-               List<Banner> banners=new ArrayList<Banner>();
+                List<collectionCategory> categories = new ArrayList<collectionCategory>();
 
                 try {
                     String realData = Utils.convertStreamToString(response.getBody().in());
-                    if(!realData.contains(CommonUtilities.SUCCESS))
-                    {
-                        Toast.makeText(context,"Error",Toast.LENGTH_SHORT).show();
+                    if (!realData.contains(CommonUtilities.SUCCESS)) {
+                        Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
+
+                    } else {
+                        categories = parseCategoriesFromString(realData);
+                        FileCacheUtil.setCache(realData, MainActivity.this, CommonUtilities.CACHE_FILE_TAB_TITLE, 0);
+
+                        setUpNavigationTab(categories);
 
                     }
-                    else
-                    {
-                        JSONObject jsonObject=new JSONObject(realData);
-                        JSONArray results = jsonObject.getJSONObject("result").getJSONArray("data");
-                        for (int i = 0; i < results.length(); i++) {
-                            Banner banner=new Banner();
-                            JSONObject result = results.getJSONObject(i);
-                            System.out.println(result.getString("image")+" "+result.getString("type")+" "
-                                    +result.getString("id")+" "+result.getString("title"));
-                            banner.setId(result.getString("id"));
-                            banner.setImage(result.getString("image"));
-                            banner.setType(result.getString("type"));
-                            banner.setTitle(result.getString("title"));
-                            banners.add(banner);
-                        }
-                        hideProgressBar();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.i("MainActivity", "request banner failed: " + error.toString());
+
+            }
+        });
+
+    }
+    private void getBannerInfoFromServer() {
+
+        ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
+        iTask.banner(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), new Callback<JSONObject>() {
+
+            @Override
+            public void success(JSONObject object, Response response) {
+                List<Banner> banners = new ArrayList<Banner>();
+
+                try {
+                    String realData = Utils.convertStreamToString(response.getBody().in());
+                    if (!realData.contains(CommonUtilities.SUCCESS)) {
+                        Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
+
+                    } else {
+                        banners = parseBannersFromString(realData);
+                        FileCacheUtil.setCache(realData, MainActivity.this, CommonUtilities.CACHE_FILE_BANNER, 0);
+
                         setUpViewPagerBanner(banners);
 
                     }
@@ -396,12 +472,73 @@ public class MainActivity extends BaseActivity {
         });
     }
 
+    private List<Banner> parseBannersFromString(String realData) throws JSONException {
+        List<Banner> banners = new ArrayList<Banner>();
+        JSONObject jsonObject = new JSONObject(realData);
+        JSONArray results = jsonObject.getJSONObject("result").getJSONArray("data");
+        for (int i = 0; i < results.length(); i++) {
+            Banner banner = new Banner();
+            JSONObject result = results.getJSONObject(i);
+            System.out.println(result.getString("image") + " " + result.getString("type") + " "
+                    + result.getString("id") + " " + result.getString("title"));
+            banner.setId(result.getString("id"));
+            banner.setImage(result.getString("image"));
+            banner.setType(result.getString("type"));
+            banner.setTitle(result.getString("title"));
+            banners.add(banner);
+        }
+        return banners;
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.toolbar, menu);
         MenuItem menuItem = menu.findItem(R.id.search);
         menuItem.setVisible(true);
+
+        SearchManager searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        final SearchView searchView =
+                (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setQueryHint(getResources().getString(R.string.search_hint));
+
+        ( (ImageView)searchView.findViewById(android.support.v7.appcompat.R.id.search_button)).setImageResource(R.drawable.selector_btn_search);
+
+
+        final String [] testStrings = getResources().getStringArray(R.array.test_array);
+//        int completeTextId = searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
+//        AutoCompleteTextView completeText = (AutoCompleteTextView) searchView
+//                .findViewById(completeTextId) ;
+
+
+        AutoCompleteTextView completeText = (SearchView.SearchAutoComplete) searchView.findViewById(R.id.search_src_text);
+        completeText.setAdapter(new ArrayAdapter<>(this,R.layout.list_item_search,R.id.text,testStrings));
+        completeText.setTextColor(getResources().getColor(R.color.search_text_view_color));
+        completeText.setHintTextColor(getResources().getColor(R.color.search_text_view_color));
+        completeText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                searchView.setQuery(testStrings[position],true);
+            }
+        });
+
+        completeText.setThreshold(0);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                Toast.makeText(MainActivity.this, query, Toast.LENGTH_SHORT).show();
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
+        searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getComponentName()));
         return true;
     }
 
@@ -475,37 +612,19 @@ public class MainActivity extends BaseActivity {
 
     }
 
-    public class MyAdapter extends FragmentPagerAdapter {
+    private ViewPager.OnPageChangeListener mPageChangeListener = new ViewPager.OnPageChangeListener() {
+        @Override
+        public void onPageSelected(int position) {
 
-        private List<String> list;
 
-        public MyAdapter(FragmentManager fm, List<String> list) {
-            super(fm);
-            this.list = list;
+            adapter.notifyDataSetChanged();
         }
 
         @Override
-        public Fragment getItem(int position) {
-            if (position != 0) {
-                return categaryFragment.newInstance(list.get(position));
-
-            }
-            return homeFragment.newInstance(list.get(position));
-        }
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
 
         @Override
-        public int getCount() {
-            return list.size();
-        }
+        public void onPageScrollStateChanged(int state) {}
+    };
 
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return list.get(position);
-        }
-
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-            super.destroyItem(container, position, object);
-        }
-    }
 }

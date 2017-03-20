@@ -1,14 +1,19 @@
 package com.wewow.fragment;
 
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -22,8 +27,7 @@ import java.util.List;
 /**
  * Created by iris on 17/3/13.
  */
-public class homeFragment  extends Fragment {
-
+public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
 
     private String[] dummyVols = {"vol.79", "vol.64"};
@@ -33,19 +37,19 @@ public class homeFragment  extends Fragment {
     private String[] dummyCollectionCount = {"1203", "1232"};
     private ListView listViewInstituteRecommended;
     private ViewPager viewPagerLoverOfLife;
-    
+    private SwipeRefreshLayout swipeRefreshLayout;
 
 
     public homeFragment() {
 
     }
 
-    public static homeFragment newInstance(String text){
+    public static homeFragment newInstance(String text) {
         Bundle bundle = new Bundle();
-        bundle.putString("text",text);
+        bundle.putString("text", text);
         homeFragment blankFragment = new homeFragment();
         blankFragment.setArguments(bundle);
-        return  blankFragment;
+        return blankFragment;
     }
 
     @Override
@@ -65,13 +69,47 @@ public class homeFragment  extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setUpViewPagerLoverOfLife();
-        setUpListViewInstituteRecommend();
+        swipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(this);
+
+        swipeRefreshLayout.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        swipeRefreshLayout.setRefreshing(true);
+
+                                        new Handler().postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+
+                                                swipeRefreshLayout.setRefreshing(false);
+                                                setUpViewPagerLoverOfLife();
+                                                setUpListViewInstituteRecommend();
+
+                                                //dummy effect
+                                                LinearLayout linearLayout=(LinearLayout)getActivity().findViewById(R.id.layoutHome);
+                                                linearLayout.setVisibility(View.VISIBLE);
+
+                                                startAnimation();
+                                            }
+                                        }, 3000);
+
+                                    }
+                                }
+        );
 
 
     }
 
-    private void setUpViewPagerLoverOfLife() {
+    private void startAnimation() {
+
+        Animation animation = new TranslateAnimation(0, 0, 300, 300);
+        animation.setDuration(1500);
+        animation.setRepeatCount(1);//动画的重复次数
+        animation.setFillAfter(true);//设置为true，动画转化结束后被应用
+//        imageView1.startAnimation(animation);//开始动画
+    }
+
+    public void setUpViewPagerLoverOfLife() {
 
         //blank view for bounce effect
         View left = new View(getActivity());
@@ -92,19 +130,21 @@ public class homeFragment  extends Fragment {
         MyPagerAdapter myAdapter = new MyPagerAdapter();
 
         myAdapter.setList(mListViews);
-        viewPagerLoverOfLife = (ViewPager)getActivity().findViewById(R.id.viewpagerLayout);
+        viewPagerLoverOfLife = (ViewPager) getActivity().findViewById(R.id.viewpagerLayout);
 
         viewPagerLoverOfLife.setAdapter(myAdapter);
         viewPagerLoverOfLife.setCurrentItem(1);
         viewPagerLoverOfLife.setOnPageChangeListener(new BouncePageChangeListener(
                 viewPagerLoverOfLife, mListViews));
         viewPagerLoverOfLife.setPageMargin(getResources().getDimensionPixelSize(R.dimen.life_lover_recommended_page_margin));
+        myAdapter.notifyDataSetChanged();
 
 
     }
-    private void setUpListViewInstituteRecommend() {
 
-       listViewInstituteRecommended = (ListView) getActivity().findViewById(R.id.listViewSelectedInstitute);
+    public void setUpListViewInstituteRecommend() {
+
+        listViewInstituteRecommended = (ListView) getActivity().findViewById(R.id.listViewSelectedInstitute);
 
         ArrayList<HashMap<String, Object>> listItem = new ArrayList<HashMap<String, Object>>();
 
@@ -130,12 +170,27 @@ public class homeFragment  extends Fragment {
                 new int[]{R.id.textViewNum, R.id.textViewTitle, R.id.textViewRead, R.id.textViewCollection}
         );
         listViewInstituteRecommended.setAdapter(listItemAdapter);
+        listItemAdapter.notifyDataSetChanged();
 
         //fix bug created by scrollview
         fixListViewHeight(listViewInstituteRecommended);
-
+        swipeRefreshLayout.setRefreshing(false);
     }
 
+    @Override
+    public void onRefresh() {
+
+        setUpViewPagerLoverOfLife();
+        setUpListViewInstituteRecommend();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        }, 6000);
+
+    }
 
 
     private class BouncePageChangeListener implements ViewPager.OnPageChangeListener {

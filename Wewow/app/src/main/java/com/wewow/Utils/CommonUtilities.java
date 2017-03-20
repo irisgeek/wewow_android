@@ -11,5 +11,11 @@ public class CommonUtilities {
 
     public static final String NETWORK_STATE="network_state";
 
+    // cache_time :1 day
+    public static final long CACHE_TIME=24*60*60*1000;
+
+    public static final String CACHE_FILE_BANNER="cache_file_banner";
+    public static final String CACHE_FILE_TAB_TITLE="cache_file_tab_title";
+
 
 }

@@ -4,7 +4,7 @@
 
     <!-- pressed state   -->
     <item android:drawable="@drawable/search_b"
-        android:state_enabled="true"
+
         android:state_pressed="true" />
 
     <!-- normal state  -->

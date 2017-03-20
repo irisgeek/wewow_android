@@ -13,4 +13,11 @@ import retrofit.http.Header;
 public interface ITask {
     @GET("/banner")
     void banner(@Header("User-Agent") String headerContentType, Callback<JSONObject> callback);
+
+    @GET("/index_collection_categorys")
+    void indexCollectionCategorys(@Header("User-Agent") String headerContentType, Callback<JSONObject> callback);
+
+    @GET("/new")
+    void latestInstite(@Header("User-Agent") String headerContentType, Callback<JSONObject> callback);
+
 }

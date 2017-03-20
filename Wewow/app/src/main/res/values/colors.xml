@@ -7,6 +7,8 @@
     <color name="font_color">#333631</color>
     <color name="menu_checked_color">#69b076</color>
 
+    <color name="search_text_view_color">#ffffff</color>
+
 
 
     <integer-array name="loading_colors">

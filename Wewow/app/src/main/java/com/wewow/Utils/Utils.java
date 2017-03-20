@@ -20,6 +20,7 @@ import android.widget.ListView;
 import com.squareup.okhttp.OkHttpClient;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -101,7 +102,6 @@ public class Utils {
     }
 
 
-
     public static String MD5(String s) {
         char hexDigits[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
         try {
@@ -146,11 +146,11 @@ public class Utils {
     public static String getPath(Context context, Uri uri) {
 
         if ("content".equalsIgnoreCase(uri.getScheme())) {
-            String[] projection = { "_data" };
+            String[] projection = {"_data"};
             Cursor cursor = null;
 
             try {
-                cursor = context.getContentResolver().query(uri, projection,null, null, null);
+                cursor = context.getContentResolver().query(uri, projection, null, null, null);
                 int column_index = cursor.getColumnIndexOrThrow("_data");
                 if (cursor.moveToFirst()) {
                     return cursor.getString(column_index);
@@ -158,9 +158,7 @@ public class Utils {
             } catch (Exception e) {
                 // Eat it
             }
-        }
-
-        else if ("file".equalsIgnoreCase(uri.getScheme())) {
+        } else if ("file".equalsIgnoreCase(uri.getScheme())) {
             return uri.getPath();
         }
 
@@ -199,13 +197,13 @@ public class Utils {
         return versionName;
     }
 
-    public static void regitsterNetSateBroadcastReceiver(Context context)
-    {
+    public static void regitsterNetSateBroadcastReceiver(Context context) {
         IntentFilter filter = new IntentFilter();
         filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
         filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         context.registerReceiver(new NetStateUtils(), filter);
     }
+
 }
 
