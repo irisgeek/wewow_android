@@ -8,15 +8,21 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.Interpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 
 import com.wewow.R;
 
@@ -38,6 +44,11 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private ListView listViewInstituteRecommended;
     private ViewPager viewPagerLoverOfLife;
     private SwipeRefreshLayout swipeRefreshLayout;
+
+    private TextView textViewHotArtist;
+    private TextView textViewLatest;
+    private TextView textViewRecommendedInstitute;
+    private CardView viewLatest;
 
 
     public homeFragment() {
@@ -69,6 +80,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        initData();
         swipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(this);
 
@@ -86,12 +98,12 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                                                 setUpListViewInstituteRecommend();
 
                                                 //dummy effect
-                                                LinearLayout linearLayout=(LinearLayout)getActivity().findViewById(R.id.layoutHome);
+                                                LinearLayout linearLayout = (LinearLayout) getActivity().findViewById(R.id.layoutHome);
                                                 linearLayout.setVisibility(View.VISIBLE);
 
                                                 startAnimation();
                                             }
-                                        }, 3000);
+                                        }, 2000);
 
                                     }
                                 }
@@ -101,12 +113,59 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     }
 
     private void startAnimation() {
+        textViewHotArtist.startAnimation(moveToViewLocation(0));
+        textViewLatest.startAnimation(moveToViewLocation(0));
+        textViewRecommendedInstitute.startAnimation(moveToViewLocation(0));
 
-        Animation animation = new TranslateAnimation(0, 0, 300, 300);
-        animation.setDuration(1500);
-        animation.setRepeatCount(1);//动画的重复次数
-        animation.setFillAfter(true);//设置为true，动画转化结束后被应用
-//        imageView1.startAnimation(animation);//开始动画
+        viewLatest.startAnimation(contentsMoveToViewLocation(100));
+        viewPagerLoverOfLife.startAnimation(contentsMoveToViewLocation(100));
+        listViewInstituteRecommended.startAnimation(contentsMoveToViewLocation(100));
+    }
+
+    private void initData() {
+
+        textViewHotArtist = (TextView) getActivity().findViewById(R.id.textViewPopularArtist);
+        textViewLatest = (TextView) getActivity().findViewById(R.id.textViewLatest);
+        textViewRecommendedInstitute = (TextView) getActivity().findViewById(R.id.textViewSelectedInstitute);
+        viewLatest = (CardView) getActivity().findViewById(R.id.cardViewLatest);
+
+
+    }
+
+
+    public static AnimationSet moveToViewLocation(long startOff) {
+        TranslateAnimation mHiddenAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,
+                Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
+                1.0f, Animation.RELATIVE_TO_SELF, 0.0f);
+
+        AlphaAnimation alpha = new AlphaAnimation(0.0f, 1.0f);
+
+        AnimationSet set= new AnimationSet(true);
+        set.addAnimation(mHiddenAction);
+        set.addAnimation(alpha);
+        set.setDuration(300);
+        set.setStartOffset(startOff);
+        set.setFillAfter(true);
+        set.setInterpolator(new AccelerateInterpolator());
+
+
+        return set;
+    }
+
+    public static AnimationSet contentsMoveToViewLocation(long startOff) {
+        TranslateAnimation mHiddenAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,
+                Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
+                1.0f, Animation.RELATIVE_TO_SELF, 0.0f);
+        AlphaAnimation alpha = new AlphaAnimation(0.0f, 1.0f);
+        AnimationSet set= new AnimationSet(true);
+
+        set.addAnimation(mHiddenAction);
+        set.addAnimation(alpha);
+        set.setStartOffset(startOff);
+        set.setDuration(200);
+        set.setFillAfter(true);
+        set.setInterpolator(new AccelerateInterpolator());
+        return set;
     }
 
     public void setUpViewPagerLoverOfLife() {

@@ -110,7 +110,7 @@ public class MainActivity extends BaseActivity {
     private FragmentAdapter adapter;
     private Context context;
 
-    private boolean onPauseCalled=false;
+    private boolean onPauseCalled = false;
 
 
     @Override
@@ -122,7 +122,6 @@ public class MainActivity extends BaseActivity {
         context = this;
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         Utils.regitsterNetSateBroadcastReceiver(this);
-
 
 
 //        setUpNavigationTab();
@@ -188,12 +187,13 @@ public class MainActivity extends BaseActivity {
 
         }
 
+
 //        setUpScrollView();
 
 
     }
 
-    private List<collectionCategory> parseCategoriesFromString(String fileContent)  throws JSONException{
+    private List<collectionCategory> parseCategoriesFromString(String fileContent) throws JSONException {
 
 
         List<collectionCategory> categories = new ArrayList<collectionCategory>();
@@ -210,7 +210,6 @@ public class MainActivity extends BaseActivity {
     }
 
 
-
     @Override
     protected void onResume() {
 
@@ -221,13 +220,13 @@ public class MainActivity extends BaseActivity {
         }
 
         //resendQuest
-        if (!FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_TAB_TITLE,this)&& Utils.isNetworkAvailable(this) && onPauseCalled) {
+        if (!FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_TAB_TITLE, this) && Utils.isNetworkAvailable(this) && onPauseCalled) {
 
             getTabTitlesFromServer();
 
         }
 
-        if (!FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_BANNER,this)&& Utils.isNetworkAvailable(this) && onPauseCalled) {
+        if (!FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_BANNER, this) && Utils.isNetworkAvailable(this) && onPauseCalled) {
 
             getBannerInfoFromServer();
 
@@ -246,13 +245,28 @@ public class MainActivity extends BaseActivity {
     private void setUpNavigationTab(List<collectionCategory> titles) {
         mTabLayout = (TabLayout) findViewById(R.id.tabs);
 
-        mTabLayout.addTab(mTabLayout.newTab().setText(getResources().getString(R.string.home_page)));
+        mTabLayout.addTab(mTabLayout.newTab().setText(" " + getResources().getString(R.string.home_page) + " "));
         for (int i = 0; i < titles.size(); i++) {
             mTabLayout.addTab(mTabLayout.newTab().setText(titles.get(i).getTitle()));
         }
 
+
+//        mTabLayout.addTab(mTabLayout.newTab().setText(" " + getResources().getString(R.string.home)));
+//
+//        mTabLayout.addTab(mTabLayout.newTab().setText(" " + getResources().getString(R.string.test1)));
+//        mTabLayout.addTab(mTabLayout.newTab().setText(" " + getResources().getString(R.string.test2)));
+//
+//        mTabLayout.addTab(mTabLayout.newTab().setText(" " + getResources().getString(R.string.test3)));
+//        mTabLayout.addTab(mTabLayout.newTab().setText(" " + getResources().getString(R.string.test4)));
+//
+//
         ArrayList<String> list = new ArrayList<String>();
-        list.add(getResources().getString(R.string.home_page));
+        list.add(getResources().getString(R.string.home));
+//        list.add(getResources().getString(R.string.test1));
+//        list.add(getResources().getString(R.string.test2));
+//        list.add(getResources().getString(R.string.test3));
+//        list.add(getResources().getString(R.string.test4));
+
         for (collectionCategory category : titles) {
             list.add(category.getTitle());
         }
@@ -434,6 +448,7 @@ public class MainActivity extends BaseActivity {
         });
 
     }
+
     private void getBannerInfoFromServer() {
 
         ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
@@ -503,23 +518,23 @@ public class MainActivity extends BaseActivity {
                 (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setQueryHint(getResources().getString(R.string.search_hint));
 
-        ( (ImageView)searchView.findViewById(android.support.v7.appcompat.R.id.search_button)).setImageResource(R.drawable.selector_btn_search);
+        ((ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_button)).setImageResource(R.drawable.selector_btn_search);
 
 
-        final String [] testStrings = getResources().getStringArray(R.array.test_array);
+        final String[] testStrings = getResources().getStringArray(R.array.test_array);
 //        int completeTextId = searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
 //        AutoCompleteTextView completeText = (AutoCompleteTextView) searchView
 //                .findViewById(completeTextId) ;
 
 
         AutoCompleteTextView completeText = (SearchView.SearchAutoComplete) searchView.findViewById(R.id.search_src_text);
-        completeText.setAdapter(new ArrayAdapter<>(this,R.layout.list_item_search,R.id.text,testStrings));
+        completeText.setAdapter(new ArrayAdapter<>(this, R.layout.list_item_search, R.id.text, testStrings));
         completeText.setTextColor(getResources().getColor(R.color.search_text_view_color));
         completeText.setHintTextColor(getResources().getColor(R.color.search_text_view_color));
         completeText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                searchView.setQuery(testStrings[position],true);
+                searchView.setQuery(testStrings[position], true);
             }
         });
 
@@ -621,10 +636,12 @@ public class MainActivity extends BaseActivity {
         }
 
         @Override
-        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        }
 
         @Override
-        public void onPageScrollStateChanged(int state) {}
+        public void onPageScrollStateChanged(int state) {
+        }
     };
 
 }

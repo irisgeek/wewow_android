@@ -17,7 +17,7 @@
 
     <!-- Home page -->
     <!-- naivgation title -->
-    <string name="home">首页</string>
+    <string name="home"> 首页 </string>
     <string name="test1">个人养成</string>
     <string name="test2">日常生活</string>
     <string name="test3">家的管理</string>

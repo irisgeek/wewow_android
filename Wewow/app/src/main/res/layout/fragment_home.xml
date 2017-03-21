@@ -152,7 +152,8 @@
             android:layout_marginTop="12dp"
             android:text="@string/popularLoverOfLife"
             android:textColor="#333631"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:id="@+id/textViewPopularArtist"/>
 
         <!-- recommended life lover -->
 
@@ -171,6 +172,7 @@
         </LinearLayout>
 
         <TextView
+            android:id="@+id/textViewLatest"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="12dp"
@@ -190,6 +192,8 @@
             android:layout_marginRight="5dp"
             android:layout_marginTop="12dp"
             android:orientation="horizontal"
+            android:id="@+id/cardViewLatest"
+
             card_view:cardCornerRadius="2dp">
 
             <RelativeLayout
@@ -284,6 +288,7 @@
             android:layout_marginLeft="12dp"
             android:layout_marginTop="12dp"
             android:text="@string/selectedInstitute"
+            android:id="@+id/textViewSelectedInstitute"
             android:textColor="#333631"
             android:textSize="14sp" />
 
