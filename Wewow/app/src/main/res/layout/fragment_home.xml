@@ -196,12 +196,28 @@
 
             card_view:cardCornerRadius="2dp">
 
+            <FrameLayout
+
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+
+
+
+            <ImageView
+                android:id="@+id/imageViewLatestInstitue"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/dummy_latest_life_institue"
+                android:scaleType="fitXY"/>
+
             <RelativeLayout
                 android:id="@+id/layoutLatestInstitue"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/dummy_latest_life_institue"
-                android:padding="1dp">
+              >
+
+
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -279,6 +295,7 @@
 
                 </RelativeLayout>
             </RelativeLayout>
+            </FrameLayout>
         </android.support.v7.widget.CardView>
 
 

@@ -44,11 +44,7 @@ public class FragmentAdapter extends FragmentPagerAdapter {
     public int getItemPosition(Object object) {
         Log.d(TAG, "getItemPosition(" + object.getClass().getSimpleName() + ")");
         if (object instanceof homeFragment) {
-            ((homeFragment) object).setUpListViewInstituteRecommend();
-            ((homeFragment) object).setUpViewPagerLoverOfLife();
         } else if (object instanceof categaryFragment) {
-            ((categaryFragment) object).setUpListViewInstituteRecommend();
-            ((categaryFragment) object).setUpViewPagerLoverOfLife();
         }
 
         return super.getItemPosition(object);

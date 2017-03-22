@@ -9,6 +9,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,17 +19,37 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.Interpolator;
 import android.view.animation.TranslateAnimation;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.wewow.R;
+import com.wewow.dto.Artist;
+import com.wewow.dto.Institute;
+import com.wewow.dto.collectionCategory;
+import com.wewow.netTask.ITask;
+import com.wewow.utils.CommonUtilities;
+import com.wewow.utils.FileCacheUtil;
+import com.wewow.utils.Utils;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Created by iris on 17/3/13.
@@ -49,6 +70,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private TextView textViewLatest;
     private TextView textViewRecommendedInstitute;
     private CardView viewLatest;
+    private int requestSentCount=0;
 
 
     public homeFragment() {
@@ -83,31 +105,34 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         initData();
         swipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(this);
+//
+//        swipeRefreshLayout.post(new Runnable() {
+//                                    @Override
+//                                    public void run() {
+//                                        swipeRefreshLayout.setRefreshing(true);
+//
+//                                        new Handler().postDelayed(new Runnable() {
+//                                            @Override
+//                                            public void run() {
+//
+//                                                swipeRefreshLayout.setRefreshing(false);
+//                                                setUpViewPagerLoverOfLife();
+//                                                setUpListViewInstituteRecommend();
+//
+//                                                //dummy effect
+//                                                LinearLayout linearLayout = (LinearLayout) getActivity().findViewById(R.id.layoutHome);
+//                                                linearLayout.setVisibility(View.VISIBLE);
+//
+//                                                startAnimation();
+//                                            }
+//                                        }, 2000);
+//
+//                                    }
+//                                }
+//        );
 
-        swipeRefreshLayout.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        swipeRefreshLayout.setRefreshing(true);
-
-                                        new Handler().postDelayed(new Runnable() {
-                                            @Override
-                                            public void run() {
-
-                                                swipeRefreshLayout.setRefreshing(false);
-                                                setUpViewPagerLoverOfLife();
-                                                setUpListViewInstituteRecommend();
-
-                                                //dummy effect
-                                                LinearLayout linearLayout = (LinearLayout) getActivity().findViewById(R.id.layoutHome);
-                                                linearLayout.setVisibility(View.VISIBLE);
-
-                                                startAnimation();
-                                            }
-                                        }, 2000);
-
-                                    }
-                                }
-        );
+        getLatestInstituteFromServer();
+        getRecommendArtistsAndInstitueFromServer();
 
 
     }
@@ -133,14 +158,225 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     }
 
 
+    private void getLatestInstituteFromServer() {
+        swipeRefreshLayout.setRefreshing(true);
+
+        ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
+        iTask.latestInstite(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(getActivity()), new Callback<JSONObject>() {
+
+            @Override
+            public void success(JSONObject object, Response response) {
+                Institute institute = new Institute();
+
+                try {
+                    String realData = Utils.convertStreamToString(response.getBody().in());
+                    if (!realData.contains(CommonUtilities.SUCCESS)) {
+                        Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+                        swipeRefreshLayout.setRefreshing(false);
+
+                    } else {
+                        institute = parseInstituteFromString(realData);
+                        FileCacheUtil.setCache(realData, getActivity(), CommonUtilities.CACHE_FILE_LATEST_INSTITUTE, 0);
+                        setUpLatestInstitue(institute);
+
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+                    swipeRefreshLayout.setRefreshing(false);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.i("MainActivity", "request banner failed: " + error.toString());
+                Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+                swipeRefreshLayout.setRefreshing(false);
+
+            }
+        });
+
+    }
+
+    private void getRecommendArtistsAndInstitueFromServer() {
+
+
+        ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
+        iTask.hotArtistisAndInstitutes(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(getActivity()), new Callback<JSONObject>() {
+
+            @Override
+            public void success(JSONObject object, Response response) {
+                List<Institute> institutes = new ArrayList<Institute>();
+
+                List<Artist> artists = new ArrayList<Artist>();
+
+
+                try {
+                    String realData = Utils.convertStreamToString(response.getBody().in());
+                    if (!realData.contains(CommonUtilities.SUCCESS)) {
+                        Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+                        swipeRefreshLayout.setRefreshing(false);
+
+                    } else {
+
+                        FileCacheUtil.setCache(realData, getActivity(), CommonUtilities.CACHE_FILE_RECOMMANDED_ARTISTS_AND_INSTITUTES, 0);
+                        institutes = parseInstituteListFromString(realData);
+                        artists = parseArtistsListFromString(realData);
+
+                        setUpRecommendArtistsAndInstitute(institutes,artists);
+
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+                    swipeRefreshLayout.setRefreshing(false);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+                swipeRefreshLayout.setRefreshing(false);
+
+                Log.i("MainActivity", "request banner failed: " + error.toString());
+
+            }
+        });
+    }
+
+    private void setUpRecommendArtistsAndInstitute(List<Institute> institutes, List<Artist> artists) {
+        setUpViewPagerLoverOfLife(artists);
+        setUpListViewInstituteRecommend(institutes);
+
+        requestSentCount++;
+
+        if( requestSentCount==2)
+        {
+            swipeRefreshLayout.setRefreshing(false);
+            LinearLayout linearLayout = (LinearLayout) getActivity().findViewById(R.id.layoutHome);
+                                                linearLayout.setVisibility(View.VISIBLE);
+
+                                                startAnimation();
+            requestSentCount=0;
+
+        }
+
+
+    }
+
+    private List<Artist> parseArtistsListFromString(String realData) throws JSONException {
+
+        List<Artist> artists = new ArrayList<Artist>();
+
+        JSONObject object = new JSONObject(realData);
+        JSONArray results = object.getJSONObject("result").getJSONObject("data").getJSONArray("recommend_artist_list");
+        for (int i = 0; i < results.length(); i++) {
+            Artist artist = new Artist();
+            JSONObject result = results.getJSONObject(i);
+            artist.setId(result.getString("id"));
+            artist.setNickname(result.getString("nickname"));
+            artist.setDesc(result.getString("desc"));
+            artist.setImage(result.getString("image"));
+            artist.setArticle_count(result.getString("article_count"));
+            artist.setFollower_count(result.getString("follow_count"));
+
+            artists.add(artist);
+        }
+
+        return artists;
+    }
+
+    private List<Institute> parseInstituteListFromString(String realData) throws JSONException {
+        List<Institute> institutes = new ArrayList<Institute>();
+
+        JSONObject object = new JSONObject(realData);
+        JSONArray results = object.getJSONObject("result").getJSONObject("data").getJSONArray("recommend_collections");
+        for (int i = 0; i < results.length(); i++) {
+            Institute institute = new Institute();
+            JSONObject result = results.getJSONObject(i);
+            institute.setId(result.getString("collection_id"));
+            institute.setTitle(result.getString("collection_title"));
+            institute.setOrder(result.getString("order"));
+            institute.setImage(result.getString("image_642_320"));
+            institute.setRead_count(result.getString("read_count"));
+            institute.setLiked_count(result.getString("liked_count"));
+
+
+            institutes.add(institute);
+        }
+
+        return institutes;
+    }
+
+
+    private void setUpLatestInstitue(Institute institue) {
+
+        ImageView imageView = (ImageView) getActivity().findViewById(R.id.imageViewLatestInstitue);
+        Glide.with(getActivity())
+                .load(institue.getImage())
+                .placeholder(R.drawable.banner_loading_spinner)
+                .crossFade(300)
+                .into(imageView);
+
+        TextView textViewNum = (TextView) getActivity().findViewById(R.id.textViewNum);
+        textViewNum.setText(getActivity().getResources().getString(R.string.number_refix) + institue.getOrder());
+
+        TextView textViewTitle = (TextView) getActivity().findViewById(R.id.textViewTitle);
+        textViewTitle.setText(institue.getTitle());
+
+        TextView textViewReadCount = (TextView) getActivity().findViewById(R.id.textViewRead);
+        textViewReadCount.setText(institue.getRead_count());
+
+        TextView textViewCollectionCount = (TextView) getActivity().findViewById(R.id.textViewCollection);
+        textViewCollectionCount.setText(institue.getLiked_count());
+        requestSentCount++;
+
+        if( requestSentCount==2)
+        {
+            swipeRefreshLayout.setRefreshing(false);
+            requestSentCount=0;
+        }
+
+
+    }
+
+
+    private Institute parseInstituteFromString(String fileContent) throws JSONException {
+
+
+        Institute institutes = new Institute();
+        JSONObject jsonObject = new JSONObject(fileContent);
+        JSONObject result = jsonObject.getJSONObject("result").getJSONObject("data");
+        institutes.setId(result.getString("id"));
+        institutes.setRead_count(result.getString("read_count"));
+        institutes.setTitle(result.getString("title"));
+        institutes.setImage(result.getString("image"));
+        institutes.setLiked_count(result.getString("liked_count"));
+        institutes.setOrder(result.getString("order"));
+        return institutes;
+    }
+
+
     public static AnimationSet moveToViewLocation(long startOff) {
         TranslateAnimation mHiddenAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,
                 Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
-                1.0f, Animation.RELATIVE_TO_SELF, 0.0f);
+                0.2f, Animation.RELATIVE_TO_SELF, 0.0f);
 
         AlphaAnimation alpha = new AlphaAnimation(0.0f, 1.0f);
 
-        AnimationSet set= new AnimationSet(true);
+        AnimationSet set = new AnimationSet(true);
         set.addAnimation(mHiddenAction);
         set.addAnimation(alpha);
         set.setDuration(300);
@@ -155,9 +391,9 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     public static AnimationSet contentsMoveToViewLocation(long startOff) {
         TranslateAnimation mHiddenAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,
                 Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
-                1.0f, Animation.RELATIVE_TO_SELF, 0.0f);
+                0.2f, Animation.RELATIVE_TO_SELF, 0.0f);
         AlphaAnimation alpha = new AlphaAnimation(0.0f, 1.0f);
-        AnimationSet set= new AnimationSet(true);
+        AnimationSet set = new AnimationSet(true);
 
         set.addAnimation(mHiddenAction);
         set.addAnimation(alpha);
@@ -168,7 +404,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         return set;
     }
 
-    public void setUpViewPagerLoverOfLife() {
+    public void setUpViewPagerLoverOfLifeDummy() {
 
         //blank view for bounce effect
         View left = new View(getActivity());
@@ -201,7 +437,58 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     }
 
-    public void setUpListViewInstituteRecommend() {
+    public void setUpViewPagerLoverOfLife(List<Artist> artists) {
+
+        //blank view for bounce effect
+        View left = new View(getActivity());
+        List<View> mListViews = new ArrayList<View>();
+        mListViews.add(left);
+
+        for (int i = 0; i < 3; i++) {
+            View view = getActivity().getLayoutInflater().inflate(R.layout.list_item_lover_of_life_recommended, null);
+            ImageView image = (ImageView) view.findViewById(R.id.imageViewIcon);
+            Glide.with(getActivity())
+                    .load(artists.get(i).getImage())
+                    .placeholder(R.drawable.banner_loading_spinner)
+                    .crossFade(300)
+                    .into(image);
+
+            TextView textNickName=(TextView)view.findViewById(R.id.textViewNickName);
+            TextView textDesc=(TextView)view.findViewById(R.id.textViewDesc);
+            TextView textArticleCount=(TextView)view.findViewById(R.id.textViewRead);
+            TextView textFollowerCount=(TextView)view.findViewById(R.id.textViewCollection);
+
+            textNickName.setText(artists.get(i).getNickname());
+            textDesc.setText(artists.get(i).getDesc());
+
+            textArticleCount.setText(artists.get(i).getArticle_count());
+            textFollowerCount.setText(artists.get(i).getFollower_count());
+
+
+            //to set data
+
+
+            mListViews.add(view);
+        }
+
+        View right = new View(getActivity());
+        mListViews.add(right);
+        MyPagerAdapter myAdapter = new MyPagerAdapter();
+
+        myAdapter.setList(mListViews);
+        viewPagerLoverOfLife = (ViewPager) getActivity().findViewById(R.id.viewpagerLayout);
+
+        viewPagerLoverOfLife.setAdapter(myAdapter);
+        viewPagerLoverOfLife.setCurrentItem(1);
+        viewPagerLoverOfLife.setOnPageChangeListener(new BouncePageChangeListener(
+                viewPagerLoverOfLife, mListViews));
+        viewPagerLoverOfLife.setPageMargin(getResources().getDimensionPixelSize(R.dimen.life_lover_recommended_page_margin));
+        myAdapter.notifyDataSetChanged();
+
+
+    }
+
+    public void setUpListViewInstituteRecommendDummy() {
 
         listViewInstituteRecommended = (ListView) getActivity().findViewById(R.id.listViewSelectedInstitute);
 
@@ -236,11 +523,45 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         swipeRefreshLayout.setRefreshing(false);
     }
 
+    public void setUpListViewInstituteRecommend(List<Institute> institutes) {
+
+        listViewInstituteRecommended = (ListView) getActivity().findViewById(R.id.listViewSelectedInstitute);
+
+        ArrayList<HashMap<String, Object>> listItem = new ArrayList<HashMap<String, Object>>();
+
+        for (int i = 0; i < 2; i++) {
+            HashMap<String, Object> map = new HashMap<String, Object>();
+
+            //
+
+            map.put("image",institutes.get(i).getImage());
+            map.put("textVol", getActivity().getResources().getString(R.string.number_refix)+institutes.get(i).getOrder());
+            map.put("textTitle", institutes.get(i).getTitle());
+            map.put("textReadCount", institutes.get(i).getRead_count());
+            map.put("textCollectionCount",institutes.get(i).getLiked_count());
+
+            listItem.add(map);
+        }
+
+        SimpleAdapter listItemAdapter = new SimpleAdapter(getActivity(), listItem,//data source
+                R.layout.list_item_life_institue_recommended,
+
+                new String[]{"image","textVol", "textTitle", "textReadCount", "textCollectionCount"},
+                //ids
+                new int[]{R.id.imageViewInstitue,R.id.textViewNum, R.id.textViewTitle, R.id.textViewRead, R.id.textViewCollection}
+        );
+        listViewInstituteRecommended.setAdapter(listItemAdapter);
+        listItemAdapter.notifyDataSetChanged();
+
+        //fix bug created by scrollview
+        fixListViewHeight(listViewInstituteRecommended);
+    }
+
     @Override
     public void onRefresh() {
 
-        setUpViewPagerLoverOfLife();
-        setUpListViewInstituteRecommend();
+//        setUpViewPagerLoverOfLife();
+//        setUpListViewInstituteRecommend();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {

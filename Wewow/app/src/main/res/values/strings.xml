@@ -69,5 +69,7 @@
 
     <string name="search_hint">输入你感兴趣的内容</string>
 
+    <string name="number_refix">Vol.</string>
+
 
 </resources>

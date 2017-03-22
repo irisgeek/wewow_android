@@ -25,7 +25,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.MessageDigest;
+
 import com.wewow.netTask.ITask;
+
 import java.util.concurrent.TimeUnit;
 
 import retrofit.RestAdapter;
@@ -203,6 +205,16 @@ public class Utils {
         filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         context.registerReceiver(new NetStateUtils(), filter);
+    }
+
+    //get time stamp
+    public String getTime() {
+
+        long time = System.currentTimeMillis() / 1000;
+        String str = String.valueOf(time);
+
+        return str;
+
     }
 
 }

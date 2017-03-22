@@ -24,6 +24,7 @@
         android:layout_height="60dp"
         android:layout_gravity="left|center_vertical"
         android:layout_marginLeft="10dp"
+        android:scaleType="fitXY"
         android:id="@+id/imageViewIcon"
         />
     <LinearLayout

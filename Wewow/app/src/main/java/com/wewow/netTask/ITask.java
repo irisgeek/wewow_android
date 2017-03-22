@@ -20,4 +20,11 @@ public interface ITask {
     @GET("/new")
     void latestInstite(@Header("User-Agent") String headerContentType, Callback<JSONObject> callback);
 
+    @GET("/discovery_info")
+    void hotArtistisAndInstitutes(@Header("User-Agent") String headerContentType, Callback<JSONObject> callback);
+
+    @GET("/upate_at")
+    void updateAt(@Header("User-Agent") String headerContentType, Callback<JSONObject> callback);
+
+
 }
