@@ -23,7 +23,7 @@ public interface ITask {
     @GET("/discovery_info")
     void hotArtistisAndInstitutes(@Header("User-Agent") String headerContentType, Callback<JSONObject> callback);
 
-    @GET("/upate_at")
+    @GET("/update_at")
     void updateAt(@Header("User-Agent") String headerContentType, Callback<JSONObject> callback);
 
 

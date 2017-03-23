@@ -1,6 +1,7 @@
 package com.wewow.fragment;
 
 import android.os.Handler;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -29,13 +30,17 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.wewow.R;
+import com.wewow.adapter.ListViewAdapter;
 import com.wewow.dto.Artist;
+import com.wewow.dto.Banner;
 import com.wewow.dto.Institute;
 import com.wewow.dto.collectionCategory;
 import com.wewow.netTask.ITask;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.FileCacheUtil;
+import com.wewow.utils.SettingUtils;
 import com.wewow.utils.Utils;
+import com.wewow.view.CircleImageView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -70,7 +75,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private TextView textViewLatest;
     private TextView textViewRecommendedInstitute;
     private CardView viewLatest;
-    private int requestSentCount=0;
+    private int requestSentCount = 0;
 
 
     public homeFragment() {
@@ -95,6 +100,22 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        initData();
+        swipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(this);
+
+        if (Utils.isNetworkAvailable(getActivity())) {
+
+            checkCacheUpdatedOrNot();
+
+        } else {
+            Toast.makeText(getActivity(), getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
+            swipeRefreshLayout.setRefreshing(false);
+
+            SettingUtils.set(getActivity(), CommonUtilities.NETWORK_STATE, false);
+            setUpLatestInstitueFromCache();
+            setUpRecommendedArtistsAndInstituesFromCache();
+        }
 
 
     }
@@ -102,39 +123,37 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        initData();
-        swipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(R.id.swipe_refresh_layout);
-        swipeRefreshLayout.setOnRefreshListener(this);
-//
-//        swipeRefreshLayout.post(new Runnable() {
-//                                    @Override
-//                                    public void run() {
-//                                        swipeRefreshLayout.setRefreshing(true);
-//
-//                                        new Handler().postDelayed(new Runnable() {
-//                                            @Override
-//                                            public void run() {
-//
-//                                                swipeRefreshLayout.setRefreshing(false);
-//                                                setUpViewPagerLoverOfLife();
-//                                                setUpListViewInstituteRecommend();
-//
-//                                                //dummy effect
-//                                                LinearLayout linearLayout = (LinearLayout) getActivity().findViewById(R.id.layoutHome);
-//                                                linearLayout.setVisibility(View.VISIBLE);
-//
-//                                                startAnimation();
-//                                            }
-//                                        }, 2000);
-//
-//                                    }
-//                                }
-//        );
-
-        getLatestInstituteFromServer();
-        getRecommendArtistsAndInstitueFromServer();
 
 
+    }
+
+    private void setUpRecommendedArtistsAndInstituesFromCache() {
+        if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_RECOMMANDED_ARTISTS_AND_INSTITUTES, getActivity())) {
+            String fileContent = FileCacheUtil.getCache(getActivity(), CommonUtilities.CACHE_FILE_RECOMMANDED_ARTISTS_AND_INSTITUTES);
+            List<Institute> institutes = new ArrayList<Institute>();
+            List<Artist> artists = new ArrayList<Artist>();
+
+            try {
+                institutes = parseInstituteListFromString(fileContent);
+                artists = parseArtistsListFromString(fileContent);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            setUpRecommendArtistsAndInstitute(institutes,artists,true);
+        }
+    }
+
+    private void setUpLatestInstitueFromCache() {
+        if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_LATEST_INSTITUTE, getActivity())) {
+            String fileContent = FileCacheUtil.getCache(getActivity(), CommonUtilities.CACHE_FILE_LATEST_INSTITUTE);
+            Institute institute = new Institute();
+            try {
+                institute = parseInstituteFromString(fileContent);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            setUpLatestInstitue(institute,true);
+        }
     }
 
     private void startAnimation() {
@@ -157,10 +176,81 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     }
 
+    private void checkCacheUpdatedOrNot() {
+        swipeRefreshLayout.setRefreshing(true);
+
+        ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
+        iTask.updateAt(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(getActivity()), new Callback<JSONObject>() {
+
+            @Override
+            public void success(JSONObject object, Response response) {
+
+
+                try {
+                    String realData = Utils.convertStreamToString(response.getBody().in());
+                    if (!realData.contains(CommonUtilities.SUCCESS)) {
+                        Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+                        swipeRefreshLayout.setRefreshing(false);
+
+                    } else {
+                        JSONObject jsonObject = new JSONObject(realData);
+                        String cacheUpdatedTimeStamp = jsonObject
+                                .getJSONObject("result")
+                                .getJSONObject("data")
+                                .getString("update_at");
+
+                        long cacheUpdatedTime = (long)(Double.parseDouble(cacheUpdatedTimeStamp) * 1000);
+
+                        boolean isCacheDataOutdated = FileCacheUtil
+                                .isCacheDataFailure(CommonUtilities.CACHE_FILE_LATEST_INSTITUTE, getActivity(), cacheUpdatedTime);
+
+                        if (isCacheDataOutdated) {
+                            getLatestInstituteFromServer();
+                        } else {
+                            setUpLatestInstitueFromCache();
+                        }
+
+                        isCacheDataOutdated = FileCacheUtil
+                                .isCacheDataFailure(CommonUtilities.CACHE_FILE_RECOMMANDED_ARTISTS_AND_INSTITUTES, getActivity(), cacheUpdatedTime);
+
+                        if (isCacheDataOutdated) {
+
+                            getRecommendArtistsAndInstitueFromServer();
+
+                        } else {
+                            setUpRecommendedArtistsAndInstituesFromCache();
+                        }
+
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+                    swipeRefreshLayout.setRefreshing(false);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.i("MainActivity", "request banner failed: " + error.toString());
+                Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+                swipeRefreshLayout.setRefreshing(false);
+
+            }
+        });
+
+
+    }
+
 
     private void getLatestInstituteFromServer() {
         swipeRefreshLayout.setRefreshing(true);
-
+        requestSentCount++;
         ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
         iTask.latestInstite(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(getActivity()), new Callback<JSONObject>() {
 
@@ -177,7 +267,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     } else {
                         institute = parseInstituteFromString(realData);
                         FileCacheUtil.setCache(realData, getActivity(), CommonUtilities.CACHE_FILE_LATEST_INSTITUTE, 0);
-                        setUpLatestInstitue(institute);
+                        setUpLatestInstitue(institute,false);
 
                     }
 
@@ -206,7 +296,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     private void getRecommendArtistsAndInstitueFromServer() {
 
-
+        requestSentCount++;
         ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
         iTask.hotArtistisAndInstitutes(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(getActivity()), new Callback<JSONObject>() {
 
@@ -229,7 +319,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                         institutes = parseInstituteListFromString(realData);
                         artists = parseArtistsListFromString(realData);
 
-                        setUpRecommendArtistsAndInstitute(institutes,artists);
+                        setUpRecommendArtistsAndInstitute(institutes, artists,false);
 
                     }
 
@@ -256,20 +346,18 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         });
     }
 
-    private void setUpRecommendArtistsAndInstitute(List<Institute> institutes, List<Artist> artists) {
+    private void setUpRecommendArtistsAndInstitute(List<Institute> institutes, List<Artist> artists,boolean isFromCache) {
         setUpViewPagerLoverOfLife(artists);
         setUpListViewInstituteRecommend(institutes);
 
-        requestSentCount++;
+        requestSentCount--;
 
-        if( requestSentCount==2)
-        {
+        if (requestSentCount == 0||isFromCache) {
             swipeRefreshLayout.setRefreshing(false);
             LinearLayout linearLayout = (LinearLayout) getActivity().findViewById(R.id.layoutHome);
-                                                linearLayout.setVisibility(View.VISIBLE);
+            linearLayout.setVisibility(View.VISIBLE);
 
-                                                startAnimation();
-            requestSentCount=0;
+            startAnimation();
 
         }
 
@@ -321,7 +409,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     }
 
 
-    private void setUpLatestInstitue(Institute institue) {
+    private void setUpLatestInstitue(Institute institue ,boolean isFromCache) {
 
         ImageView imageView = (ImageView) getActivity().findViewById(R.id.imageViewLatestInstitue);
         Glide.with(getActivity())
@@ -341,12 +429,11 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
         TextView textViewCollectionCount = (TextView) getActivity().findViewById(R.id.textViewCollection);
         textViewCollectionCount.setText(institue.getLiked_count());
-        requestSentCount++;
+        requestSentCount--;
 
-        if( requestSentCount==2)
-        {
+        if (requestSentCount == 0||isFromCache) {
             swipeRefreshLayout.setRefreshing(false);
-            requestSentCount=0;
+
         }
 
 
@@ -446,17 +533,17 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
         for (int i = 0; i < 3; i++) {
             View view = getActivity().getLayoutInflater().inflate(R.layout.list_item_lover_of_life_recommended, null);
-            ImageView image = (ImageView) view.findViewById(R.id.imageViewIcon);
+            CircleImageView image = (CircleImageView) view.findViewById(R.id.imageViewIcon);
             Glide.with(getActivity())
                     .load(artists.get(i).getImage())
                     .placeholder(R.drawable.banner_loading_spinner)
                     .crossFade(300)
                     .into(image);
 
-            TextView textNickName=(TextView)view.findViewById(R.id.textViewNickName);
-            TextView textDesc=(TextView)view.findViewById(R.id.textViewDesc);
-            TextView textArticleCount=(TextView)view.findViewById(R.id.textViewRead);
-            TextView textFollowerCount=(TextView)view.findViewById(R.id.textViewCollection);
+            TextView textNickName = (TextView) view.findViewById(R.id.textViewNickName);
+            TextView textDesc = (TextView) view.findViewById(R.id.textViewDesc);
+            TextView textArticleCount = (TextView) view.findViewById(R.id.textViewRead);
+            TextView textFollowerCount = (TextView) view.findViewById(R.id.textViewCollection);
 
             textNickName.setText(artists.get(i).getNickname());
             textDesc.setText(artists.get(i).getDesc());
@@ -534,22 +621,24 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
             //
 
-            map.put("image",institutes.get(i).getImage());
-            map.put("textVol", getActivity().getResources().getString(R.string.number_refix)+institutes.get(i).getOrder());
-            map.put("textTitle", institutes.get(i).getTitle());
-            map.put("textReadCount", institutes.get(i).getRead_count());
-            map.put("textCollectionCount",institutes.get(i).getLiked_count());
+            Institute institute = institutes.get(i);
+            map.put("imageView", institute.getImage());
+            map.put("textViewNum", getActivity().getResources().getString(R.string.number_refix) + institutes.get(i).getOrder());
+            map.put("textViewTitle", institutes.get(i).getTitle());
+            map.put("textViewRead", institutes.get(i).getRead_count());
+            map.put("textViewCollection", institutes.get(i).getLiked_count());
 
             listItem.add(map);
         }
+        ListViewAdapter listItemAdapter = new ListViewAdapter(getActivity(), listItem);
 
-        SimpleAdapter listItemAdapter = new SimpleAdapter(getActivity(), listItem,//data source
-                R.layout.list_item_life_institue_recommended,
-
-                new String[]{"image","textVol", "textTitle", "textReadCount", "textCollectionCount"},
-                //ids
-                new int[]{R.id.imageViewInstitue,R.id.textViewNum, R.id.textViewTitle, R.id.textViewRead, R.id.textViewCollection}
-        );
+//        SimpleAdapter listItemAdapter = new SimpleAdapter(getActivity(), listItem,//data source
+//                R.layout.list_item_life_institue_recommended,
+//
+//                new String[]{"image","textVol", "textTitle", "textReadCount", "textCollectionCount"},
+//                //ids
+//                new int[]{R.id.imageViewInstitue,R.id.textViewNum, R.id.textViewTitle, R.id.textViewRead, R.id.textViewCollection}
+//        );
         listViewInstituteRecommended.setAdapter(listItemAdapter);
         listItemAdapter.notifyDataSetChanged();
 

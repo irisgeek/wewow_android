@@ -2,11 +2,15 @@ package com.wewow.utils;
 
 import android.content.Context;
 
+import com.squareup.okhttp.Call;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import javax.security.auth.callback.Callback;
 
 /**
  * Created by iris on 17/3/19.
@@ -89,10 +93,12 @@ public class FileCacheUtil {
         boolean failure = false;
         File data = context.getFileStreamPath(cachefile);
         if (data.exists()
-                && (System.currentTimeMillis() - data.lastModified()) > cacheTime)
+                &&  data.lastModified() < cacheTime)
             failure = true;
         else if (!data.exists())
             failure = true;
         return failure;
     }
+
+
 }
