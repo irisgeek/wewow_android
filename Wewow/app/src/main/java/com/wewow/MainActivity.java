@@ -516,7 +516,9 @@ public class MainActivity extends BaseActivity {
                 (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         final SearchView searchView =
                 (SearchView) menu.findItem(R.id.search).getActionView();
+
         searchView.setQueryHint(getResources().getString(R.string.search_hint));
+
 
         ((ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_button)).setImageResource(R.drawable.selector_btn_search);
 
@@ -528,9 +530,11 @@ public class MainActivity extends BaseActivity {
 
 
         AutoCompleteTextView completeText = (SearchView.SearchAutoComplete) searchView.findViewById(R.id.search_src_text);
-        completeText.setAdapter(new ArrayAdapter<>(this, R.layout.list_item_search, R.id.text, testStrings));
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.list_item_search, R.id.text, testStrings);
+
+        completeText.setAdapter(adapter);
         completeText.setTextColor(getResources().getColor(R.color.search_text_view_color));
-        completeText.setHintTextColor(getResources().getColor(R.color.search_text_view_color));
+        completeText.setHintTextColor(getResources().getColor(R.color.search_text_view_hint_color));
         completeText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -543,6 +547,8 @@ public class MainActivity extends BaseActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 Toast.makeText(MainActivity.this, query, Toast.LENGTH_SHORT).show();
+                LinearLayout layout=(LinearLayout)findViewById(R.id.layoutCover);
+                layout.setVisibility(View.GONE);
                 return false;
             }
 
@@ -565,7 +571,9 @@ public class MainActivity extends BaseActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.search) {
+            LinearLayout layout=(LinearLayout)findViewById(R.id.layoutCover);
+            layout.setVisibility(View.VISIBLE);
             return true;
         }
 

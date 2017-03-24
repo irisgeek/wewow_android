@@ -8,6 +8,10 @@
     <color name="menu_checked_color">#69b076</color>
 
     <color name="search_text_view_color">#ffffff</color>
+    <color name="search_text_view_hint_color">#91ffffff</color>
+    <color name="search_hot_search">#7c7d7a</color>
+    <color name="search_hot_search_words">#333631</color>
+
 
 
 
@@ -17,5 +21,7 @@
         <item>@color/font_color</item>
         <item>@color/font_color</item>
     </integer-array>
+
+
 
 </resources>

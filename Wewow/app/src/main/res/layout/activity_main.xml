@@ -136,7 +136,7 @@
                 <android.support.v4.view.ViewPager
                     android:id="@+id/pagerTabs"
                     android:layout_width="fill_parent"
-                    android:layout_height="1200dp" />
+                    android:layout_height="1000dp" />
 
             </LinearLayout>
 
@@ -144,6 +144,15 @@
             <include layout="@layout/toolbar"
 
                 />
+            <LinearLayout
+                android:id="@+id/layoutCover"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#88000000"
+                android:visibility="gone"
+                android:orientation="horizontal">
+
+            </LinearLayout>
         </FrameLayout>
     </com.wewow.view.BounceScrollView>
 
