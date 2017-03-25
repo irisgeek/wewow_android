@@ -21,6 +21,11 @@
     <string name="login_wechat_cancel">微信登录已取消</string>
     <string name="login_wechat_ok">微信登录已成功</string>
     <string name="login_wechat_deny">微信登录已被用户拒绝</string>
+    <string name="login_huawei_download_service_title">提示</string>
+    <string name="login_huawei_download_service_description">您可能需要安装华为移动服务。如果持续遇到下载失败的提示，建议自行手动下载安装“华为移动服务”。</string>
+    <string name="login_huawei_prompt_gotit">我知道了</string>
+    <string name="login_huawei_connecting">连接华为移动服务</string>
+    <string name="login_huawei_cancel">华为登录已取消</string>
 
     <!-- Home page -->
     <!-- naivgation title -->

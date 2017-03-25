@@ -227,6 +227,13 @@ public class WebAPIHelper {
         } else {
             sb.append(url.charAt(url.length() - 1) == '&' ? "" : "&");
         }
+        String querystr = WebAPIHelper.buildHttpQuery(params);
+        sb.append(querystr);
+        return sb.toString();
+    }
+
+    public static String buildHttpQuery(List<Pair<String, String>> params) {
+        StringBuilder sb = new StringBuilder();
         for (Pair<String, String> p : params) {
             try {
                 sb.append(URLEncoder.encode(p.first, "UTF-8"))
@@ -236,6 +243,9 @@ public class WebAPIHelper {
             } catch (UnsupportedEncodingException ex) {
                 Log.e(TAG, String.format("encoding eerror in addDefaultUrlParams, key:%s, value:%s", p.first, p.second));
             }
+        }
+        if (sb.charAt(sb.length() - 1) == '&') {
+            sb.deleteCharAt(sb.length() - 1);
         }
         return sb.toString();
     }
