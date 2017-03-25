@@ -57,6 +57,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -149,14 +150,12 @@ public class BaseActivity extends ActionBarActivity {
         TextView usertv = (TextView) this.findViewById(R.id.textViewUsername);
 //        usertv.setText("Anonymous");
 
-        if(UserInfo.isUserLogged(this))
-        {
+        if (UserInfo.isUserLogged(this)) {
 
             usertv.setText(UserInfo.getCurrentUser(this).getNickname());
-            TextView userSignature=(TextView)findViewById(R.id.textViewSignature);
+            TextView userSignature = (TextView) findViewById(R.id.textViewSignature);
             userSignature.setText(UserInfo.getCurrentUser(this).getDesc());
-        }
-        else {
+        } else {
             usertv.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -178,7 +177,7 @@ public class BaseActivity extends ActionBarActivity {
 
         TextView usertv = (TextView) this.findViewById(R.id.textViewUsername);
         usertv.setText(UserInfo.getCurrentUser(this).getNickname());
-        TextView userSignature=(TextView)findViewById(R.id.textViewSignature);
+        TextView userSignature = (TextView) findViewById(R.id.textViewSignature);
         userSignature.setText(UserInfo.getCurrentUser(this).getDesc());
     }
 
@@ -199,7 +198,17 @@ public class BaseActivity extends ActionBarActivity {
 
     private void selectItem(int position) {
         drawerLayout.closeDrawer(GravityCompat.START);
-        Toast.makeText(BaseActivity.this, planetTitles[position], Toast.LENGTH_SHORT).show();
+        Toast.makeText(BaseActivity.this, planetTitles[position-1], Toast.LENGTH_SHORT).show();
+        switch (position-1) {
+            case 0:
+                break;
+            case 1:
+                Intent intent = new Intent(BaseActivity.this, ListArtistActivity.class);
+                BaseActivity.this.startActivity(intent);
+                break;
+            default:
+                break;
+        }
     }
 
     @Override

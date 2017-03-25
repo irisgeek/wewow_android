@@ -1,5 +1,6 @@
 package com.wewow.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
@@ -13,6 +14,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
@@ -215,6 +217,11 @@ public class Utils {
 
         return str;
 
+    }
+
+    public static void setActivityToBeFullscreen(Activity activity)
+    {
+        activity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 
 }

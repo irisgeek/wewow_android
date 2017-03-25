@@ -30,6 +30,12 @@
         </activity>
         <activity
             android:name=".LoginActivity"
+            android:screenOrientation="portrait"
+            android:label="Login">
+        </activity>
+        <activity
+            android:name=".ListArtistActivity"
+            android:screenOrientation="portrait"
             android:label="Login">
         </activity>
         <receiver android:name=".utils.NetStateUtils" >

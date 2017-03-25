@@ -39,6 +39,7 @@
 
     <!--network unavilable-->
     <string name="networkError">亲，网络不给力哦！</string>
+    <string name="serverError">亲，服务器开小差啦</string>
 
 
     <string name="newVersionAvailable">我们有了新版本！</string>

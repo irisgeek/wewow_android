@@ -116,7 +116,8 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        Utils.setActivityToBeFullscreen(this);
 
         setContentView(R.layout.activity_main);
         context = this;
@@ -127,36 +128,8 @@ public class MainActivity extends BaseActivity {
 //        setUpNavigationTab();
         if (Utils.isNetworkAvailable(this)) {
             //if banner data never cached or outdated
-            if (FileCacheUtil.isCacheDataFailure(CommonUtilities.CACHE_FILE_BANNER, this, 15 * 60 * 60 * 1000)) {
-                getBannerInfoFromServer();
-            } else {
-                String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_BANNER);
-                List<Banner> banners = new ArrayList<Banner>();
-                try {
-                    banners = parseBannersFromString(fileContent);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                setUpViewPagerBanner(banners);
 
-            }
-
-            // if tab title never cached or outdated
-            if (FileCacheUtil.isCacheDataFailure(CommonUtilities.CACHE_FILE_TAB_TITLE, this, 15 * 60 * 60 * 1000)) {
-                getTabTitlesFromServer();
-            } else {
-                String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_TAB_TITLE);
-                List<collectionCategory> categories = new ArrayList<collectionCategory>();
-                try {
-                    categories = parseCategoriesFromString(fileContent);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                setUpNavigationTab(categories);
-
-            }
-
-
+            checkcacheUpdatedOrNot();
         } else {
             Toast.makeText(this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
 
@@ -192,6 +165,77 @@ public class MainActivity extends BaseActivity {
 
 
     }
+
+    private void checkcacheUpdatedOrNot() {
+        ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
+        iTask.updateAt(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), new Callback<JSONObject>() {
+            @Override
+            public void success(JSONObject object, Response response) {
+
+
+                try {
+                    String realData = Utils.convertStreamToString(response.getBody().in());
+                    if (!realData.contains(CommonUtilities.SUCCESS)) {
+                        Toast.makeText(context, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+
+                    } else {
+                        JSONObject jsonObject = new JSONObject(realData);
+                        String cacheUpdatedTimeStamp = jsonObject
+                                .getJSONObject("result")
+                                .getJSONObject("data")
+                                .getString("update_at");
+
+                        long cacheUpdatedTime = (long) (Double.parseDouble(cacheUpdatedTimeStamp) * 1000);
+                        boolean isCacheDataOutdated = FileCacheUtil
+                                .isCacheDataFailure(CommonUtilities.CACHE_FILE_BANNER, context, cacheUpdatedTime);
+
+                        if (isCacheDataOutdated) {
+                            getBannerInfoFromServer();
+                        } else {
+                            String fileContent = FileCacheUtil.getCache(MainActivity.this, CommonUtilities.CACHE_FILE_BANNER);
+                            List<Banner> banners = new ArrayList<Banner>();
+                            try {
+                                banners = parseBannersFromString(fileContent);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            setUpViewPagerBanner(banners);
+
+                        }
+
+                        isCacheDataOutdated = FileCacheUtil
+                                .isCacheDataFailure(CommonUtilities.CACHE_FILE_TAB_TITLE, context, cacheUpdatedTime);
+                        if (isCacheDataOutdated) {
+                            getTabTitlesFromServer();
+                        } else {
+                            String fileContent = FileCacheUtil.getCache(context, CommonUtilities.CACHE_FILE_TAB_TITLE);
+                            List<collectionCategory> categories = new ArrayList<collectionCategory>();
+                            try {
+                                categories = parseCategoriesFromString(fileContent);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            setUpNavigationTab(categories);
+                        }
+
+
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+
+            }
+
+        });
+    }
+
 
     private List<collectionCategory> parseCategoriesFromString(String fileContent) throws JSONException {
 
@@ -547,7 +591,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 Toast.makeText(MainActivity.this, query, Toast.LENGTH_SHORT).show();
-                LinearLayout layout=(LinearLayout)findViewById(R.id.layoutCover);
+                LinearLayout layout = (LinearLayout) findViewById(R.id.layoutCover);
                 layout.setVisibility(View.GONE);
                 return false;
             }
@@ -572,7 +616,7 @@ public class MainActivity extends BaseActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.search) {
-            LinearLayout layout=(LinearLayout)findViewById(R.id.layoutCover);
+            LinearLayout layout = (LinearLayout) findViewById(R.id.layoutCover);
             layout.setVisibility(View.VISIBLE);
             return true;
         }
