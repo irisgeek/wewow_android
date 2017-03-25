@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         debug {
-            storeFile file('/Users/suncjs/projects/wewow_android/Wewow/debug.jks')
+            storeFile file('/Users/suncjs/projects/wewow_android/Wewow/wewow.jks')
             keyAlias 'debug'
             keyPassword 'com.wewow'
             storePassword 'com.wewow'
