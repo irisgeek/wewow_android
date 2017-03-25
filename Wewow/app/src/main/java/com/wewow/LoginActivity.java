@@ -48,7 +48,7 @@ import java.util.ArrayList;
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends ActionBarActivity implements IWXAPIEventHandler {
+public class LoginActivity extends ActionBarActivity {
 
     public static final int REQUEST_CODE_LOGIN = 1;
 
@@ -373,27 +373,17 @@ public class LoginActivity extends ActionBarActivity implements IWXAPIEventHandl
             @Override
             public void onClick(View view) {
                 IWXAPI api = WXAPIFactory.createWXAPI(LoginActivity.this, CommonUtilities.WX_AppID, false);
-                api.registerApp(CommonUtilities.WX_AppID);
                 if (!api.isWXAppInstalled()) {
                     Toast.makeText(LoginActivity.this, R.string.login_wechat_not_install, Toast.LENGTH_LONG).show();
                     return;
                 }
+                api.registerApp(CommonUtilities.WX_AppID);
                 final SendAuth.Req req = new SendAuth.Req();
                 req.scope = "snsapi_userinfo";
                 req.state = LoginActivity.this.getPackageName();
                 api.sendReq(req);
             }
         });
-    }
-
-    @Override
-    public void onReq(BaseReq baseReq) {
-        Log.d(TAG, String.format("WX req"));
-    }
-
-    @Override
-    public void onResp(BaseResp baseResp) {
-        Log.d(TAG, String.format("WX resp"));
     }
 
     @Override
