@@ -8,6 +8,8 @@ import android.util.Log;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by iris on 17/3/2.
@@ -97,6 +99,17 @@ public class SettingUtils {
         commitOrApply(editor);
     }
 
+    public static void set(Context context, int resId,Set<String> value) {
+        set(context, context.getString(resId), value);
+    }
+
+    public static void set(Context context, String key, Set<String> value) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        Editor editor = prefs.edit();
+        editor.putStringSet(key, (Set<String>) value);
+        commitOrApply(editor);
+    }
+
     public static boolean get(Context context, int resId, boolean defValue) {
         return get(context, context.getString(resId), defValue);
     }
@@ -140,6 +153,11 @@ public class SettingUtils {
     public static String get(Context context, String key, String defValue) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getString(key, defValue);
+    }
+
+    public static Set<String> get(Context context, String key, Set<String> defValue) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getStringSet(key, defValue);
     }
 
     //////////////////////////////////////////////////////////////////////////

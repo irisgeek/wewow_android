@@ -66,8 +66,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
                     app:tabIndicatorColor="#333631"
-                    app:tabMinWidth="80dp"
+                    app:tabMinWidth="90dp"
                     app:tabMode="scrollable" />
+
                 <!--<LinearLayout-->
                 <!--android:layout_width="match_parent"-->
                 <!--android:layout_height="52dp"-->
@@ -134,8 +135,8 @@
 
                 <android.support.v4.view.ViewPager
                     android:id="@+id/pagerTabs"
-                    android:layout_width="match_parent"
-                    android:layout_height="500dp" />
+                    android:layout_width="fill_parent"
+                    android:layout_height="1000dp" />
 
             </LinearLayout>
 
@@ -143,14 +144,17 @@
             <include layout="@layout/toolbar"
 
                 />
+            <LinearLayout
+                android:id="@+id/layoutCover"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#88000000"
+                android:visibility="gone"
+                android:orientation="horizontal">
+
+            </LinearLayout>
         </FrameLayout>
     </com.wewow.view.BounceScrollView>
-
-    <include
-        layout="@layout/loading"
-        android:layout_centerInParent="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
 
 
 </RelativeLayout>

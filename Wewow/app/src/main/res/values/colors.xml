@@ -5,6 +5,14 @@
     <color name="button_enabled_background">#3399FF</color>
     <color name="button_disabled_background">#C0C0C0</color>
     <color name="font_color">#333631</color>
+    <color name="menu_checked_color">#69b076</color>
+
+    <color name="search_text_view_color">#ffffff</color>
+    <color name="search_text_view_hint_color">#91ffffff</color>
+    <color name="search_hot_search">#7c7d7a</color>
+    <color name="search_hot_search_words">#333631</color>
+
+
 
 
     <integer-array name="loading_colors">
@@ -13,5 +21,7 @@
         <item>@color/font_color</item>
         <item>@color/font_color</item>
     </integer-array>
+
+
 
 </resources>

@@ -1,28 +1,151 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="1100dp"
+    android:orientation="vertical">
+    <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/swipe_refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
     <LinearLayout
+        android:id="@+id/layoutHome"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#f7f7f7"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
 
 
         <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:card_view="http://schemas.android.com/apk/res-auto"
-            android:layout_width="344dp"
-            android:layout_height="185dp"
+            android:id="@+id/cardViewNewVersionAvailable"
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
             android:layout_gravity="center"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
             android:layout_marginTop="12dp"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:visibility="gone"
             card_view:cardCornerRadius="2dp">
 
-            </android.support.v7.widget.CardView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="24dp"
+                android:layout_marginTop="19dp"
+                android:text="@string/newVersionAvailable"
+                android:textColor="#333631"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textViewDownloadContent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="24dp"
+                android:layout_marginTop="53dp"
+
+                android:text="@string/newVersionAvailable"
+                android:textColor="#333631"
+                android:textSize="12sp" />
+
+
+            <LinearLayout
+                android:layout_width="158dp"
+                android:layout_height="36dp"
+                android:layout_gravity="right|bottom"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="75dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/ignore"
+                    android:textColor="#333631"
+                    android:textSize="10sp" />
+
+                <TextView
+                    android:layout_width="75dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:gravity="center"
+                    android:text="@string/download"
+                    android:textColor="#333631"
+                    android:textSize="10sp" />
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/ads"
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:layout_marginTop="12dp"
+            android:orientation="vertical"
+            android:visibility="gone"
+            card_view:cardCornerRadius="2dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="24dp"
+                    android:layout_marginTop="19dp"
+                    android:text="@string/dummy_ads_title"
+                    android:textColor="#333631"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textViewAdsContent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="24dp"
+                    android:layout_marginTop="53dp"
+                    android:text="@string/dummy_ads_content"
+                    android:textColor="#333631"
+                    android:textSize="12sp" />
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_below="@id/textViewAdsContent"
+                    android:layout_height="122dp"
+                    android:layout_gravity="bottom"
+                    android:gravity="bottom"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/dummy_latest_life_institue"
+                    android:orientation="vertical">
+
+
+                    <TextView
+                        android:layout_width="75dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|right"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginRight="5dp"
+                        android:gravity="center"
+                        android:text="@string/download"
+                        android:textColor="#333631"
+                        android:textSize="10sp" />
+                </LinearLayout>
+            </RelativeLayout>
+
+        </android.support.v7.widget.CardView>
 
         <TextView
             android:layout_width="wrap_content"
@@ -31,7 +154,8 @@
             android:layout_marginTop="12dp"
             android:text="@string/popularLoverOfLife"
             android:textColor="#333631"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:id="@+id/textViewPopularArtist"/>
 
         <!-- recommended life lover -->
 
@@ -43,13 +167,14 @@
             <android.support.v4.view.ViewPager
                 android:id="@+id/viewpagerLayout"
                 android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginLeft="12dp"
                 android:background="#f7f7f7"
-                android:clipChildren="false"
-                android:layout_height="wrap_content" />
+                android:clipChildren="false" />
         </LinearLayout>
 
         <TextView
+            android:id="@+id/textViewLatest"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="12dp"
@@ -69,14 +194,32 @@
             android:layout_marginRight="5dp"
             android:layout_marginTop="12dp"
             android:orientation="horizontal"
+            android:id="@+id/cardViewLatest"
+
             card_view:cardCornerRadius="2dp">
+
+            <FrameLayout
+
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+
+
+
+            <ImageView
+                android:id="@+id/imageViewLatestInstitue"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/dummy_latest_life_institue"
+                android:scaleType="fitXY"/>
 
             <RelativeLayout
                 android:id="@+id/layoutLatestInstitue"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/dummy_latest_life_institue"
-                android:padding="1dp">
+              >
+
+
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -154,6 +297,7 @@
 
                 </RelativeLayout>
             </RelativeLayout>
+            </FrameLayout>
         </android.support.v7.widget.CardView>
 
 
@@ -163,6 +307,7 @@
             android:layout_marginLeft="12dp"
             android:layout_marginTop="12dp"
             android:text="@string/selectedInstitute"
+            android:id="@+id/textViewSelectedInstitute"
             android:textColor="#333631"
             android:textSize="14sp" />
 
@@ -179,4 +324,5 @@
             android:divider="@android:color/transparent"
             android:dividerHeight="12dp" />
     </LinearLayout>
+    </android.support.v4.widget.SwipeRefreshLayout>
 </LinearLayout>

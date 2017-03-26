@@ -29,7 +29,7 @@
 
     <!-- Home page -->
     <!-- naivgation title -->
-    <string name="home">首页</string>
+    <string name="home"> 首页 </string>
     <string name="test1">个人养成</string>
     <string name="test2">日常生活</string>
     <string name="test3">家的管理</string>
@@ -48,5 +48,41 @@
     <!-- categary -->
     <string name="RelativeLoverOfLife">相关生活家</string>
     <string name="RelativeInstite">生活研究所</string>
+
+    <!--network unavilable-->
+    <string name="networkError">亲，网络不给力哦！</string>
+    <string name="serverError">亲，服务器开小差啦</string>
+
+
+    <string name="newVersionAvailable">我们有了新版本！</string>
+
+    <string name="ignore">忽略</string>
+    <string name="download">去下载</string>
+
+    <string name="dummy_ads_title">Nintendo Switch</string>
+    <string name="dummy_ads_content">买买买 不买不是好任豚</string>
+
+    <!--slide menu items -->
+
+    <string name="home_page">首页</string>
+    <string name="all_artists">查看全部生活家</string>
+    <string name="all_institutes">查看全部生活研究所</string>
+    <string name="talk_to_wewow">跟唯物聊一聊</string>
+
+    <string name="my_favourite">我的收藏</string>
+    <string name="my_favourite_artists">我订阅的生活家</string>
+
+    <string name="about">关于唯物</string>
+    <string name="share">分享唯物</string>
+    <string name="clear_cache">清除缓存</string>
+    <string name="logout">退出登录</string>
+
+    <string name="login_to_see_more">登录来收藏和订阅你感兴趣的内容</string>
+
+
+    <string name="search_hint">输入你感兴趣的内容</string>
+
+    <string name="number_refix">Vol.</string>
+
 
 </resources>

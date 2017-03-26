@@ -3,7 +3,7 @@
     android:orientation="vertical"
     android:layout_width="304dp"
     android:layout_height="172dp"
-    android:background="@drawable/dummy_user_pic">
+    android:background="@drawable/dummy_latest_life_institue">
     <ImageView
         android:src="@drawable/setting"
         android:layout_width="wrap_content"
@@ -17,10 +17,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="18sp"
-        android:text=""
+        android:text="@string/login_gologin"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="45dp"
         android:layout_marginLeft="17dp"
         android:id="@+id/textViewUsername"/>
 
@@ -28,9 +28,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="14sp"
-        android:text=""
+        android:text="@string/login_to_see_more"
         android:textColor="#FFFFFF"
-        android:layout_marginTop="1dp"
+        android:layout_marginTop="5dp"
         android:layout_marginLeft="17dp"
         android:id="@+id/textViewSignature"/>
 </LinearLayout>

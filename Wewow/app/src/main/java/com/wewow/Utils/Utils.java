@@ -1,16 +1,20 @@
 package com.wewow.utils;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
@@ -18,11 +22,14 @@ import android.widget.ListView;
 import com.squareup.okhttp.OkHttpClient;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.MessageDigest;
+
 import com.wewow.netTask.ITask;
+
 import java.util.concurrent.TimeUnit;
 
 import retrofit.RestAdapter;
@@ -99,7 +106,6 @@ public class Utils {
     }
 
 
-
     public static String MD5(String s) {
         char hexDigits[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
         try {
@@ -144,11 +150,11 @@ public class Utils {
     public static String getPath(Context context, Uri uri) {
 
         if ("content".equalsIgnoreCase(uri.getScheme())) {
-            String[] projection = { "_data" };
+            String[] projection = {"_data"};
             Cursor cursor = null;
 
             try {
-                cursor = context.getContentResolver().query(uri, projection,null, null, null);
+                cursor = context.getContentResolver().query(uri, projection, null, null, null);
                 int column_index = cursor.getColumnIndexOrThrow("_data");
                 if (cursor.moveToFirst()) {
                     return cursor.getString(column_index);
@@ -156,9 +162,7 @@ public class Utils {
             } catch (Exception e) {
                 // Eat it
             }
-        }
-
-        else if ("file".equalsIgnoreCase(uri.getScheme())) {
+        } else if ("file".equalsIgnoreCase(uri.getScheme())) {
             return uri.getPath();
         }
 
@@ -196,4 +200,29 @@ public class Utils {
         }
         return versionName;
     }
+
+    public static void regitsterNetSateBroadcastReceiver(Context context) {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        context.registerReceiver(new NetStateUtils(), filter);
+    }
+
+    //get time stamp
+    public String getTime() {
+
+        long time = System.currentTimeMillis() / 1000;
+        String str = String.valueOf(time);
+
+        return str;
+
+    }
+
+    public static void setActivityToBeFullscreen(Activity activity)
+    {
+        activity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    }
+
 }
+

@@ -5,6 +5,7 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,8 @@ public class categaryFragment  extends Fragment {
     private String[] dummyCollectionCount = {"1203", "1232"};
     private ViewPager viewPagerLoverOfLife;
     private ListView listViewInstituteRecommended;
+    private SwipeRefreshLayout swipeRefreshLayout
+            ;
 
 
     public categaryFragment() {
@@ -63,11 +66,23 @@ public class categaryFragment  extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        swipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(R.id.swipe_refresh_layout);
+
+        swipeRefreshLayout.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        swipeRefreshLayout.setRefreshing(true);
+
+                                    }
+                                }
+        );
+
         setUpViewPagerLoverOfLife();
         setUpListViewInstituteRecommend();
     }
 
-    private void setUpViewPagerLoverOfLife() {
+    public void setUpViewPagerLoverOfLife() {
 
         //blank view for bounce effect
         View left = new View(getActivity());
@@ -88,9 +103,10 @@ public class categaryFragment  extends Fragment {
         MyPagerAdapter myAdapter = new MyPagerAdapter();
 
         myAdapter.setList(mListViews);
-      viewPagerLoverOfLife = (ViewPager)getActivity().findViewById(R.id.viewpagerLayout);
+      viewPagerLoverOfLife = (ViewPager)getActivity().findViewById(R.id.viewpagerLayoutCategory);
 
         viewPagerLoverOfLife.setAdapter(myAdapter);
+        myAdapter.notifyDataSetChanged();
         viewPagerLoverOfLife.setCurrentItem(1);
         viewPagerLoverOfLife.setOnPageChangeListener(new BouncePageChangeListener(
                 viewPagerLoverOfLife, mListViews));
@@ -98,9 +114,9 @@ public class categaryFragment  extends Fragment {
 
 
     }
-    private void setUpListViewInstituteRecommend() {
+    public void setUpListViewInstituteRecommend() {
 
-       listViewInstituteRecommended = (ListView) getActivity().findViewById(R.id.listViewSelectedInstitute);
+       listViewInstituteRecommended = (ListView) getActivity().findViewById(R.id.listViewSelectedInstituteCategory);
 
         ArrayList<HashMap<String, Object>> listItem = new ArrayList<HashMap<String, Object>>();
 
@@ -126,9 +142,11 @@ public class categaryFragment  extends Fragment {
                 new int[]{R.id.textViewNum, R.id.textViewTitle, R.id.textViewRead, R.id.textViewCollection}
         );
         listViewInstituteRecommended.setAdapter(listItemAdapter);
+        listItemAdapter.notifyDataSetChanged();
 
         //fix bug created by scrollview
         fixListViewHeight(listViewInstituteRecommended);
+        swipeRefreshLayout.setRefreshing(false);
 
     }
 
