@@ -118,4 +118,12 @@ public class UserInfo {
         }
         return ui;
     }
+
+    public static void logout(Context cxt) {
+        SharedPreferences sp = cxt.getSharedPreferences(PREFERENCE_USERINFO, Context.MODE_PRIVATE);
+        Editor ed = sp.edit();
+        ed.remove(UserInfo.PREFERENCE_USERINFO_KEY);
+        ed.commit();
+    }
+
 }
