@@ -429,10 +429,6 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
                     this.onHuaweiCancelled();
                     return;
                 }
-                /*SignInResult lresult = HuaweiId.HuaweiIdApi.getSignInResultFromIntent(data);
-                Log.d(TAG, String.format("Huawei Login returned code: %d %S"
-                        , lresult.getStatus().getStatusCode()
-                        , lresult.getStatus().getStatusMessage()));*/
                 this.startHuaweiLogin();
                 break;
             case HUAWEI_REQUEST_AUTH:
@@ -461,11 +457,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
         this.imHuawei.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!LoginActivity.this.huaweiClient.isConnected()) {
-                    LoginActivity.this.huaweiClient.connect();
-                } else {
-                    LoginActivity.this.startHuaweiLogin();
-                }
+                LoginActivity.this.huaweiClient.connect();
             }
         });
     }
@@ -494,6 +486,10 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
     };
 
     private void startHuaweiLogin() {
+        if (!this.huaweiClient.isConnected()) {
+            this.huaweiClient.connect();
+            return;
+        }
         PendingResult<SignInResult> signReuslt = HuaweiId.HuaweiIdApi.signIn(this.huaweiClient);
         signReuslt.setResultCallback(new ResultCallback<SignInResult>() {
             @Override
@@ -507,7 +503,9 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
                     LoginActivity.this.onHuaweiAuthorized(signInResult);
                 } else {
                     int code = signInResult.getStatus().getStatusCode();
-                    LoginActivity.this.progressDlg = ProgressDialog.show(LoginActivity.this, null, null, true, true);
+                    if ((LoginActivity.this.progressDlg == null) || !LoginActivity.this.progressDlg.isShowing()) {
+                        LoginActivity.this.progressDlg = ProgressDialog.show(LoginActivity.this, null, null, true, true);
+                    }
                     if (code == HuaweiIdStatusCodes.SIGN_IN_UNLOGIN) {
                         Intent i = signInResult.getData();
                         LoginActivity.this.startActivityForResult(i, HUAWEI_REQUEST_UNLOGIN);
