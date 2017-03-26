@@ -17,6 +17,7 @@ android {
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
+        signingConfig signingConfigs.debug
     }
     buildTypes {
         release {
@@ -25,7 +26,10 @@ android {
         }
         debug {
             signingConfig signingConfigs.debug
+            proguardFile '/Users/suncjs/projects/wewow_android/Wewow/app/proguard-rules.pro'
         }
+    }
+    productFlavors {
     }
 }
 
