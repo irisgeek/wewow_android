@@ -54,6 +54,7 @@ import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.tencent.mm.opensdk.modelmsg.SendAuth;
 
 import com.wewow.utils.CommonUtilities;
+import com.wewow.utils.HttpAsyncTask;
 import com.wewow.utils.WebAPIHelper;
 
 import org.json.JSONException;
@@ -193,7 +194,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
                 ups.add(new Pair<String, String>("code", sb.toString()));
                 Object[] params = new Object[]{
                         WebAPIHelper.addUrlParams(String.format("%s/verifycode", CommonUtilities.WS_HOST), ups),
-                        new TaskDelegate() {
+                        new HttpAsyncTask.TaskDelegate() {
                             @Override
                             public void taskCompletionResult(byte[] result) {
                                 LoginActivity.this.progressDlg.dismiss();
@@ -219,7 +220,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
                         }
                 };
                 LoginActivity.this.progressDlg = ProgressDialog.show(LoginActivity.this, null, null, false, true);
-                new LoginAyncTask().execute(params);
+                new HttpAsyncTask().execute(params);
             }
         });
     }
@@ -290,7 +291,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
             public void onClick(View view) {
                 Object[] params = new Object[]{
                         String.format("%s/getcode?phone=%s", CommonUtilities.WS_HOST, LoginActivity.this.edtPhoneNo.getText().toString()),
-                        new TaskDelegate() {
+                        new HttpAsyncTask.TaskDelegate() {
                             private static final String TAG = "ReqCodeTaskDeletegate";
 
                             @Override
@@ -315,7 +316,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
                         }
                 };
                 LoginActivity.this.progressDlg = ProgressDialog.show(LoginActivity.this, null, null, true, false);
-                new LoginAyncTask().execute(params);
+                new HttpAsyncTask().execute(params);
             }
         });
     }
@@ -345,31 +346,6 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
             }
         }
         return super.onKeyUp(keyCode, event);
-    }
-
-    private interface TaskDelegate {
-        public void taskCompletionResult(byte[] result);
-    }
-
-    private class LoginAyncTask extends AsyncTask<Object, Integer, byte[]> {
-
-        public TaskDelegate delegate;
-
-        @Override
-        protected byte[] doInBackground(Object... objects) {
-            String url = (String) objects[0];
-            this.delegate = objects.length > 1 ? (TaskDelegate) objects[1] : null;
-            WebAPIHelper.HttpMethod method = objects.length > 2 ? (WebAPIHelper.HttpMethod) objects[2] : WebAPIHelper.HttpMethod.GET;
-            byte[] buf = objects.length > 3 ? (byte[]) objects[3] : null;
-            WebAPIHelper wpi = WebAPIHelper.getWewowWebAPIHelper();
-            List<Pair<String, String>> headers = objects.length > 4 ? (List<Pair<String, String>>) objects[4] : null;
-            return wpi.callWebAPI(url, method, buf, headers);
-        }
-
-        @Override
-        protected void onPostExecute(byte[] result) {
-            this.delegate.taskCompletionResult(result);
-        }
     }
 
     private void setupWeibo() {
@@ -540,7 +516,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
         headers.add(new Pair<String, String>("Content-Type", "application/x-www-form-urlencoded"));
         Object[] params = new Object[]{
                 String.format("%s/register", CommonUtilities.WS_HOST),
-                new TaskDelegate() {
+                new HttpAsyncTask.TaskDelegate() {
                     @Override
                     public void taskCompletionResult(byte[] result) {
                         LoginActivity.this.progressDlg.dismiss();
@@ -568,7 +544,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
                 WebAPIHelper.buildHttpQuery(urlparams).getBytes(),
                 headers
         };
-        new LoginAyncTask().execute(params);
+        new HttpAsyncTask().execute(params);
     }
 
     private void onHuaweiCancelled() {
