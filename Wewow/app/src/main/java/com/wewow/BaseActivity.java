@@ -74,6 +74,8 @@ public class BaseActivity extends ActionBarActivity {
             R.drawable.selector_btn_share, R.drawable.selector_btn_clear_cache, R.drawable.selector_btn_logout};
     private NavigationView mainNavView;
 
+    private TextView tvusername, tvuserdesc;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,6 +111,8 @@ public class BaseActivity extends ActionBarActivity {
     private void setUpNavigation() {
         planetTitles = getResources().getStringArray(R.array.planets_array);
         drawerList = (ListView) findViewById(R.id.left_drawer);
+        View VheandrView = LayoutInflater.from(this).inflate(R.layout.list_header_drawer, null);
+        drawerList.addHeaderView(VheandrView, null, true);
 
         ArrayList<HashMap<String, Object>> listItem = new ArrayList<HashMap<String, Object>>();
 
@@ -140,23 +144,21 @@ public class BaseActivity extends ActionBarActivity {
 
 
         drawerList.setOnItemClickListener(new DrawerItemClickListener());
-        View VheandrView = LayoutInflater.from(this).inflate(R.layout.list_header_drawer, null);
-        drawerList.addHeaderView(VheandrView);
 
         /**
          * 这里是登录页入口代码sample，登录结果见void onActivityResult 的resultcode，RESULT_CANCELED or  RESULT_OK
          * 登录名，token从UserUtils对象获取
          */
-        TextView usertv = (TextView) this.findViewById(R.id.textViewUsername);
+        this.tvusername = (TextView) VheandrView.findViewById(R.id.textViewUsername);
 //        usertv.setText("Anonymous");
 
         if (UserInfo.isUserLogged(this)) {
 
-            usertv.setText(UserInfo.getCurrentUser(this).getNickname());
-            TextView userSignature = (TextView) findViewById(R.id.textViewSignature);
-            userSignature.setText(UserInfo.getCurrentUser(this).getDesc());
+            this.tvusername.setText(UserInfo.getCurrentUser(this).getNickname());
+            this.tvuserdesc = (TextView) VheandrView.findViewById(R.id.textViewSignature);
+            this.tvuserdesc.setText(UserInfo.getCurrentUser(this).getDesc());
         } else {
-            usertv.setOnClickListener(new View.OnClickListener() {
+            this.tvusername.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Intent i = new Intent();
@@ -196,14 +198,42 @@ public class BaseActivity extends ActionBarActivity {
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            selectItem(position);
+            //selectItem(position);
+            Log.d("BaseActivity", String.format("onItemClick: %d", position));
+            if (position == 0) {
+                Intent i = new Intent();
+                i.setClass(BaseActivity.this, LoginActivity.class);
+                BaseActivity.this.startActivityForResult(i, LoginActivity.REQUEST_CODE_LOGIN);
+                return;
+            }
+            HashMap<String, Object> map = (HashMap<String, Object>) parent.getAdapter().getItem(position - 1);
+            String text = (String) map.get("menuText");
+            int resid = (Integer) map.get("icon");
+            Toast.makeText(BaseActivity.this, text, Toast.LENGTH_SHORT).show();
+            drawerLayout.closeDrawer(GravityCompat.START);
+            switch (position - 1) {
+                case 1:
+                    Intent intent = new Intent(BaseActivity.this, ListArtistActivity.class);
+                    BaseActivity.this.startActivity(intent);
+                    break;
+                case 11:
+                    Log.d("BaseActivity", "Logout");
+                    UserInfo.logout(BaseActivity.this);
+                    BaseActivity.this.tvusername.setText(R.string.notlogged);
+                    BaseActivity.this.tvuserdesc.setText("");
+                    break;
+                case 4:
+                case 7:
+                default:
+                    break;
+            }
         }
     }
 
     private void selectItem(int position) {
         drawerLayout.closeDrawer(GravityCompat.START);
-        Toast.makeText(BaseActivity.this, planetTitles[position-1], Toast.LENGTH_SHORT).show();
-        switch (position-1) {
+        Toast.makeText(BaseActivity.this, planetTitles[position - 1], Toast.LENGTH_SHORT).show();
+        switch (position - 1) {
             case 0:
                 break;
             case 1:
