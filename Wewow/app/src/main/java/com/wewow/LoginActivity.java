@@ -1,5 +1,11 @@
 package com.wewow;
 
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.util.Pair;
 
 import android.app.ProgressDialog;
@@ -22,6 +28,31 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.huawei.hms.api.ConnectionResult;
+import com.huawei.hms.api.HuaweiApiAvailability;
+import com.huawei.hms.api.HuaweiApiAvailability.OnUpdateListener;
+import com.huawei.hms.api.HuaweiApiClient;
+import com.huawei.hms.api.HuaweiApiClient.ConnectionCallbacks;
+import com.huawei.hms.api.HuaweiApiClient.OnConnectionFailedListener;
+import com.huawei.hms.support.api.client.PendingResult;
+import com.huawei.hms.support.api.client.ResultCallback;
+import com.huawei.hms.support.api.client.Status;
+import com.huawei.hms.support.api.hwid.HuaweiId;
+import com.huawei.hms.support.api.hwid.HuaweiIdSignInOptions;
+import com.huawei.hms.support.api.hwid.HuaweiIdStatusCodes;
+import com.huawei.hms.support.api.hwid.SignInHuaweiId;
+import com.huawei.hms.support.api.hwid.SignInResult;
+import com.sina.weibo.sdk.auth.AuthInfo;
+import com.sina.weibo.sdk.auth.WeiboAuthListener;
+import com.sina.weibo.sdk.auth.sso.SsoHandler;
+import com.sina.weibo.sdk.exception.WeiboException;
+import com.tencent.mm.opensdk.modelbase.BaseReq;
+import com.tencent.mm.opensdk.modelbase.BaseResp;
+import com.tencent.mm.opensdk.openapi.IWXAPI;
+import com.tencent.mm.opensdk.openapi.IWXAPIEventHandler;
+import com.tencent.mm.opensdk.openapi.WXAPIFactory;
+import com.tencent.mm.opensdk.modelmsg.SendAuth;
+
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.WebAPIHelper;
 
@@ -30,19 +61,26 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends ActionBarActivity {
+public class LoginActivity extends ActionBarActivity implements OnConnectionFailedListener, ConnectionCallbacks, OnUpdateListener {
 
     public static final int REQUEST_CODE_LOGIN = 1;
 
     public static final int RESPONSE_CODE_MOILE = 1;
-    public static final int RESPONSE_CODE_WECHAT= 2;
+    public static final int RESPONSE_CODE_WECHAT = 2;
     public static final int RESPONSE_CODE_WEIBO = 3;
     public static final int RESPONSE_CODE_HUAWEI = 4;
+
+    private static final int HUAWEI_REQUEST_RESOLVE_ERROR = 1001;
+    private static final int HUAWEI_REQUEST_UNLOGIN = 1002;
+    private static final int HUAWEI_REQUEST_AUTH = 1003;
+
+    private static final String TAG = "LoginActivity";
 
     private Button btnSendVerifyCode;
     private TextView btnSendVerifyCode2;
@@ -56,6 +94,7 @@ public class LoginActivity extends ActionBarActivity {
     private Button btnlogin;
     private TextView tvNumberSent;
     private TextView tvVerifyCountdown;
+    private HuaweiApiClient huaweiClient = null;
 
     private ProgressDialog progressDlg;
     private CountDownTimer verifyTimer = new CountDownTimer(30 * 1000, 1000) {
@@ -78,14 +117,19 @@ public class LoginActivity extends ActionBarActivity {
         this.initView();
     }
 
+    @Override
+    protected void onStop() {
+        if ((this.huaweiClient != null) && this.huaweiClient.isConnected()) {
+            this.huaweiClient.disconnect();
+        }
+        super.onStop();
+    }
+
     /**
      * register event handlers
      */
     private void initView() {
         this.edtPhoneNo = (EditText) this.findViewById(R.id.login_phone_number);
-        this.imWechat = (ImageButton) this.findViewById(R.id.login_btn_wechat);
-        this.imWeibo = (ImageButton) this.findViewById(R.id.login_btn_weibo);
-        this.imHuawei = (ImageButton) this.findViewById(R.id.login_btn_huawei);
         this.startView = this.findViewById(R.id.login_mobile_start_view);
         this.verifyView = this.findViewById(R.id.login_mobile_verify_view);
         this.btnlogin = (Button) this.findViewById(R.id.login_btn_login);
@@ -123,6 +167,9 @@ public class LoginActivity extends ActionBarActivity {
 
         this.setupInputVerifyCode();
         this.setupLogin();
+        this.setupWeibo();
+        this.setupWechat();
+        this.setupHuawei();
     }
 
     /**
@@ -315,7 +362,8 @@ public class LoginActivity extends ActionBarActivity {
             WebAPIHelper.HttpMethod method = objects.length > 2 ? (WebAPIHelper.HttpMethod) objects[2] : WebAPIHelper.HttpMethod.GET;
             byte[] buf = objects.length > 3 ? (byte[]) objects[3] : null;
             WebAPIHelper wpi = WebAPIHelper.getWewowWebAPIHelper();
-            return wpi.callWebAPI(url, method, buf);
+            List<Pair<String, String>> headers = objects.length > 4 ? (List<Pair<String, String>>) objects[4] : null;
+            return wpi.callWebAPI(url, method, buf, headers);
         }
 
         @Override
@@ -323,5 +371,248 @@ public class LoginActivity extends ActionBarActivity {
             this.delegate.taskCompletionResult(result);
         }
     }
+
+    private void setupWeibo() {
+        this.imWeibo = (ImageButton) this.findViewById(R.id.login_btn_weibo);
+        AuthInfo authInfo = new AuthInfo(this, CommonUtilities.Weibo_AppKey, CommonUtilities.Weibo_Redirect_URL, CommonUtilities.Weibo_Scope);
+        final SsoHandler ssohandler = new SsoHandler(this, authInfo);
+        this.imWeibo.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ssohandler.authorize(new WeiboAuthListener() {
+                    @Override
+                    public void onComplete(Bundle bundle) {
+                        // todo parse login result and login
+                        Toast.makeText(LoginActivity.this, R.string.login_weibo_ok, Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onWeiboException(WeiboException e) {
+                        Toast.makeText(LoginActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        Toast.makeText(LoginActivity.this, R.string.login_weibo_cancel, Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        });
+    }
+
+    private void setupWechat() {
+        this.imWechat = (ImageButton) this.findViewById(R.id.login_btn_wechat);
+        this.imWechat.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                IWXAPI api = WXAPIFactory.createWXAPI(LoginActivity.this, CommonUtilities.WX_AppID, false);
+                if (!api.isWXAppInstalled()) {
+                    Toast.makeText(LoginActivity.this, R.string.login_wechat_not_install, Toast.LENGTH_LONG).show();
+                    return;
+                }
+                api.registerApp(CommonUtilities.WX_AppID);
+                final SendAuth.Req req = new SendAuth.Req();
+                req.scope = "snsapi_userinfo";
+                req.state = LoginActivity.this.getPackageName();
+                api.sendReq(req);
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, String.format("onActivityResult request:%d  result:%d", requestCode, resultCode));
+        switch (requestCode) {
+            case HUAWEI_REQUEST_UNLOGIN:
+                this.progressDlg.dismiss();
+                if (resultCode == 0) {
+                    this.onHuaweiCancelled();
+                    return;
+                }
+                this.startHuaweiLogin();
+                break;
+            case HUAWEI_REQUEST_AUTH:
+                this.progressDlg.dismiss();
+                if (resultCode == 0) {
+                    this.onHuaweiCancelled();
+                    return;
+                }
+                SignInResult aresult = HuaweiId.HuaweiIdApi.getSignInResultFromIntent(data);
+                Log.d(TAG, String.format("Huawei Auth returned code: %d", aresult.getStatus().getStatusCode()));
+                this.onHuaweiAuthorized(aresult);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void setupHuawei() {
+        this.imHuawei = (ImageButton) this.findViewById(R.id.login_btn_huawei);
+        HuaweiIdSignInOptions signInOptions = new HuaweiIdSignInOptions.Builder(HuaweiIdSignInOptions.DEFAULT_SIGN_IN).build();
+        this.huaweiClient = new HuaweiApiClient.Builder(this)
+                .addApi(HuaweiId.SIGN_IN_API, signInOptions)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+        this.imHuawei.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LoginActivity.this.huaweiClient.connect();
+            }
+        });
+    }
+
+    private ResultCallback<SignInResult> huaweiCallback = new ResultCallback<SignInResult>() {
+        @Override
+        public void onResult(SignInResult signInResult) {
+            if (signInResult == null) {
+                Log.d(TAG, "signInResult null");
+                return;
+            }
+            Log.d(TAG, String.format("Huawei sign onResult: %b", signInResult.isSuccess()));
+            if (signInResult.isSuccess()) {
+                LoginActivity.this.onHuaweiAuthorized(signInResult);
+            } else {
+                int code = signInResult.getStatus().getStatusCode();
+                if (code == HuaweiIdStatusCodes.SIGN_IN_UNLOGIN) {
+                    Intent i = signInResult.getData();
+                    LoginActivity.this.startActivityForResult(i, HUAWEI_REQUEST_UNLOGIN);
+                } else if (code == HuaweiIdStatusCodes.SIGN_IN_AUTH) {
+                    Intent i = signInResult.getData();
+                    LoginActivity.this.startActivityForResult(i, HUAWEI_REQUEST_AUTH);
+                }
+            }
+        }
+    };
+
+    private void startHuaweiLogin() {
+        if (!this.huaweiClient.isConnected()) {
+            this.huaweiClient.connect();
+            return;
+        }
+        PendingResult<SignInResult> signReuslt = HuaweiId.HuaweiIdApi.signIn(this.huaweiClient);
+        signReuslt.setResultCallback(new ResultCallback<SignInResult>() {
+            @Override
+            public void onResult(SignInResult signInResult) {
+                if (signInResult == null) {
+                    Log.d(TAG, "signInResult null");
+                    return;
+                }
+                Log.d(TAG, String.format("Huawei sign onResult: %b", signInResult.isSuccess()));
+                if (signInResult.isSuccess()) {
+                    LoginActivity.this.onHuaweiAuthorized(signInResult);
+                } else {
+                    int code = signInResult.getStatus().getStatusCode();
+                    if ((LoginActivity.this.progressDlg == null) || !LoginActivity.this.progressDlg.isShowing()) {
+                        LoginActivity.this.progressDlg = ProgressDialog.show(LoginActivity.this, null, null, true, true);
+                    }
+                    if (code == HuaweiIdStatusCodes.SIGN_IN_UNLOGIN) {
+                        Intent i = signInResult.getData();
+                        LoginActivity.this.startActivityForResult(i, HUAWEI_REQUEST_UNLOGIN);
+                    } else if (code == HuaweiIdStatusCodes.SIGN_IN_AUTH) {
+                        Intent i = signInResult.getData();
+                        LoginActivity.this.startActivityForResult(i, HUAWEI_REQUEST_AUTH);
+                    }
+                }
+            }
+        });
+    }
+
+    private void onHuaweiAuthorized(SignInResult result) {
+        Log.d(TAG, "onHuaweiAuthorized: ");
+        Log.d(TAG, result != null ? "result" : "null");
+        final SignInHuaweiId hid = result.getSignInHuaweiId();
+        Log.d(TAG, "onHuaweiAuthorized: " + hid.getOpenId() + " " + hid.getDisplayName());
+        this.progressDlg = ProgressDialog.show(LoginActivity.this, null, null, true, true);
+        List<Pair<String, String>> urlparams = new ArrayList<Pair<String, String>>();
+        urlparams.add(new Pair<String, String>("open_id", hid.getOpenId()));
+        urlparams.add(new Pair<String, String>("nickname", hid.getDisplayName()));
+        urlparams.add(new Pair<String, String>("from", "huawei"));
+        Log.d(TAG, WebAPIHelper.buildHttpQuery(urlparams));
+        byte[] load;
+        try {
+            load = WebAPIHelper.buildHttpQuery(urlparams).getBytes("utf-8");
+        } catch (UnsupportedEncodingException e) {
+            load = new byte[0];
+        }
+        List<Pair<String, String>> headers = new ArrayList<Pair<String, String>>();
+        headers.add(new Pair<String, String>("Content-Type", "application/x-www-form-urlencoded"));
+        Object[] params = new Object[]{
+                String.format("%s/register", CommonUtilities.WS_HOST),
+                new TaskDelegate() {
+                    @Override
+                    public void taskCompletionResult(byte[] result) {
+                        LoginActivity.this.progressDlg.dismiss();
+                        try {
+                            String s = new String(result, "utf-8");
+                            Log.d(TAG, "taskCompletionResult: " + s);
+                            JSONObject jobj = new JSONObject(s).getJSONObject("result");
+                            Toast.makeText(LoginActivity.this, jobj.getString("message"), Toast.LENGTH_LONG).show();
+                            if (jobj.getInt("code") == 0) {
+                                UserInfo user = UserInfo.getUserInfo(jobj.getJSONObject("user"));
+                                user.saveUserInfo(LoginActivity.this);
+                                LoginActivity.this.setResult(RESPONSE_CODE_HUAWEI);
+                                LoginActivity.this.finish();
+                            } else {
+                                Toast.makeText(LoginActivity.this, jobj.getString("message"), Toast.LENGTH_LONG).show();
+                            }
+                        } catch (UnsupportedEncodingException e) {
+                            Log.e(TAG, String.format("register Huawei user %s %s decode fail", hid.getDisplayName(), hid.getDisplayName()));
+                        } catch (JSONException e) {
+                            Log.e(TAG, String.format("register Huawei user %s %s json fail", hid.getDisplayName(), hid.getDisplayName()));
+                        }
+                    }
+                },
+                WebAPIHelper.HttpMethod.POST,
+                WebAPIHelper.buildHttpQuery(urlparams).getBytes(),
+                headers
+        };
+        new LoginAyncTask().execute(params);
+    }
+
+    private void onHuaweiCancelled() {
+        Log.d(TAG, "Huawei cancelled");
+        Toast.makeText(LoginActivity.this, R.string.login_huawei_cancel, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onUpdateFailed(@NonNull ConnectionResult connectionResult) {
+        Log.d(TAG, "Huawei client onUpdateFailed");
+        Log.d(TAG, String.format("code:%d message:%s", connectionResult.getErrorCode(), connectionResult.toString()));
+    }
+
+    @Override
+    public void onConnected() {
+        Log.d(TAG, "Huawei client onConnected");
+        this.startHuaweiLogin();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.d(TAG, "Huawei client onConnectionSuspended");
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.d(TAG, "Huawei client onConnectionFailed");
+        Log.d(TAG, String.format("code:%d", connectionResult.getErrorCode()));
+        final int errorCode = connectionResult.getErrorCode();
+        final HuaweiApiAvailability availability = HuaweiApiAvailability.getInstance();
+        Log.d(TAG, String.format("Huawei API avaiable: %b", availability.isHuaweiMobileServicesAvailable(this)));
+        if (availability.isUserResolvableError(errorCode)) {
+            AlertDialog adlg = new AlertDialog.Builder(this)
+                    .setTitle(R.string.login_huawei_download_service_title)
+                    .setMessage(R.string.login_huawei_download_service_description)
+                    .setNeutralButton(R.string.login_huawei_prompt_gotit, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            availability.resolveError(LoginActivity.this, errorCode, HUAWEI_REQUEST_RESOLVE_ERROR, LoginActivity.this);
+                        }
+                    }).show();
+
+        }
+    }
+
 }
 

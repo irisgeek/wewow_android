@@ -3,6 +3,8 @@
 
 
     <string name="action_settings">Settings</string>
+
+    <!-- Login -->
     <string name="login_title">登录唯物</string>
     <string name="login_phone_country_code">+86</string>
     <string name="login_send_verify_code">发送验证码</string>
@@ -13,10 +15,21 @@
     <string name="login_wait_verify_countdown">%d秒后可再次尝试</string>
     <string name="login_gologin">登录</string>
     <string name="login_verifycode_sent">验证码已发送至%s</string>
-
+    <string name="login_weibo_cancel">微博登录已取消</string>
+    <string name="login_weibo_ok">微博登录已成功</string>
+    <string name="login_wechat_not_install">请先安装微信</string>
+    <string name="login_wechat_cancel">微信登录已取消</string>
+    <string name="login_wechat_ok">微信登录已成功</string>
+    <string name="login_wechat_deny">微信登录已被用户拒绝</string>
+    <string name="login_huawei_download_service_title">提示</string>
+    <string name="login_huawei_download_service_description">您可能需要安装华为移动服务。如果持续遇到下载失败的提示，建议自行手动下载安装“华为移动服务”。</string>
+    <string name="login_huawei_prompt_gotit">我知道了</string>
+    <string name="login_huawei_connecting">连接华为移动服务</string>
+    <string name="login_huawei_cancel">华为登录已取消</string>
 
     <!-- Home page -->
     <!-- naivgation title -->
+    <string name="notlogged">尚未登录</string>
     <string name="home"> 首页 </string>
     <string name="test1">个人养成</string>
     <string name="test2">日常生活</string>
