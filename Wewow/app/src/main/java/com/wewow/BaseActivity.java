@@ -150,12 +150,15 @@ public class BaseActivity extends ActionBarActivity {
          * 登录名，token从UserUtils对象获取
          */
         this.tvusername = (TextView) VheandrView.findViewById(R.id.textViewUsername);
+
+        //fix crash when clicking logout
+        this.tvuserdesc = (TextView) VheandrView.findViewById(R.id.textViewSignature);
 //        usertv.setText("Anonymous");
 
         if (UserInfo.isUserLogged(this)) {
 
             this.tvusername.setText(UserInfo.getCurrentUser(this).getNickname());
-            this.tvuserdesc = (TextView) VheandrView.findViewById(R.id.textViewSignature);
+
             this.tvuserdesc.setText(UserInfo.getCurrentUser(this).getDesc());
         } else {
             this.tvusername.setOnClickListener(new View.OnClickListener() {
@@ -206,12 +209,17 @@ public class BaseActivity extends ActionBarActivity {
                 BaseActivity.this.startActivityForResult(i, LoginActivity.REQUEST_CODE_LOGIN);
                 return;
             }
-            HashMap<String, Object> map = (HashMap<String, Object>) parent.getAdapter().getItem(position - 1);
+
+            HashMap<String, Object> map = (HashMap<String, Object>) parent.getAdapter().getItem(position);
             String text = (String) map.get("menuText");
             int resid = (Integer) map.get("icon");
             Toast.makeText(BaseActivity.this, text, Toast.LENGTH_SHORT).show();
             drawerLayout.closeDrawer(GravityCompat.START);
             switch (position - 1) {
+                case 0:
+                    Intent intentMain = new Intent(BaseActivity.this, MainActivity.class);
+                    BaseActivity.this.startActivity(intentMain);
+                    break;
                 case 1:
                     Intent intent = new Intent(BaseActivity.this, ListArtistActivity.class);
                     BaseActivity.this.startActivity(intent);
@@ -219,8 +227,8 @@ public class BaseActivity extends ActionBarActivity {
                 case 11:
                     Log.d("BaseActivity", "Logout");
                     UserInfo.logout(BaseActivity.this);
-                    BaseActivity.this.tvusername.setText(R.string.notlogged);
-                    BaseActivity.this.tvuserdesc.setText("");
+                    BaseActivity.this.tvusername.setText(R.string.login_gologin);
+                    BaseActivity.this.tvuserdesc.setText(R.string.login_to_see_more);
                     break;
                 case 4:
                 case 7:

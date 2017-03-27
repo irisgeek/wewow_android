@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         debug {
-            storeFile file('/Users/suncjs/projects/wewow_android/Wewow/wewow.jks')
+            storeFile file('wewow.jks')
             keyAlias 'debug'
             keyPassword 'com.wewow'
             storePassword 'com.wewow'
@@ -26,7 +26,7 @@ android {
         }
         debug {
             signingConfig signingConfigs.debug
-            proguardFile '/Users/suncjs/projects/wewow_android/Wewow/app/proguard-rules.pro'
+            proguardFile 'proguard-rules.pro'
         }
     }
     productFlavors {
