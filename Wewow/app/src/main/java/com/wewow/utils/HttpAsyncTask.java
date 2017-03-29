@@ -1,8 +1,13 @@
 package com.wewow.utils;
 
 import android.os.AsyncTask;
+import android.util.Log;
 import android.util.Pair;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 /**
@@ -10,6 +15,9 @@ import java.util.List;
  */
 
 public class HttpAsyncTask extends AsyncTask<Object, Integer, byte[]> {
+
+    private static final String TAG = "HttpAsyncTask";
+
     public interface TaskDelegate {
         public void taskCompletionResult(byte[] result);
     }
@@ -32,4 +40,27 @@ public class HttpAsyncTask extends AsyncTask<Object, Integer, byte[]> {
         this.delegate.taskCompletionResult(result);
     }
 
+    public static JSONObject bytearray2JSON(byte[] in) {
+        return bytearray2JSON(in, "utf-8");
+    }
+
+    public static JSONObject bytearray2JSON(byte[] in, String charsetname) {
+        try {
+            String s = new String(in, charsetname);
+            return string2JSON(s);
+        } catch (UnsupportedEncodingException e) {
+            Log.w(TAG, "can't convert byte[] to string, encoding error");
+            return null;
+        }
+    }
+
+    public static JSONObject string2JSON(String s) {
+        try {
+            return s == null ? null : new JSONObject(s);
+        } catch (JSONException e) {
+            Log.w(TAG, "can't convert string to json");
+            Log.w(TAG, s);
+            return null;
+        }
+    }
 }
