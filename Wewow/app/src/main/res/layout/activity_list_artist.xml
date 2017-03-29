@@ -12,10 +12,22 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="80dp"
+            android:layout_marginTop="60dp"
             android:scaleType="fitXY"
             android:src="@drawable/divider" />
     </LinearLayout>
+
+    <ListView
+        android:id="@+id/listViewArtists"
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="70dp"
+        android:choiceMode="singleChoice"
+android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:divider="#e2e2e2"
+        android:dividerHeight="1dp" />
 
     <include layout="@layout/toolbar" />
 
