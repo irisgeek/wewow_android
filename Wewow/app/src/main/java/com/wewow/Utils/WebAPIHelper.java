@@ -107,6 +107,7 @@ public class WebAPIHelper {
             }
             InputStream is = entity.getContent();
             int len = (int) entity.getContentLength();
+            len = len > 0 ? len : 1024 * 1024;
             byte[] buf = new byte[len];
             ByteArrayOutputStream ops = new ByteArrayOutputStream();
             while (true) {
