@@ -60,6 +60,12 @@
             android:name=".LifeLabActivity"
             android:label="LifeLabList"
             android:screenOrientation="portrait"></activity>
+        <activity
+            android:name="com.sina.weibo.sdk.component.WeiboSdkBrowser"
+            android:configChanges="keyboardHidden|orientation"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false" >
+        </activity>
 
         <receiver android:name=".utils.NetStateUtils">
             <intent-filter>
