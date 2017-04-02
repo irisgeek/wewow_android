@@ -43,9 +43,14 @@ import com.huawei.hms.support.api.hwid.HuaweiIdStatusCodes;
 import com.huawei.hms.support.api.hwid.SignInHuaweiId;
 import com.huawei.hms.support.api.hwid.SignInResult;
 import com.sina.weibo.sdk.auth.AuthInfo;
+import com.sina.weibo.sdk.auth.Oauth2AccessToken;
 import com.sina.weibo.sdk.auth.WeiboAuthListener;
 import com.sina.weibo.sdk.auth.sso.SsoHandler;
 import com.sina.weibo.sdk.exception.WeiboException;
+import com.sina.weibo.sdk.net.HttpManager;
+import com.sina.weibo.sdk.net.RequestListener;
+import com.sina.weibo.sdk.openapi.UsersAPI;
+import com.sina.weibo.sdk.openapi.models.User;
 import com.tencent.mm.opensdk.modelbase.BaseReq;
 import com.tencent.mm.opensdk.modelbase.BaseResp;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
@@ -54,6 +59,7 @@ import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.tencent.mm.opensdk.modelmsg.SendAuth;
 
 import com.wewow.utils.CommonUtilities;
+import com.wewow.utils.HttpAsyncTask;
 import com.wewow.utils.WebAPIHelper;
 
 import org.json.JSONException;
@@ -95,6 +101,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
     private TextView tvNumberSent;
     private TextView tvVerifyCountdown;
     private HuaweiApiClient huaweiClient = null;
+    private SsoHandler ssohandler;
 
     private ProgressDialog progressDlg;
     private CountDownTimer verifyTimer = new CountDownTimer(30 * 1000, 1000) {
@@ -193,10 +200,10 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
                 ups.add(new Pair<String, String>("code", sb.toString()));
                 Object[] params = new Object[]{
                         WebAPIHelper.addUrlParams(String.format("%s/verifycode", CommonUtilities.WS_HOST), ups),
-                        new TaskDelegate() {
+                        new HttpAsyncTask.TaskDelegate() {
                             @Override
                             public void taskCompletionResult(byte[] result) {
-                                LoginActivity.this.progressDlg.dismiss();
+                                LoginActivity.this.toggleProgressDialog(false);
                                 try {
                                     String x = new String(result, "utf-8");
                                     Log.d(TAG, String.format("login returns: %s", x));
@@ -218,10 +225,22 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
                             }
                         }
                 };
-                LoginActivity.this.progressDlg = ProgressDialog.show(LoginActivity.this, null, null, false, true);
-                new LoginAyncTask().execute(params);
+                LoginActivity.this.toggleProgressDialog(true);
+                new HttpAsyncTask().execute(params);
             }
         });
+    }
+
+    private void toggleProgressDialog(boolean show) {
+        if (show) {
+            if ((this.progressDlg == null) || !this.progressDlg.isShowing()) {
+                this.progressDlg = ProgressDialog.show(LoginActivity.this, null, null, false, true);
+            }
+        } else {
+            if (this.progressDlg != null) {
+                this.progressDlg.dismiss();
+            }
+        }
     }
 
     /**
@@ -290,13 +309,13 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
             public void onClick(View view) {
                 Object[] params = new Object[]{
                         String.format("%s/getcode?phone=%s", CommonUtilities.WS_HOST, LoginActivity.this.edtPhoneNo.getText().toString()),
-                        new TaskDelegate() {
+                        new HttpAsyncTask.TaskDelegate() {
                             private static final String TAG = "ReqCodeTaskDeletegate";
 
                             @Override
                             public void taskCompletionResult(byte[] result) {
                                 try {
-                                    LoginActivity.this.progressDlg.dismiss();
+                                    LoginActivity.this.toggleProgressDialog(false);
                                     String x = new String(result, "utf-8");
                                     Log.d(TAG, String.format("return: %s", x));
                                     JSONObject jobj = new JSONObject(x).getJSONObject("result");
@@ -314,8 +333,8 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
                             }
                         }
                 };
-                LoginActivity.this.progressDlg = ProgressDialog.show(LoginActivity.this, null, null, true, false);
-                new LoginAyncTask().execute(params);
+                LoginActivity.this.toggleProgressDialog(true);
+                new HttpAsyncTask().execute(params);
             }
         });
     }
@@ -347,43 +366,72 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
         return super.onKeyUp(keyCode, event);
     }
 
-    private interface TaskDelegate {
-        public void taskCompletionResult(byte[] result);
-    }
-
-    private class LoginAyncTask extends AsyncTask<Object, Integer, byte[]> {
-
-        public TaskDelegate delegate;
-
-        @Override
-        protected byte[] doInBackground(Object... objects) {
-            String url = (String) objects[0];
-            this.delegate = objects.length > 1 ? (TaskDelegate) objects[1] : null;
-            WebAPIHelper.HttpMethod method = objects.length > 2 ? (WebAPIHelper.HttpMethod) objects[2] : WebAPIHelper.HttpMethod.GET;
-            byte[] buf = objects.length > 3 ? (byte[]) objects[3] : null;
-            WebAPIHelper wpi = WebAPIHelper.getWewowWebAPIHelper();
-            List<Pair<String, String>> headers = objects.length > 4 ? (List<Pair<String, String>>) objects[4] : null;
-            return wpi.callWebAPI(url, method, buf, headers);
-        }
-
-        @Override
-        protected void onPostExecute(byte[] result) {
-            this.delegate.taskCompletionResult(result);
-        }
-    }
-
     private void setupWeibo() {
         this.imWeibo = (ImageButton) this.findViewById(R.id.login_btn_weibo);
         AuthInfo authInfo = new AuthInfo(this, CommonUtilities.Weibo_AppKey, CommonUtilities.Weibo_Redirect_URL, CommonUtilities.Weibo_Scope);
-        final SsoHandler ssohandler = new SsoHandler(this, authInfo);
+        this.ssohandler = new SsoHandler(this, authInfo);
         this.imWeibo.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 ssohandler.authorize(new WeiboAuthListener() {
                     @Override
                     public void onComplete(Bundle bundle) {
-                        // todo parse login result and login
-                        Toast.makeText(LoginActivity.this, R.string.login_weibo_ok, Toast.LENGTH_LONG).show();
+                        Log.d(TAG, "Weibo login succeed");
+                        final Oauth2AccessToken token = Oauth2AccessToken.parseAccessToken(bundle);
+                        UsersAPI userapi = new UsersAPI(LoginActivity.this, CommonUtilities.Weibo_AppKey, token);
+                        LoginActivity.this.toggleProgressDialog(true);
+                        userapi.show(Long.parseLong(token.getUid()), new RequestListener() {
+                            @Override
+                            public void onComplete(String s) {
+                                LoginActivity.this.toggleProgressDialog(false);
+                                final User user = User.parse(s);
+                                List<Pair<String, String>> urlparams = new ArrayList<Pair<String, String>>();
+                                urlparams.add(new Pair<String, String>("open_id", token.getUid()));
+                                urlparams.add(new Pair<String, String>("nickname", user.screen_name));
+                                urlparams.add(new Pair<String, String>("from", "weibo"));
+                                List<Pair<String, String>> headers = new ArrayList<Pair<String, String>>();
+                                headers.add(new Pair<String, String>("Content-Type", "application/x-www-form-urlencoded"));
+                                Object[] params = new Object[]{
+                                        String.format("%s/register", CommonUtilities.WS_HOST),
+                                        new HttpAsyncTask.TaskDelegate() {
+                                            @Override
+                                            public void taskCompletionResult(byte[] result) {
+                                                LoginActivity.this.toggleProgressDialog(false);
+                                                try {
+                                                    String s = new String(result, "utf-8");
+                                                    Log.d(TAG, "taskCompletionResult: " + s);
+                                                    JSONObject jobj = new JSONObject(s).getJSONObject("result");
+                                                    Toast.makeText(LoginActivity.this, jobj.getString("message"), Toast.LENGTH_LONG).show();
+                                                    if (jobj.getInt("code") == 0) {
+                                                        UserInfo user = UserInfo.getUserInfo(jobj.getJSONObject("user"));
+                                                        user.saveUserInfo(LoginActivity.this);
+                                                        Toast.makeText(LoginActivity.this, R.string.login_weibo_ok, Toast.LENGTH_LONG).show();
+                                                        LoginActivity.this.setResult(RESPONSE_CODE_WEIBO);
+                                                        LoginActivity.this.finish();
+                                                    } else {
+                                                        Toast.makeText(LoginActivity.this, jobj.getString("message"), Toast.LENGTH_LONG).show();
+                                                    }
+                                                } catch (UnsupportedEncodingException e) {
+                                                    Log.e(TAG, String.format("register Weibo user %s %s decode fail", user.idstr, user.screen_name));
+                                                } catch (JSONException e) {
+                                                    Log.e(TAG, String.format("register Weibo user %s %s json fail", user.idstr, user.screen_name));
+                                                }
+                                            }
+                                        },
+                                        WebAPIHelper.HttpMethod.POST,
+                                        WebAPIHelper.buildHttpQuery(urlparams).getBytes(),
+                                        headers
+                                };
+                                new HttpAsyncTask().execute(params);
+                            }
+
+                            @Override
+                            public void onWeiboException(WeiboException e) {
+                                LoginActivity.this.toggleProgressDialog(false);
+                                Log.e(TAG, String.format("onWeiboException: %s", e.getMessage()));
+                                Toast.makeText(LoginActivity.this, R.string.serverError, Toast.LENGTH_LONG).show();
+                            }
+                        });
                     }
 
                     @Override
@@ -425,7 +473,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
         Log.d(TAG, String.format("onActivityResult request:%d  result:%d", requestCode, resultCode));
         switch (requestCode) {
             case HUAWEI_REQUEST_UNLOGIN:
-                this.progressDlg.dismiss();
+                this.toggleProgressDialog(true);
                 if (resultCode == 0) {
                     this.onHuaweiCancelled();
                     return;
@@ -433,7 +481,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
                 this.startHuaweiLogin();
                 break;
             case HUAWEI_REQUEST_AUTH:
-                this.progressDlg.dismiss();
+                this.toggleProgressDialog(true);
                 if (resultCode == 0) {
                     this.onHuaweiCancelled();
                     return;
@@ -443,6 +491,9 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
                 this.onHuaweiAuthorized(aresult);
                 break;
             default:
+                if (this.ssohandler != null) {
+                    this.ssohandler.authorizeCallBack(requestCode, resultCode, data);
+                }
                 break;
         }
     }
@@ -504,9 +555,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
                     LoginActivity.this.onHuaweiAuthorized(signInResult);
                 } else {
                     int code = signInResult.getStatus().getStatusCode();
-                    if ((LoginActivity.this.progressDlg == null) || !LoginActivity.this.progressDlg.isShowing()) {
-                        LoginActivity.this.progressDlg = ProgressDialog.show(LoginActivity.this, null, null, true, true);
-                    }
+                    LoginActivity.this.toggleProgressDialog(true);
                     if (code == HuaweiIdStatusCodes.SIGN_IN_UNLOGIN) {
                         Intent i = signInResult.getData();
                         LoginActivity.this.startActivityForResult(i, HUAWEI_REQUEST_UNLOGIN);
@@ -524,7 +573,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
         Log.d(TAG, result != null ? "result" : "null");
         final SignInHuaweiId hid = result.getSignInHuaweiId();
         Log.d(TAG, "onHuaweiAuthorized: " + hid.getOpenId() + " " + hid.getDisplayName());
-        this.progressDlg = ProgressDialog.show(LoginActivity.this, null, null, true, true);
+        this.toggleProgressDialog(true);
         List<Pair<String, String>> urlparams = new ArrayList<Pair<String, String>>();
         urlparams.add(new Pair<String, String>("open_id", hid.getOpenId()));
         urlparams.add(new Pair<String, String>("nickname", hid.getDisplayName()));
@@ -540,10 +589,10 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
         headers.add(new Pair<String, String>("Content-Type", "application/x-www-form-urlencoded"));
         Object[] params = new Object[]{
                 String.format("%s/register", CommonUtilities.WS_HOST),
-                new TaskDelegate() {
+                new HttpAsyncTask.TaskDelegate() {
                     @Override
                     public void taskCompletionResult(byte[] result) {
-                        LoginActivity.this.progressDlg.dismiss();
+                        LoginActivity.this.toggleProgressDialog(false);
                         try {
                             String s = new String(result, "utf-8");
                             Log.d(TAG, "taskCompletionResult: " + s);
@@ -568,7 +617,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
                 WebAPIHelper.buildHttpQuery(urlparams).getBytes(),
                 headers
         };
-        new LoginAyncTask().execute(params);
+        new HttpAsyncTask().execute(params);
     }
 
     private void onHuaweiCancelled() {
