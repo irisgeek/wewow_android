@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import retrofit.Callback;
 import retrofit.http.GET;
 import retrofit.http.Header;
+import retrofit.http.Query;
 
 /**
  * Created by iris on 17/3/14.
@@ -25,6 +26,12 @@ public interface ITask {
 
     @GET("/update_at")
     void updateAt(@Header("User-Agent") String headerContentType, Callback<JSONObject> callback);
+
+    @GET("/artists_mini")
+    void allArtists(@Header("User-Agent") String headerContentType, @Query("user_id") String userId, @Query("page") int page,  Callback<JSONObject> callback);
+
+
+
 
 
 }

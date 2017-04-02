@@ -6,21 +6,21 @@ import android.os.Parcelable;
 /**
  * Created by iris on 17/3/22.
  */
-public class Artist implements Parcelable{
+public class Artist implements Parcelable {
 
-    private  String image;
-    private  String nickname;
-    private  String id;
-    private  String desc;
-    private  String article_count;
-    private  String follower_count;
+    private String image;
+    private String nickname;
+    private String id;
+    private String desc;
+    private String article_count;
+    private String follower_count;
+    private String followed;
 
 
     public static final Creator<Artist> CREATOR = new Creator<Artist>() {
         @Override
         public Artist createFromParcel(Parcel in) {
-            Artist artist=new Artist();
-
+            Artist artist = new Artist();
 
 
             return artist;
@@ -93,5 +93,13 @@ public class Artist implements Parcelable{
 
     public void setFollower_count(String follower_count) {
         this.follower_count = follower_count;
+    }
+
+    public String getFollowed() {
+        return followed;
+    }
+
+    public void setFollowed(String followed) {
+        this.followed = followed;
     }
 }

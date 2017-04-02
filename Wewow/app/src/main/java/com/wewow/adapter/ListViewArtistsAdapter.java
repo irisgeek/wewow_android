@@ -55,6 +55,7 @@ public class ListViewArtistsAdapter extends BaseAdapter
             holder.textViewDesc= (TextView)convertView.findViewById(R.id.textViewDesc);
             holder.textViewArticleCount=(TextView)convertView.findViewById(R.id.textViewArticle);
             holder.textViewFollowerCount=(TextView)convertView.findViewById(R.id.textViewFollow);
+            holder.imageViewFollowed=(ImageView)convertView.findViewById(R.id.imageViewFollowed);
 
             convertView.setTag(holder);
         }else
@@ -71,6 +72,15 @@ public class ListViewArtistsAdapter extends BaseAdapter
         holder.textViewDesc.setText(stringObjectHashMap.get("textViewDesc").toString());
         holder.textViewArticleCount.setText(stringObjectHashMap.get("textViewArticleCount").toString());
         holder.textViewFollowerCount.setText(stringObjectHashMap.get("textViewFollowerCount").toString());
+        if(stringObjectHashMap.get("imageViewFollowed").toString().equals("1")) {
+            holder.imageViewFollowed.setImageResource(R.drawable.followed);
+
+        }
+        else
+        {
+            holder.imageViewFollowed.setImageResource(R.drawable.follow);
+        }
+
 
         return convertView;
 
@@ -85,6 +95,7 @@ public class ListViewArtistsAdapter extends BaseAdapter
         public TextView textViewDesc;
         public TextView textViewArticleCount;
         public TextView textViewFollowerCount;
+        public ImageView imageViewFollowed;
     }
 
 }
