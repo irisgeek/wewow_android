@@ -38,7 +38,6 @@ public class LifeLabActivity extends BaseActivity {
         this.setupUI();
     }
 
-    @Override
     protected CharSequence getActionBarTitle() {
         return this.getText(R.string.lifelab_title);
     }
@@ -94,7 +93,8 @@ public class LifeLabActivity extends BaseActivity {
                         }
                     }
                 }
-        }
+        };
+
         new HttpAsyncTask().execute(params);
     }
 
@@ -111,4 +111,3 @@ public class LifeLabActivity extends BaseActivity {
     }
 }
 
-}
