@@ -38,6 +38,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -261,36 +262,40 @@ public class LifeLabActivity extends BaseActivity {
             Bitmap bm = BitmapFactory.decodeByteArray(buf, 0, buf.length);
             BitmapDrawable bd = new BitmapDrawable(this.getResources(), bm);
             target.setImageDrawable(bd);
-        }
-        Object[] params = new Object[]{
-                data.image,
-                new HttpAsyncTask.TaskDelegate() {
-                    @Override
-                    public void taskCompletionResult(byte[] result) {
-                        if (result != null) {
-                            Bitmap bm = BitmapFactory.decodeByteArray(result, 0, result.length);
-                            BitmapDrawable bd = new BitmapDrawable(LifeLabActivity.this.getResources(), bm);
-                            target.setImageDrawable(bd);
-                            //LifeLabActivity.this.saveImage(data.image, result);
+            //bm.recycle();
+        } else {
+            Object[] params = new Object[]{
+                    data.image,
+                    new HttpAsyncTask.TaskDelegate() {
+                        @Override
+                        public void taskCompletionResult(byte[] result) {
+                            if (result != null) {
+                                Bitmap bm = BitmapFactory.decodeByteArray(result, 0, result.length);
+                                BitmapDrawable bd = new BitmapDrawable(LifeLabActivity.this.getResources(), bm);
+                                target.setImageDrawable(bd);
+                                //bm.recycle();
+                                LifeLabActivity.this.saveImage(data.image, result);
+                            }
                         }
-                    }
-                },
-                WebAPIHelper.HttpMethod.GET,
-                null,
-                null,
-                true
-        };
-        new HttpAsyncTask().execute(params);
+                    },
+                    WebAPIHelper.HttpMethod.GET,
+                    null,
+                    null,
+                    true
+            };
+            new HttpAsyncTask().execute(params);
+        }
     }
 
     private boolean isImageSaved(String url) {
-//        String fn = this.getImageFilePath(url);
-//        File f = new File(fn);
-//        return f.exists() && f.isFile();
-        return false;
+        String fn = this.getImageFilePath(url);
+        File f = new File(fn);
+        return f.exists() && f.isFile() && (System.currentTimeMillis() - f.lastModified() < 1000 * 3600);
+//        return false;
     }
 
     private void saveImage(String url, byte[] buf) {
+        Log.d(TAG, String.format("saveImage %s %d bytes", url, buf.length));
         String fn = this.getImageFilePath(url);
         try {
             FileOutputStream fos = new FileOutputStream(fn);
@@ -304,19 +309,12 @@ public class LifeLabActivity extends BaseActivity {
     private byte[] getImageFile(String url) {
         String path = this.getImageFilePath(url);
         try {
+            File f = new File(path);
+            byte[] buf = new byte[(int) f.length()];
             FileInputStream fis = new FileInputStream(path);
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            int len = 1024 * 1024 * 10;
-            byte[] buf = new byte[len];
-            for (int i = fis.read(buf, 0, len); i != -1; ) {
-                bos.write(buf, 0, i);
-            }
+            fis.read(buf, 0, buf.length);
             fis.close();
-            byte[] ret = bos.toByteArray();
-            bos.reset();
-            bos.close();
-            System.gc();
-            return ret;
+            return buf;
         } catch (FileNotFoundException e) {
             Log.e(TAG, String.format("getImageFile: fail %s", url));
             return null;
