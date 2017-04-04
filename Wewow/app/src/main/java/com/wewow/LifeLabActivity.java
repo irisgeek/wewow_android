@@ -345,4 +345,3 @@ public class LifeLabActivity extends BaseActivity {
         }
     }
 }
-

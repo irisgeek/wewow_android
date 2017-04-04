@@ -18,6 +18,7 @@ public class CommonUtilities {
     public static final String CACHE_FILE_TAB_TITLE="cache_file_tab_title";
     public static final String CACHE_FILE_LATEST_INSTITUTE="cache_file_latest_institute";
     public static final String CACHE_FILE_RECOMMANDED_ARTISTS_AND_INSTITUTES="cache_file_recommended_artists_and_institute";
+    public static final String CACHE_FILE_ARTISTS_LIST="cache_file_artists_list";
 
 
 

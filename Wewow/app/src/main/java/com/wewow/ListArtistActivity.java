@@ -3,9 +3,12 @@ package com.wewow;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.pm.LabeledIntent;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,30 +16,78 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.wewow.adapter.ListViewArtistsAdapter;
+import com.wewow.dto.Artist;
+import com.wewow.dto.Banner;
+import com.wewow.dto.Institute;
+import com.wewow.dto.collectionCategory;
+import com.wewow.netTask.ITask;
+import com.wewow.utils.CommonUtilities;
+import com.wewow.utils.FileCacheUtil;
+import com.wewow.utils.SettingUtils;
 import com.wewow.utils.Utils;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Created by iris on 17/3/24.
  */
-public class ListArtistActivity extends BaseActivity {
+public class ListArtistActivity extends BaseActivity implements SwipeRefreshLayout.OnRefreshListener {
+
+
+    private int currentPage = 1;
+    private ListView listView;
+    private ArrayList<HashMap<String, Object>> listItem;
+    private ListViewArtistsAdapter adapter;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        Utils.setActivityToBeFullscreen(this);
 
+
         setContentView(R.layout.activity_list_artist);
-        setUpListViewDummy();
+        initData();
+
+        if (Utils.isNetworkAvailable(this)) {
+
+            checkcacheUpdatedOrNot();
+
+        } else {
+            Toast.makeText(this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
+            swipeRefreshLayout.setRefreshing(false);
+
+            SettingUtils.set(this, CommonUtilities.NETWORK_STATE, false);
+            setUpArtistsFromCache();
+
+        }
         setUpToolBar();
+
+    }
+
+    private void initData() {
+
+        listView = (ListView) findViewById(R.id.listViewArtists);
+
+        listItem = new ArrayList<HashMap<String, Object>>();
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(this);
     }
 
     @Override
@@ -154,6 +205,234 @@ public class ListArtistActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.selector_btn_menu);
         getSupportActionBar().setTitle(getResources().getString(R.string.all_artists_title));
+
+    }
+
+    private List<Artist> parseArtistsListFromString(String realData) throws JSONException {
+
+        List<Artist> artists = new ArrayList<Artist>();
+
+        JSONObject object = new JSONObject(realData);
+        JSONArray results = object.getJSONObject("result").getJSONObject("data").getJSONArray("artist_list");
+        for (int i = 0; i < results.length(); i++) {
+            Artist artist = new Artist();
+            JSONObject result = results.getJSONObject(i);
+            artist.setId(result.getString("id"));
+            artist.setNickname(result.getString("nickname"));
+            artist.setDesc(result.getString("desc"));
+            artist.setImage(result.getString("image"));
+            artist.setArticle_count(result.getString("article_count"));
+            artist.setFollower_count(result.getString("follow_count"));
+            artist.setFollowed(result.getString("followed"));
+
+            artists.add(artist);
+        }
+
+        return artists;
+    }
+
+    private void checkcacheUpdatedOrNot() {
+        swipeRefreshLayout.setRefreshing(true);
+        ITask iTask = Utils.getItask(com.wewow.utils.CommonUtilities.WS_HOST);
+        iTask.updateAt(com.wewow.utils.CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), new Callback<JSONObject>() {
+            @Override
+            public void success(JSONObject object, Response response) {
+
+
+                try {
+                    String realData = Utils.convertStreamToString(response.getBody().in());
+                    if (!realData.contains(com.wewow.utils.CommonUtilities.SUCCESS)) {
+                        Toast.makeText(ListArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+
+                        swipeRefreshLayout.setRefreshing(false);
+
+                    } else {
+                        JSONObject jsonObject = new JSONObject(realData);
+                        String cacheUpdatedTimeStamp = jsonObject
+                                .getJSONObject("result")
+                                .getJSONObject("data")
+                                .getString("update_at");
+
+                        long cacheUpdatedTime = (long) (Double.parseDouble(cacheUpdatedTimeStamp) * 1000);
+                        boolean isCacheDataOutdated = com.wewow.utils.FileCacheUtil
+                                .isCacheDataFailure(CommonUtilities.CACHE_FILE_ARTISTS_LIST, ListArtistActivity.this, cacheUpdatedTime);
+
+                        if (isCacheDataOutdated) {
+                            getArtistListFromServer();
+                        } else {
+                            setUpArtistsFromCache();
+//                            setUpListViewDummy();
+
+                        }
+
+
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(ListArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+                    swipeRefreshLayout.setRefreshing(false);
+                } catch (JSONException e) {
+                    Toast.makeText(ListArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Toast.makeText(ListArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+                swipeRefreshLayout.setRefreshing(false);
+            }
+
+        });
+    }
+
+    private void setUpArtistsFromCache() {
+        if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_ARTISTS_LIST, this)) {
+            String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_ARTISTS_LIST);
+            List<Artist> artists = new ArrayList<Artist>();
+            try {
+                artists = parseArtistsListFromString(fileContent);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            setUpArtists(artists, false);
+        }
+    }
+
+    private void setUpArtists(List<Artist> artists, boolean refresh) {
+
+
+        ArrayList<HashMap<String, Object>> listItemCopy = new ArrayList<HashMap<String, Object>>();
+        listItemCopy.addAll(listItem);
+        if (refresh) {
+
+            if (listItem != null && listItem.size() > 0) {
+                listItem.clear();
+
+            }
+        }
+
+        for (int i = 0; i < artists.size(); i++) {
+            HashMap<String, Object> map = new HashMap<String, Object>();
+
+            //
+
+            map.put("imageView", artists.get(i).getImage());
+
+            map.put("textViewName", artists.get(i).getNickname());
+            map.put("textViewDesc", artists.get(i).getDesc());
+            map.put("textViewArticleCount", artists.get(i).getArticle_count());
+            map.put("textViewFollowerCount", artists.get(i).getFollower_count());
+            map.put("imageViewFollowed", artists.get(i).getFollowed());
+
+            listItem.add(map);
+        }
+
+        listItem.addAll(listItemCopy);
+        if (!refresh)
+        {
+            adapter = new ListViewArtistsAdapter(this, listItem);
+
+            listView.setAdapter(adapter);
+
+        }
+        adapter.notifyDataSetChanged();
+        currentPage++;
+        swipeRefreshLayout.setRefreshing(false);
+
+
+    }
+
+    private void getArtistListFromServer() {
+        swipeRefreshLayout.setRefreshing(true);
+        ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
+        String userId = "0";
+        //check user login or not
+        if (UserInfo.isUserLogged(ListArtistActivity.this)) {
+            userId = UserInfo.getCurrentUser(ListArtistActivity.this).getOpen_id();
+
+        }
+        iTask.allArtists(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), userId, currentPage, new Callback<JSONObject>() {
+
+            @Override
+            public void success(JSONObject object, Response response) {
+                List<Artist> artists = new ArrayList<Artist>();
+
+                try {
+                    String realData = Utils.convertStreamToString(response.getBody().in());
+                    if (!realData.contains(CommonUtilities.SUCCESS)) {
+                        Toast.makeText(ListArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+                        swipeRefreshLayout.setRefreshing(false);
+
+                    } else {
+                        artists = parseArtistsListFromString(realData);
+
+                        if (currentPage > 1) {
+                            setUpArtists(artists, true);
+                        } else {
+                            FileCacheUtil.setCache(realData, ListArtistActivity.this, CommonUtilities.CACHE_FILE_ARTISTS_LIST, 0);
+                            setUpArtists(artists, false);
+                        }
+
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(ListArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+                    swipeRefreshLayout.setRefreshing(false);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(ListArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Toast.makeText(ListArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+                swipeRefreshLayout.setRefreshing(false);
+
+            }
+        });
+    }
+
+    @Override
+    public void onRefresh() {
+
+        boolean isLastPageLoaded = false;
+        try {
+            isLastPageLoaded = isLastPageLoaded();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if (!isLastPageLoaded) {
+
+            getArtistListFromServer();
+        }
+        else {
+            swipeRefreshLayout.setRefreshing(false);
+        }
+    }
+
+    private boolean isLastPageLoaded() throws JSONException {
+
+        boolean result = false;
+
+        if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_ARTISTS_LIST, this)) {
+            String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_ARTISTS_LIST);
+            JSONObject object = new JSONObject(fileContent);
+            String totalPages = object.getJSONObject("result").getJSONObject("data").getString("total_pages");
+            if (currentPage>Integer.parseInt(totalPages)) {
+
+                result = true;
+            }
+        }
+
+        return result;
 
     }
 }

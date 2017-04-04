@@ -110,6 +110,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="right|center_vertical"
             android:layout_marginRight="16dp"
+            android:id="@+id/imageViewFollowed"
             android:src="@drawable/selector_btn_follow"/>
 </android.support.v7.widget.CardView>
 
