@@ -100,8 +100,8 @@ public class LifeLabActivity extends BaseActivity {
             tv.setText(labcol.title);
             ImageView iv = (ImageView) view.findViewById(R.id.iv_lab_image);
             LifeLabActivity.this.loadItemImage(iv, labcol);
-            TextView tvvol = (TextView) view.findViewById(R.id.tv_lab_num);
-            tvvol.setText(String.format("vol. %d", labcol.order));
+            //TextView tvvol = (TextView) view.findViewById(R.id.tv_lab_num);
+            //tvvol.setText(String.format("vol. %d", labcol.order));
             TextView tvread = (TextView) view.findViewById(R.id.tv_lab_read);
             tvread.setText(labcol.read_count);
             TextView tvlike = (TextView) view.findViewById(R.id.tv_lab_collection);
@@ -154,7 +154,11 @@ public class LifeLabActivity extends BaseActivity {
                             Toast.makeText(LifeLabActivity.this, R.string.serverError, Toast.LENGTH_LONG).show();
                         }
                     }
-                }
+                },
+                WebAPIHelper.HttpMethod.GET,
+                null,
+                null,
+                true
         };
         new HttpAsyncTask().execute(params);
     }
@@ -260,12 +264,17 @@ public class LifeLabActivity extends BaseActivity {
                 new HttpAsyncTask.TaskDelegate() {
                     @Override
                     public void taskCompletionResult(byte[] result) {
-                        Bitmap bm = BitmapFactory.decodeByteArray(result, 0, result.length);
-                        BitmapDrawable bd = new BitmapDrawable(LifeLabActivity.this.getResources(), bm);
-                        target.setImageDrawable(bd);
+                        if (result != null) {
+                            Bitmap bm = BitmapFactory.decodeByteArray(result, 0, result.length);
+                            BitmapDrawable bd = new BitmapDrawable(LifeLabActivity.this.getResources(), bm);
+                            target.setImageDrawable(bd);
+                        }
                     }
                 },
-                WebAPIHelper.HttpMethod.GET
+                WebAPIHelper.HttpMethod.GET,
+                null,
+                null,
+                true
         };
         new HttpAsyncTask().execute(params);
     }

@@ -60,8 +60,12 @@ public class WebAPIHelper {
     private boolean ignoreSslCheck = false;
 
     public static WebAPIHelper getWewowWebAPIHelper() {
+        return getWewowWebAPIHelper(false);
+    }
+
+    public static WebAPIHelper getWewowWebAPIHelper(boolean sslcheck) {
         if (WebAPIHelper.instance == null) {
-            WebAPIHelper.instance = new WebAPIHelper();
+            WebAPIHelper.instance = new WebAPIHelper(sslcheck);
             WebAPIHelper.instance.addDefaultHeader("User-Agent", "Wewow/1.6");
         }
         return WebAPIHelper.instance;
@@ -90,8 +94,9 @@ public class WebAPIHelper {
         this.createClient();
     }
 
-    public void setIgnoreSsl(boolean ignoreSsl) {
-        this.ignoreSslCheck = ignoreSsl;
+    private WebAPIHelper(boolean ignoressl) {
+        this.ignoreSslCheck = ignoressl;
+        this.createClient();
     }
 
     public byte[] callWebAPI(String url) {
