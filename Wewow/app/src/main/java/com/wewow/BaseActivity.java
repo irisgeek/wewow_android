@@ -224,6 +224,10 @@ public class BaseActivity extends ActionBarActivity {
                     Intent intent = new Intent(BaseActivity.this, ListArtistActivity.class);
                     BaseActivity.this.startActivity(intent);
                     break;
+                case 2:
+                    Intent intentLab = new Intent(BaseActivity.this, LifeLabActivity.class);
+                    BaseActivity.this.startActivity(intentLab);
+                    break;
                 case 11:
                     Log.d("BaseActivity", "Logout");
                     UserInfo.logout(BaseActivity.this);
