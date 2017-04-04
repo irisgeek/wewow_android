@@ -32,6 +32,8 @@ public class HttpAsyncTask extends AsyncTask<Object, Integer, byte[]> {
         byte[] buf = objects.length > 3 ? (byte[]) objects[3] : null;
         WebAPIHelper wpi = WebAPIHelper.getWewowWebAPIHelper();
         List<Pair<String, String>> headers = objects.length > 4 ? (List<Pair<String, String>>) objects[4] : null;
+        boolean ignoressl = objects.length > 5 ? (Boolean) objects[5] : false;
+        wpi.setIgnoreSsl(ignoressl);
         return wpi.callWebAPI(url, method, buf, headers);
     }
 
