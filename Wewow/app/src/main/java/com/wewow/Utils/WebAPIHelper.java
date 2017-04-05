@@ -7,8 +7,17 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.Socket;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.security.InvalidParameterException;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +33,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
@@ -31,9 +41,14 @@ import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.SingleClientConnManager;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 /**
  * Created by suncjs on 2017/3/11.
@@ -42,10 +57,15 @@ import org.apache.http.params.HttpParams;
 public class WebAPIHelper {
 
     private static WebAPIHelper instance = null;
+    private boolean ignoreSslCheck = false;
 
     public static WebAPIHelper getWewowWebAPIHelper() {
+        return getWewowWebAPIHelper(false);
+    }
+
+    public static WebAPIHelper getWewowWebAPIHelper(boolean sslcheck) {
         if (WebAPIHelper.instance == null) {
-            WebAPIHelper.instance = new WebAPIHelper();
+            WebAPIHelper.instance = new WebAPIHelper(sslcheck);
             WebAPIHelper.instance.addDefaultHeader("User-Agent", "Wewow/1.6");
         }
         return WebAPIHelper.instance;
@@ -71,6 +91,11 @@ public class WebAPIHelper {
     private HashMap<String, String> responseHeaders = null;
 
     private WebAPIHelper() {
+        this.createClient();
+    }
+
+    private WebAPIHelper(boolean ignoressl) {
+        this.ignoreSslCheck = ignoressl;
         this.createClient();
     }
 
@@ -122,7 +147,7 @@ public class WebAPIHelper {
             Log.d(TAG, String.format("complete %s as %d", req.getURI().toString(), st.getStatusCode()));
             return ret;
         } catch (IOException ex) {
-            Log.d(TAG, String.format("fail %s", req.getURI().toString()));
+            Log.d(TAG, String.format("fail %s %s", req.getURI().toString(), ex.getMessage()));
             return null;
         }
     }
@@ -133,9 +158,75 @@ public class WebAPIHelper {
                 .getSocketFactory(), 80));
         schemeRegistry.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
         HttpParams params = new BasicHttpParams();
-        ThreadSafeClientConnManager cm = new ThreadSafeClientConnManager(params, schemeRegistry);
+        ClientConnectionManager cm;
+        if (this.ignoreSslCheck) {
+            SchemeRegistry registry = new SchemeRegistry();
+            registry.register(new Scheme("http", new PlainSocketFactory(), 80));
+            try {
+                KeyStore trustStore = KeyStore.getInstance(KeyStore
+                        .getDefaultType());
+                registry.register(new Scheme("https", new MySSLSocketFactory(trustStore), 443));
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            } catch (KeyManagementException e) {
+                e.printStackTrace();
+            } catch (KeyStoreException e) {
+                e.printStackTrace();
+            } catch (UnrecoverableKeyException e) {
+                e.printStackTrace();
+            }
+            cm = new SingleClientConnManager(params, registry);
+        } else {
+            cm = new ThreadSafeClientConnManager(params, schemeRegistry);
+        }
         this.client = new DefaultHttpClient(cm, params);
         this.client.setCookieStore(this.ckstore);
+    }
+
+    private class FullTrustX509TrustManager implements X509TrustManager {
+
+        @Override
+        public void checkClientTrusted(X509Certificate[] chain, String authType)
+                throws CertificateException {
+            // TODO Auto-generated method stub
+        }
+
+        @Override
+        public void checkServerTrusted(X509Certificate[] chain, String authType)
+                throws CertificateException {
+            // TODO Auto-generated method stub
+        }
+
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+    }
+
+    private class MySSLSocketFactory extends SSLSocketFactory {
+        private SSLContext sslContext = SSLContext.getInstance("TLS");
+
+        public MySSLSocketFactory(KeyStore truststore)
+                throws NoSuchAlgorithmException, KeyManagementException,
+                KeyStoreException, UnrecoverableKeyException {
+            super(truststore);
+            sslContext.init(null,
+                    new TrustManager[]{new FullTrustX509TrustManager()},
+                    null);
+        }
+
+        @Override
+        public Socket createSocket(Socket socket, String host, int port,
+                                   boolean autoClose) throws IOException, UnknownHostException {
+            return sslContext.getSocketFactory().createSocket(socket, host,
+                    port, autoClose);
+        }
+
+        @Override
+        public Socket createSocket() throws IOException {
+            return sslContext.getSocketFactory().createSocket();
+        }
     }
 
     private void checkMethod(HttpMethod method, byte[] data) {

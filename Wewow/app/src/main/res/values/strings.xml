@@ -27,8 +27,9 @@
     <string name="login_huawei_connecting">连接华为移动服务</string>
     <string name="login_huawei_cancel">华为登录已取消</string>
 
-    <!-- 生活家 -->
+    <!-- 生活研究所 -->
     <string name="lifelab_title">生活研究所</string>
+    <string name="lifelab_more">加载更多</string>
 
     <!-- Home page -->
     <!-- naivgation title -->
