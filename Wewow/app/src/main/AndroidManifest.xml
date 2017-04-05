@@ -54,7 +54,11 @@
             android:exported="true"></activity>
         <activity
             android:name=".ListArtistActivity"
-            android:label="Login"
+            android:label="ListArtist"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".DetailArtistActivity"
+            android:label="DetailArtist"
             android:screenOrientation="portrait"></activity>
         <activity
             android:name=".LifeLabActivity"

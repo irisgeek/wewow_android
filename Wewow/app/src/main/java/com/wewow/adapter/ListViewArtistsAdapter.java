@@ -35,7 +35,7 @@ public class ListViewArtistsAdapter extends BaseAdapter
     @Override
     public Object getItem(int position) {
         // Get the data item associated with the specified position in the data set.(获取数据集中与指定索引对应的数据项)
-        return null;
+        return list.get(position);
     }
     @Override
     public long getItemId(int position) {

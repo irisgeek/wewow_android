@@ -1,8 +1,10 @@
 package com.wewow;
 
 
+import android.app.ListActivity;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.LabeledIntent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -194,6 +196,7 @@ public class ListArtistActivity extends BaseActivity implements SwipeRefreshLayo
             map.put("textViewArticleCount", "22");
             map.put("textViewFollowerCount", "534");
 
+
             listItem.add(map);
         }
 
@@ -327,6 +330,7 @@ public class ListArtistActivity extends BaseActivity implements SwipeRefreshLayo
             map.put("textViewArticleCount", artists.get(i).getArticle_count());
             map.put("textViewFollowerCount", artists.get(i).getFollower_count());
             map.put("imageViewFollowed", artists.get(i).getFollowed());
+            map.put("id",artists.get(i).getId());
 
             listItem.add(map);
         }
@@ -339,6 +343,18 @@ public class ListArtistActivity extends BaseActivity implements SwipeRefreshLayo
             listView.setAdapter(adapter);
 
         }
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                            @Override
+                                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                                                HashMap<String, Object> stringObjectHashMap = (  HashMap<String, Object>)adapter.getItem(position);
+                                                String artistId=stringObjectHashMap.get("id").toString();
+                                                Intent intent = new Intent(ListArtistActivity.this,DetailArtistActivity.class);
+                                                intent.putExtra("id",artistId);
+                                                startActivity(intent);
+                                            }
+                                        }
+        );
         adapter.notifyDataSetChanged();
         currentPage++;
         swipeRefreshLayout.setRefreshing(false);

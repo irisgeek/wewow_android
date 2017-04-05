@@ -28,10 +28,12 @@ public interface ITask {
     void updateAt(@Header("User-Agent") String headerContentType, Callback<JSONObject> callback);
 
     @GET("/artists_mini")
-    void allArtists(@Header("User-Agent") String headerContentType, @Query("user_id") String userId, @Query("page") int page,  Callback<JSONObject> callback);
+    void allArtists(@Header("User-Agent") String headerContentType, @Query("user_id") String userId,
+                    @Query("page") int page, Callback<JSONObject> callback);
 
-
-
+    @GET("/artist_mini")
+    void artistDetail(@Header("User-Agent") String headerContentType, @Query("user_id") String userId,
+                      @Query("page") int page, @Query("artist_id") String artistId, Callback<JSONObject> callback);
 
 
 }

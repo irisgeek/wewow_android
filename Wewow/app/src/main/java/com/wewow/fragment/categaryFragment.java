@@ -35,6 +35,7 @@ public class categaryFragment  extends Fragment {
     private ListView listViewInstituteRecommended;
     private SwipeRefreshLayout swipeRefreshLayout
             ;
+    private View view;
 
 
     public categaryFragment() {
@@ -52,7 +53,22 @@ public class categaryFragment  extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_other_categary, container, false);
+        view= inflater.inflate(R.layout.fragment_other_categary, container, false);
+
+        swipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(R.id.swipe_refresh_layout);
+
+        swipeRefreshLayout.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        swipeRefreshLayout.setRefreshing(true);
+
+                                    }
+                                }
+        );
+
+        setUpViewPagerLoverOfLife(view);
+        setUpListViewInstituteRecommend(view);
+        return view;
 
     }
 
@@ -67,25 +83,12 @@ public class categaryFragment  extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        swipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(R.id.swipe_refresh_layout);
-
-        swipeRefreshLayout.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        swipeRefreshLayout.setRefreshing(true);
-
-                                    }
-                                }
-        );
-
-        setUpViewPagerLoverOfLife();
-        setUpListViewInstituteRecommend();
     }
 
-    public void setUpViewPagerLoverOfLife() {
+    public void setUpViewPagerLoverOfLife(View viewRoot) {
 
         //blank view for bounce effect
-        View left = new View(getActivity());
+        View left = new View(viewRoot.getContext());
         List<View> mListViews = new ArrayList<View>();
         mListViews.add(left);
 
@@ -98,12 +101,12 @@ public class categaryFragment  extends Fragment {
             mListViews.add(view);
         }
 
-        View right = new View(getActivity());
+        View right = new View(viewRoot.getContext());
         mListViews.add(right);
         MyPagerAdapter myAdapter = new MyPagerAdapter();
 
         myAdapter.setList(mListViews);
-      viewPagerLoverOfLife = (ViewPager)getActivity().findViewById(R.id.viewpagerLayoutCategory);
+      viewPagerLoverOfLife = (ViewPager)viewRoot.findViewById(R.id.viewpagerLayoutCategory);
 
         viewPagerLoverOfLife.setAdapter(myAdapter);
         myAdapter.notifyDataSetChanged();
@@ -114,9 +117,9 @@ public class categaryFragment  extends Fragment {
 
 
     }
-    public void setUpListViewInstituteRecommend() {
+    public void setUpListViewInstituteRecommend(View view) {
 
-       listViewInstituteRecommended = (ListView) getActivity().findViewById(R.id.listViewSelectedInstituteCategory);
+       listViewInstituteRecommended = (ListView) view.findViewById(R.id.listViewSelectedInstituteCategory);
 
         ArrayList<HashMap<String, Object>> listItem = new ArrayList<HashMap<String, Object>>();
 
@@ -134,7 +137,7 @@ public class categaryFragment  extends Fragment {
             listItem.add(map);
         }
 
-        SimpleAdapter listItemAdapter = new SimpleAdapter(getActivity(), listItem,//data source
+        SimpleAdapter listItemAdapter = new SimpleAdapter(view.getContext(), listItem,//data source
                 R.layout.list_item_life_institue_recommended,
 
                 new String[]{"textVol", "textTitle", "textReadCount", "textCollectionCount"},
