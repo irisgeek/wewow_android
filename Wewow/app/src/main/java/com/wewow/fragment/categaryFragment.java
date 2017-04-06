@@ -57,14 +57,14 @@ public class categaryFragment  extends Fragment {
 
         swipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(R.id.swipe_refresh_layout);
 
-        swipeRefreshLayout.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        swipeRefreshLayout.setRefreshing(true);
-
-                                    }
-                                }
-        );
+//        swipeRefreshLayout.post(new Runnable() {
+//                                    @Override
+//                                    public void run() {
+//                                        swipeRefreshLayout.setRefreshing(true);
+//
+//                                    }
+//                                }
+//        );
 
         setUpViewPagerLoverOfLife(view);
         setUpListViewInstituteRecommend(view);

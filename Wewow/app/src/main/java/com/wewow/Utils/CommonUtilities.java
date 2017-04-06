@@ -6,7 +6,7 @@ package com.wewow.utils;
 public class CommonUtilities {
     public static final String WS_HOST ="https://api-tw.wewow.com.cn";
     public static final String REQUEST_KEY="";
-    public static final String REQUEST_HEADER_PREFIX="Wewow/";
+    public static final String REQUEST_HEADER_PREFIX="Wewow/Android";
     public static final String SUCCESS="success";
 
     public static final String NETWORK_STATE="network_state";
@@ -19,6 +19,7 @@ public class CommonUtilities {
     public static final String CACHE_FILE_LATEST_INSTITUTE="cache_file_latest_institute";
     public static final String CACHE_FILE_RECOMMANDED_ARTISTS_AND_INSTITUTES="cache_file_recommended_artists_and_institute";
     public static final String CACHE_FILE_ARTISTS_LIST="cache_file_artists_list";
+    public static final String CACHE_FILE_ARTISTS_DETAIL="cache_file_artists_detail";
 
 
 

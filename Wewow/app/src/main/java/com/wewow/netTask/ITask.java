@@ -33,7 +33,7 @@ public interface ITask {
 
     @GET("/artist_mini")
     void artistDetail(@Header("User-Agent") String headerContentType, @Query("user_id") String userId,
-                      @Query("page") int page, @Query("artist_id") String artistId, Callback<JSONObject> callback);
+                       @Query("artist_id") String artistId, Callback<JSONObject> callback);
 
 
 }

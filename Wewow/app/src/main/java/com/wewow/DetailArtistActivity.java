@@ -4,7 +4,9 @@ package com.wewow;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.SearchView;
@@ -25,7 +27,10 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.wewow.adapter.ListViewArtistsAdapter;
+import com.wewow.adapter.RecycleViewArticlesOfArtistDetail;
+import com.wewow.dto.Article;
 import com.wewow.dto.Artist;
+import com.wewow.dto.ArtistDetail;
 import com.wewow.netTask.ITask;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.FileCacheUtil;
@@ -45,14 +50,16 @@ import java.util.Random;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
+
 import android.support.v7.widget.RecyclerView;
 
 /**
  * Created by iris on 17/3/24.
  */
-public class DetailArtistActivity extends BaseActivity  {
+public class DetailArtistActivity extends BaseActivity {
 
 
+    private String id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,19 +68,214 @@ public class DetailArtistActivity extends BaseActivity  {
 
         setContentView(R.layout.activity_detail_artist);
         Intent getIntent = getIntent();
-        String id = getIntent.getStringExtra("id");
+        id = getIntent.getStringExtra("id");
 
-        initData();
-
-
-//        setUpToolBar();
+//        initData();
         RecyclerView rv = (RecyclerView)findViewById(R.id.recyclerview);
-        setupRecyclerView(rv);
+        rv.setLayoutManager(new LinearLayoutManager(rv.getContext()));
+
+        if (Utils.isNetworkAvailable(this)) {
+
+            checkcacheUpdatedOrNot();
+
+        } else {
+            Toast.makeText(this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
+
+
+            SettingUtils.set(this, CommonUtilities.NETWORK_STATE, false);
+            setUpArtistFromCache();
+
+        }
+
+
+        setUpToolBar();
+
 
     }
 
+
+
+
+    private void checkcacheUpdatedOrNot() {
+
+        ITask iTask = Utils.getItask(com.wewow.utils.CommonUtilities.WS_HOST);
+        iTask.updateAt(com.wewow.utils.CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), new Callback<JSONObject>() {
+            @Override
+            public void success(JSONObject object, Response response) {
+
+
+                try {
+                    String realData = Utils.convertStreamToString(response.getBody().in());
+                    if (!realData.contains(com.wewow.utils.CommonUtilities.SUCCESS)) {
+                        Toast.makeText(DetailArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+
+
+                    } else {
+                        JSONObject jsonObject = new JSONObject(realData);
+                        String cacheUpdatedTimeStamp = jsonObject
+                                .getJSONObject("result")
+                                .getJSONObject("data")
+                                .getString("update_at");
+
+                        long cacheUpdatedTime = (long) (Double.parseDouble(cacheUpdatedTimeStamp) * 1000);
+                        boolean isCacheDataOutdated = com.wewow.utils.FileCacheUtil
+                                .isCacheDataFailure(CommonUtilities.CACHE_FILE_ARTISTS_DETAIL + id, DetailArtistActivity.this, cacheUpdatedTime);
+
+                        if (isCacheDataOutdated) {
+                            getArtistFromServer();
+                        } else {
+                            setUpArtistFromCache();
+//                            setUpListViewDummy();
+
+                        }
+
+
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(DetailArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+//                    swipeRefreshLayout.setRefreshing(false);
+                } catch (JSONException e) {
+                    Toast.makeText(DetailArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+//                    swipeRefreshLayout.setRefreshing(false);
+                }
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Toast.makeText(DetailArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+//                swipeRefreshLayout.setRefreshing(false);
+            }
+
+        });
+
+
+    }
+
+    private void getArtistFromServer() {
+
+        ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
+        String userId = "0";
+        //check user login or not
+        if (UserInfo.isUserLogged(DetailArtistActivity.this)) {
+            userId = UserInfo.getCurrentUser(DetailArtistActivity.this).getOpen_id();
+
+        }
+        iTask.artistDetail(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), userId, id, new Callback<JSONObject>() {
+
+            @Override
+            public void success(JSONObject object, Response response) {
+                ArtistDetail artist = new ArtistDetail();
+
+                try {
+                    String realData = Utils.convertStreamToString(response.getBody().in());
+                    if (!realData.contains(CommonUtilities.SUCCESS)) {
+                        Toast.makeText(DetailArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+//                        swipeRefreshLayout.setRefreshing(false);
+
+                    } else {
+                        artist = parseArtistFromString(realData);
+
+                        FileCacheUtil.setCache(realData, DetailArtistActivity.this, CommonUtilities.CACHE_FILE_ARTISTS_DETAIL + id, 0);
+                        setUpArtist(artist);
+
+
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(DetailArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+//                    swipeRefreshLayout.setRefreshing(false);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(DetailArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+//                    swipeRefreshLayout.setRefreshing(false);
+                }
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Toast.makeText(DetailArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+//                swipeRefreshLayout.setRefreshing(false);
+
+            }
+        });
+    }
+
+    private void setUpArtist(ArtistDetail artist) {
+
+        ImageView imageView=(ImageView)findViewById(R.id.imageViewIcon);
+        Glide.with(this)
+        .load(artist.getArtist().getImage()).crossFade().into(imageView);
+
+        TextView textViewNickName=(TextView)findViewById(R.id.textViewNickName);
+        textViewNickName.setText(artist.getArtist().getNickname());
+
+        TextView textViewDesc=(TextView)findViewById(R.id.textViewDesc);
+        textViewDesc.setText(artist.getArtist().getDesc());
+
+        ImageView imageViewSubscribe=(ImageView) findViewById(R.id.imageViewSubscribe);
+        if(artist.getArtist().getFollowed().equals("1"))
+        {
+            imageViewSubscribe.setImageResource(R.drawable.subscribed);
+        }
+        else {
+            imageViewSubscribe.setImageResource(R.drawable.subscribe);
+        }
+
+        TextView textViewCount=(TextView)findViewById(R.id.textViewCount);
+        textViewCount.setText(artist.getArtist().getFollower_count()+getResources().getString(R.string.subscriber));
+
+
+        ArrayList<HashMap<String, Object>> listItem = new ArrayList<HashMap<String, Object>>();
+        List<Article> articles=artist.getArticles();
+
+
+        for (int i = 0; i < articles.size(); i++) {
+            HashMap<String, Object> map = new HashMap<String, Object>();
+
+            //
+
+            map.put("image", articles.get(i).getImage_320_160());
+
+            map.put("title", articles.get(i).getTitle());
+       //todo
+            listItem.add(map);
+        }
+        RecyclerView rv = (RecyclerView) findViewById(R.id.recyclerview);
+        rv.setLayoutManager(new LinearLayoutManager(rv.getContext()));
+        rv.setAdapter(new RecycleViewArticlesOfArtistDetail(this,
+                listItem));
+
+
+    }
+
+    private void setUpArtistFromCache() {
+
+        if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_ARTISTS_DETAIL+id, this)) {
+            String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_ARTISTS_DETAIL+id);
+           ArtistDetail artist= new ArtistDetail();
+            try {
+                artist = parseArtistFromString(fileContent);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            setUpArtist(artist);
+        }
+    }
+
+
     private void initData() {
 
+        final ImageView imageView = (ImageView) findViewById(R.id.backdrop);
+        Glide.with(this)
+                .load("https://wewow.wewow.com.cn/article/20170327/14513-amanda-kerr-39507.jpg?x-oss-process=image/resize,m_fill,h_384,w_720,,limit_0/quality,Q_40/format,jpg")
+                .fitCenter()
+                .into(imageView);
 
     }
 
@@ -159,6 +361,11 @@ public class DetailArtistActivity extends BaseActivity  {
 //            layout.setVisibility(View.VISIBLE);
             return true;
         }
+        if(id==android.R.id.home) {
+          finish();
+            return true;
+
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -190,121 +397,48 @@ public class DetailArtistActivity extends BaseActivity  {
     private void setUpToolBar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setNavigationIcon(R.drawable.selector_btn_menu);
-        getSupportActionBar().setTitle(getResources().getString(R.string.all_artists_title));
+        toolbar.setNavigationIcon(R.drawable.selector_btn_back);
+//        getSupportActionBar().setTitle(getResources().getString(R.string.all_artists_title));
 
     }
 
-    private List<Artist> parseArtistsListFromString(String realData) throws JSONException {
+    private ArtistDetail parseArtistFromString(String realData) throws JSONException {
 
-        List<Artist> artists = new ArrayList<Artist>();
-
+        ArtistDetail artistDetail = new ArtistDetail();
+        Artist artist = new Artist();
         JSONObject object = new JSONObject(realData);
-        JSONArray results = object.getJSONObject("result").getJSONObject("data").getJSONArray("artist_list");
-        for (int i = 0; i < results.length(); i++) {
-            Artist artist = new Artist();
-            JSONObject result = results.getJSONObject(i);
-            artist.setId(result.getString("id"));
-            artist.setNickname(result.getString("nickname"));
-            artist.setDesc(result.getString("desc"));
-            artist.setImage(result.getString("image"));
-            artist.setArticle_count(result.getString("article_count"));
-            artist.setFollower_count(result.getString("follow_count"));
-            artist.setFollowed(result.getString("followed"));
+        JSONObject results = object.getJSONObject("result").getJSONObject("data").getJSONObject("artist");
+        artist.setFollower_count(results.getString("follow_count"));
+        artist.setNickname(results.getString("nickname"));
+        artist.setImage(results.getString("image_750_512"));
+        artist.setDesc(results.getString("desc"));
+        artist.setFollowed(results.getString("followed"));
+        artistDetail.setArtist(artist);
+        List<Article> articles = new ArrayList<Article>();
 
-            artists.add(artist);
+
+        JSONArray array = object.getJSONObject("result").getJSONObject("data").getJSONArray("article_list");
+
+        for (int i = 0; i < array.length(); i++) {
+            Article article = new Article();
+
+            JSONObject result = array.getJSONObject(i);
+            article.setId(result.getString("id"));
+            article.setImage_284_160(result.getString("image_284_160"));
+            article.setImage_320_160(result.getString("image_320_160"));
+            article.setTitle(result.getString("title"));
+            article.setWewow_category(result.getString("wewow_category"));
+
+            articles.add(article);
         }
+        artistDetail.setArticles(articles);
 
-        return artists;
+        return artistDetail;
     }
 
-    private void setupRecyclerView(RecyclerView recyclerView) {
-        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-        String[] list={"1","1","1","1","1","1","1","1"};
-        recyclerView.setAdapter(new SimpleStringRecyclerViewAdapter(this,
-                getRandomSublist(list, 8)));
-    }
 
-    private List<String> getRandomSublist(String[] array, int amount) {
-        ArrayList<String> list = new ArrayList<>(amount);
-        Random random = new Random();
-        while (list.size() < amount) {
-            list.add(array[random.nextInt(array.length)]);
-        }
-        return list;
-    }
 
-    public static class SimpleStringRecyclerViewAdapter
-            extends RecyclerView.Adapter<SimpleStringRecyclerViewAdapter.ViewHolder> {
 
-        private final TypedValue mTypedValue = new TypedValue();
-        private int mBackground;
-        private List<String> mValues;
 
-        public static class ViewHolder extends RecyclerView.ViewHolder {
-            public String mBoundString;
-
-            public final View mView;
-            public final ImageView mImageView;
-            public final TextView mTextView;
-
-            public ViewHolder(View view) {
-                super(view);
-                mView = view;
-                mImageView = (ImageView) view.findViewById(R.id.imageViewInstitue);
-                mTextView = (TextView) view.findViewById(R.id.textViewNum);
-            }
-
-            @Override
-            public String toString() {
-                return super.toString() + " '" + mTextView.getText();
-            }
-        }
-
-        public String getValueAt(int position) {
-            return mValues.get(position);
-        }
-
-        public SimpleStringRecyclerViewAdapter(Context context, List<String> items) {
-            context.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
-            mBackground = mTypedValue.resourceId;
-            mValues = items;
-        }
-
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.list_item_detail_lover_of_life, parent, false);
-            view.setBackgroundResource(mBackground);
-            return new ViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.mBoundString = mValues.get(position);
-//            holder.mTextView.setText(mValues.get(position));
-
-//            holder.mView.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    Context context = v.getContext();
-//                    Intent intent = new Intent(context, CheeseDetailActivity.class);
-//                    intent.putExtra(CheeseDetailActivity.EXTRA_NAME, holder.mBoundString);
-//
-//                    context.startActivity(intent);
-//                }
-//            });
-
-            Glide.with(holder.mImageView.getContext())
-                    .load("https://wewow.wewow.com.cn/article/20170327/14513-amanda-kerr-39507.jpg?x-oss-process=image/resize,m_fill,h_384,w_720,,limit_0/quality,Q_40/format,jpg")
-                    .fitCenter()
-                    .into(holder.mImageView);
-        }
-
-        @Override
-        public int getItemCount() {
-            return mValues.size();
-        }
-    }
 
 }
