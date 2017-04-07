@@ -1,0 +1,44 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="60dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/divider" />
+        <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/swipe_refresh_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        <ListView
+            android:id="@+id/listViewArtists"
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:choiceMode="singleChoice"
+            android:divider="#e2e2e2"
+            android:dividerHeight="1dp"
+            android:scrollbars="none"/>
+
+        </android.support.v4.widget.SwipeRefreshLayout>
+
+    </LinearLayout>
+
+
+    <include layout="@layout/toolbar" />
+
+</FrameLayout>

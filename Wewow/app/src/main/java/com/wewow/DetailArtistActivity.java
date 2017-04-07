@@ -60,6 +60,7 @@ public class DetailArtistActivity extends BaseActivity {
 
 
     private String id;
+    private ImageView imageViewSubscribe;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,9 +159,11 @@ public class DetailArtistActivity extends BaseActivity {
 
         ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
         String userId = "0";
+        String userToken="0";
         //check user login or not
         if (UserInfo.isUserLogged(DetailArtistActivity.this)) {
-            userId = UserInfo.getCurrentUser(DetailArtistActivity.this).getOpen_id();
+            userId = UserInfo.getCurrentUser(DetailArtistActivity.this).getId().toString();
+            userToken=UserInfo.getCurrentUser(DetailArtistActivity.this).getToken();
 
         }
         iTask.artistDetail(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), userId, id, new Callback<JSONObject>() {
@@ -205,7 +208,7 @@ public class DetailArtistActivity extends BaseActivity {
         });
     }
 
-    private void setUpArtist(ArtistDetail artist) {
+    private void setUpArtist(final ArtistDetail artist) {
 
         ImageView imageView=(ImageView)findViewById(R.id.imageViewIcon);
         Glide.with(this)
@@ -217,14 +220,31 @@ public class DetailArtistActivity extends BaseActivity {
         TextView textViewDesc=(TextView)findViewById(R.id.textViewDesc);
         textViewDesc.setText(artist.getArtist().getDesc());
 
-        ImageView imageViewSubscribe=(ImageView) findViewById(R.id.imageViewSubscribe);
-        if(artist.getArtist().getFollowed().equals("1"))
+        imageViewSubscribe=(ImageView) findViewById(R.id.imageViewSubscribe);
+        final String followed = artist.getArtist().getFollowed();
+        if(followed.equals("1"))
         {
             imageViewSubscribe.setImageResource(R.drawable.subscribed);
         }
         else {
             imageViewSubscribe.setImageResource(R.drawable.subscribe);
         }
+
+        imageViewSubscribe.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if(followed.equals("1"))
+                {
+                    imageViewSubscribe.setImageResource(R.drawable.subscribe);
+                }
+                else {
+                    imageViewSubscribe.setImageResource(R.drawable.subscribed);
+                }
+
+                postFollowToServer(followed);
+            }
+        });
 
         TextView textViewCount=(TextView)findViewById(R.id.textViewCount);
         textViewCount.setText(artist.getArtist().getFollower_count()+getResources().getString(R.string.subscriber));
@@ -249,6 +269,12 @@ public class DetailArtistActivity extends BaseActivity {
         rv.setLayoutManager(new LinearLayoutManager(rv.getContext()));
         rv.setAdapter(new RecycleViewArticlesOfArtistDetail(this,
                 listItem));
+
+
+    }
+
+    private void postFollowToServer(String followed) {
+
 
 
     }

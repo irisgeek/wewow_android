@@ -20,6 +20,7 @@ public class CommonUtilities {
     public static final String CACHE_FILE_RECOMMANDED_ARTISTS_AND_INSTITUTES="cache_file_recommended_artists_and_institute";
     public static final String CACHE_FILE_ARTISTS_LIST="cache_file_artists_list";
     public static final String CACHE_FILE_ARTISTS_DETAIL="cache_file_artists_detail";
+    public static final String CACHE_FILE_SUBSCRIBED_ARTISTS_LIST="cache_file_subscribed_artists_list";
 
 
 

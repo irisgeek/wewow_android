@@ -55,6 +55,8 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wewow.utils.DataCleanUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -227,6 +229,14 @@ public class BaseActivity extends ActionBarActivity {
                 case 2:
                     Intent intentLab = new Intent(BaseActivity.this, LifeLabActivity.class);
                     BaseActivity.this.startActivity(intentLab);
+                    break;
+                case 6:
+                    Intent intentSubscribedArtists = new Intent(BaseActivity.this, ListSubscribedArtistActivity.class);
+                    BaseActivity.this.startActivity(intentSubscribedArtists);
+                    break;
+                case 10:
+                    //clear cache
+                    DataCleanUtils.cleanAllApplicationData(BaseActivity.this);
                     break;
                 case 11:
                     Log.d("BaseActivity", "Logout");

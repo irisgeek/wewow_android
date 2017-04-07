@@ -57,6 +57,10 @@
             android:label="ListArtist"
             android:screenOrientation="portrait"></activity>
         <activity
+            android:name=".ListSubscribedArtistActivity"
+            android:label="ListSubscribedArtist"
+            android:screenOrientation="portrait"></activity>
+        <activity
             android:name=".DetailArtistActivity"
             android:label="DetailArtist"
             android:screenOrientation="portrait"></activity>

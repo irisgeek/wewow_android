@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import retrofit.Callback;
 import retrofit.http.GET;
 import retrofit.http.Header;
+import retrofit.http.POST;
 import retrofit.http.Query;
 
 /**
@@ -35,5 +36,13 @@ public interface ITask {
     void artistDetail(@Header("User-Agent") String headerContentType, @Query("user_id") String userId,
                        @Query("artist_id") String artistId, Callback<JSONObject> callback);
 
+    @GET("/user_followed_mini")
+    void artistsSubscribed(@Header("User-Agent") String headerContentType, @Query("user_id") String userId,
+                      @Query("page") int page, Callback<JSONObject> callback);
+
+
+    @POST("/follow")
+    void followArtist(@Header("User-Agent") String headerContentType, @Query("user_id") String userId,
+                      @Query("artist_id") String artistId, @Query("token") String token,   @Query("follow") int follow, Callback<JSONObject> callback);
 
 }
