@@ -34,15 +34,23 @@ public interface ITask {
 
     @GET("/artist_mini")
     void artistDetail(@Header("User-Agent") String headerContentType, @Query("user_id") String userId,
-                       @Query("artist_id") String artistId, Callback<JSONObject> callback);
+                      @Query("artist_id") String artistId, Callback<JSONObject> callback);
 
     @GET("/user_followed_mini")
     void artistsSubscribed(@Header("User-Agent") String headerContentType, @Query("user_id") String userId,
-                      @Query("page") int page, Callback<JSONObject> callback);
+                           @Query("page") int page, Callback<JSONObject> callback);
 
 
     @POST("/follow")
     void followArtist(@Header("User-Agent") String headerContentType, @Query("user_id") String userId,
-                      @Query("artist_id") String artistId, @Query("token") String token,   @Query("follow") int follow, Callback<JSONObject> callback);
+                      @Query("artist_id") String artistId, @Query("token") String token, @Query("follow") int follow, Callback<JSONObject> callback);
+
+    @GET("/index_category_collections")
+    void categoryArtistsAndInstitutes(@Header("User-Agent") String headerContentType, @Query("collection_category_id") String id,
+                                     Callback<JSONObject> callback);
+
 
 }
+
+
+

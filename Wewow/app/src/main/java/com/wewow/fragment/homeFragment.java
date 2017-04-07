@@ -550,7 +550,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         List<View> mListViews = new ArrayList<View>();
         mListViews.add(left);
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < artists.size(); i++) {
             View view = getActivity().getLayoutInflater().inflate(R.layout.list_item_lover_of_life_recommended, null);
             CircleImageView image = (CircleImageView) view.findViewById(R.id.imageViewIcon);
             Glide.with(rootView.getContext())
@@ -635,7 +635,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
         ArrayList<HashMap<String, Object>> listItem = new ArrayList<HashMap<String, Object>>();
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < institutes.size(); i++) {
             HashMap<String, Object> map = new HashMap<String, Object>();
 
             //

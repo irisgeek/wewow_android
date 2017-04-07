@@ -20,23 +20,30 @@ import java.util.List;
 public class FragmentAdapter extends FragmentPagerAdapter {
 
     private List<String> list;
+    private List<String> ids;
     private static final String TAG = FragmentAdapter.class.getSimpleName();
     private FragmentManager fm;
 
-    public FragmentAdapter(FragmentManager fm, List<String> list) {
+    public FragmentAdapter(FragmentManager fm, List<String> list,List<String> ids) {
         super(fm);
         this.list = list;
         this.fm=fm;
+        this.ids=ids;
 
     }
 
     @Override
     public Fragment getItem(int position) {
         if (position != 0) {
-            return categaryFragment.newInstance(list.get(position));
+            return categaryFragment.newInstance(ids.get(position));
 
         }
-        return homeFragment.newInstance(list.get(position));
+        return homeFragment.newInstance(ids.get(position));
+    }
+
+    public String getId(int position)
+    {
+        return  ids.get(position);
     }
 
 

@@ -305,7 +305,9 @@ public class MainActivity extends BaseActivity {
 //
 //
         ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> ids = new ArrayList<String>();
         list.add(getResources().getString(R.string.home));
+        ids.add("0");
 //        list.add(getResources().getString(R.string.test1));
 //        list.add(getResources().getString(R.string.test2));
 //        list.add(getResources().getString(R.string.test3));
@@ -313,17 +315,18 @@ public class MainActivity extends BaseActivity {
 
         for (collectionCategory category : titles) {
             list.add(category.getTitle());
+            ids.add(category.getId());
         }
 
-        setUpTabs(list);
+        setUpTabs(list,ids);
 
     }
 
-    private void setUpTabs(List<String> titles) {
+    private void setUpTabs(List<String> titles,List<String> ids) {
 
 
         ViewPager viewPagerTabs = (ViewPager) findViewById(R.id.pagerTabs);
-        adapter = new FragmentAdapter(getSupportFragmentManager(), titles);
+        adapter = new FragmentAdapter(getSupportFragmentManager(), titles,ids);
         viewPagerTabs.setAdapter(adapter);
         viewPagerTabs.setOffscreenPageLimit(5);
         mTabLayout.setupWithViewPager(viewPagerTabs);
