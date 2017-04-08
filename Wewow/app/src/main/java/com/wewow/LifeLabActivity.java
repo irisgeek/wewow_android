@@ -1,14 +1,17 @@
 package com.wewow;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.HeaderViewListAdapter;
 import android.widget.ImageView;
@@ -17,8 +20,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wewow.dto.LabCollection;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
+import com.wewow.utils.RemoteImageLoader;
 import com.wewow.utils.Utils;
 import com.wewow.utils.WebAPIHelper;
 
@@ -38,6 +43,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 
@@ -65,6 +71,16 @@ public class LifeLabActivity extends BaseActivity {
     private void setupUI() {
         this.lvlifelab = (ListView) this.findViewById(R.id.list_lifelab);
         this.lvlifelab.setAdapter(new LifeLabAdapter());
+        this.lvlifelab.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                LabCollection lc = (LabCollection) adapterView.getAdapter().getItem(i);
+                Intent intent = new Intent(LifeLabActivity.this, LifeLabItemActivity.class);
+                intent.putExtra(LifeLabItemActivity.LIFELAB_COLLECTION, lc);
+                Bundle b = new Bundle();
+                LifeLabActivity.this.startActivity(intent);
+            }
+        });
         View foot = View.inflate(this, R.layout.layout_lifelab_foot, null);
         foot.findViewById(R.id.tv_lab_more).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,7 +115,7 @@ public class LifeLabActivity extends BaseActivity {
                 view = View.inflate(LifeLabActivity.this, R.layout.layout_lifelab_item, null);
                 //view = View.inflate(LifeLabActivity.this, R.layout.layout_lifelab_item1, null);
             }
-            LabData.LabCollection labcol = (LabData.LabCollection) this.getItem(i);
+            LabCollection labcol = (LabCollection) this.getItem(i);
             TextView tv = (TextView) view.findViewById(R.id.tv_lab_title);
             tv.setText(labcol.title);
             ImageView iv = (ImageView) view.findViewById(R.id.iv_lab_image);
@@ -239,18 +255,6 @@ public class LifeLabActivity extends BaseActivity {
             return this.pageCount;
         }
 
-        public class LabCollection {
-            public long id;
-            public String image;
-            public String title;
-            public String date;
-            public String liked_count;
-            public int order;
-            public String read_count;
-            public String image_688_316;
-            public String image_642_320;
-        }
-
         public boolean isItemLoaded(int i) {
             return this.collections.size() > i;
         }
@@ -260,96 +264,16 @@ public class LifeLabActivity extends BaseActivity {
         }
     }
 
-    private void loadItemImage(final ImageView target, final LabData.LabCollection data) {
-        if (this.isImageSaved(data.image)) {
-            byte[] buf = this.getImageFile(data.image);
-            Bitmap bm = BitmapFactory.decodeByteArray(buf, 0, buf.length);
-            BitmapDrawable bd = new BitmapDrawable(this.getResources(), bm);
-            target.setImageDrawable(bd);
-            //bm.recycle();
-        } else {
-            Object[] params = new Object[]{
-                    data.image_688_316,
-                    new HttpAsyncTask.TaskDelegate() {
-                        @Override
-                        public void taskCompletionResult(byte[] result) {
-                            if (result != null) {
-                                BitmapDrawable oldbd = (BitmapDrawable)target.getDrawable();
-                                Bitmap bm = BitmapFactory.decodeByteArray(result, 0, result.length);
-                                BitmapDrawable bd = new BitmapDrawable(LifeLabActivity.this.getResources(), bm);
-                                target.setImageDrawable(bd);
-                                //bm.recycle();
-                                if (oldbd != null) {
-                                    oldbd.getBitmap().recycle();
-                                }
-                                LifeLabActivity.this.saveImage(data.image, result);
-                            }
-                        }
-                    },
-                    WebAPIHelper.HttpMethod.GET,
-                    null,
-                    null,
-                    true
-            };
-            new HttpAsyncTask().execute(params);
-        }
-    }
-
-    private boolean isImageSaved(String url) {
-        String fn = this.getImageFilePath(url);
-        File f = new File(fn);
-        return f.exists() && f.isFile() && (System.currentTimeMillis() - f.lastModified() < 1000 * 3600);
-//        return false;
-    }
-
-    private void saveImage(String url, byte[] buf) {
-        Log.d(TAG, String.format("saveImage %s %d bytes", url, buf.length));
-        String fn = this.getImageFilePath(url);
-        try {
-            FileOutputStream fos = new FileOutputStream(fn);
-            fos.write(buf, 0, buf.length);
-            fos.close();
-        } catch (Exception e) {
-            Log.e(TAG, String.format("write file error for %s", url));
-        }
-    }
-
-    private byte[] getImageFile(String url) {
-        String path = this.getImageFilePath(url);
-        try {
-            File f = new File(path);
-            byte[] buf = new byte[(int) f.length()];
-            FileInputStream fis = new FileInputStream(path);
-            fis.read(buf, 0, buf.length);
-            fis.close();
-            return buf;
-        } catch (FileNotFoundException e) {
-            Log.e(TAG, String.format("getImageFile: fail %s", url));
-            return null;
-        } catch (IOException e) {
-            Log.e(TAG, String.format("getImageFile: IO error %s", e.getMessage()));
-            return null;
-        }
-    }
-
-    private String getImageFilePath(String url) {
-        File root = this.getCacheDir();
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-1");
-            byte[] in = url.getBytes("utf-8");
-            md.update(in);
-            byte[] out = md.digest();
-            StringBuilder sb = new StringBuilder();
-            for (byte b : out) {
-                sb.append(String.format("%02X", b));
+    private void loadItemImage(final ImageView target, final LabCollection data) {
+        new RemoteImageLoader(this, data.image_688_316, new RemoteImageLoader.RemoteImageListener() {
+            @Override
+            public void onRemoteImageAcquired(Drawable dr) {
+                BitmapDrawable oldbd = (BitmapDrawable) target.getDrawable();
+                target.setImageDrawable(dr);
+                if (oldbd != null) {
+                    oldbd.getBitmap().recycle();
+                }
             }
-            String fn = String.format("%s/%s", root.getAbsolutePath(), sb.toString());
-            Log.d(TAG, String.format("file %s for url %s", fn, url));
-            return fn;
-        } catch (NoSuchAlgorithmException e) {
-            return null;
-        } catch (UnsupportedEncodingException e) {
-            return null;
-        }
+        });
     }
 }

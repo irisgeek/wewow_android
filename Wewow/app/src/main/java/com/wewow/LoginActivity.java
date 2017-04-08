@@ -453,12 +453,12 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
         this.imWechat.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                IWXAPI api = WXAPIFactory.createWXAPI(LoginActivity.this, CommonUtilities.WX_AppID, false);
+                IWXAPI api = WXAPIFactory.createWXAPI(LoginActivity.this, CommonUtilities.WX_AppID, true);
                 if (!api.isWXAppInstalled()) {
                     Toast.makeText(LoginActivity.this, R.string.login_wechat_not_install, Toast.LENGTH_LONG).show();
                     return;
                 }
-                api.registerApp(CommonUtilities.WX_AppID);
+                //api.registerApp(CommonUtilities.WX_AppID);
                 final SendAuth.Req req = new SendAuth.Req();
                 req.scope = "snsapi_userinfo";
                 req.state = LoginActivity.this.getPackageName();
