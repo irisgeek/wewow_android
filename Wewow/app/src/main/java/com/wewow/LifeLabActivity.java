@@ -2,8 +2,6 @@ package com.wewow;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -31,20 +29,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -81,7 +66,7 @@ public class LifeLabActivity extends BaseActivity {
                 LifeLabActivity.this.startActivity(intent);
             }
         });
-        View foot = View.inflate(this, R.layout.layout_lifelab_foot, null);
+        View foot = View.inflate(this, R.layout.lifelab_foot, null);
         foot.findViewById(R.id.tv_lab_more).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -112,7 +97,7 @@ public class LifeLabActivity extends BaseActivity {
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
             if (view == null) {
-                view = View.inflate(LifeLabActivity.this, R.layout.layout_lifelab_item, null);
+                view = View.inflate(LifeLabActivity.this, R.layout.lifelab_item, null);
                 //view = View.inflate(LifeLabActivity.this, R.layout.layout_lifelab_item1, null);
             }
             LabCollection labcol = (LabCollection) this.getItem(i);
