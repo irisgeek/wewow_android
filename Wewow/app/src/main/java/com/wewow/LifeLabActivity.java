@@ -96,16 +96,16 @@ public class LifeLabActivity extends BaseActivity {
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
             if (view == null) {
-                //view = View.inflate(LifeLabActivity.this, R.layout.layout_lifelab_item, null);
-                view = View.inflate(LifeLabActivity.this, R.layout.layout_lifelab_item1, null);
+                view = View.inflate(LifeLabActivity.this, R.layout.layout_lifelab_item, null);
+                //view = View.inflate(LifeLabActivity.this, R.layout.layout_lifelab_item1, null);
             }
             LabData.LabCollection labcol = (LabData.LabCollection) this.getItem(i);
             TextView tv = (TextView) view.findViewById(R.id.tv_lab_title);
             tv.setText(labcol.title);
             ImageView iv = (ImageView) view.findViewById(R.id.iv_lab_image);
             LifeLabActivity.this.loadItemImage(iv, labcol);
-            //TextView tvvol = (TextView) view.findViewById(R.id.tv_lab_num);
-            //tvvol.setText(String.format("vol. %d", labcol.order));
+            TextView tvvol = (TextView) view.findViewById(R.id.tv_lab_num);
+            tvvol.setText(String.format("vol. %d", labcol.order));
             TextView tvread = (TextView) view.findViewById(R.id.tv_lab_read);
             tvread.setText(labcol.read_count);
             TextView tvlike = (TextView) view.findViewById(R.id.tv_lab_collection);
@@ -210,6 +210,8 @@ public class LifeLabActivity extends BaseActivity {
                     lc.liked_count = jj.getString("liked_count");
                     lc.order = jj.getInt("order");
                     lc.read_count = jj.getString("read_count");
+                    lc.image_642_320 = jj.getString("image_642_320");
+                    lc.image_688_316 = jj.getString("image_688_316");
                     this.collections.add(lc);
                 }
             } catch (JSONException e) {
@@ -245,6 +247,8 @@ public class LifeLabActivity extends BaseActivity {
             public String liked_count;
             public int order;
             public String read_count;
+            public String image_688_316;
+            public String image_642_320;
         }
 
         public boolean isItemLoaded(int i) {
@@ -265,15 +269,19 @@ public class LifeLabActivity extends BaseActivity {
             //bm.recycle();
         } else {
             Object[] params = new Object[]{
-                    data.image,
+                    data.image_688_316,
                     new HttpAsyncTask.TaskDelegate() {
                         @Override
                         public void taskCompletionResult(byte[] result) {
                             if (result != null) {
+                                BitmapDrawable oldbd = (BitmapDrawable)target.getDrawable();
                                 Bitmap bm = BitmapFactory.decodeByteArray(result, 0, result.length);
                                 BitmapDrawable bd = new BitmapDrawable(LifeLabActivity.this.getResources(), bm);
                                 target.setImageDrawable(bd);
                                 //bm.recycle();
+                                if (oldbd != null) {
+                                    oldbd.getBitmap().recycle();
+                                }
                                 LifeLabActivity.this.saveImage(data.image, result);
                             }
                         }
