@@ -1,6 +1,7 @@
 package com.wewow;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
@@ -13,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.wewow.dto.LabCollection;
@@ -25,6 +27,7 @@ import com.wewow.utils.WebAPIHelper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,6 +45,7 @@ public class LifeLabItemActivity extends Activity {
     private LabCollection lc;
     private LabCollectionDetail lcd = new LabCollectionDetail();
     private ExpandableListView lvArticles;
+    private LinearLayout container;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +59,7 @@ public class LifeLabItemActivity extends Activity {
     }
 
     private void setupUI() {
+        this.container = (LinearLayout) this.findViewById(R.id.lifelab_item_container);
         new RemoteImageLoader(this, this.lc.image, new RemoteImageLoader.RemoteImageListener() {
             @Override
             public void onRemoteImageAcquired(Drawable dr) {
@@ -79,28 +84,130 @@ public class LifeLabItemActivity extends Activity {
                         LabCollectionDetail x = LabCollectionDetail.parse(jobj);
                         if (x != null) {
                             LifeLabItemActivity.this.lcd = x;
-                            LifeLabItemActivity.this.adapter.notifyDataSetChanged();
-                            LifeLabItemActivity.this.expandAll();
+//                            LifeLabItemActivity.this.adapter.notifyDataSetChanged();
+//                            LifeLabItemActivity.this.expandAll();
+                            LifeLabItemActivity.this.display();
                         }
                     }
                 },
                 WebAPIHelper.HttpMethod.GET
         };
         new HttpAsyncTask().execute(params);
+        //this.setArticles();
+        //this.setupPosts();
+    }
+
+    private void display() {
         this.setArticles();
+        this.setupPosts();
+        this.setArtists();
     }
 
     private void setArticles() {
-        this.lvArticles = (ExpandableListView) this.findViewById(R.id.list_lifelab_article);
-        this.lvArticles.setAdapter(this.adapter);
-        this.lvArticles.setGroupIndicator(null);
-        this.lvArticles.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+//        this.lvArticles = (ExpandableListView) this.findViewById(R.id.list_lifelab_article);
+//        this.lvArticles.setAdapter(this.adapter);
+//        this.lvArticles.setGroupIndicator(null);
+//        this.lvArticles.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+//            @Override
+//            public boolean onGroupClick(ExpandableListView expandableListView, View view, int i, long l) {
+//                return true;
+//            }
+//        });
+        int gc = this.lcd.getArticleGroupCount() > 2 ? 2 : this.lcd.getArticleGroupCount();
+        LinearLayout.LayoutParams groupParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        groupParams.setMargins(Utils.dipToPixel(this, 8), Utils.dipToPixel(this, 6), Utils.dipToPixel(this, 8), 0);
+        LinearLayout.LayoutParams articleParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        articleParams.setMargins(Utils.dipToPixel(this, 8), 0, Utils.dipToPixel(this, 8), 0);
+        for (int i = 0; i < gc; i++) {
+            String g = this.lcd.getArticleGroup(i);
+            this.addArticleView(g, groupParams, articleParams);
+        }
+    }
+
+    private void addArticleView(String group, LinearLayout.LayoutParams groupParams, LinearLayout.LayoutParams articleParams) {
+        View groupView = View.inflate(this, R.layout.lifelab_item_article_group, null);
+        TextView tv = (TextView) groupView.findViewById(R.id.lifelab_item_group_title);
+        tv.setText(group);
+        container.addView(groupView, groupParams);
+        int cc = this.lcd.getArticleCount(group) > 2 ? 2 : this.lcd.getArticleCount(group);
+        for (int i = 0; i < cc; i++) {
+            LabCollectionDetail.Article a = this.lcd.getArticle(group, i);
+            View itemView = View.inflate(this, R.layout.lifelab_item_article, null);
+            itemView.setBackgroundColor(i % 2 == 0 ? Color.rgb(252, 230, 194) : Color.WHITE);
+            tv = (TextView) itemView.findViewById(R.id.lifelab_item_article_category);
+            tv.setText(a.wewow_category);
+            tv = (TextView) itemView.findViewById(R.id.lifelab_item_article_title);
+            tv.setText(a.title);
+            final ImageView iv = (ImageView) itemView.findViewById(R.id.lifelab_item_article_img);
+            new RemoteImageLoader(this, a.image_320_160, new RemoteImageLoader.RemoteImageListener() {
+                @Override
+                public void onRemoteImageAcquired(Drawable dr) {
+                    BitmapDrawable bd = (BitmapDrawable) iv.getDrawable();
+                    iv.setImageDrawable(dr);
+                    if (bd != null) {
+                        bd.getBitmap().recycle();
+                    }
+                }
+            });
+            container.addView(itemView, articleParams);
+        }
+    }
+
+    private void setupPosts() {
+        if (this.lcd.getPostCount() == 0) {
+            return;
+        }
+        LabCollectionDetail.Post p = this.lcd.getPost(0);
+        View view = View.inflate(this, R.layout.lifelab_item_discuz, null);
+        LinearLayout.LayoutParams groupParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        groupParams.setMargins(Utils.dipToPixel(this, 8), Utils.dipToPixel(this, 6), Utils.dipToPixel(this, 8), 0);
+        TextView tv = (TextView) view.findViewById(R.id.lifelab_item_discuz_title);
+        tv.setText(this.lcd.daily_topic_section);
+        tv = (TextView) view.findViewById(R.id.tv_lifelab_item_discuz_topic);
+        tv.setText(p.title);
+        tv = (TextView) view.findViewById(R.id.tv_lifelab_item_discuz_count);
+        tv.setText(this.lcd.liked_count);
+        final ImageView iv = (ImageView) view.findViewById(R.id.iv_lifelab_item_discuz);
+        new RemoteImageLoader(this, p.image_664_250, new RemoteImageLoader.RemoteImageListener() {
             @Override
-            public boolean onGroupClick(ExpandableListView expandableListView, View view, int i, long l) {
-                return true;
+            public void onRemoteImageAcquired(Drawable dr) {
+                BitmapDrawable bd = (BitmapDrawable) iv.getDrawable();
+                iv.setImageDrawable(dr);
+                if (bd != null) {
+                    bd.getBitmap().recycle();
+                }
             }
         });
+        container.addView(view, groupParams);
+    }
 
+    private void setArtists() {
+        if (this.lcd.getArtistCount() == 0) {
+            return;
+        }
+        View view = View.inflate(this, R.layout.lifelab_item_artists, null);
+        LinearLayout r = (LinearLayout) view.findViewById(R.id.lifelab_item_artist_container);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.setMargins(0, Utils.dipToPixel(this, 10), Utils.dipToPixel(this, 8), Utils.dipToPixel(this, 10));
+        for (int i = 0; i < this.lcd.getArtistCount(); i++) {
+            LabCollectionDetail.Artist a = this.lcd.getArtist(i);
+            TextView tv = (TextView) view.findViewById(R.id.lifelab_item_artist_name);
+            tv.setText(a.nickname);
+            tv = (TextView) view.findViewById(R.id.lifelab_item_artist_desc);
+            tv.setText(a.desc);
+            final ImageView iv = (ImageView) view.findViewById(R.id.lifelab_item_artist_logo);
+            new RemoteImageLoader(this, a.image, new RemoteImageLoader.RemoteImageListener() {
+                @Override
+                public void onRemoteImageAcquired(Drawable dr) {
+                    BitmapDrawable bd = (BitmapDrawable) iv.getDrawable();
+                    iv.setImageDrawable(dr);
+                    if (bd != null) {
+                        bd.getBitmap().recycle();
+                    }
+                }
+            });
+        }
+        this.container.addView(view, params);
     }
 
     private void expandAll() {

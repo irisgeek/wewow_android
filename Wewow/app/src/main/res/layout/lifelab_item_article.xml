@@ -2,6 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginLeft="8dp"
+    android:layout_marginRight="8dp"
     android:background="#ffffff"
     android:orientation="horizontal">
 
@@ -26,7 +28,7 @@
             android:layout_marginRight="12dp"
             android:layout_marginTop="26dp"
             android:textColor="#ff000000"
-            android:textSize="12sp" />
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/lifelab_item_article_category"
@@ -36,7 +38,7 @@
             android:layout_marginBottom="25dp"
             android:layout_marginLeft="12dp"
             android:textColor="#ff333631"
-            android:textSize="10sp" />
+            android:textSize="14sp" />
 
     </RelativeLayout>
 

@@ -1,61 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/lifelab_item_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#553311"
-    android:orientation="vertical">
+    android:background="#553311">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="59dp">
-
-        <ImageView
-            android:id="@+id/lifelab_item_back"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="6dp"
-            android:foregroundGravity="center"
-            android:src="@drawable/back" />
-
-
-        <ImageView
-            android:id="@+id/lifelab_share"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="6dp"
-            android:src="@drawable/share" />
-
-        <ImageView
-            android:id="@+id/lifelab_fav"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/lifelab_share"
-            android:src="@drawable/favourite_b" />
-
-    </RelativeLayout>
-
-    <TextView
-        android:id="@+id/lifelab_item_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="25dp"
-        android:layout_marginLeft="19dp"
-        android:text="abc"
-        android:textColor="#ffffffff"
-        android:textSize="36sp" />
-
-    <ExpandableListView
-        android:id="@+id/list_lifelab_article"
+    <LinearLayout
+        android:id="@+id/lifelab_item_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:dividerHeight="6dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp">
+        android:orientation="vertical">
 
-    </ExpandableListView>
-</LinearLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="59dp">
+
+            <ImageView
+                android:id="@+id/lifelab_item_back"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="6dp"
+                android:foregroundGravity="center"
+                android:src="@drawable/back" />
+
+
+            <ImageView
+                android:id="@+id/lifelab_share"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="6dp"
+                android:src="@drawable/share" />
+
+            <ImageView
+                android:id="@+id/lifelab_fav"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/lifelab_share"
+                android:src="@drawable/favourite_b" />
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/lifelab_item_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="25dp"
+            android:layout_marginLeft="19dp"
+            android:text="abc"
+            android:textColor="#ffffffff"
+            android:textSize="36sp" />
+
+        <!--<ExpandableListView
+            android:id="@+id/list_lifelab_article"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp">
+
+        </ExpandableListView>-->
+
+    </LinearLayout>
+</ScrollView>
