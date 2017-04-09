@@ -100,6 +100,7 @@ public class LifeLabItemActivity extends Activity {
                 return true;
             }
         });
+
     }
 
     private void expandAll() {
@@ -111,14 +112,16 @@ public class LifeLabItemActivity extends Activity {
     private BaseExpandableListAdapter adapter = new BaseExpandableListAdapter() {
         @Override
         public int getGroupCount() {
-            return LifeLabItemActivity.this.lcd.getArticleGroupCount();
+            int l = LifeLabItemActivity.this.lcd.getArticleGroupCount();
+            return l > 2 ? 2 : l;
         }
 
         @Override
         public int getChildrenCount(int i) {
             String group = LifeLabItemActivity.this.lcd.getArticleGroup(i);
-            Log.d(TAG, String.format("getChildrenCount: %s %d", group, LifeLabItemActivity.this.lcd.getArticleCount(group)));
-            return LifeLabItemActivity.this.lcd.getArticleCount(group);
+            //Log.d(TAG, String.format("getChildrenCount: %s %d", group, LifeLabItemActivity.this.lcd.getArticleCount(group)));
+            int l = LifeLabItemActivity.this.lcd.getArticleCount(group);
+            return l > 2 ? 2 : l;
         }
 
         @Override
