@@ -212,7 +212,8 @@ public class DetailArtistActivity extends BaseActivity {
 
         ImageView imageView=(ImageView)findViewById(R.id.imageViewIcon);
         Glide.with(this)
-        .load(artist.getArtist().getImage()).crossFade().into(imageView);
+
+        .load(artist.getArtist().getImage()).crossFade().fitCenter().placeholder(R.drawable.banner_loading_spinner).placeholder(R.drawable.banner_loading_spinner).into(imageView);
 
         TextView textViewNickName=(TextView)findViewById(R.id.textViewNickName);
         textViewNickName.setText(artist.getArtist().getNickname());
@@ -300,7 +301,7 @@ public class DetailArtistActivity extends BaseActivity {
         final ImageView imageView = (ImageView) findViewById(R.id.backdrop);
         Glide.with(this)
                 .load("https://wewow.wewow.com.cn/article/20170327/14513-amanda-kerr-39507.jpg?x-oss-process=image/resize,m_fill,h_384,w_720,,limit_0/quality,Q_40/format,jpg")
-                .fitCenter()
+                .fitCenter().placeholder(R.drawable.banner_loading_spinner)
                 .into(imageView);
 
     }

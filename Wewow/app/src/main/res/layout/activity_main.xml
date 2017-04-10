@@ -74,7 +74,7 @@
                 app:tabTextAppearance="@style/MyTabLayoutTextAppearance"
                 app:tabSelectedTextColor="@color/tab_text_selected_color"
                 app:tabIndicatorColor="#333631"
-                app:tabMinWidth="90dp"
+                app:tabMinWidth="@dimen/tab_width"
                 app:tabMode="scrollable" />
 
 
@@ -94,7 +94,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingTop="24dp">
+       >
 
 
     <!--<LinearLayout-->

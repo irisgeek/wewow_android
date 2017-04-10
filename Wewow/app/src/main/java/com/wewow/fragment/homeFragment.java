@@ -1,5 +1,6 @@
 package com.wewow.fragment;
 
+import android.content.Intent;
 import android.os.Handler;
 import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
@@ -29,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.wewow.DetailArtistActivity;
 import com.wewow.R;
 import com.wewow.adapter.ListViewAdapter;
 import com.wewow.dto.Artist;
@@ -543,7 +545,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     }
 
-    public void setUpViewPagerLoverOfLife(List<Artist> artists,View rootView) {
+    public void setUpViewPagerLoverOfLife(final List<Artist> artists,View rootView) {
 
         //blank view for bounce effect
         View left = new View(rootView.getContext());
@@ -569,12 +571,24 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
             textArticleCount.setText(artists.get(i).getArticle_count());
             textFollowerCount.setText(artists.get(i).getFollower_count());
-
+            final String artistId=artists.get(i).getId();
 
             //to set data
 
 
             mListViews.add(view);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+
+
+                    Intent intent = new Intent(getActivity(),DetailArtistActivity.class);
+                    intent.putExtra("id",artistId);
+                    startActivity(intent);
+
+                }
+            });
         }
 
         View right = new View(rootView.getContext());
@@ -585,6 +599,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         viewPagerLoverOfLife = (ViewPager) rootView.findViewById(R.id.viewpagerLayout);
 
         viewPagerLoverOfLife.setAdapter(myAdapter);
+
         viewPagerLoverOfLife.setCurrentItem(1);
         viewPagerLoverOfLife.setOnPageChangeListener(new BouncePageChangeListener(
                 viewPagerLoverOfLife, mListViews));
