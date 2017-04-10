@@ -337,19 +337,7 @@ public class MainActivity extends BaseActivity {
 
     }
 
-    private void setUpScrollView() {
 
-        ScrollView mScrollView = (ScrollView) findViewById(R.id.scrollView1);
-        final GestureDetectorCompat mDetectorCompat = new GestureDetectorCompat(this, new MyGestureListener());
-
-        mScrollView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                mDetectorCompat.onTouchEvent(event);
-                return false;
-            }
-        });
-    }
 
 
     public void fixListViewHeight(ListView listView) {
@@ -657,30 +645,6 @@ public class MainActivity extends BaseActivity {
     }
 
 
-    class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
-
-        @Override
-        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-
-            if (Math.abs(distanceY) > Math.abs(distanceX)) {//判断是否竖直滑动
-
-
-                //是否向下滑动
-                boolean isScrollDown = e1.getRawY() < e2.getRawY() ? true : false;
-
-                if (!isScrollDown) {
-                    RelativeLayout layoutBanner = (RelativeLayout) findViewById(R.id.layoutBanner);
-                    layoutBanner.setVisibility(View.GONE);
-                    LinearLayout layoutForScrollUp = (LinearLayout) findViewById(R.id.layoutForScrollUp);
-                    layoutForScrollUp.setVisibility(View.VISIBLE);
-                }
-            }
-
-            return super.onScroll(e1, e2, distanceX, distanceY);
-        }
-
-
-    }
 
     private ViewPager.OnPageChangeListener mPageChangeListener = new ViewPager.OnPageChangeListener() {
         @Override
