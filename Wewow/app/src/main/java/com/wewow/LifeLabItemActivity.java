@@ -3,11 +3,15 @@ package com.wewow;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +24,7 @@ import android.widget.TextView;
 import com.wewow.dto.LabCollection;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
+import com.wewow.utils.PhotoUtils;
 import com.wewow.utils.RemoteImageLoader;
 import com.wewow.utils.Utils;
 import com.wewow.utils.WebAPIHelper;
@@ -101,6 +106,7 @@ public class LifeLabItemActivity extends Activity {
         this.setArticles();
         this.setupPosts();
         this.setArtists();
+        this.setFoot();
     }
 
     private void setArticles() {
@@ -189,25 +195,42 @@ public class LifeLabItemActivity extends Activity {
         LinearLayout r = (LinearLayout) view.findViewById(R.id.lifelab_item_artist_container);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.setMargins(0, Utils.dipToPixel(this, 10), Utils.dipToPixel(this, 8), Utils.dipToPixel(this, 10));
+        LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(Utils.dipToPixel(this, 256), ViewGroup.LayoutParams.WRAP_CONTENT);
+        params1.setMargins(Utils.dipToPixel(this, 10), 0, 0, 0);
         for (int i = 0; i < this.lcd.getArtistCount(); i++) {
+            View itemView = View.inflate(this, R.layout.lifelab_item_artist, null);
             LabCollectionDetail.Artist a = this.lcd.getArtist(i);
-            TextView tv = (TextView) view.findViewById(R.id.lifelab_item_artist_name);
+            TextView tv = (TextView) itemView.findViewById(R.id.lifelab_item_artist_name);
             tv.setText(a.nickname);
-            tv = (TextView) view.findViewById(R.id.lifelab_item_artist_desc);
+            tv = (TextView) itemView.findViewById(R.id.lifelab_item_artist_desc);
             tv.setText(a.desc);
-            final ImageView iv = (ImageView) view.findViewById(R.id.lifelab_item_artist_logo);
+            tv = (TextView) itemView.findViewById(R.id.lifelab_item_artist_articlecount);
+            tv.setText(String.format(this.getString(R.string.lifelab_item_artist_article), 0));
+            tv = (TextView) itemView.findViewById(R.id.lifelab_item_artist_follower);
+            tv.setText(String.format(this.getString(R.string.lifelab_item_artist_follower), 0));
+            final ImageView iv = (ImageView) itemView.findViewById(R.id.lifelab_item_artist_logo);
             new RemoteImageLoader(this, a.image, new RemoteImageLoader.RemoteImageListener() {
                 @Override
                 public void onRemoteImageAcquired(Drawable dr) {
                     BitmapDrawable bd = (BitmapDrawable) iv.getDrawable();
-                    iv.setImageDrawable(dr);
+                    Bitmap bm = PhotoUtils.drawableToBitmap(dr);
+                    RoundedBitmapDrawable rdr = PhotoUtils.createRoundedDrawable(LifeLabItemActivity.this, bm, bm.getWidth());
+                    iv.setImageDrawable(rdr);
                     if (bd != null) {
                         bd.getBitmap().recycle();
                     }
                 }
             });
+            r.addView(itemView, params1);
         }
         this.container.addView(view, params);
+    }
+
+    private void setFoot() {
+        View view = View.inflate(this, R.layout.lifelab_item_foot, null);
+        TextView tv = (TextView) view.findViewById(R.id.lifelab_item_desc);
+        tv.setText(String.format(this.getString(R.string.lifelab_item_desc), this.lcd.editor));
+        this.container.addView(view);
     }
 
     private void expandAll() {
@@ -375,10 +398,23 @@ public class LifeLabItemActivity extends Activity {
                 }
                 lcd.share_title = data.getString("share_title");
                 lcd.liked_count = data.getString("liked_count");
+                lcd.addTestArtist();
                 return lcd;
             } catch (JSONException e) {
                 Log.e(TAG, "parse fail");
                 return null;
+            }
+        }
+
+        private void addTestArtist() {
+            if (this.artists.size() == 0) {
+                for (int i = 0; i < 3; i++) {
+                    Artist artist = new Artist();
+                    artist.nickname = String.format("生活家%d", i);
+                    artist.desc = String.format("生活家描述%d", i);
+                    artist.image = this.collection_image;
+                    this.artists.add(artist);
+                }
             }
         }
 
