@@ -123,7 +123,7 @@ public class MainActivity extends BaseActivity {
         context = this;
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         Utils.regitsterNetSateBroadcastReceiver(this);
-
+//        setUpNavigationTabDummy(null);
 
 //        setUpNavigationTab();
         if (Utils.isNetworkAvailable(this)) {
@@ -322,6 +322,43 @@ public class MainActivity extends BaseActivity {
 
     }
 
+    private void setUpNavigationTabDummy(List<collectionCategory> titles) {
+        mTabLayout = (TabLayout) findViewById(R.id.tabs);
+
+//        mTabLayout.addTab(mTabLayout.newTab().setText(" " + getResources().getString(R.string.home_page) + " "));
+//        for (int i = 0; i < titles.size(); i++) {
+//            mTabLayout.addTab(mTabLayout.newTab().setText(titles.get(i).getTitle()));
+//        }
+
+
+        mTabLayout.addTab(mTabLayout.newTab().setText(" " + getResources().getString(R.string.home)));
+
+        mTabLayout.addTab(mTabLayout.newTab().setText(" " + getResources().getString(R.string.test1)));
+        mTabLayout.addTab(mTabLayout.newTab().setText(" " + getResources().getString(R.string.test2)));
+
+        mTabLayout.addTab(mTabLayout.newTab().setText(" " + getResources().getString(R.string.test3)));
+        mTabLayout.addTab(mTabLayout.newTab().setText(" " + getResources().getString(R.string.test4)));
+
+
+        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> ids = new ArrayList<String>();
+        list.add(getResources().getString(R.string.home));
+        ids.add("0");
+        list.add(getResources().getString(R.string.test1));
+        list.add(getResources().getString(R.string.test2));
+        list.add(getResources().getString(R.string.test3));
+        list.add(getResources().getString(R.string.test4));
+//
+//        for (collectionCategory category : titles) {
+//            list.add(category.getTitle());
+//            ids.add(category.getId());
+//        }
+
+//        setUpTabs(list,ids);
+
+    }
+
+
     private void setUpTabs(List<String> titles,List<String> ids) {
 
 
@@ -337,19 +374,7 @@ public class MainActivity extends BaseActivity {
 
     }
 
-    private void setUpScrollView() {
 
-        ScrollView mScrollView = (ScrollView) findViewById(R.id.scrollView1);
-        final GestureDetectorCompat mDetectorCompat = new GestureDetectorCompat(this, new MyGestureListener());
-
-        mScrollView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                mDetectorCompat.onTouchEvent(event);
-                return false;
-            }
-        });
-    }
 
 
     public void fixListViewHeight(ListView listView) {
@@ -657,30 +682,6 @@ public class MainActivity extends BaseActivity {
     }
 
 
-    class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
-
-        @Override
-        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-
-            if (Math.abs(distanceY) > Math.abs(distanceX)) {//判断是否竖直滑动
-
-
-                //是否向下滑动
-                boolean isScrollDown = e1.getRawY() < e2.getRawY() ? true : false;
-
-                if (!isScrollDown) {
-                    RelativeLayout layoutBanner = (RelativeLayout) findViewById(R.id.layoutBanner);
-                    layoutBanner.setVisibility(View.GONE);
-                    LinearLayout layoutForScrollUp = (LinearLayout) findViewById(R.id.layoutForScrollUp);
-                    layoutForScrollUp.setVisibility(View.VISIBLE);
-                }
-            }
-
-            return super.onScroll(e1, e2, distanceX, distanceY);
-        }
-
-
-    }
 
     private ViewPager.OnPageChangeListener mPageChangeListener = new ViewPager.OnPageChangeListener() {
         @Override

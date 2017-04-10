@@ -20,7 +20,7 @@
         card_view:cardCornerRadius="2dp">
     <com.wewow.view.CircleImageView
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:src="@drawable/artist"
+
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_gravity="left|center_vertical"
@@ -55,16 +55,17 @@
             android:layout_gravity="left"
             android:layout_marginLeft="32dp"
             android:id="@+id/textViewDesc"/>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
 
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
+            android:layout_gravity="bottom"
             android:layout_alignParentRight="true"
-            android:layout_marginTop="20dp"
+            android:layout_marginBottom="5dp"
             android:layout_marginRight="12dp"
-            android:layout_marginLeft="32dp"
+            android:layout_marginLeft="80dp"
             android:orientation="horizontal">
 
             <TextView
@@ -104,7 +105,7 @@
 
         </LinearLayout>
 
-    </LinearLayout>
+
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
