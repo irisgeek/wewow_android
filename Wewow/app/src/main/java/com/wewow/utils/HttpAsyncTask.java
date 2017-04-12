@@ -52,6 +52,9 @@ public class HttpAsyncTask extends AsyncTask<Object, Integer, byte[]> {
         } catch (UnsupportedEncodingException e) {
             Log.w(TAG, "can't convert byte[] to string, encoding error");
             return null;
+        } catch (NullPointerException e) {
+            Log.w(TAG, "can't convert null to string, encoding error");
+            return null;
         }
     }
 
