@@ -30,6 +30,10 @@
     <!-- 生活研究所 -->
     <string name="lifelab_title">生活研究所</string>
     <string name="lifelab_more">加载更多</string>
+    <string name="lifelab_item_artist_title">你可能感兴趣的生活家</string>
+    <string name="lifelab_item_artist_article">文章 %d</string>
+    <string name="lifelab_item_artist_follower">关注者 %d</string>
+    <string name="lifelab_item_desc">本期生活研究所，由%s采集组织</string>
 
     <!-- Home page -->
     <!-- naivgation title -->
