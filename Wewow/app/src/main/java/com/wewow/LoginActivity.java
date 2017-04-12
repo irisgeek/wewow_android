@@ -60,6 +60,7 @@ import com.tencent.mm.opensdk.modelmsg.SendAuth;
 
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
+import com.wewow.utils.ProgressDialogUtil;
 import com.wewow.utils.WebAPIHelper;
 
 import org.json.JSONException;
@@ -103,7 +104,6 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
     private HuaweiApiClient huaweiClient = null;
     private SsoHandler ssohandler;
 
-    private ProgressDialog progressDlg;
     private CountDownTimer verifyTimer = new CountDownTimer(30 * 1000, 1000) {
         @Override
         public void onTick(long l) {
@@ -203,7 +203,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
                         new HttpAsyncTask.TaskDelegate() {
                             @Override
                             public void taskCompletionResult(byte[] result) {
-                                LoginActivity.this.toggleProgressDialog(false);
+                                ProgressDialogUtil.getInstance(LoginActivity.this).finishProgressDialog();
                                 try {
                                     String x = new String(result, "utf-8");
                                     Log.d(TAG, String.format("login returns: %s", x));
@@ -225,22 +225,10 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
                             }
                         }
                 };
-                LoginActivity.this.toggleProgressDialog(true);
+                ProgressDialogUtil.getInstance(LoginActivity.this).showProgressDialog();
                 new HttpAsyncTask().execute(params);
             }
         });
-    }
-
-    private void toggleProgressDialog(boolean show) {
-        if (show) {
-            if ((this.progressDlg == null) || !this.progressDlg.isShowing()) {
-                this.progressDlg = ProgressDialog.show(LoginActivity.this, null, null, false, true);
-            }
-        } else {
-            if (this.progressDlg != null) {
-                this.progressDlg.dismiss();
-            }
-        }
     }
 
     /**
@@ -315,7 +303,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
                             @Override
                             public void taskCompletionResult(byte[] result) {
                                 try {
-                                    LoginActivity.this.toggleProgressDialog(false);
+                                    ProgressDialogUtil.getInstance(LoginActivity.this).finishProgressDialog();
                                     String x = new String(result, "utf-8");
                                     Log.d(TAG, String.format("return: %s", x));
                                     JSONObject jobj = new JSONObject(x).getJSONObject("result");
@@ -333,7 +321,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
                             }
                         }
                 };
-                LoginActivity.this.toggleProgressDialog(true);
+                ProgressDialogUtil.getInstance(LoginActivity.this).showProgressDialog();
                 new HttpAsyncTask().execute(params);
             }
         });
@@ -379,11 +367,11 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
                         Log.d(TAG, "Weibo login succeed");
                         final Oauth2AccessToken token = Oauth2AccessToken.parseAccessToken(bundle);
                         UsersAPI userapi = new UsersAPI(LoginActivity.this, CommonUtilities.Weibo_AppKey, token);
-                        LoginActivity.this.toggleProgressDialog(true);
+                        ProgressDialogUtil.getInstance(LoginActivity.this).showProgressDialog();
                         userapi.show(Long.parseLong(token.getUid()), new RequestListener() {
                             @Override
                             public void onComplete(String s) {
-                                LoginActivity.this.toggleProgressDialog(false);
+                                //ProgressDialogUtil.getInstance(LoginActivity.this).finishProgressDialog();
                                 final User user = User.parse(s);
                                 List<Pair<String, String>> urlparams = new ArrayList<Pair<String, String>>();
                                 urlparams.add(new Pair<String, String>("open_id", token.getUid()));
@@ -396,7 +384,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
                                         new HttpAsyncTask.TaskDelegate() {
                                             @Override
                                             public void taskCompletionResult(byte[] result) {
-                                                LoginActivity.this.toggleProgressDialog(false);
+                                                ProgressDialogUtil.getInstance(LoginActivity.this).finishProgressDialog();
                                                 try {
                                                     String s = new String(result, "utf-8");
                                                     Log.d(TAG, "taskCompletionResult: " + s);
@@ -427,7 +415,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
 
                             @Override
                             public void onWeiboException(WeiboException e) {
-                                LoginActivity.this.toggleProgressDialog(false);
+                                ProgressDialogUtil.getInstance(LoginActivity.this).finishProgressDialog();
                                 Log.e(TAG, String.format("onWeiboException: %s", e.getMessage()));
                                 Toast.makeText(LoginActivity.this, R.string.serverError, Toast.LENGTH_LONG).show();
                             }
@@ -473,7 +461,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
         Log.d(TAG, String.format("onActivityResult request:%d  result:%d", requestCode, resultCode));
         switch (requestCode) {
             case HUAWEI_REQUEST_UNLOGIN:
-                this.toggleProgressDialog(true);
+                ProgressDialogUtil.getInstance(LoginActivity.this).showProgressDialog();
                 if (resultCode == 0) {
                     this.onHuaweiCancelled();
                     return;
@@ -481,7 +469,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
                 this.startHuaweiLogin();
                 break;
             case HUAWEI_REQUEST_AUTH:
-                this.toggleProgressDialog(true);
+                ProgressDialogUtil.getInstance(LoginActivity.this).showProgressDialog();
                 if (resultCode == 0) {
                     this.onHuaweiCancelled();
                     return;
@@ -555,7 +543,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
                     LoginActivity.this.onHuaweiAuthorized(signInResult);
                 } else {
                     int code = signInResult.getStatus().getStatusCode();
-                    LoginActivity.this.toggleProgressDialog(true);
+                    ProgressDialogUtil.getInstance(LoginActivity.this).showProgressDialog();
                     if (code == HuaweiIdStatusCodes.SIGN_IN_UNLOGIN) {
                         Intent i = signInResult.getData();
                         LoginActivity.this.startActivityForResult(i, HUAWEI_REQUEST_UNLOGIN);
@@ -573,7 +561,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
         Log.d(TAG, result != null ? "result" : "null");
         final SignInHuaweiId hid = result.getSignInHuaweiId();
         Log.d(TAG, "onHuaweiAuthorized: " + hid.getOpenId() + " " + hid.getDisplayName());
-        this.toggleProgressDialog(true);
+        ProgressDialogUtil.getInstance(this).showProgressDialog();
         List<Pair<String, String>> urlparams = new ArrayList<Pair<String, String>>();
         urlparams.add(new Pair<String, String>("open_id", hid.getOpenId()));
         urlparams.add(new Pair<String, String>("nickname", hid.getDisplayName()));
@@ -592,7 +580,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
                 new HttpAsyncTask.TaskDelegate() {
                     @Override
                     public void taskCompletionResult(byte[] result) {
-                        LoginActivity.this.toggleProgressDialog(false);
+                        ProgressDialogUtil.getInstance(LoginActivity.this).finishProgressDialog();
                         try {
                             String s = new String(result, "utf-8");
                             Log.d(TAG, "taskCompletionResult: " + s);

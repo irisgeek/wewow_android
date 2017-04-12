@@ -25,6 +25,7 @@ import com.wewow.dto.LabCollection;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
 import com.wewow.utils.PhotoUtils;
+import com.wewow.utils.ProgressDialogUtil;
 import com.wewow.utils.RemoteImageLoader;
 import com.wewow.utils.Utils;
 import com.wewow.utils.WebAPIHelper;
@@ -80,11 +81,13 @@ public class LifeLabItemActivity extends Activity {
                 LifeLabItemActivity.this.finish();
             }
         });
+        ProgressDialogUtil.getInstance(this).showProgressDialog();
         Object[] params = new Object[]{
                 String.format("%s/collection_info?collection_id=%s", CommonUtilities.WS_HOST, this.lc.id),
                 new HttpAsyncTask.TaskDelegate() {
                     @Override
                     public void taskCompletionResult(byte[] result) {
+                        ProgressDialogUtil.getInstance(LifeLabItemActivity.this).finishProgressDialog();
                         JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
                         LabCollectionDetail x = LabCollectionDetail.parse(jobj);
                         if (x != null) {
