@@ -48,7 +48,9 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".wxapi.WXEntryActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
         <activity
             android:name=".ListArtistActivity"
             android:label="ListArtist"

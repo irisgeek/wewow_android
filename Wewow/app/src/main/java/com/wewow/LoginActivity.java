@@ -62,6 +62,7 @@ import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
 import com.wewow.utils.ProgressDialogUtil;
 import com.wewow.utils.WebAPIHelper;
+import com.wewow.wxapi.WXEntryActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -447,10 +448,12 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
                     return;
                 }
                 //api.registerApp(CommonUtilities.WX_AppID);
+                //ProgressDialogUtil.getInstance(LoginActivity.this).showProgressDialog();
                 final SendAuth.Req req = new SendAuth.Req();
                 req.scope = "snsapi_userinfo";
                 req.state = LoginActivity.this.getPackageName();
                 api.sendReq(req);
+                LoginActivity.this.finish();
             }
         });
     }
