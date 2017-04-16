@@ -39,6 +39,8 @@
     <string name="article_more_discuss">查看更多</string>
     <string name="article_feedback">文章排版出错了？或者有任何建议请</string>
     <string name="article_feedback_link">反馈给我们</string>
+    <string name="lifepost_nodata">还没有人发表看法</string>
+    <string name="lifepost_mycomment">我的评论</string>
 
     <!-- Home page -->
     <!-- naivgation title -->
@@ -119,6 +121,7 @@
     <string name="about_10">一一一一一一 </string>
     <string name="about_11">一起</string>
     <string name="about_12">认真活</string>
+    <string name="title_activity_life_post">LifePostActivity</string>
 
 
 </resources>

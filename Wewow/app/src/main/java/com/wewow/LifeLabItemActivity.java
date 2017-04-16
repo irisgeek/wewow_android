@@ -167,7 +167,7 @@ public class LifeLabItemActivity extends Activity {
     private View.OnClickListener articleClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            int id = (Integer)view.getTag();
+            int id = (Integer) view.getTag();
             Intent intent = new Intent(LifeLabItemActivity.this, ArticleActivity.class);
             intent.putExtra(ArticleActivity.ARTICLE_ID, id);
             LifeLabItemActivity.this.startActivity(intent);
@@ -199,8 +199,20 @@ public class LifeLabItemActivity extends Activity {
                 }
             }
         });
+        view.setTag(p.id);
+        view.setOnClickListener(this.postClickListener);
         container.addView(view, groupParams);
     }
+
+    private View.OnClickListener postClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            int id = (Integer) view.getTag();
+            Intent intent = new Intent(LifeLabItemActivity.this, LifePostActivity.class);
+            intent.putExtra(LifePostActivity.POST_ID, id);
+            LifeLabItemActivity.this.startActivity(intent);
+        }
+    };
 
     private void setArtists() {
         if (this.lcd.getArtistCount() == 0) {

@@ -90,7 +90,11 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".ArticleActivity"></activity>
+        <activity android:name=".ArticleActivity" />
+        <activity
+            android:name=".LifePostActivity"
+            android:label="@string/title_activity_life_post"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"></activity>
     </application>
 
 </manifest>
