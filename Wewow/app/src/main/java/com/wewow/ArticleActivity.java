@@ -71,6 +71,12 @@ public class ArticleActivity extends AppCompatActivity {
     }
 
     private void setupUI() {
+        this.findViewById(R.id.article_back).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ArticleActivity.this.finish();
+            }
+        });
         this.title = (TextView) this.findViewById(R.id.article_title);
         this.content = (WebView) this.findViewById(R.id.article_content);
         this.logo = (ImageView) this.findViewById(R.id.article_logo);

@@ -8,7 +8,7 @@
     tools:context="com.wewow.ArticleActivity">
 
     <LinearLayout
-        android:id="@+id/lifelab_item_container"
+        android:id="@+id/article_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -19,7 +19,7 @@
             android:background="#ffffff">
 
             <ImageView
-                android:id="@+id/lifelab_item_back"
+                android:id="@+id/article_back"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_centerVertical="true"
@@ -29,7 +29,7 @@
 
 
             <ImageView
-                android:id="@+id/lifelab_share"
+                android:id="@+id/article_share"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:layout_alignParentRight="true"
@@ -38,7 +38,7 @@
                 android:src="@drawable/share" />
 
             <ImageView
-                android:id="@+id/lifelab_fav"
+                android:id="@+id/article_fav"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:layout_centerVertical="true"
