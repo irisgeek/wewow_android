@@ -21,6 +21,13 @@ public class UserInfo {
     private String reg_time;
     private String token;
 
+    public static UserInfo getAnonymouUser() {
+        UserInfo anonymous = new UserInfo();
+        anonymous.id = 0L;
+        anonymous.nickname = "Anonymous User";
+        return anonymous;
+    }
+
     private static final String TAG = "Userinfo";
     private static final String PREFERENCE_USERINFO = "PREFERENCE_USERINFO";
     private static final String PREFERENCE_USERINFO_KEY = "PREFERENCE_USERINFO_KEY";
