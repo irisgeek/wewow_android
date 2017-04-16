@@ -4,6 +4,7 @@ import org.json.JSONObject;
 
 
 import retrofit.Callback;
+import retrofit.http.Field;
 import retrofit.http.GET;
 import retrofit.http.Header;
 import retrofit.http.POST;
@@ -13,6 +14,9 @@ import retrofit.http.Query;
  * Created by iris on 17/3/14.
  */
 public interface ITask {
+
+
+    //home page
     @GET("/banner")
     void banner(@Header("User-Agent") String headerContentType, Callback<JSONObject> callback);
 
@@ -25,13 +29,17 @@ public interface ITask {
     @GET("/discovery_info")
     void hotArtistisAndInstitutes(@Header("User-Agent") String headerContentType, Callback<JSONObject> callback);
 
+    //check cache updated or not
     @GET("/update_at")
     void updateAt(@Header("User-Agent") String headerContentType, Callback<JSONObject> callback);
 
+    //artist list
     @GET("/artists_mini")
     void allArtists(@Header("User-Agent") String headerContentType, @Query("user_id") String userId,
                     @Query("page") int page, Callback<JSONObject> callback);
 
+
+    //artist detail
     @GET("/artist_mini")
     void artistDetail(@Header("User-Agent") String headerContentType, @Query("user_id") String userId,
                       @Query("artist_id") String artistId, Callback<JSONObject> callback);
@@ -42,12 +50,49 @@ public interface ITask {
 
 
     @POST("/follow")
-    void followArtist(@Header("User-Agent") String headerContentType, @Query("user_id") String userId,
-                      @Query("artist_id") String artistId, @Query("token") String token, @Query("follow") int follow, Callback<JSONObject> callback);
+    void followArtist(@Header("User-Agent") String headerContentType, @Field("user_id") String userId,
+                      @Field("artist_id") String artistId, @Field("token") String token, @Field("follow") int follow, Callback<JSONObject> callback);
 
     @GET("/index_category_collections")
     void categoryArtistsAndInstitutes(@Header("User-Agent") String headerContentType, @Query("collection_category_id") String id,
                                      Callback<JSONObject> callback);
+
+    //feedback
+    @GET("/feedbacks")
+    void feedbacks(@Header("User-Agent") String headerContentType, @Query("user_id") String id,@Query("page") int page,
+                                      Callback<JSONObject> callback);
+
+    @GET("/feedback")
+    void feedbackText(@Header("User-Agent") String headerContentType, @Field("user_id") String id,
+                  @Field("token") String token, @Field("content") String content,
+                  @Field("content_type") String content_type,  @Field("status") String status,
+                      Callback<JSONObject> callback);
+
+    @GET("/feedback")
+    void feedbackImage(@Header("User-Agent") String headerContentType, @Field("user_id") String id,
+                      @Field("token") String token, @Field("content") String content,
+                      @Field("content_type") String content_type, @Field("image_width") String image_width,
+                       @Field("image_height") String image_height, @Field("status") String status,
+                      Callback<JSONObject> callback);
+
+    //search
+    @GET("/hotwords")
+    void getHotSearchWords(@Header("User-Agent") String headerContentType, Callback<JSONObject> callback);
+
+    @GET("/search_mini")
+    void search(@Header("User-Agent") String headerContentType,  @Query("keywords") String keywords,Callback<JSONObject> callback);
+
+    //new version notification
+    @GET("/notification")
+    void notification(@Header("User-Agent") String headerContentType, Callback<JSONObject> callback);
+
+    //get ads
+    @GET("/ads")
+    void ads(@Header("User-Agent") String headerContentType, Callback<JSONObject> callback);
+
+    @GET("/user_notification")
+    void user_notification(@Header("User-Agent") String headerContentType,@Query("user_id") String user_id, Callback<JSONObject> callback);
+
 
 
 }

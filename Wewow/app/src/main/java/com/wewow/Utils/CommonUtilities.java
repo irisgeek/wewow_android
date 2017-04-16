@@ -23,6 +23,8 @@ public class CommonUtilities {
     public static final String CACHE_FILE_SUBSCRIBED_ARTISTS_LIST="cache_file_subscribed_artists_list";
     public static final String CACHE_FILE_CATEGORY_ARTISTS_AND_INSTITUTES="cache_file_category_artists_and_institute";
 
+    public static final String CACHE_FILE_FEEDBACKS="cache_file_feedbacks";
+
 
 
     public static final String Weibo_AppKey = "3768596648";

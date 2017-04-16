@@ -55,6 +55,7 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wewow.dto.Feedback;
 import com.wewow.utils.DataCleanUtils;
 
 import java.util.ArrayList;
@@ -215,7 +216,7 @@ public class BaseActivity extends ActionBarActivity {
             HashMap<String, Object> map = (HashMap<String, Object>) parent.getAdapter().getItem(position);
             String text = (String) map.get("menuText");
             int resid = (Integer) map.get("icon");
-            Toast.makeText(BaseActivity.this, text, Toast.LENGTH_SHORT).show();
+//            Toast.makeText(BaseActivity.this, text, Toast.LENGTH_SHORT).show();
             drawerLayout.closeDrawer(GravityCompat.START);
             switch (position - 1) {
                 case 0:
@@ -230,9 +231,18 @@ public class BaseActivity extends ActionBarActivity {
                     Intent intentLab = new Intent(BaseActivity.this, LifeLabActivity.class);
                     BaseActivity.this.startActivity(intentLab);
                     break;
+                case 3:
+                    Intent intentFeedback = new Intent(BaseActivity.this, FeedbackActivity.class);
+                    BaseActivity.this.startActivity(intentFeedback);
+                    break;
+
                 case 6:
                     Intent intentSubscribedArtists = new Intent(BaseActivity.this, ListSubscribedArtistActivity.class);
                     BaseActivity.this.startActivity(intentSubscribedArtists);
+                    break;
+                case 7:
+                    Intent intentAbout = new Intent(BaseActivity.this, AboutActivity.class);
+                    BaseActivity.this.startActivity(intentAbout);
                     break;
                 case 10:
                     //clear cache
@@ -245,7 +255,6 @@ public class BaseActivity extends ActionBarActivity {
                     BaseActivity.this.tvuserdesc.setText(R.string.login_to_see_more);
                     break;
                 case 4:
-                case 7:
                 default:
                     break;
             }
@@ -254,7 +263,7 @@ public class BaseActivity extends ActionBarActivity {
 
     private void selectItem(int position) {
         drawerLayout.closeDrawer(GravityCompat.START);
-        Toast.makeText(BaseActivity.this, planetTitles[position - 1], Toast.LENGTH_SHORT).show();
+//        Toast.makeText(BaseActivity.this, planetTitles[position - 1], Toast.LENGTH_SHORT).show();
         switch (position - 1) {
             case 0:
                 break;
