@@ -25,6 +25,7 @@ import com.wewow.dto.LabCollection;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
 import com.wewow.utils.PhotoUtils;
+import com.wewow.utils.ProgressDialogUtil;
 import com.wewow.utils.RemoteImageLoader;
 import com.wewow.utils.Utils;
 import com.wewow.utils.WebAPIHelper;
@@ -80,11 +81,13 @@ public class LifeLabItemActivity extends Activity {
                 LifeLabItemActivity.this.finish();
             }
         });
+        ProgressDialogUtil.getInstance(this).showProgressDialog();
         Object[] params = new Object[]{
                 String.format("%s/collection_info?collection_id=%s", CommonUtilities.WS_HOST, this.lc.id),
                 new HttpAsyncTask.TaskDelegate() {
                     @Override
                     public void taskCompletionResult(byte[] result) {
+                        ProgressDialogUtil.getInstance(LifeLabItemActivity.this).finishProgressDialog();
                         JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
                         LabCollectionDetail x = LabCollectionDetail.parse(jobj);
                         if (x != null) {
@@ -140,6 +143,7 @@ public class LifeLabItemActivity extends Activity {
             LabCollectionDetail.Article a = this.lcd.getArticle(group, i);
             View itemView = View.inflate(this, R.layout.lifelab_item_article, null);
             itemView.setBackgroundColor(i % 2 == 0 ? Color.rgb(252, 230, 194) : Color.WHITE);
+            itemView.setTag(a.id);
             tv = (TextView) itemView.findViewById(R.id.lifelab_item_article_category);
             tv.setText(a.wewow_category);
             tv = (TextView) itemView.findViewById(R.id.lifelab_item_article_title);
@@ -155,9 +159,20 @@ public class LifeLabItemActivity extends Activity {
                     }
                 }
             });
+            itemView.setOnClickListener(this.articleClickListener);
             container.addView(itemView, articleParams);
         }
     }
+
+    private View.OnClickListener articleClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            int id = (Integer) view.getTag();
+            Intent intent = new Intent(LifeLabItemActivity.this, ArticleActivity.class);
+            intent.putExtra(ArticleActivity.ARTICLE_ID, id);
+            LifeLabItemActivity.this.startActivity(intent);
+        }
+    };
 
     private void setupPosts() {
         if (this.lcd.getPostCount() == 0) {
@@ -184,8 +199,20 @@ public class LifeLabItemActivity extends Activity {
                 }
             }
         });
+        view.setTag(p.id);
+        view.setOnClickListener(this.postClickListener);
         container.addView(view, groupParams);
     }
+
+    private View.OnClickListener postClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            int id = (Integer) view.getTag();
+            Intent intent = new Intent(LifeLabItemActivity.this, LifePostActivity.class);
+            intent.putExtra(LifePostActivity.POST_ID, id);
+            LifeLabItemActivity.this.startActivity(intent);
+        }
+    };
 
     private void setArtists() {
         if (this.lcd.getArtistCount() == 0) {

@@ -21,6 +21,7 @@
     <string name="login_wechat_cancel">微信登录已取消</string>
     <string name="login_wechat_ok">微信登录已成功</string>
     <string name="login_wechat_deny">微信登录已被用户拒绝</string>
+    <string name="login_wechat_other">微信登录出错了</string>
     <string name="login_huawei_download_service_title">提示</string>
     <string name="login_huawei_download_service_description">您可能需要安装华为移动服务。如果持续遇到下载失败的提示，建议自行手动下载安装“华为移动服务”。</string>
     <string name="login_huawei_prompt_gotit">我知道了</string>
@@ -34,6 +35,13 @@
     <string name="lifelab_item_artist_article">文章 %d</string>
     <string name="lifelab_item_artist_follower">关注者 %d</string>
     <string name="lifelab_item_desc">本期生活研究所，由%s采集组织</string>
+    <string name="article_share_title">分享这篇文章</string>
+    <string name="article_hot_discuss">热门评论</string>
+    <string name="article_more_discuss">查看更多</string>
+    <string name="article_feedback">文章排版出错了？或者有任何建议请</string>
+    <string name="article_feedback_link">反馈给我们</string>
+    <string name="lifepost_nodata">还没有人发表看法</string>
+    <string name="lifepost_mycomment">我的评论</string>
 
     <!-- Home page -->
     <!-- naivgation title -->
@@ -114,10 +122,7 @@
     <string name="about_10">一一一一一一 </string>
     <string name="about_11">一起</string>
     <string name="about_12">认真活</string>
-
-
-
-
+    <string name="title_activity_life_post">LifePostActivity</string>
 
 
 </resources>
