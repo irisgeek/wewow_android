@@ -34,6 +34,11 @@
     <string name="lifelab_item_artist_article">文章 %d</string>
     <string name="lifelab_item_artist_follower">关注者 %d</string>
     <string name="lifelab_item_desc">本期生活研究所，由%s采集组织</string>
+    <string name="article_share_title">分享这篇文章</string>
+    <string name="article_hot_discuss">热门评论</string>
+    <string name="article_more_discuss">查看更多</string>
+    <string name="article_feedback">文章排版出错了？或者有任何建议请</string>
+    <string name="article_feedback_link">反馈给我们</string>
 
     <!-- Home page -->
     <!-- naivgation title -->
@@ -114,10 +119,6 @@
     <string name="about_10">一一一一一一 </string>
     <string name="about_11">一起</string>
     <string name="about_12">认真活</string>
-
-
-
-
 
 
 </resources>

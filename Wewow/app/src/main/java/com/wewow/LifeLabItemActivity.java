@@ -143,6 +143,7 @@ public class LifeLabItemActivity extends Activity {
             LabCollectionDetail.Article a = this.lcd.getArticle(group, i);
             View itemView = View.inflate(this, R.layout.lifelab_item_article, null);
             itemView.setBackgroundColor(i % 2 == 0 ? Color.rgb(252, 230, 194) : Color.WHITE);
+            itemView.setTag(a.id);
             tv = (TextView) itemView.findViewById(R.id.lifelab_item_article_category);
             tv.setText(a.wewow_category);
             tv = (TextView) itemView.findViewById(R.id.lifelab_item_article_title);
@@ -158,9 +159,20 @@ public class LifeLabItemActivity extends Activity {
                     }
                 }
             });
+            itemView.setOnClickListener(this.articleClickListener);
             container.addView(itemView, articleParams);
         }
     }
+
+    private View.OnClickListener articleClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            int id = (Integer)view.getTag();
+            Intent intent = new Intent(LifeLabItemActivity.this, ArticleActivity.class);
+            intent.putExtra(ArticleActivity.ARTICLE_ID, id);
+            LifeLabItemActivity.this.startActivity(intent);
+        }
+    };
 
     private void setupPosts() {
         if (this.lcd.getPostCount() == 0) {
