@@ -65,6 +65,14 @@
             android:label="DetailArtist"
             android:screenOrientation="portrait"></activity>
         <activity
+            android:name=".FeedbackActivity"
+            android:label="Feedbacks"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".AboutActivity"
+            android:label="about"
+            android:screenOrientation="portrait"></activity>
+        <activity
             android:name=".LifeLabActivity"
             android:label="LifeLabList"
             android:screenOrientation="portrait"></activity>

@@ -97,7 +97,27 @@
     <string name="all_artists_title">全部生活家</string>
     <string name="all_artists_subscribed_title">我订阅的生活家</string>
 
+
     <string name="subscriber">订阅者</string>
+
+    <string name="type_feedback">在这里提出建议</string>
+
+    <string name="about_1">体面的人生</string>
+    <string name="about_2">是在95%的日常生活里善待自己</string>
+    <string name="about_3">那些鲜被关注的生活与家</string>
+    <string name="about_4">也应该让你上瘾</string>
+    <string name="about_5">我们寻找和创造那些值得细细感受的</string>
+    <string name="about_6">生活片段</string>
+    <string name="about_7">以及构成它们的，</string>
+    <string name="about_8">每一个质地出众、</string>
+    <string name="about_9">独具匠心的东西</string>
+    <string name="about_10">一一一一一一 </string>
+    <string name="about_11">一起</string>
+    <string name="about_12">认真活</string>
+
+
+
+
 
 
 </resources>
