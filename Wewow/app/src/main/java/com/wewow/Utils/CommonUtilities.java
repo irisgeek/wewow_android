@@ -24,6 +24,12 @@ public class CommonUtilities {
     public static final String CACHE_FILE_CATEGORY_ARTISTS_AND_INSTITUTES="cache_file_category_artists_and_institute";
 
     public static final String CACHE_FILE_FEEDBACKS="cache_file_feedbacks";
+    public static final String CACHE_FILE_SEARCH_RESULT="cache_file_search_result";
+
+    public static final String RESEARCH_RESULT_CATEGORY_ARTICLE="article";
+    public static final String RESEARCH_RESULT_CATEGORY_INSTITUTE="institute";
+    public static final String RESEARCH_RESULT_CATEGORY_ARTIST="artist";
+    public static final String RESEARCH_RESULT_CATEGORY_POST="post";
 
 
 

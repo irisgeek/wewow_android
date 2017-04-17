@@ -191,6 +191,20 @@ public class BaseActivity extends ActionBarActivity {
         usertv.setText(UserInfo.getCurrentUser(this).getNickname());
         TextView userSignature = (TextView) findViewById(R.id.textViewSignature);
         userSignature.setText(UserInfo.getCurrentUser(this).getDesc());
+
+        if(requestCode==LoginActivity.REQUEST_CODE_FEEDBACK)
+        {
+            Intent intentFeedback = new Intent(BaseActivity.this, FeedbackActivity.class);
+            BaseActivity.this.startActivity(intentFeedback);
+
+        }
+        else  if(requestCode==LoginActivity.REQUEST_CODE_SUBSCRIBED_ARTISTS)
+        {
+            Intent intentSubscribedArtists = new Intent(BaseActivity.this, ListSubscribedArtistActivity.class);
+            BaseActivity.this.startActivity(intentSubscribedArtists);
+
+        }
+
     }
 
     private void setUpToolBar() {
@@ -232,13 +246,31 @@ public class BaseActivity extends ActionBarActivity {
                     BaseActivity.this.startActivity(intentLab);
                     break;
                 case 3:
-                    Intent intentFeedback = new Intent(BaseActivity.this, FeedbackActivity.class);
-                    BaseActivity.this.startActivity(intentFeedback);
+
+                    if(UserInfo.isUserLogged(BaseActivity.this)) {
+                        Intent intentFeedback = new Intent(BaseActivity.this, FeedbackActivity.class);
+                        BaseActivity.this.startActivity(intentFeedback);
+                    }
+                    else {
+                        Intent i = new Intent();
+                        i.setClass(BaseActivity.this, LoginActivity.class);
+                        BaseActivity.this.startActivityForResult(i, LoginActivity.REQUEST_CODE_FEEDBACK);
+                    }
                     break;
 
                 case 6:
-                    Intent intentSubscribedArtists = new Intent(BaseActivity.this, ListSubscribedArtistActivity.class);
-                    BaseActivity.this.startActivity(intentSubscribedArtists);
+
+                    if(UserInfo.isUserLogged(BaseActivity.this)) {
+                        Intent intentSubscribedArtists = new Intent(BaseActivity.this, ListSubscribedArtistActivity.class);
+                        BaseActivity.this.startActivity(intentSubscribedArtists);
+                    }
+                    else
+                    {
+                        Intent i = new Intent();
+                        i.setClass(BaseActivity.this, LoginActivity.class);
+                        BaseActivity.this.startActivityForResult(i, LoginActivity.REQUEST_CODE_SUBSCRIBED_ARTISTS);
+
+                    }
                     break;
                 case 7:
                     Intent intentAbout = new Intent(BaseActivity.this, AboutActivity.class);

@@ -122,7 +122,16 @@
     <string name="about_10">一一一一一一 </string>
     <string name="about_11">一起</string>
     <string name="about_12">认真活</string>
+
     <string name="title_activity_life_post">LifePostActivity</string>
+
+
+    <string name="search_result_category_1">文章</string>
+    <string name="search_result_category_2">生活研究所</string>
+    <string name="search_result_category_3">生活家</string>
+    <string name="search_result_category_4">生活贴</string>
+
+    <string name="join_discussion">人参加讨论</string>
 
 
 </resources>

@@ -78,6 +78,9 @@ import java.util.List;
 public class LoginActivity extends ActionBarActivity implements OnConnectionFailedListener, ConnectionCallbacks, OnUpdateListener {
 
     public static final int REQUEST_CODE_LOGIN = 1;
+    public static final int REQUEST_CODE_FEEDBACK = 2;
+    public static final int REQUEST_CODE_SUBSCRIBED_ARTISTS = 3;
+
 
     public static final int RESPONSE_CODE_MOILE = 1;
     public static final int RESPONSE_CODE_WECHAT = 2;
