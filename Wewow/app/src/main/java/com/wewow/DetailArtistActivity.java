@@ -437,7 +437,7 @@ public class DetailArtistActivity extends BaseActivity {
         JSONObject results = object.getJSONObject("result").getJSONObject("data").getJSONObject("artist");
         artist.setFollower_count(results.getString("follow_count"));
         artist.setNickname(results.getString("nickname"));
-        artist.setImage(results.getString("image_750_512"));
+        artist.setImage(results.getString("image_120_120"));
         artist.setDesc(results.getString("desc"));
         artist.setFollowed(results.getString("followed"));
         artistDetail.setArtist(artist);

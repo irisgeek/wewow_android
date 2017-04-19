@@ -111,7 +111,7 @@ public class BaseActivity extends ActionBarActivity {
 
         super.setContentView(drawerLayout);
 
-        if (UserInfo.isUserLogged(this)) {
+        if (UserInfo.isUserLogged(this)&&Utils.isNetworkAvailable(this)) {
             String userId = UserInfo.getCurrentUser(this).getId().toString();
             getNewFeedsAndArtistInfo(userId);
 
