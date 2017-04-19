@@ -26,6 +26,10 @@ import com.bumptech.glide.Glide;
 import com.wewow.R;
 import com.wewow.adapter.ListViewAdapter;
 import com.wewow.adapter.RecycleViewArticlesOfArtistDetail;
+import com.wewow.adapter.RecycleViewArtistsOfSearchResultAdapter;
+import com.wewow.adapter.RecycleViewInstitutesOfSearchResultAdapter;
+import com.wewow.adapter.RecycleViewPostOfSearchResultAdapter;
+import com.wewow.dto.Article;
 import com.wewow.dto.Artist;
 import com.wewow.dto.Institute;
 import com.wewow.netTask.ITask;
@@ -40,6 +44,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,8 +59,9 @@ import retrofit.client.Response;
  */
 public class searchResultListFragment extends Fragment {
 
-    private String category=CommonUtilities.RESEARCH_RESULT_CATEGORY_ARTICLE;
-    private ArrayList<HashMap<String, Object>> list=new ArrayList<HashMap<String, Object>>();
+    private String category = CommonUtilities.RESEARCH_RESULT_CATEGORY_ARTICLE;
+    private ArrayList<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
+    private View view;
 
     @Nullable
     @Override
@@ -65,34 +71,59 @@ public class searchResultListFragment extends Fragment {
         Bundle bundle = getArguments();
         if (bundle != null) {
             category = bundle.getString("catetory");
+            list=(ArrayList<HashMap<String, Object>>)bundle.getSerializable("list");
         }
-        RecyclerView rv = (RecyclerView) inflater.inflate(
+        view =inflater.inflate(
                 R.layout.fragment_search_result_list, container, false);
+        RecyclerView rv = (RecyclerView) view.findViewById(R.id.recyclerview);
         setupRecyclerView(rv);
-        return rv;
+        return view;
     }
 
-    public searchResultListFragment ()
-    {
+    public searchResultListFragment() {
 
     }
 
-    public static searchResultListFragment newInstance(String text,ArrayList<HashMap<String, Object>> list) {
+    public static searchResultListFragment newInstance(String text, ArrayList<HashMap<String, Object>> list) {
         Bundle bundle = new Bundle();
         bundle.putString("catetory", text);
+        bundle.putSerializable("list", (Serializable) list);
         searchResultListFragment blankFragment = new searchResultListFragment();
         blankFragment.setArguments(bundle);
+
 
         return blankFragment;
     }
 
     private void setupRecyclerView(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-    if(category.equals (CommonUtilities.RESEARCH_RESULT_CATEGORY_ARTICLE))
-        {
-            recyclerView.setAdapter(new RecycleViewArticlesOfArtistDetail(getActivity(),null));
+        if (category.equals(CommonUtilities.RESEARCH_RESULT_CATEGORY_ARTICLE)) {
 
-    }
+            recyclerView.setAdapter(new RecycleViewArticlesOfArtistDetail(getActivity(), list));
+
+        }
+        else
+
+        if (category.equals(CommonUtilities.RESEARCH_RESULT_CATEGORY_INSTITUTE)) {
+
+            recyclerView.setAdapter(new RecycleViewInstitutesOfSearchResultAdapter(getActivity(), list));
+
+        }
+        else
+
+        if (category.equals(CommonUtilities.RESEARCH_RESULT_CATEGORY_ARTIST)) {
+
+            recyclerView.setAdapter(new RecycleViewArtistsOfSearchResultAdapter(getActivity(), list));
+
+        }
+        else
+        if (category.equals(CommonUtilities.RESEARCH_RESULT_CATEGORY_POST)) {
+
+            recyclerView.setAdapter(new RecycleViewPostOfSearchResultAdapter(getActivity(), list));
+
+        }
+
+
     }
 
 

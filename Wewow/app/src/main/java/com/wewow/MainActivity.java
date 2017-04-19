@@ -34,6 +34,7 @@ package com.wewow;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.PagerAdapter;
@@ -611,6 +612,10 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 searchView.setQuery(testStrings[position], true);
+                Intent intentSearch= new Intent(MainActivity.this,SearchResultActivity.class);
+                intentSearch.putExtra("key_word",testStrings[position]);
+                startActivity(intentSearch);
+
             }
         });
 
@@ -621,7 +626,12 @@ public class MainActivity extends BaseActivity {
                 Toast.makeText(MainActivity.this, query, Toast.LENGTH_SHORT).show();
                 LinearLayout layout = (LinearLayout) findViewById(R.id.layoutCover);
                 layout.setVisibility(View.GONE);
-                return false;
+
+                Intent intentSearch= new Intent(MainActivity.this,SearchResultActivity.class);
+                intentSearch.putExtra("key_word",query);
+                startActivity(intentSearch);
+
+                return true;
             }
 
             @Override

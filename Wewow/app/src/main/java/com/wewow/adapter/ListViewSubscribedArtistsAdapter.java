@@ -1,6 +1,7 @@
 package com.wewow.adapter;
 
 import android.content.Context;
+import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,6 +56,7 @@ public class ListViewSubscribedArtistsAdapter extends BaseAdapter
             holder.textViewDesc= (TextView)convertView.findViewById(R.id.textViewDesc);
             holder.textViewArticleCount=(TextView)convertView.findViewById(R.id.textViewArticle);
             holder.textViewFollowerCount=(TextView)convertView.findViewById(R.id.textViewFollow);
+            holder.imageNew=(ImageView)convertView.findViewById(R.id.imageNew);
 
             convertView.setTag(holder);
         }else
@@ -72,6 +74,14 @@ public class ListViewSubscribedArtistsAdapter extends BaseAdapter
         holder.textViewArticleCount.setText(stringObjectHashMap.get("textViewArticleCount").toString());
         holder.textViewFollowerCount.setText(stringObjectHashMap.get("textViewFollowerCount").toString());
 
+        if(stringObjectHashMap.get("read").toString().equals("1")) {
+            holder.imageNew.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            holder.imageNew.setVisibility(View.GONE);
+        }
+
 
         return convertView;
 
@@ -86,6 +96,7 @@ public class ListViewSubscribedArtistsAdapter extends BaseAdapter
         public TextView textViewDesc;
         public TextView textViewArticleCount;
         public TextView textViewFollowerCount;
+        public ImageView imageNew;
     }
 
 }

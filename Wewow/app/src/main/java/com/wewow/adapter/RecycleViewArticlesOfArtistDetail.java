@@ -28,6 +28,7 @@ public  class RecycleViewArticlesOfArtistDetail
     private ArrayList<HashMap<String, Object>> list;
 
 
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
 

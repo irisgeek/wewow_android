@@ -220,6 +220,7 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
             artist.setImage(result.getString("image"));
             artist.setArticle_count(result.getString("article_count"));
             artist.setFollower_count(result.getString("follow_count"));
+            artist.setRead(result.getString("read"));
 
             artists.add(artist);
         }
@@ -324,6 +325,7 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
             map.put("textViewFollowerCount", artists.get(i).getFollower_count());
             map.put("imageViewFollowed", artists.get(i).getFollowed());
             map.put("id",artists.get(i).getId());
+            map.put("read",artists.get(i).getRead());
 
             listItem.add(map);
         }

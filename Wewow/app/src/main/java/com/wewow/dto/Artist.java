@@ -15,6 +15,7 @@ public class Artist implements Parcelable {
     private String article_count;
     private String follower_count;
     private String followed;
+    private String read;
 
 
     public static final Creator<Artist> CREATOR = new Creator<Artist>() {
@@ -101,5 +102,13 @@ public class Artist implements Parcelable {
 
     public void setFollowed(String followed) {
         this.followed = followed;
+    }
+
+    public String getRead() {
+        return read;
+    }
+
+    public void setRead(String read) {
+        this.read = read;
     }
 }

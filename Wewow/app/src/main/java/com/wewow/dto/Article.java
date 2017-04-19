@@ -11,6 +11,7 @@ public class Article implements Parcelable {
     private String wewow_category;
     private String image_284_160;
     private String image_320_160;
+    private String image_642_320;
     private String id;
     private String title;
 
@@ -78,5 +79,13 @@ public class Article implements Parcelable {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getImage_642_320() {
+        return image_642_320;
+    }
+
+    public void setImage_642_320(String image_642_320) {
+        this.image_642_320 = image_642_320;
     }
 }

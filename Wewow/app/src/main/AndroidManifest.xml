@@ -72,6 +72,10 @@
             android:label="about"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".SearchResultActivity"
+            android:label="search"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".LifeLabActivity"
             android:label="LifeLabList"
             android:screenOrientation="portrait" />
