@@ -26,10 +26,22 @@ public class CommonUtilities {
     public static final String CACHE_FILE_FEEDBACKS="cache_file_feedbacks";
     public static final String CACHE_FILE_SEARCH_RESULT="cache_file_search_result";
 
+    public static final String CACHE_FILE_SUBJECT="cache_file_subject";
+
     public static final String RESEARCH_RESULT_CATEGORY_ARTICLE="article";
     public static final String RESEARCH_RESULT_CATEGORY_INSTITUTE="institute";
     public static final String RESEARCH_RESULT_CATEGORY_ARTIST="artist";
     public static final String RESEARCH_RESULT_CATEGORY_POST="post";
+
+
+    public static final String BANNER_TYPE_SUBJECT="subject";
+    public static final String BANNER_TYPE_COLLECTION="collection";
+    public static final String BANNER_TYPE_POST="daily_topic";
+    public static final String BANNER_TYPE_HTML="html";
+
+
+
+
 
 
 

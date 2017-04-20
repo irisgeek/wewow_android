@@ -16,7 +16,6 @@
 <ImageView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:src="@drawable/dummy_top_subject"
     android:id="@+id/imageViewTop"
     />
             <LinearLayout
@@ -26,7 +25,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="老年乐队回忆童年梦想"
+                    android:text=""
                     android:layout_marginLeft="19dp"
                     android:layout_marginTop="100dp"
                     android:textColor="#ffffff"
@@ -38,7 +37,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="2017/03/01"
+                android:text=""
                 android:textColor="#ffffff"
                 android:layout_gravity="bottom"
                 android:layout_marginLeft="19dp"
@@ -70,13 +69,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/textViewContent"
-                android:text="哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦
-                哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦
-                哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦
-                哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦哦
+                android:text="
                 "
                 android:layout_marginLeft="22dp"
-                android:textSize="11sp"
+                android:textSize="12sp"
                 android:textColor="#606060"
                 android:layout_marginRight="56dp"
                 />
@@ -92,10 +88,9 @@
             android:layout_height="match_parent"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="40dp"
             android:choiceMode="singleChoice"
-            android:divider="#e2e2e2"
-            android:dividerHeight="1dp"
+            android:divider="@android:color/transparent"
             android:scrollbars="none"/>
 
 

@@ -16,7 +16,7 @@ public class Subject implements Parcelable {
     private String image;
 
 
-    private List<Institute> institutes;
+    private List<List<Institute>> institutes;
     private List<String> instituteDescs;
 
 
@@ -69,11 +69,11 @@ public class Subject implements Parcelable {
         this.content = content;
     }
 
-    public List<Institute> getInstitutes() {
+    public List<List<Institute>> getInstitutes() {
         return institutes;
     }
 
-    public void setInstitutes(List<Institute> institutes) {
+    public void setInstitutes(List<List<Institute>> institutes) {
         this.institutes = institutes;
     }
 

@@ -100,6 +100,11 @@ public interface ITask {
                      Callback<JSONObject> callback);
 
 
+   @GET("/subject")
+    void subject(@Header("User-Agent") String headerContentType, @Query("subject_id") String subjectId,
+                  Callback<JSONObject> callback);
+
+
 }
 
 

@@ -67,7 +67,8 @@ public class ListViewMenuAdapter extends BaseAdapter
             holder.imageNew.setVisibility(View.VISIBLE);
         }
         else
-        {holder.imageNew.setVisibility(View.GONE);
+        {
+            holder.imageNew.setVisibility(View.GONE);
 
         }
 
