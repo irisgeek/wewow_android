@@ -256,7 +256,13 @@ public class BaseActivity extends ActionBarActivity {
         this.findViewById(R.id.imageViewSetting).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                
+                if (UserInfo.isUserLogged(BaseActivity.this)) {
+                    Intent edIntent = new Intent(BaseActivity.this, UserInfoActivity.class);
+                    BaseActivity.this.startActivity(edIntent);
+                } else {
+                    Intent intentMain = new Intent(BaseActivity.this, MainActivity.class);
+                    BaseActivity.this.startActivityForResult(intentMain, LoginActivity.REQUEST_CODE_LOGIN);
+                }
             }
         });
     }
@@ -318,7 +324,7 @@ public class BaseActivity extends ActionBarActivity {
             switch (position - 1) {
                 case 0:
                     Intent intentMain = new Intent(BaseActivity.this, MainActivity.class);
-                    BaseActivity.this.startActivity(intentMain);
+                    BaseActivity.this.startActivityForResult(intentMain, LoginActivity.REQUEST_CODE_LOGIN);
                     break;
                 case 1:
                     Intent intent = new Intent(BaseActivity.this, ListArtistActivity.class);

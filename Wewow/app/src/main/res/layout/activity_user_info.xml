@@ -73,6 +73,7 @@
                 android:textSize="12sp" />
 
             <EditText
+                android:id="@+id/userinfo_nickname"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginLeft="20dp"
@@ -92,15 +93,16 @@
                 android:textSize="12sp" />
 
             <EditText
+                android:id="@+id/userinfo_desp"
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:background="#ffffff"
+                android:gravity="start"
+                android:inputType="textMultiLine"
                 android:paddingLeft="14dp"
                 android:paddingTop="14dp"
-                android:inputType="textMultiLine"
-                android:gravity="start"
                 android:textSize="14sp" />
 
         </LinearLayout>

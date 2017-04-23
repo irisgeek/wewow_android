@@ -133,4 +133,11 @@ public class UserInfo {
         ed.commit();
     }
 
+    public void setNickName(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void setSignature(String sig) {
+        this.desc = sig;
+    }
 }
