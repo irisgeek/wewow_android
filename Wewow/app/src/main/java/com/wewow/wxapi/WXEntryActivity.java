@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.bumptech.glide.util.Util;
+import com.tencent.mm.opensdk.constants.ConstantsAPI;
 import com.tencent.mm.opensdk.modelbase.BaseReq;
 import com.tencent.mm.opensdk.modelbase.BaseResp;
 import com.tencent.mm.opensdk.modelmsg.SendAuth;
@@ -61,10 +62,18 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
 
     @Override
     public void onResp(BaseResp baseResp) {
-        Log.d(TAG, String.format("onResp: %d %s", baseResp.errCode, baseResp.errStr));
-        switch (baseResp.errCode) {
+        Log.d(TAG, String.format("onResp: %d %d %s", baseResp.getType(), baseResp.errCode, baseResp.errStr));
+        switch (baseResp.getType()) {
+            case ConstantsAPI.COMMAND_SENDAUTH:
+                this.onAuthResp((SendAuth.Resp) baseResp);
+                break;
+        }
+    }
+
+    private void onAuthResp(SendAuth.Resp resp) {
+        switch (resp.errCode) {
             case BaseResp.ErrCode.ERR_OK:
-                SendAuth.Resp sresp = (SendAuth.Resp) baseResp;
+                SendAuth.Resp sresp = (SendAuth.Resp) resp;
                 ProgressDialogUtil.getInstance(this).showProgressDialog();
                 Object[] params = new Object[]{
                         String.format("https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code",
