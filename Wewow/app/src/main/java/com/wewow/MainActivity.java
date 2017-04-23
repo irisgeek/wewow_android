@@ -34,6 +34,7 @@ package com.wewow;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.PagerAdapter;
@@ -64,6 +65,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.wewow.adapter.FragmentAdapter;
 import com.wewow.dto.Banner;
+import com.wewow.dto.Institute;
 import com.wewow.dto.collectionCategory;
 import com.wewow.netTask.ITask;
 import com.wewow.utils.CommonUtilities;
@@ -403,7 +405,7 @@ public class MainActivity extends BaseActivity {
     }
 
 
-    private void setUpViewPagerBanner(List<Banner> banners) {
+    private void setUpViewPagerBanner(final List<Banner> banners) {
 
 
         group = (ViewGroup) findViewById(R.id.viewGroup);
@@ -424,6 +426,18 @@ public class MainActivity extends BaseActivity {
                     .crossFade(300)
                     .into(imageBanner);
             pageview.add(view);
+            final int j=i;
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String type = banners.get(j).getType();
+                    if (type.equals(CommonUtilities.BANNER_TYPE_SUBJECT)) {
+                        Intent intent= new Intent(MainActivity.this,SubjectActivity.class);
+                        intent.putExtra("id",banners.get(j).getId());
+                        startActivity(intent);
+                    }
+                }
+            });
         }
 
         //
@@ -611,6 +625,10 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 searchView.setQuery(testStrings[position], true);
+//                Intent intentSearch= new Intent(MainActivity.this,SearchResultActivity.class);
+//                intentSearch.putExtra("key_word",testStrings[position]);
+//                startActivity(intentSearch);
+
             }
         });
 
@@ -621,7 +639,12 @@ public class MainActivity extends BaseActivity {
                 Toast.makeText(MainActivity.this, query, Toast.LENGTH_SHORT).show();
                 LinearLayout layout = (LinearLayout) findViewById(R.id.layoutCover);
                 layout.setVisibility(View.GONE);
-                return false;
+
+                Intent intentSearch= new Intent(MainActivity.this,SearchResultActivity.class);
+                intentSearch.putExtra("key_word",query);
+                startActivity(intentSearch);
+
+                return true;
             }
 
             @Override

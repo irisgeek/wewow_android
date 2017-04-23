@@ -18,11 +18,11 @@ import java.util.HashMap;
 /**
  * Created by iris on 17/3/23.
  */
-public class ListViewSubscribedArtistsAdapter extends BaseAdapter
+public class ListViewMenuAdapter extends BaseAdapter
 {
     private Context context;
     private ArrayList<HashMap<String, Object>> list;
-    public ListViewSubscribedArtistsAdapter(Context context, ArrayList<HashMap<String, Object>> list)
+    public ListViewMenuAdapter(Context context, ArrayList<HashMap<String, Object>> list)
     {
         this.context = context;
         this.list=list;
@@ -50,12 +50,9 @@ public class ListViewSubscribedArtistsAdapter extends BaseAdapter
         if(convertView == null)
         {
             holder = new ViewHolder();
-            convertView = inflater.inflate(R.layout.list_item_lover_of_life_subscribed, null);
+            convertView = inflater.inflate(R.layout.list_item_drawer, null);
             holder.imageView = (ImageView)convertView.findViewById(R.id.imageViewIcon);
-            holder.textViewName = (TextView)convertView.findViewById(R.id.textViewNickName);
-            holder.textViewDesc= (TextView)convertView.findViewById(R.id.textViewDesc);
-            holder.textViewArticleCount=(TextView)convertView.findViewById(R.id.textViewArticle);
-            holder.textViewFollowerCount=(TextView)convertView.findViewById(R.id.textViewFollow);
+            holder.textViewTitle = (TextView)convertView.findViewById(R.id.textViewMenuItem);
             holder.imageNew=(ImageView)convertView.findViewById(R.id.imageNew);
 
             convertView.setTag(holder);
@@ -64,22 +61,15 @@ public class ListViewSubscribedArtistsAdapter extends BaseAdapter
             holder = (ViewHolder)convertView.getTag();
         }
         HashMap<String, Object> stringObjectHashMap = list.get(position);
-        Glide.with(context)
-                .load(stringObjectHashMap.get("imageView").toString())
-                .placeholder(R.drawable.banner_loading_spinner)
-                .crossFade()
-                .into(holder.imageView);
-        holder.textViewName.setText(stringObjectHashMap.get("textViewName").toString());
-        holder.textViewDesc.setText(stringObjectHashMap.get("textViewDesc").toString());
-        holder.textViewArticleCount.setText(stringObjectHashMap.get("textViewArticleCount").toString());
-        holder.textViewFollowerCount.setText(stringObjectHashMap.get("textViewFollowerCount").toString());
-
-        if(stringObjectHashMap.get("read").toString().equals("1")) {
+        holder.imageView.setImageResource((int)stringObjectHashMap.get("icon"));
+        holder.textViewTitle.setText(stringObjectHashMap.get("menuText").toString());
+        if(stringObjectHashMap.get("new").toString().equals("1")) {
             holder.imageNew.setVisibility(View.VISIBLE);
         }
         else
         {
             holder.imageNew.setVisibility(View.GONE);
+
         }
 
 
@@ -92,10 +82,7 @@ public class ListViewSubscribedArtistsAdapter extends BaseAdapter
     static class ViewHolder
     {
         public ImageView imageView;
-        public TextView textViewName;
-        public TextView textViewDesc;
-        public TextView textViewArticleCount;
-        public TextView textViewFollowerCount;
+        public TextView textViewTitle;
         public ImageView imageNew;
     }
 

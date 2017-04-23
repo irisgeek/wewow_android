@@ -75,7 +75,7 @@ public  class RecycleViewPostOfSearchResultAdapter
                 .crossFade()
                 .into(holder.imageView);
         holder.textViewTitle.setText(stringObjectHashMap.get("textViewTitle").toString());
-        holder.textViewNum.setText(stringObjectHashMap.get("textViewNum").toString());
+//        holder.textViewNum.setText(stringObjectHashMap.get("textViewNum").toString());
 
     }
 

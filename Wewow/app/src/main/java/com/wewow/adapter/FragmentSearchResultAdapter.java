@@ -10,6 +10,7 @@ import com.wewow.fragment.categaryFragment;
 import com.wewow.fragment.homeFragment;
 import com.wewow.fragment.searchResultListFragment;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,26 +21,26 @@ import java.util.List;
 
 public class FragmentSearchResultAdapter extends FragmentPagerAdapter {
 
-    private ArrayList<HashMap<String, Object>> list;
+    private ArrayList<ArrayList<HashMap<String, Object>>> list;
     private List<String> ids;
+    private List<String> listTitle;
     private static final String TAG = FragmentSearchResultAdapter.class.getSimpleName();
     private FragmentManager fm;
 
-    public FragmentSearchResultAdapter(FragmentManager fm,   ArrayList<HashMap<String, Object>> list, List<String> ids) {
+    public FragmentSearchResultAdapter(FragmentManager fm,   ArrayList< ArrayList<HashMap<String, Object>>> list, List<String> ids, List<String> listTitle) {
         super(fm);
         this.list = list;
         this.fm=fm;
         this.ids=ids;
+        this.listTitle=listTitle;
 
     }
 
     @Override
     public Fragment getItem(int position) {
-        if (position != 0) {
-            return searchResultListFragment.newInstance(ids.get(position),list);
 
-        }
-        return homeFragment.newInstance(ids.get(position));
+            return searchResultListFragment.newInstance(ids.get(position),list.get(position));
+
     }
 
     public String getId(int position)
@@ -51,9 +52,7 @@ public class FragmentSearchResultAdapter extends FragmentPagerAdapter {
     @Override
     public int getItemPosition(Object object) {
         Log.d(TAG, "getItemPosition(" + object.getClass().getSimpleName() + ")");
-        if (object instanceof homeFragment) {
-        } else if (object instanceof categaryFragment) {
-        }
+
 
         return super.getItemPosition(object);
     };
@@ -64,7 +63,10 @@ public class FragmentSearchResultAdapter extends FragmentPagerAdapter {
     }
 
 
-
+    @Override
+    public CharSequence getPageTitle(int position) {
+        return listTitle.get(position);
+    }
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
         super.destroyItem(container, position, object);

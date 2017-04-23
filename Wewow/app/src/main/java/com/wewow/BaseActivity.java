@@ -49,19 +49,36 @@ import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseExpandableListAdapter;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wewow.adapter.ListViewMenuAdapter;
+import com.wewow.dto.Artist;
 import com.wewow.dto.Feedback;
+import com.wewow.dto.collectionCategory;
+import com.wewow.netTask.ITask;
+import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.DataCleanUtils;
+import com.wewow.utils.FileCacheUtil;
+import com.wewow.utils.Utils;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Created by iris on 17/3/6.
@@ -94,11 +111,74 @@ public class BaseActivity extends ActionBarActivity {
 
         super.setContentView(drawerLayout);
 
-        setUpNavigation();
+        if (UserInfo.isUserLogged(this)&&Utils.isNetworkAvailable(this)) {
+            String userId = UserInfo.getCurrentUser(this).getId().toString();
+            getNewFeedsAndArtistInfo(userId);
+
+        } else {
+            setUpNavigation("0", "0");
 //        setUpNavigationView();
-        setUpToolBar();
+        }
+            setUpToolBar();
+
 
     }
+
+    private void getNewFeedsAndArtistInfo(String userId) {
+        ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
+
+
+        iTask.user_notification(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), userId, new Callback<JSONObject>() {
+
+            @Override
+            public void success(JSONObject object, Response response) {
+
+
+                try {
+                    String realData = Utils.convertStreamToString(response.getBody().in());
+                    if (!realData.contains(CommonUtilities.SUCCESS)) {
+                        Toast.makeText(BaseActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+
+
+                    } else {
+
+                        List<String> updates = parseFeedbackAndArtistUpdate(realData);
+                        setUpNavigation(updates.get(0), updates.get(1));
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(BaseActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(BaseActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+
+                }
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Toast.makeText(BaseActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+
+
+            }
+        });
+    }
+
+    private List<String> parseFeedbackAndArtistUpdate(String realData) throws  JSONException{
+
+        List<String> results = new ArrayList<String>();
+        JSONObject jsonObject = new JSONObject(realData);
+        JSONObject result = jsonObject.getJSONObject("result").getJSONObject("data");
+        results.add(result.getString("feedback_reply"));
+        results.add(result.getString("artist_update"));
+        return results;
+
+    }
+
+
 
     private void setUpNavigationView() {
 
@@ -111,7 +191,7 @@ public class BaseActivity extends ActionBarActivity {
     }
 
 
-    private void setUpNavigation() {
+    private void setUpNavigation(String feedbackUpdate,String artistUpdate) {
         planetTitles = getResources().getStringArray(R.array.planets_array);
         drawerList = (ListView) findViewById(R.id.left_drawer);
         View VheandrView = LayoutInflater.from(this).inflate(R.layout.list_header_drawer, null);
@@ -126,24 +206,38 @@ public class BaseActivity extends ActionBarActivity {
             if (i == 4 || i == 7) {
                 map.put("icon", 0);
                 map.put("menuText", "");
+                map.put("new","0");
                 listItem.add(map);
                 map = new HashMap<String, Object>();
             }
 
             map.put("icon", iconResIcon[i]);
             map.put("menuText", planetTitles[i]);
+            if(i==3)
+            {
+                map.put("new", feedbackUpdate);
+            }
+            else if(i==6)
+            {
+                map.put("new",artistUpdate);
+            }
+            else {
+                map.put("new","0");
+            }
+
 
             listItem.add(map);
         }
-
-        SimpleAdapter listItemAdapter = new SimpleAdapter(this, listItem,//data source
-                R.layout.list_item_drawer,
-
-                new String[]{"icon", "menuText"},
-                //ids
-                new int[]{R.id.imageViewIcon, R.id.textViewMenuItem}
-        );
-        drawerList.setAdapter(listItemAdapter);
+//
+//        SimpleAdapter listItemAdapter = new SimpleAdapter(this, listItem,//data source
+//                R.layout.list_item_drawer,
+//
+//                new String[]{"icon", "menuText"},
+//                //ids
+//                new int[]{R.id.imageViewIcon, R.id.textViewMenuItem}
+//        );
+        ListViewMenuAdapter adapter=new ListViewMenuAdapter(this,listItem);
+        drawerList.setAdapter(adapter);
 
 
         drawerList.setOnItemClickListener(new DrawerItemClickListener());
@@ -192,14 +286,11 @@ public class BaseActivity extends ActionBarActivity {
         TextView userSignature = (TextView) findViewById(R.id.textViewSignature);
         userSignature.setText(UserInfo.getCurrentUser(this).getDesc());
 
-        if(requestCode==LoginActivity.REQUEST_CODE_FEEDBACK)
-        {
+        if (requestCode == LoginActivity.REQUEST_CODE_FEEDBACK) {
             Intent intentFeedback = new Intent(BaseActivity.this, FeedbackActivity.class);
             BaseActivity.this.startActivity(intentFeedback);
 
-        }
-        else  if(requestCode==LoginActivity.REQUEST_CODE_SUBSCRIBED_ARTISTS)
-        {
+        } else if (requestCode == LoginActivity.REQUEST_CODE_SUBSCRIBED_ARTISTS) {
             Intent intentSubscribedArtists = new Intent(BaseActivity.this, ListSubscribedArtistActivity.class);
             BaseActivity.this.startActivity(intentSubscribedArtists);
 
@@ -247,11 +338,10 @@ public class BaseActivity extends ActionBarActivity {
                     break;
                 case 3:
 
-                    if(UserInfo.isUserLogged(BaseActivity.this)) {
+                    if (UserInfo.isUserLogged(BaseActivity.this)) {
                         Intent intentFeedback = new Intent(BaseActivity.this, FeedbackActivity.class);
                         BaseActivity.this.startActivity(intentFeedback);
-                    }
-                    else {
+                    } else {
                         Intent i = new Intent();
                         i.setClass(BaseActivity.this, LoginActivity.class);
                         BaseActivity.this.startActivityForResult(i, LoginActivity.REQUEST_CODE_FEEDBACK);
@@ -260,12 +350,10 @@ public class BaseActivity extends ActionBarActivity {
 
                 case 6:
 
-                    if(UserInfo.isUserLogged(BaseActivity.this)) {
+                    if (UserInfo.isUserLogged(BaseActivity.this)) {
                         Intent intentSubscribedArtists = new Intent(BaseActivity.this, ListSubscribedArtistActivity.class);
                         BaseActivity.this.startActivity(intentSubscribedArtists);
-                    }
-                    else
-                    {
+                    } else {
                         Intent i = new Intent();
                         i.setClass(BaseActivity.this, LoginActivity.class);
                         BaseActivity.this.startActivityForResult(i, LoginActivity.REQUEST_CODE_SUBSCRIBED_ARTISTS);

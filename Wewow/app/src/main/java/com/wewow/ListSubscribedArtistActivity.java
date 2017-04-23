@@ -220,6 +220,7 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
             artist.setImage(result.getString("image"));
             artist.setArticle_count(result.getString("article_count"));
             artist.setFollower_count(result.getString("follow_count"));
+            artist.setRead(result.getString("read"));
 
             artists.add(artist);
         }
@@ -324,6 +325,7 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
             map.put("textViewFollowerCount", artists.get(i).getFollower_count());
             map.put("imageViewFollowed", artists.get(i).getFollowed());
             map.put("id",artists.get(i).getId());
+            map.put("read",artists.get(i).getRead());
 
             listItem.add(map);
         }
@@ -342,6 +344,12 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
 
                                                 HashMap<String, Object> stringObjectHashMap = (  HashMap<String, Object>)adapter.getItem(position);
                                                 String artistId=stringObjectHashMap.get("id").toString();
+                                                String read=stringObjectHashMap.get("read").toString();
+                                                if(read.equals("1"))
+                                                {
+                                                    postReadToServer(artistId);
+
+                                                }
                                                 Intent intent = new Intent(ListSubscribedArtistActivity.this,DetailArtistActivity.class);
                                                 intent.putExtra("id",artistId);
                                                 startActivity(intent);
@@ -352,6 +360,46 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
         currentPage++;
         swipeRefreshLayout.setRefreshing(false);
 
+
+    }
+
+    private void postReadToServer(String artistId) {
+
+        ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
+
+          String   userId = UserInfo.getCurrentUser(ListSubscribedArtistActivity.this).getId().toString();
+        String token=UserInfo.getCurrentUser(this).getToken().toString();
+        String read="1";
+
+
+        iTask.artist_read(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), userId, token,artistId,read, new Callback<JSONObject>() {
+
+            @Override
+            public void success(JSONObject object, Response response) {
+
+
+                try {
+                    String realData = Utils.convertStreamToString(response.getBody().in());
+                    if (!realData.contains(CommonUtilities.SUCCESS)) {
+                        Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+
+
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+
+                }
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+
+            }
+        });
 
     }
 

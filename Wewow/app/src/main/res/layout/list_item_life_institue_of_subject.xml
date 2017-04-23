@@ -1,0 +1,41 @@
+
+
+    <FrameLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="4dp"
+
+        >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textViewContent"
+                android:textSize="15sp"
+                android:layout_marginLeft="28dp"
+                android:text=""
+                />
+            <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/listViewInstitutes"
+
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="16dp"
+                android:choiceMode="singleChoice"
+                android:divider="#e2e2e2"
+                android:dividerHeight="1dp"
+
+                android:scrollbars="none"/>
+
+
+
+
+        </LinearLayout>
+    </FrameLayout>
