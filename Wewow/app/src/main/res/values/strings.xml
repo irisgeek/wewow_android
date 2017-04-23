@@ -43,6 +43,20 @@
     <string name="lifepost_nodata">还没有人发表看法</string>
     <string name="lifepost_mycomment">我的评论</string>
 
+    <!-- 分享 -->
+    <string name="share_unknown">分享类型未知 %d</string>
+    <string name="share_wechat_friend">微信好友</string>
+    <string name="share_wechat_circle">朋友圈</string>
+    <string name="share_weibo">微博</string>
+    <string name="share_copy_link">复制链接</string>
+    <string name="share_more">更多</string>
+    <string name="share_weibo_result">分享到微博%s</string>
+    <string name="share_wechat_friend_result">分享微信好友%s</string>
+    <string name="share_wechat_circle_result">分享朋友圈%s</string>
+    <string name="share_result_succeed">成功</string>
+    <string name="share_result_fail">失败</string>
+    <string name="share_result_cancel">取消</string>
+
     <!-- Home page -->
     <!-- naivgation title -->
     <string name="notlogged">尚未登录</string>

@@ -28,10 +28,10 @@ public class ShareActivity extends AppCompatActivity implements IWeiboHandler.Re
     public static final int SHARE_TYPE_UNKNOWN = -1;
     public static final int SHARE_TYPE_TOSELECT = 0;
     public static final int SHARE_TYPE_WEIBO = 1;
-    //public static final String SHARE_TITLE = "SHARE_TITLE";
+    public static final String SHARE_URL = "SHARE_URL";
     public static final String SHARE_CONTEXT = "SHARE_CONTEXT";
     public static final String SHARE_IMAGE = "SHARE_IMAGE";
-    private IWeiboShareAPI api = WeiboShareSDK.createWeiboAPI(this, CommonUtilities.Weibo_AppKey);
+    private IWeiboShareAPI api;
 
 
     private int shareType;
@@ -44,6 +44,7 @@ public class ShareActivity extends AppCompatActivity implements IWeiboHandler.Re
         this.intent = this.getIntent();
         this.shareType = this.intent.getIntExtra(SHARE_TYPE, SHARE_TYPE_TOSELECT);
         this.setContentView(this.shareType == SHARE_TYPE_TOSELECT ? R.layout.activity_share : R.layout.activity_share_empty);
+        this.api = WeiboShareSDK.createWeiboAPI(this, CommonUtilities.Weibo_AppKey);
         switch (this.shareType) {
             case SHARE_TYPE_TOSELECT:
                 this.setupUI();
@@ -71,6 +72,7 @@ public class ShareActivity extends AppCompatActivity implements IWeiboHandler.Re
     private void shareWeibo() {
         this.api.registerApp();
         WeiboMultiMessage msg = new WeiboMultiMessage();
+        String url = this.intent.getStringExtra(SHARE_URL);
         if (this.intent.hasExtra(SHARE_IMAGE)) {
             byte[] buf = this.intent.getByteArrayExtra(SHARE_IMAGE);
             Bitmap bm = BitmapFactory.decodeByteArray(buf, 0, buf.length);
@@ -79,7 +81,7 @@ public class ShareActivity extends AppCompatActivity implements IWeiboHandler.Re
             msg.imageObject = iobj;
         }
         msg.textObject = new TextObject();
-        msg.textObject.text = this.intent.getStringExtra(SHARE_CONTEXT);
+        msg.textObject.text = String.format("%s %s", this.intent.getStringExtra(SHARE_CONTEXT), url);
         SendMultiMessageToWeiboRequest req = new SendMultiMessageToWeiboRequest();
         req.transaction = String.valueOf(System.currentTimeMillis());
         req.multiMessage = msg;
@@ -89,13 +91,20 @@ public class ShareActivity extends AppCompatActivity implements IWeiboHandler.Re
     @Override
     public void onResponse(BaseResponse baseResponse) {
         Log.d(TAG, String.format("Weibo share onResponse: %d %s", baseResponse.errCode, baseResponse.errMsg));
+        String resultmsg = null;
         switch (baseResponse.errCode) {
             case WBConstants.ErrorCode.ERR_OK:
+                resultmsg = this.getString(R.string.share_result_succeed);
                 break;
             case WBConstants.ErrorCode.ERR_CANCEL:
+                resultmsg = this.getString(R.string.share_result_cancel);
                 break;
             case WBConstants.ErrorCode.ERR_FAIL:
+                resultmsg = this.getString(R.string.share_result_fail);
                 break;
         }
+        String msg = this.getString(R.string.share_weibo_result, resultmsg);
+        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+        this.finish();
     }
 }
