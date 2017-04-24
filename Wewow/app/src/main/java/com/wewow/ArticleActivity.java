@@ -103,6 +103,15 @@ public class ArticleActivity extends AppCompatActivity {
                 ArticleActivity.this.startActivity(i);
             }
         });
+        this.findViewById(R.id.share_copylink).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(ArticleActivity.this, ShareActivity.class);
+                i.putExtra(ShareActivity.SHARE_TYPE, ShareActivity.SHARE_TYPE_COPY_LINK);
+                i.putExtra(ShareActivity.SHARE_URL, ArticleActivity.this.data.optString("share_link", "no link"));
+                ArticleActivity.this.startActivity(i);
+            }
+        });
     }
 
     private void fillContent(JSONObject article) {

@@ -1,6 +1,9 @@
 package com.wewow;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -28,6 +31,7 @@ public class ShareActivity extends AppCompatActivity implements IWeiboHandler.Re
     public static final int SHARE_TYPE_UNKNOWN = -1;
     public static final int SHARE_TYPE_TOSELECT = 0;
     public static final int SHARE_TYPE_WEIBO = 1;
+    public static final int SHARE_TYPE_COPY_LINK = 2;
     public static final String SHARE_URL = "SHARE_URL";
     public static final String SHARE_CONTEXT = "SHARE_CONTEXT";
     public static final String SHARE_IMAGE = "SHARE_IMAGE";
@@ -51,6 +55,9 @@ public class ShareActivity extends AppCompatActivity implements IWeiboHandler.Re
                 break;
             case SHARE_TYPE_WEIBO:
                 this.shareWeibo();
+                break;
+            case SHARE_TYPE_COPY_LINK:
+                this.shareLink();
                 break;
             case SHARE_TYPE_UNKNOWN:
             default:
@@ -105,6 +112,15 @@ public class ShareActivity extends AppCompatActivity implements IWeiboHandler.Re
         }
         String msg = this.getString(R.string.share_weibo_result, resultmsg);
         Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+        this.finish();
+    }
+
+    private void shareLink() {
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        String url = this.intent.getStringExtra(SHARE_URL);
+        ClipData clip = ClipData.newPlainText("", url);
+        clipboard.setPrimaryClip(clip);
+        Toast.makeText(this, this.getString(R.string.share_copylink_result, this.getString(R.string.share_result_succeed)), Toast.LENGTH_LONG).show();
         this.finish();
     }
 }
