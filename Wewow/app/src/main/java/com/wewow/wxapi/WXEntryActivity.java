@@ -11,6 +11,7 @@ import com.tencent.mm.opensdk.constants.ConstantsAPI;
 import com.tencent.mm.opensdk.modelbase.BaseReq;
 import com.tencent.mm.opensdk.modelbase.BaseResp;
 import com.tencent.mm.opensdk.modelmsg.SendAuth;
+import com.tencent.mm.opensdk.modelmsg.SendMessageToWX;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.IWXAPIEventHandler;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
@@ -62,6 +63,11 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
             case ConstantsAPI.COMMAND_SENDAUTH:
                 this.onAuthResp((SendAuth.Resp) baseResp);
                 break;
+            case ConstantsAPI.COMMAND_SENDMESSAGE_TO_WX:
+                this.onSendMsgResp((SendMessageToWX.Resp) baseResp);
+                break;
+            default:
+                Log.d(TAG, String.format("Wechat onResp: unknown type", baseResp.getType()));
         }
     }
 
@@ -107,6 +113,23 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
                 break;
         }
         Log.d(TAG, "onResp: finish");
+        this.finish();
+    }
+
+    private void onSendMsgResp(SendMessageToWX.Resp resp) {
+        String result;
+        switch (resp.errCode) {
+            case BaseResp.ErrCode.ERR_OK:
+                result = this.getString(R.string.share_result_succeed);
+                break;
+            case BaseResp.ErrCode.ERR_USER_CANCEL:
+                result = this.getString(R.string.share_result_cancel);
+                break;
+            default:
+                result = this.getString(R.string.share_result_fail);
+        }
+        String msg = this.getString(R.string.share_wechat_result, result);
+        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
         this.finish();
     }
 
