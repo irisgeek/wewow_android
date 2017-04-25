@@ -63,6 +63,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.growingio.android.sdk.collection.GrowingIO;
 import com.wewow.adapter.FragmentAdapter;
 import com.wewow.dto.Banner;
 import com.wewow.dto.Institute;
@@ -72,6 +73,7 @@ import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.FileCacheUtil;
 import com.wewow.utils.SettingUtils;
 import com.wewow.utils.Utils;
+import com.wewow.view.CustomViewPager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -124,6 +126,7 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         context = this;
         viewPager = (ViewPager) findViewById(R.id.viewPager);
+
         Utils.regitsterNetSateBroadcastReceiver(this);
 //        setUpNavigationTabDummy(null);
 
@@ -290,7 +293,7 @@ public class MainActivity extends BaseActivity {
 
     private void setUpNavigationTab(List<collectionCategory> titles) {
         mTabLayout = (TabLayout) findViewById(R.id.tabs);
-
+        mTabLayout.setTabMode(TabLayout.MODE_FIXED);
         mTabLayout.addTab(mTabLayout.newTab().setText(" " + getResources().getString(R.string.home_page) + " "));
         for (int i = 0; i < titles.size(); i++) {
             mTabLayout.addTab(mTabLayout.newTab().setText(titles.get(i).getTitle()));
@@ -364,7 +367,7 @@ public class MainActivity extends BaseActivity {
     private void setUpTabs(List<String> titles,List<String> ids) {
 
 
-        ViewPager viewPagerTabs = (ViewPager) findViewById(R.id.pagerTabs);
+        CustomViewPager viewPagerTabs = (CustomViewPager) findViewById(R.id.pagerTabs);
         adapter = new FragmentAdapter(getSupportFragmentManager(), titles,ids);
         viewPagerTabs.setAdapter(adapter);
         viewPagerTabs.setOffscreenPageLimit(5);

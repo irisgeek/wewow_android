@@ -75,7 +75,7 @@
                 app:tabSelectedTextColor="@color/tab_text_selected_color"
                 app:tabIndicatorColor="#333631"
                 app:tabMinWidth="@dimen/tab_width"
-                app:tabMode="scrollable" />
+                app:tabMode="fixed" />
 
 
 
@@ -161,7 +161,7 @@
         <!--android:layout_height="wrap_content"-->
         <!--android:background="@drawable/divider" />-->
 
-    <android.support.v4.view.ViewPager
+    <com.wewow.view.CustomViewPager
         android:id="@+id/pagerTabs"
         android:layout_width="fill_parent"
         android:layout_height="1000dp" />

@@ -6,6 +6,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Point;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -50,6 +51,14 @@ public class Utils {
         DisplayMetrics displayMetrics = mContext.getResources()
                 .getDisplayMetrics();
         return (int) ((pixel / displayMetrics.density) + 0.5);
+    }
+
+    public static int getScreenWidthDp(Activity activity)
+    {
+        Point size = new Point();
+        activity.getWindowManager().getDefaultDisplay().getSize(size);
+        int screenWidth = size.x;
+        return pixelToDip(activity,screenWidth);
     }
 
     /**

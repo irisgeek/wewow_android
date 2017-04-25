@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -74,6 +75,7 @@ public class FeedbackActivity extends BaseActivity implements SwipeRefreshLayout
         }
         setUpToolBar();
 
+
     }
 
     private void initData() {
@@ -96,7 +98,6 @@ public class FeedbackActivity extends BaseActivity implements SwipeRefreshLayout
     }
 
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -110,7 +111,7 @@ public class FeedbackActivity extends BaseActivity implements SwipeRefreshLayout
 //            layout.setVisibility(View.VISIBLE);
             return true;
         }
-        if(id==android.R.id.home) {
+        if (id == android.R.id.home) {
             finish();
             return true;
 
@@ -158,7 +159,7 @@ public class FeedbackActivity extends BaseActivity implements SwipeRefreshLayout
 
         JSONObject object = new JSONObject(realData);
         JSONArray results = object.getJSONObject("result").getJSONObject("data").getJSONArray("feedbacks");
-        for (int i = 0; i < results.length(); i++) {
+        for (int i = results.length() - 1; i >= 0; i--) {
             Feedback feedback = new Feedback();
             JSONObject result = results.getJSONObject(i);
             feedback.setId(result.getString("id"));
@@ -275,8 +276,7 @@ public class FeedbackActivity extends BaseActivity implements SwipeRefreshLayout
         }
 
         listItem.addAll(listItemCopy);
-        if (!refresh)
-        {
+        if (!refresh) {
             adapter = new ListViewFeedbackAdapter(this, listItem);
 
             listView.setAdapter(adapter);
@@ -296,7 +296,89 @@ public class FeedbackActivity extends BaseActivity implements SwipeRefreshLayout
         );
         adapter.notifyDataSetChanged();
         currentPage++;
+//        setUpButtons();
         swipeRefreshLayout.setRefreshing(false);
+
+
+    }
+
+    private void setUpButtons() {
+        ImageView buttonSendPic = (ImageView) findViewById(R.id.imageViewSendPic);
+        buttonSendPic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                choosePic();
+            }
+        });
+
+        ImageView buttonSendText = (ImageView) findViewById(R.id.imageViewSend);
+        buttonSendText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SendText();
+            }
+        });
+    }
+
+    private void SendText() {
+
+        ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
+
+        UserInfo currentUser = UserInfo.getCurrentUser(FeedbackActivity.this);
+        String userId = currentUser.getId().toString();
+        String token=currentUser.getToken().toString();
+        EditText textContent=(EditText) findViewById(R.id.editTextContent);
+        String content=textContent.getText().toString();
+
+
+        iTask.feedbackText(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), userId,token,content ,"0","", new Callback<JSONObject>() {
+
+            @Override
+            public void success(JSONObject object, Response response) {
+                List<Feedback> feedbacks = new ArrayList<Feedback>();
+
+                try {
+                    String realData = Utils.convertStreamToString(response.getBody().in());
+                    if (!realData.contains(CommonUtilities.SUCCESS)) {
+                        Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+                        swipeRefreshLayout.setRefreshing(false);
+
+                    } else {
+                        feedbacks = parseFeedbackFromString(realData);
+
+                        if (currentPage > 1) {
+                            setUpFeedbacks(feedbacks, true);
+                        } else {
+                            FileCacheUtil.setCache(realData, FeedbackActivity.this, CommonUtilities.CACHE_FILE_FEEDBACKS, 0);
+                            setUpFeedbacks(feedbacks, false);
+                        }
+
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+                    swipeRefreshLayout.setRefreshing(false);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+                swipeRefreshLayout.setRefreshing(false);
+
+            }
+        });
+
+
+    }
+
+    private void choosePic() {
 
 
     }
@@ -367,8 +449,7 @@ public class FeedbackActivity extends BaseActivity implements SwipeRefreshLayout
         if (!isLastPageLoaded) {
 
             getFeedbackFromServer();
-        }
-        else {
+        } else {
             swipeRefreshLayout.setRefreshing(false);
         }
     }
@@ -377,11 +458,11 @@ public class FeedbackActivity extends BaseActivity implements SwipeRefreshLayout
 
         boolean result = false;
 
-        if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_ARTISTS_LIST, this)) {
-            String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_ARTISTS_LIST);
+        if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_FEEDBACKS, this)) {
+            String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_FEEDBACKS);
             JSONObject object = new JSONObject(fileContent);
             String totalPages = object.getJSONObject("result").getJSONObject("data").getString("total_pages");
-            if (currentPage>Integer.parseInt(totalPages)) {
+            if (currentPage > Integer.parseInt(totalPages)) {
 
                 result = true;
             }

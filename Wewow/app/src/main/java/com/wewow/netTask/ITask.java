@@ -1,5 +1,7 @@
 package com.wewow.netTask;
 
+import com.squareup.okhttp.RequestBody;
+
 import org.json.JSONObject;
 
 
@@ -7,7 +9,9 @@ import retrofit.Callback;
 import retrofit.http.Field;
 import retrofit.http.GET;
 import retrofit.http.Header;
+import retrofit.http.Multipart;
 import retrofit.http.POST;
+import retrofit.http.Part;
 import retrofit.http.Query;
 
 /**
@@ -55,32 +59,43 @@ public interface ITask {
 
     @GET("/index_category_collections")
     void categoryArtistsAndInstitutes(@Header("User-Agent") String headerContentType, @Query("collection_category_id") String id,
-                                     Callback<JSONObject> callback);
+                                      Callback<JSONObject> callback);
 
     //feedback
     @GET("/feedbacks")
-    void feedbacks(@Header("User-Agent") String headerContentType, @Query("user_id") String id,@Query("page") int page,
-                                      Callback<JSONObject> callback);
+    void feedbacks(@Header("User-Agent") String headerContentType, @Query("user_id") String id, @Query("page") int page,
+                   Callback<JSONObject> callback);
 
     @POST("/feedback")
     void feedbackText(@Header("User-Agent") String headerContentType, @Query("user_id") String id,
-                  @Query("token") String token, @Query("content") String content,
-                  @Query("content_type") String content_type,  @Query("status") String status,
+                      @Query("token") String token, @Query("content") String content,
+                      @Query("content_type") String content_type, @Query("status") String status,
                       Callback<JSONObject> callback);
 
     @POST("/feedback")
     void feedbackImage(@Header("User-Agent") String headerContentType, @Query("user_id") String id,
-                      @Query("token") String token, @Query("content") String content,
-                      @Query("content_type") String content_type, @Query("image_width") String image_width,
+                       @Query("token") String token, @Query("content") String content,
+                       @Query("content_type") String content_type, @Query("image_width") String image_width,
                        @Query("image_height") String image_height, @Query("status") String status,
-                      Callback<JSONObject> callback);
+                       Callback<JSONObject> callback);
+
+
+    @Multipart
+    @POST("/feedback")
+    void uploadImage(@Header("User-Agent") String headerContentType, @Query("user_id") String id,
+                     @Query("token") String token, @Query("content") String content,
+                     @Query("content_type") String content_type, @Query("image_width") String image_width,
+                     @Query("image_height") String image_height, @Query("status") String status,
+                     @Part("fileName") String description,
+                     @Part("file\"; filename=\"image.png\"") RequestBody imgs, Callback<JSONObject> callback);
+
 
     //search
     @GET("/hotwords")
     void getHotSearchWords(@Header("User-Agent") String headerContentType, Callback<JSONObject> callback);
 
     @GET("/search_mini")
-    void search(@Header("User-Agent") String headerContentType,  @Query("keywords") String keywords,Callback<JSONObject> callback);
+    void search(@Header("User-Agent") String headerContentType, @Query("keywords") String keywords, Callback<JSONObject> callback);
 
     //new version notification
     @GET("/notification")
@@ -91,7 +106,7 @@ public interface ITask {
     void ads(@Header("User-Agent") String headerContentType, Callback<JSONObject> callback);
 
     @GET("/user_notification")
-    void user_notification(@Header("User-Agent") String headerContentType,@Query("user_id") String user_id, Callback<JSONObject> callback);
+    void user_notification(@Header("User-Agent") String headerContentType, @Query("user_id") String user_id, Callback<JSONObject> callback);
 
 
     @POST("/artist_read")
@@ -100,9 +115,9 @@ public interface ITask {
                      Callback<JSONObject> callback);
 
 
-   @GET("/subject")
+    @GET("/subject")
     void subject(@Header("User-Agent") String headerContentType, @Query("subject_id") String subjectId,
-                  Callback<JSONObject> callback);
+                 Callback<JSONObject> callback);
 
 
 }
