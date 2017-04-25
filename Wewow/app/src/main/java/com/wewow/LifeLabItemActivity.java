@@ -259,7 +259,7 @@ public class LifeLabItemActivity extends Activity {
         tv.setText(String.format(this.getString(R.string.lifelab_item_desc), this.lcd.editor));
         this.container.addView(view);
     }
-
+/*
     private void expandAll() {
         for (int i = 0; i < this.adapter.getGroupCount(); i++) {
             this.lvArticles.expandGroup(i);
@@ -349,7 +349,7 @@ public class LifeLabItemActivity extends Activity {
         }
 
     };
-
+*/
     private static class LabCollectionDetail {
 
         private LabCollectionDetail() {

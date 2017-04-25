@@ -111,7 +111,7 @@ public class BaseActivity extends ActionBarActivity {
 
         super.setContentView(drawerLayout);
 
-        if (UserInfo.isUserLogged(this)&&Utils.isNetworkAvailable(this)) {
+        if (UserInfo.isUserLogged(this) && Utils.isNetworkAvailable(this)) {
             String userId = UserInfo.getCurrentUser(this).getId().toString();
             getNewFeedsAndArtistInfo(userId);
 
@@ -119,7 +119,7 @@ public class BaseActivity extends ActionBarActivity {
             setUpNavigation("0", "0");
 //        setUpNavigationView();
         }
-            setUpToolBar();
+        setUpToolBar();
 
 
     }
@@ -167,7 +167,7 @@ public class BaseActivity extends ActionBarActivity {
         });
     }
 
-    private List<String> parseFeedbackAndArtistUpdate(String realData) throws  JSONException{
+    private List<String> parseFeedbackAndArtistUpdate(String realData) throws JSONException {
 
         List<String> results = new ArrayList<String>();
         JSONObject jsonObject = new JSONObject(realData);
@@ -177,7 +177,6 @@ public class BaseActivity extends ActionBarActivity {
         return results;
 
     }
-
 
 
     private void setUpNavigationView() {
@@ -191,7 +190,7 @@ public class BaseActivity extends ActionBarActivity {
     }
 
 
-    private void setUpNavigation(String feedbackUpdate,String artistUpdate) {
+    private void setUpNavigation(String feedbackUpdate, String artistUpdate) {
         planetTitles = getResources().getStringArray(R.array.planets_array);
         drawerList = (ListView) findViewById(R.id.left_drawer);
         View VheandrView = LayoutInflater.from(this).inflate(R.layout.list_header_drawer, null);
@@ -206,23 +205,19 @@ public class BaseActivity extends ActionBarActivity {
             if (i == 4 || i == 7) {
                 map.put("icon", 0);
                 map.put("menuText", "");
-                map.put("new","0");
+                map.put("new", "0");
                 listItem.add(map);
                 map = new HashMap<String, Object>();
             }
 
             map.put("icon", iconResIcon[i]);
             map.put("menuText", planetTitles[i]);
-            if(i==3)
-            {
+            if (i == 3) {
                 map.put("new", feedbackUpdate);
-            }
-            else if(i==6)
-            {
-                map.put("new",artistUpdate);
-            }
-            else {
-                map.put("new","0");
+            } else if (i == 6) {
+                map.put("new", artistUpdate);
+            } else {
+                map.put("new", "0");
             }
 
 
@@ -236,7 +231,7 @@ public class BaseActivity extends ActionBarActivity {
 //                //ids
 //                new int[]{R.id.imageViewIcon, R.id.textViewMenuItem}
 //        );
-        ListViewMenuAdapter adapter=new ListViewMenuAdapter(this,listItem);
+        ListViewMenuAdapter adapter = new ListViewMenuAdapter(this, listItem);
         drawerList.setAdapter(adapter);
 
 
@@ -257,16 +252,19 @@ public class BaseActivity extends ActionBarActivity {
             this.tvusername.setText(UserInfo.getCurrentUser(this).getNickname());
 
             this.tvuserdesc.setText(UserInfo.getCurrentUser(this).getDesc());
-        } else {
-            this.tvusername.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent i = new Intent();
-                    i.setClass(BaseActivity.this, LoginActivity.class);
-                    BaseActivity.this.startActivityForResult(i, LoginActivity.REQUEST_CODE_LOGIN);
-                }
-            });
         }
+        this.findViewById(R.id.imageViewSetting).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (UserInfo.isUserLogged(BaseActivity.this)) {
+                    Intent edIntent = new Intent(BaseActivity.this, UserInfoActivity.class);
+                    BaseActivity.this.startActivity(edIntent);
+                } else {
+                    Intent intentMain = new Intent(BaseActivity.this, MainActivity.class);
+                    BaseActivity.this.startActivityForResult(intentMain, LoginActivity.REQUEST_CODE_LOGIN);
+                }
+            }
+        });
     }
 
     @Override
@@ -326,7 +324,7 @@ public class BaseActivity extends ActionBarActivity {
             switch (position - 1) {
                 case 0:
                     Intent intentMain = new Intent(BaseActivity.this, MainActivity.class);
-                    BaseActivity.this.startActivity(intentMain);
+                    BaseActivity.this.startActivityForResult(intentMain, LoginActivity.REQUEST_CODE_LOGIN);
                     break;
                 case 1:
                     Intent intent = new Intent(BaseActivity.this, ListArtistActivity.class);

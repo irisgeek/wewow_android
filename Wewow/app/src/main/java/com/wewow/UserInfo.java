@@ -20,6 +20,7 @@ public class UserInfo {
     private String reg_type;
     private String reg_time;
     private String token;
+    private String background_id;
 
     public static UserInfo getAnonymouUser() {
         UserInfo anonymous = new UserInfo();
@@ -66,7 +67,7 @@ public class UserInfo {
         return token;
     }
 
-    private String serializa() {
+    private String serialize() {
         JSONObject jobj = new JSONObject();
         try {
             jobj.put("id", this.id);
@@ -76,6 +77,7 @@ public class UserInfo {
             jobj.put("reg_time", this.reg_time);
             jobj.put("reg_type", this.reg_type);
             jobj.put("token", this.token);
+            jobj.put("background_id", this.background_id);
             return jobj.toString();
         } catch (JSONException e) {
             Log.w(TAG, "serialize fail");
@@ -85,7 +87,7 @@ public class UserInfo {
 
     public void saveUserInfo(Context cxt) {
         SharedPreferences sp = cxt.getSharedPreferences(PREFERENCE_USERINFO, Context.MODE_PRIVATE);
-        String s = this.serializa();
+        String s = this.serialize();
         if (s != null) {
             Editor ed = sp.edit();
             ed.putString(UserInfo.PREFERENCE_USERINFO_KEY, s);
@@ -116,9 +118,10 @@ public class UserInfo {
             ui.open_id = jobj.getString("open_id");
             ui.id = jobj.getLong("id");
             ui.nickname = jobj.getString("nickname");
-            ui.reg_time = jobj.getString("reg_time");
-            ui.reg_type = jobj.getString("reg_type");
+            ui.reg_time = jobj.optString("reg_time");
+            ui.reg_type = jobj.optString("reg_type");
             ui.token = jobj.getString("token");
+            ui.background_id = jobj.optString("background_id", "1");
         } catch (JSONException e) {
             Log.w(TAG, "json to userinfo fail");
             return null;
@@ -133,4 +136,19 @@ public class UserInfo {
         ed.commit();
     }
 
+    public void setNickName(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void setSignature(String sig) {
+        this.desc = sig;
+    }
+
+    public String getBackground_id() {
+        return background_id;
+    }
+
+    public void setBackground_id(String background_id) {
+        this.background_id = background_id;
+    }
 }

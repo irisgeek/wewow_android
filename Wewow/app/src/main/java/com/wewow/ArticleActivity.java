@@ -1,7 +1,9 @@
 package com.wewow;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -31,6 +33,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.io.ByteArrayOutputStream;
+
 public class ArticleActivity extends AppCompatActivity {
 
     public static final String ARTICLE_ID = "ARTICLE_ID";
@@ -39,6 +43,7 @@ public class ArticleActivity extends AppCompatActivity {
     private WebView content;
     private ImageView logo;
     private LinearLayout discuzContainer;
+    private JSONObject data;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,9 +87,35 @@ public class ArticleActivity extends AppCompatActivity {
         this.logo = (ImageView) this.findViewById(R.id.article_logo);
         this.discuzContainer = (LinearLayout) this.findViewById(R.id.article_discuss_container);
         this.setupFeedback();
+        this.findViewById(R.id.share_weibo).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(ArticleActivity.this, ShareActivity.class);
+                i.putExtra(ShareActivity.SHARE_TYPE, ShareActivity.SHARE_TYPE_WEIBO);
+                i.putExtra(ShareActivity.SHARE_CONTEXT, ArticleActivity.this.data.optString("title", "no title"));
+                i.putExtra(ShareActivity.SHARE_URL, ArticleActivity.this.data.optString("share_link", "no link"));
+                BitmapDrawable bdr = (BitmapDrawable) ArticleActivity.this.logo.getDrawable();
+                if (bdr != null) {
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    bdr.getBitmap().compress(Bitmap.CompressFormat.PNG, 100, baos);
+                    i.putExtra(ShareActivity.SHARE_IMAGE, baos.toByteArray());
+                }
+                ArticleActivity.this.startActivity(i);
+            }
+        });
+        this.findViewById(R.id.share_copylink).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(ArticleActivity.this, ShareActivity.class);
+                i.putExtra(ShareActivity.SHARE_TYPE, ShareActivity.SHARE_TYPE_COPY_LINK);
+                i.putExtra(ShareActivity.SHARE_URL, ArticleActivity.this.data.optString("share_link", "no link"));
+                ArticleActivity.this.startActivity(i);
+            }
+        });
     }
 
     private void fillContent(JSONObject article) {
+        this.data = article;
         this.title.setText(article.optString("title", "No title"));
         this.content.loadUrl(article.optString("content", "No content"));
         new RemoteImageLoader(this, article.optString("image_750_1112"), new RemoteImageLoader.RemoteImageListener() {
