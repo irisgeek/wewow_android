@@ -31,9 +31,7 @@ import com.wewow.utils.WebAPIHelper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
-import java.io.ByteArrayOutputStream;
 
 public class ArticleActivity extends AppCompatActivity {
 
@@ -96,9 +94,8 @@ public class ArticleActivity extends AppCompatActivity {
                 i.putExtra(ShareActivity.SHARE_URL, ArticleActivity.this.data.optString("share_link", "no link"));
                 BitmapDrawable bdr = (BitmapDrawable) ArticleActivity.this.logo.getDrawable();
                 if (bdr != null) {
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    bdr.getBitmap().compress(Bitmap.CompressFormat.PNG, 100, baos);
-                    i.putExtra(ShareActivity.SHARE_IMAGE, baos.toByteArray());
+                    byte[] buf = Utils.getBitmapBytes(bdr.getBitmap());
+                    i.putExtra(ShareActivity.SHARE_IMAGE, buf);
                 }
                 ArticleActivity.this.startActivity(i);
             }
@@ -109,6 +106,36 @@ public class ArticleActivity extends AppCompatActivity {
                 Intent i = new Intent(ArticleActivity.this, ShareActivity.class);
                 i.putExtra(ShareActivity.SHARE_TYPE, ShareActivity.SHARE_TYPE_COPY_LINK);
                 i.putExtra(ShareActivity.SHARE_URL, ArticleActivity.this.data.optString("share_link", "no link"));
+                ArticleActivity.this.startActivity(i);
+            }
+        });
+        this.findViewById(R.id.share_wechat_circle).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(ArticleActivity.this, ShareActivity.class);
+                i.putExtra(ShareActivity.SHARE_TYPE, ShareActivity.SHARE_TYPE_WECHAT_CIRCLE);
+                i.putExtra(ShareActivity.SHARE_CONTEXT, ArticleActivity.this.data.optString("title", "no title"));
+                i.putExtra(ShareActivity.SHARE_URL, ArticleActivity.this.data.optString("share_link", "no link"));
+                BitmapDrawable bdr = (BitmapDrawable) ArticleActivity.this.logo.getDrawable();
+                if (bdr != null) {
+                    byte[] buf = Utils.getBitmapBytes(bdr.getBitmap());
+                    i.putExtra(ShareActivity.SHARE_IMAGE, buf);
+                }
+                ArticleActivity.this.startActivity(i);
+            }
+        });
+        this.findViewById(R.id.share_wechat_friend).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(ArticleActivity.this, ShareActivity.class);
+                i.putExtra(ShareActivity.SHARE_TYPE, ShareActivity.SHARE_TYPE_WECHAT_FRIEND);
+                i.putExtra(ShareActivity.SHARE_CONTEXT, ArticleActivity.this.data.optString("title", "no title"));
+                i.putExtra(ShareActivity.SHARE_URL, ArticleActivity.this.data.optString("share_link", "no link"));
+                BitmapDrawable bdr = (BitmapDrawable) ArticleActivity.this.logo.getDrawable();
+                if (bdr != null) {
+                    byte[] buf = Utils.getBitmapBytes(bdr.getBitmap());
+                    i.putExtra(ShareActivity.SHARE_IMAGE, buf);
+                }
                 ArticleActivity.this.startActivity(i);
             }
         });
