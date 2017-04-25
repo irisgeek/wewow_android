@@ -21,6 +21,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.Interpolator;
 import android.view.animation.TranslateAnimation;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
@@ -31,11 +32,13 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.wewow.DetailArtistActivity;
+import com.wewow.LifeLabItemActivity;
 import com.wewow.R;
 import com.wewow.adapter.ListViewAdapter;
 import com.wewow.dto.Artist;
 import com.wewow.dto.Banner;
 import com.wewow.dto.Institute;
+import com.wewow.dto.LabCollection;
 import com.wewow.dto.collectionCategory;
 import com.wewow.netTask.ITask;
 import com.wewow.utils.CommonUtilities;
@@ -52,6 +55,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 import retrofit.Callback;
@@ -430,7 +434,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     }
 
 
-    private void setUpLatestInstitue(Institute institue ,boolean isFromCache,View view) {
+    private void setUpLatestInstitue(final Institute institue ,boolean isFromCache,View view) {
 
         ImageView imageView = (ImageView) view.findViewById(R.id.imageViewLatestInstitue);
         Glide.with(view.getContext())
@@ -456,6 +460,23 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             swipeRefreshLayout.setRefreshing(false);
 
         }
+
+        CardView cardView=(CardView)view.findViewById(R.id.cardViewLatest);
+        cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                LabCollection lc = new LabCollection();
+                lc.image=institue.getImage();
+                lc.title=institue.getTitle();
+                lc.id=Long.parseLong(institue.getId());
+                Intent intent = new Intent(getActivity(), LifeLabItemActivity.class);
+                intent.putExtra(LifeLabItemActivity.LIFELAB_COLLECTION, lc);
+
+                startActivity(intent);
+
+            }
+        });
 
 
     }
@@ -661,6 +682,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             map.put("textViewTitle", institutes.get(i).getTitle());
             map.put("textViewRead", institutes.get(i).getRead_count());
             map.put("textViewCollection", institutes.get(i).getLiked_count());
+            map.put("id",institutes.get(i).getId());
 
             listItem.add(map);
         }
@@ -674,6 +696,21 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 //                new int[]{R.id.imageViewInstitue,R.id.textViewNum, R.id.textViewTitle, R.id.textViewRead, R.id.textViewCollection}
 //        );
         listViewInstituteRecommended.setAdapter(listItemAdapter);
+        listViewInstituteRecommended.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                LabCollection lc = new LabCollection();
+               HashMap<String,Object> map=(HashMap < String, Object >)parent.getAdapter().getItem(position);
+
+                lc.image=map.get("imageView").toString();
+                lc.title=map.get("textViewTitle").toString();
+                lc.id=Long.parseLong(map.get("id").toString());
+                Intent intent = new Intent(getActivity(), LifeLabItemActivity.class);
+                intent.putExtra(LifeLabItemActivity.LIFELAB_COLLECTION, lc);
+
+                startActivity(intent);
+            }
+        });
         listItemAdapter.notifyDataSetChanged();
 
         //fix bug created by scrollview

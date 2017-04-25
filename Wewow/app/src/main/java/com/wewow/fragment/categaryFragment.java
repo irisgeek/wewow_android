@@ -1,4 +1,5 @@
 package com.wewow.fragment;
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -18,10 +20,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.wewow.DetailArtistActivity;
+import com.wewow.LifeLabItemActivity;
 import com.wewow.R;
 import com.wewow.adapter.ListViewAdapter;
 import com.wewow.dto.Artist;
 import com.wewow.dto.Institute;
+import com.wewow.dto.LabCollection;
 import com.wewow.netTask.ITask;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.FileCacheUtil;
@@ -267,6 +272,7 @@ public class categaryFragment  extends Fragment implements SwipeRefreshLayout.On
             map.put("textViewTitle", institutes.get(i).getTitle());
             map.put("textViewRead", institutes.get(i).getRead_count());
             map.put("textViewCollection", institutes.get(i).getLiked_count());
+            map.put("id",institutes.get(i).getId());
 
             listItem.add(map);
         }
@@ -280,6 +286,21 @@ public class categaryFragment  extends Fragment implements SwipeRefreshLayout.On
 //                new int[]{R.id.imageViewInstitue,R.id.textViewNum, R.id.textViewTitle, R.id.textViewRead, R.id.textViewCollection}
 //        );
         listViewInstituteRecommended.setAdapter(listItemAdapter);
+        listViewInstituteRecommended.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                LabCollection lc = new LabCollection();
+                HashMap<String, Object> map = (HashMap<String, Object>) parent.getAdapter().getItem(position);
+
+                lc.image = map.get("imageView").toString();
+                lc.title = map.get("textViewTitle").toString();
+                lc.id = Long.parseLong(map.get("id").toString());
+                Intent intent = new Intent(getActivity(), LifeLabItemActivity.class);
+                intent.putExtra(LifeLabItemActivity.LIFELAB_COLLECTION, lc);
+
+                startActivity(intent);
+            }
+        });
         listItemAdapter.notifyDataSetChanged();
 
         //fix bug created by scrollview
@@ -315,10 +336,23 @@ public class categaryFragment  extends Fragment implements SwipeRefreshLayout.On
             textFollowerCount.setText(artists.get(i).getFollower_count());
 
 
+            final String artistId=artists.get(i).getId();
+
             //to set data
 
 
             mListViews.add(view);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+
+                    Intent intent = new Intent(getActivity(), DetailArtistActivity.class);
+                    intent.putExtra("id", artistId);
+                    startActivity(intent);
+
+                }
+            });
         }
 
         View right = new View(rootView.getContext());

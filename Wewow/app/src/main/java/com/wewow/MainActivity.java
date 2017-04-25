@@ -67,6 +67,7 @@ import com.growingio.android.sdk.collection.GrowingIO;
 import com.wewow.adapter.FragmentAdapter;
 import com.wewow.dto.Banner;
 import com.wewow.dto.Institute;
+import com.wewow.dto.LabCollection;
 import com.wewow.dto.collectionCategory;
 import com.wewow.netTask.ITask;
 import com.wewow.utils.CommonUtilities;
@@ -121,7 +122,7 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        Utils.setActivityToBeFullscreen(this);
+//        Utils.setActivityToBeFullscreen(this);
 
         setContentView(R.layout.activity_main);
         context = this;
@@ -433,11 +434,30 @@ public class MainActivity extends BaseActivity {
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String type = banners.get(j).getType();
+                    Banner banner = banners.get(j);
+                    String type = banner.getType();
                     if (type.equals(CommonUtilities.BANNER_TYPE_SUBJECT)) {
-                        Intent intent= new Intent(MainActivity.this,SubjectActivity.class);
-                        intent.putExtra("id",banners.get(j).getId());
+                        Intent intent = new Intent(MainActivity.this, SubjectActivity.class);
+                        intent.putExtra("id", banner.getId());
                         startActivity(intent);
+                    } else if (type.equals(CommonUtilities.BANNER_TYPE_COLLECTION)) {
+                        LabCollection lc = new LabCollection();
+                        lc.image = banner.getImage();
+                        lc.title = banner.getTitle();
+                        lc.id = Long.parseLong(banner.getId());
+                        Intent intent = new Intent(MainActivity.this, LifeLabItemActivity.class);
+                        intent.putExtra(LifeLabItemActivity.LIFELAB_COLLECTION, lc);
+
+                        startActivity(intent);
+                    } else if (type.equals(CommonUtilities.BANNER_TYPE_POST)) {
+                        Intent intent = new Intent(MainActivity.this, LifePostActivity.class);
+                        intent.putExtra(LifePostActivity.POST_ID, Integer.parseInt(banner.getId()));
+                        startActivity(intent);
+                    } else {
+                        Intent intent = new Intent(MainActivity.this, WebPageActivity.class);
+                        intent.putExtra("url", banner.getUrl());
+                        startActivity(intent);
+
                     }
                 }
             });
@@ -589,6 +609,10 @@ public class MainActivity extends BaseActivity {
             banner.setImage(result.getString("image"));
             banner.setType(result.getString("type"));
             banner.setTitle(result.getString("title"));
+            if(banner.getType().equals("html"))
+            {
+                banner.setUrl(result.getString("url"));
+            }
             banners.add(banner);
         }
         return banners;
