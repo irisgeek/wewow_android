@@ -6,6 +6,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -23,6 +24,7 @@ import android.widget.ListView;
 import com.squareup.okhttp.OkHttpClient;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,12 +55,11 @@ public class Utils {
         return (int) ((pixel / displayMetrics.density) + 0.5);
     }
 
-    public static int getScreenWidthDp(Activity activity)
-    {
+    public static int getScreenWidthDp(Activity activity) {
         Point size = new Point();
         activity.getWindowManager().getDefaultDisplay().getSize(size);
         int screenWidth = size.x;
-        return pixelToDip(activity,screenWidth);
+        return pixelToDip(activity, screenWidth);
     }
 
     /**
@@ -228,10 +229,14 @@ public class Utils {
 
     }
 
-    public static void setActivityToBeFullscreen(Activity activity)
-    {
+    public static void setActivityToBeFullscreen(Activity activity) {
         activity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 
+    public static byte[] getBitmapBytes(Bitmap bm) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bm.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        return baos.toByteArray();
+    }
 }
 

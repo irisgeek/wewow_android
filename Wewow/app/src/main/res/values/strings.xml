@@ -51,8 +51,7 @@
     <string name="share_copy_link">复制链接</string>
     <string name="share_more">更多</string>
     <string name="share_weibo_result">分享到微博%s</string>
-    <string name="share_wechat_friend_result">分享微信好友%s</string>
-    <string name="share_wechat_circle_result">分享朋友圈%s</string>
+    <string name="share_wechat_result">分享微信%s</string>
     <string name="share_copylink_result">复制链接%s</string>
     <string name="share_result_succeed">成功</string>
     <string name="share_result_fail">失败</string>
