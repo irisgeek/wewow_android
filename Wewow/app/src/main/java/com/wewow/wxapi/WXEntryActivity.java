@@ -5,11 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
-import android.view.KeyEvent;
-import android.view.View;
 import android.widget.Toast;
 
-import com.bumptech.glide.util.Util;
 import com.tencent.mm.opensdk.constants.ConstantsAPI;
 import com.tencent.mm.opensdk.modelbase.BaseReq;
 import com.tencent.mm.opensdk.modelbase.BaseResp;
@@ -17,13 +14,11 @@ import com.tencent.mm.opensdk.modelmsg.SendAuth;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.IWXAPIEventHandler;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
-import com.wewow.LoginActivity;
 import com.wewow.R;
 import com.wewow.UserInfo;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
 import com.wewow.utils.ProgressDialogUtil;
-import com.wewow.utils.Utils;
 import com.wewow.utils.WebAPIHelper;
 
 import org.json.JSONException;
@@ -91,7 +86,7 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
                                 }
                                 String token = jobj.optString("access_token");
                                 String openid = jobj.optString("openid");
-                                WXEntryActivity.this.onWecharAuthorized(openid, token);
+                                WXEntryActivity.this.onWechatAuthorized(openid, token);
                             }
                         },
                         WebAPIHelper.HttpMethod.GET
@@ -115,7 +110,7 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
         this.finish();
     }
 
-    private void onWecharAuthorized(final String openid, String token) {
+    private void onWechatAuthorized(final String openid, String token) {
         Object[] params = new Object[]{
                 String.format("https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s", token, openid),
                 new HttpAsyncTask.TaskDelegate() {
