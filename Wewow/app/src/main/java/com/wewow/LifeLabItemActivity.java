@@ -27,6 +27,7 @@ import com.wewow.utils.HttpAsyncTask;
 import com.wewow.utils.PhotoUtils;
 import com.wewow.utils.ProgressDialogUtil;
 import com.wewow.utils.RemoteImageLoader;
+import com.wewow.utils.ShareUtils;
 import com.wewow.utils.Utils;
 import com.wewow.utils.WebAPIHelper;
 
@@ -52,6 +53,7 @@ public class LifeLabItemActivity extends Activity {
     private LabCollectionDetail lcd = new LabCollectionDetail();
     private ExpandableListView lvArticles;
     private LinearLayout container;
+    private BitmapDrawable picture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +81,21 @@ public class LifeLabItemActivity extends Activity {
             @Override
             public void onClick(View view) {
                 LifeLabItemActivity.this.finish();
+            }
+        });
+        this.findViewById(R.id.lifelab_share).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (LifeLabItemActivity.this.lcd == null) {
+                    return;
+                }
+                ShareUtils su = new ShareUtils(LifeLabItemActivity.this);
+                su.setContent(LifeLabItemActivity.this.lcd.share_title);
+                su.setUrl(LifeLabItemActivity.this.lcd.share_link);
+                if (LifeLabItemActivity.this.picture != null) {
+                    su.setPicture(LifeLabItemActivity.this.picture.getBitmap());
+                }
+                su.share();
             }
         });
         ProgressDialogUtil.getInstance(this).showProgressDialog();
@@ -259,97 +276,98 @@ public class LifeLabItemActivity extends Activity {
         tv.setText(String.format(this.getString(R.string.lifelab_item_desc), this.lcd.editor));
         this.container.addView(view);
     }
-/*
-    private void expandAll() {
-        for (int i = 0; i < this.adapter.getGroupCount(); i++) {
-            this.lvArticles.expandGroup(i);
-        }
-    }
 
-    private BaseExpandableListAdapter adapter = new BaseExpandableListAdapter() {
-        @Override
-        public int getGroupCount() {
-            int l = LifeLabItemActivity.this.lcd.getArticleGroupCount();
-            return l > 2 ? 2 : l;
-        }
-
-        @Override
-        public int getChildrenCount(int i) {
-            String group = LifeLabItemActivity.this.lcd.getArticleGroup(i);
-            //Log.d(TAG, String.format("getChildrenCount: %s %d", group, LifeLabItemActivity.this.lcd.getArticleCount(group)));
-            int l = LifeLabItemActivity.this.lcd.getArticleCount(group);
-            return l > 2 ? 2 : l;
-        }
-
-        @Override
-        public Object getGroup(int i) {
-            return LifeLabItemActivity.this.lcd.getArticleGroup(i);
-        }
-
-        @Override
-        public Object getChild(int i, int i1) {
-            String group = LifeLabItemActivity.this.lcd.getArticleGroup(i);
-            return LifeLabItemActivity.this.lcd.getArticle(group, i1);
-        }
-
-        @Override
-        public long getGroupId(int i) {
-            return i;
-        }
-
-        @Override
-        public long getChildId(int i, int i1) {
-            return i * 1000 + i1;
-        }
-
-        @Override
-        public boolean hasStableIds() {
-            return false;
-        }
-
-        @Override
-        public View getGroupView(int i, boolean b, View view, ViewGroup viewGroup) {
-            if (view == null) {
-                view = View.inflate(LifeLabItemActivity.this, R.layout.lifelab_item_article_group, null);
+    /*
+        private void expandAll() {
+            for (int i = 0; i < this.adapter.getGroupCount(); i++) {
+                this.lvArticles.expandGroup(i);
             }
-            TextView tv = (TextView) view.findViewById(R.id.lifelab_item_group_title);
-            tv.setText(LifeLabItemActivity.this.lcd.getArticleGroup(i));
-            return view;
         }
 
-        @Override
-        public View getChildView(int i, int i1, boolean b, View view, ViewGroup viewGroup) {
-            if (view == null) {
-                view = View.inflate(LifeLabItemActivity.this, R.layout.lifelab_item_article, null);
+        private BaseExpandableListAdapter adapter = new BaseExpandableListAdapter() {
+            @Override
+            public int getGroupCount() {
+                int l = LifeLabItemActivity.this.lcd.getArticleGroupCount();
+                return l > 2 ? 2 : l;
             }
-            String group = LifeLabItemActivity.this.lcd.getArticleGroup(i);
-            LabCollectionDetail.Article a = LifeLabItemActivity.this.lcd.getArticle(group, i1);
-            view.setBackgroundColor(i1 % 2 == 0 ? Color.rgb(252, 230, 194) : Color.WHITE);
-            final ImageView iv = (ImageView) view.findViewById(R.id.lifelab_item_article_img);
-            new RemoteImageLoader(LifeLabItemActivity.this, a.image_320_160, new RemoteImageLoader.RemoteImageListener() {
-                @Override
-                public void onRemoteImageAcquired(Drawable dr) {
-                    BitmapDrawable old = (BitmapDrawable) iv.getDrawable();
-                    iv.setImageDrawable(dr);
-                    if (old != null) {
-                        old.getBitmap().recycle();
-                    }
+
+            @Override
+            public int getChildrenCount(int i) {
+                String group = LifeLabItemActivity.this.lcd.getArticleGroup(i);
+                //Log.d(TAG, String.format("getChildrenCount: %s %d", group, LifeLabItemActivity.this.lcd.getArticleCount(group)));
+                int l = LifeLabItemActivity.this.lcd.getArticleCount(group);
+                return l > 2 ? 2 : l;
+            }
+
+            @Override
+            public Object getGroup(int i) {
+                return LifeLabItemActivity.this.lcd.getArticleGroup(i);
+            }
+
+            @Override
+            public Object getChild(int i, int i1) {
+                String group = LifeLabItemActivity.this.lcd.getArticleGroup(i);
+                return LifeLabItemActivity.this.lcd.getArticle(group, i1);
+            }
+
+            @Override
+            public long getGroupId(int i) {
+                return i;
+            }
+
+            @Override
+            public long getChildId(int i, int i1) {
+                return i * 1000 + i1;
+            }
+
+            @Override
+            public boolean hasStableIds() {
+                return false;
+            }
+
+            @Override
+            public View getGroupView(int i, boolean b, View view, ViewGroup viewGroup) {
+                if (view == null) {
+                    view = View.inflate(LifeLabItemActivity.this, R.layout.lifelab_item_article_group, null);
                 }
-            });
-            TextView tv = (TextView) view.findViewById(R.id.lifelab_item_article_title);
-            tv.setText(a.title);
-            tv = (TextView) view.findViewById(R.id.lifelab_item_article_category);
-            tv.setText(a.wewow_category);
-            return view;
-        }
+                TextView tv = (TextView) view.findViewById(R.id.lifelab_item_group_title);
+                tv.setText(LifeLabItemActivity.this.lcd.getArticleGroup(i));
+                return view;
+            }
 
-        @Override
-        public boolean isChildSelectable(int i, int i1) {
-            return false;
-        }
+            @Override
+            public View getChildView(int i, int i1, boolean b, View view, ViewGroup viewGroup) {
+                if (view == null) {
+                    view = View.inflate(LifeLabItemActivity.this, R.layout.lifelab_item_article, null);
+                }
+                String group = LifeLabItemActivity.this.lcd.getArticleGroup(i);
+                LabCollectionDetail.Article a = LifeLabItemActivity.this.lcd.getArticle(group, i1);
+                view.setBackgroundColor(i1 % 2 == 0 ? Color.rgb(252, 230, 194) : Color.WHITE);
+                final ImageView iv = (ImageView) view.findViewById(R.id.lifelab_item_article_img);
+                new RemoteImageLoader(LifeLabItemActivity.this, a.image_320_160, new RemoteImageLoader.RemoteImageListener() {
+                    @Override
+                    public void onRemoteImageAcquired(Drawable dr) {
+                        BitmapDrawable old = (BitmapDrawable) iv.getDrawable();
+                        iv.setImageDrawable(dr);
+                        if (old != null) {
+                            old.getBitmap().recycle();
+                        }
+                    }
+                });
+                TextView tv = (TextView) view.findViewById(R.id.lifelab_item_article_title);
+                tv.setText(a.title);
+                tv = (TextView) view.findViewById(R.id.lifelab_item_article_category);
+                tv.setText(a.wewow_category);
+                return view;
+            }
 
-    };
-*/
+            @Override
+            public boolean isChildSelectable(int i, int i1) {
+                return false;
+            }
+
+        };
+    */
     private static class LabCollectionDetail {
 
         private LabCollectionDetail() {
