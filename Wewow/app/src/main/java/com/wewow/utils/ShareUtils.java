@@ -66,7 +66,7 @@ public class ShareUtils {
         Intent intent = new Intent(this.context, ShareActivity.class);
         intent.putExtra(ShareActivity.SHARE_TYPE, type.ordinal());
         intent.putExtra(ShareActivity.SHARE_CONTEXT, this.content);
-        intent.putExtra(ShareActivity.SHARE_URL, this.url);
+        intent.putExtra(ShareActivity.SHARE_URL, this.url == null ? "" : this.url);
         if (this.picture != null) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             this.picture.compress(Bitmap.CompressFormat.PNG, 100, baos);
