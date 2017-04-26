@@ -25,6 +25,7 @@ import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
 import com.wewow.utils.ProgressDialogUtil;
 import com.wewow.utils.RemoteImageLoader;
+import com.wewow.utils.ShareUtils;
 import com.wewow.utils.Utils;
 import com.wewow.utils.WebAPIHelper;
 
@@ -85,6 +86,22 @@ public class ArticleActivity extends AppCompatActivity {
         this.logo = (ImageView) this.findViewById(R.id.article_logo);
         this.discuzContainer = (LinearLayout) this.findViewById(R.id.article_discuss_container);
         this.setupFeedback();
+        this.findViewById(R.id.article_share).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ShareUtils su = new ShareUtils(ArticleActivity.this);
+                if (ArticleActivity.this.data == null) {
+                    return;
+                }
+                su.setUrl(ArticleActivity.this.data.optString("share_link"));
+                su.setContent(ArticleActivity.this.data.optString("title"));
+                BitmapDrawable bd = (BitmapDrawable) ArticleActivity.this.logo.getDrawable();
+                if (bd != null) {
+                    su.setPicture(bd.getBitmap());
+                }
+                su.share();
+            }
+        });
         this.findViewById(R.id.share_weibo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
