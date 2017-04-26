@@ -183,12 +183,19 @@ public class ShareActivity extends Activity implements IWeiboHandler.Response {
     private void shareWechat(int type) {
         String content = this.intent.getStringExtra(SHARE_CONTEXT);
         String url = this.intent.hasExtra(SHARE_URL) ? this.intent.getStringExtra(SHARE_URL) : "";
-        WXWebpageObject wpobj = new WXWebpageObject();
-        wpobj.webpageUrl = url;
+        WXMediaMessage.IMediaObject iobj = null;
+        if (!url.isEmpty()) {
+            WXWebpageObject wpobj = new WXWebpageObject();
+            wpobj.webpageUrl = url;
+            iobj = wpobj;
+        } else {
+            WXTextObject tobj = new WXTextObject(content);
+            iobj = tobj;
+        }
         WXMediaMessage msg = new WXMediaMessage();
         msg.title = content;
         msg.description = content;
-        msg.mediaObject = wpobj;
+        msg.mediaObject = iobj;
         if (this.intent.hasExtra(SHARE_IMAGE)) {
             byte[] buf = this.intent.getByteArrayExtra(SHARE_IMAGE);
             while (buf.length > WXMediaMessage.THUMB_LENGTH_LIMIT) {
