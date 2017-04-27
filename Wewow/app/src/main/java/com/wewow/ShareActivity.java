@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.sina.weibo.sdk.api.ImageObject;
@@ -35,7 +36,7 @@ import com.wewow.utils.Utils;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class ShareActivity extends AppCompatActivity implements IWeiboHandler.Response {
+public class ShareActivity extends Activity implements IWeiboHandler.Response {
 
     private static final String TAG = "ShareActivity";
     public static final String SHARE_TYPE = "SHARE_TYPE";
@@ -49,7 +50,6 @@ public class ShareActivity extends AppCompatActivity implements IWeiboHandler.Re
     public static final String SHARE_CONTEXT = "SHARE_CONTEXT";
     public static final String SHARE_IMAGE = "SHARE_IMAGE";
     private IWeiboShareAPI api;
-
 
     private int shareType;
     private Intent intent;
@@ -67,16 +67,16 @@ public class ShareActivity extends AppCompatActivity implements IWeiboHandler.Re
                 this.setupUI();
                 break;
             case SHARE_TYPE_WEIBO:
-                this.shareWeibo(this.intent);
+                this.shareWeibo();
                 break;
             case SHARE_TYPE_COPY_LINK:
-                this.shareLink(this.intent);
+                this.shareLink();
                 break;
             case SHARE_TYPE_WECHAT_CIRCLE:
-                this.shareWechatCircle(this.intent);
+                this.shareWechatCircle();
                 break;
             case SHARE_TYPE_WECHAT_FRIEND:
-                this.shareWechatFriend(this.intent);
+                this.shareWechatFriend();
                 break;
             case SHARE_TYPE_UNKNOWN:
             default:
@@ -91,23 +91,52 @@ public class ShareActivity extends AppCompatActivity implements IWeiboHandler.Re
     }
 
     private void setupUI() {
-
-
+        this.setContentView(R.layout.activity_share);
+        this.findViewById(R.id.share_close).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ShareActivity.this.finish();
+            }
+        });
+        this.findViewById(R.id.share_weibo).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ShareActivity.this.shareWeibo();
+            }
+        });
+        this.findViewById(R.id.share_copylink).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ShareActivity.this.shareLink();
+            }
+        });
+        this.findViewById(R.id.share_wechat_friend).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ShareActivity.this.shareWechatFriend();
+            }
+        });
+        this.findViewById(R.id.share_wechat_circle).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ShareActivity.this.shareWechatCircle();
+            }
+        });
     }
 
-    private void shareWeibo(Intent dataIntent) {
+    private void shareWeibo() {
         this.api.registerApp();
         WeiboMultiMessage msg = new WeiboMultiMessage();
-        String url = dataIntent.hasExtra(SHARE_URL) ? dataIntent.getStringExtra(SHARE_URL) : "";
-        if (dataIntent.hasExtra(SHARE_IMAGE)) {
-            byte[] buf = dataIntent.getByteArrayExtra(SHARE_IMAGE);
+        String url = this.intent.hasExtra(SHARE_URL) ? this.intent.getStringExtra(SHARE_URL) : "";
+        if (this.intent.hasExtra(SHARE_IMAGE)) {
+            byte[] buf = this.intent.getByteArrayExtra(SHARE_IMAGE);
             Bitmap bm = BitmapFactory.decodeByteArray(buf, 0, buf.length);
             ImageObject iobj = new ImageObject();
             iobj.setImageObject(bm);
             msg.imageObject = iobj;
         }
         msg.textObject = new TextObject();
-        msg.textObject.text = String.format("%s %s", dataIntent.getStringExtra(SHARE_CONTEXT), url);
+        msg.textObject.text = String.format("%s %s", this.intent.getStringExtra(SHARE_CONTEXT), url);
         SendMultiMessageToWeiboRequest req = new SendMultiMessageToWeiboRequest();
         req.transaction = String.valueOf(System.currentTimeMillis());
         req.multiMessage = msg;
@@ -134,34 +163,41 @@ public class ShareActivity extends AppCompatActivity implements IWeiboHandler.Re
         this.finish();
     }
 
-    private void shareLink(Intent dataIntent) {
+    private void shareLink() {
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        String url = dataIntent.getStringExtra(SHARE_URL);
+        String url = this.intent.getStringExtra(SHARE_URL);
         ClipData clip = ClipData.newPlainText("", url);
         clipboard.setPrimaryClip(clip);
         Toast.makeText(this, this.getString(R.string.share_copylink_result, this.getString(R.string.share_result_succeed)), Toast.LENGTH_LONG).show();
         this.finish();
     }
 
-    private void shareWechatCircle(Intent dataIntent) {
-        this.shareWechat(dataIntent, 1);
+    private void shareWechatCircle() {
+        this.shareWechat(1);
     }
 
-    private void shareWechatFriend(Intent dataIntent) {
-        this.shareWechat(dataIntent, 0);
+    private void shareWechatFriend() {
+        this.shareWechat(0);
     }
 
-    private void shareWechat(Intent dataIntent, int type) {
-        String content = dataIntent.getStringExtra(SHARE_CONTEXT);
-        String url = dataIntent.hasExtra(SHARE_URL) ? dataIntent.getStringExtra(SHARE_URL) : "";
-        WXWebpageObject wpobj = new WXWebpageObject();
-        wpobj.webpageUrl = url;
+    private void shareWechat(int type) {
+        String content = this.intent.getStringExtra(SHARE_CONTEXT);
+        String url = this.intent.hasExtra(SHARE_URL) ? this.intent.getStringExtra(SHARE_URL) : "";
+        WXMediaMessage.IMediaObject iobj = null;
+        if (!url.isEmpty()) {
+            WXWebpageObject wpobj = new WXWebpageObject();
+            wpobj.webpageUrl = url;
+            iobj = wpobj;
+        } else {
+            WXTextObject tobj = new WXTextObject(content);
+            iobj = tobj;
+        }
         WXMediaMessage msg = new WXMediaMessage();
         msg.title = content;
         msg.description = content;
-        msg.mediaObject = wpobj;
-        if (dataIntent.hasExtra(SHARE_IMAGE)) {
-            byte[] buf = dataIntent.getByteArrayExtra(SHARE_IMAGE);
+        msg.mediaObject = iobj;
+        if (this.intent.hasExtra(SHARE_IMAGE)) {
+            byte[] buf = this.intent.getByteArrayExtra(SHARE_IMAGE);
             while (buf.length > WXMediaMessage.THUMB_LENGTH_LIMIT) {
                 double times = Math.sqrt(Math.ceil((double) buf.length / WXMediaMessage.THUMB_LENGTH_LIMIT));
                 Bitmap bm = BitmapFactory.decodeByteArray(buf, 0, buf.length);

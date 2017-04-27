@@ -68,6 +68,8 @@
     <string name="prompt_comfirmd">好</string>
     <string name="prompt_denied">不</string>
 
+    <string name="share_title">分享到</string>
+
     <!-- Home page -->
     <!-- naivgation title -->
     <string name="notlogged">尚未登录</string>

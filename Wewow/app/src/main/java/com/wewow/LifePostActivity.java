@@ -2,6 +2,7 @@ package com.wewow;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -23,6 +24,7 @@ import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
 import com.wewow.utils.ProgressDialogUtil;
 import com.wewow.utils.RemoteImageLoader;
+import com.wewow.utils.ShareUtils;
 import com.wewow.utils.Utils;
 import com.wewow.utils.WebAPIHelper;
 
@@ -88,6 +90,18 @@ public class LifePostActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Toast.makeText(LifePostActivity.this, "new Post", Toast.LENGTH_LONG).show();
+            }
+        });
+        this.findViewById(R.id.lifepost_share).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ShareUtils su = new ShareUtils(LifePostActivity.this);
+                su.setContent(LifePostActivity.this.title.getText().toString());
+                BitmapDrawable bd = (BitmapDrawable) LifePostActivity.this.contentView.getBackground();
+                if (bd != null) {
+                    su.setPicture(bd.getBitmap());
+                }
+                su.share();
             }
         });
     }
