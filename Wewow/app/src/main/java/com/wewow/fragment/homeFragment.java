@@ -11,6 +11,8 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,6 +37,8 @@ import com.wewow.DetailArtistActivity;
 import com.wewow.LifeLabItemActivity;
 import com.wewow.R;
 import com.wewow.adapter.ListViewAdapter;
+import com.wewow.adapter.RecycleViewArtistsOfHomePageAdapter;
+import com.wewow.adapter.RecycleViewArtistsOfSearchResultAdapter;
 import com.wewow.dto.Artist;
 import com.wewow.dto.Banner;
 import com.wewow.dto.Institute;
@@ -74,7 +78,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private String[] dummyReadCount = {"8121", "7231"};
     private String[] dummyCollectionCount = {"1203", "1232"};
     private ListView listViewInstituteRecommended;
-    private ViewPager viewPagerLoverOfLife;
+    private RecyclerView rv;
     private SwipeRefreshLayout swipeRefreshLayout;
 
     private TextView textViewHotArtist;
@@ -187,7 +191,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         textViewRecommendedInstitute.startAnimation(moveToViewLocation(0));
 
         viewLatest.startAnimation(contentsMoveToViewLocation(100));
-        viewPagerLoverOfLife.startAnimation(contentsMoveToViewLocation(100));
+        rv.startAnimation(contentsMoveToViewLocation(100));
         listViewInstituteRecommended.startAnimation(contentsMoveToViewLocation(100));
     }
 
@@ -535,97 +539,127 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     public void setUpViewPagerLoverOfLifeDummy(View viewRoot) {
 
-        //blank view for bounce effect
-        View left = new View(viewRoot.getContext());
-        List<View> mListViews = new ArrayList<View>();
-        mListViews.add(left);
-
-        for (int i = 0; i < 3; i++) {
-            View view = getActivity().getLayoutInflater().inflate(R.layout.list_item_lover_of_life_recommended, null);
-
-            //to set data
-
-
-            mListViews.add(view);
-        }
-
-        View right = new View(viewRoot.getContext());
-        mListViews.add(right);
-        MyPagerAdapter myAdapter = new MyPagerAdapter();
-
-        myAdapter.setList(mListViews);
-        viewPagerLoverOfLife = (ViewPager) viewRoot.findViewById(R.id.viewpagerLayout);
-
-        viewPagerLoverOfLife.setAdapter(myAdapter);
-        viewPagerLoverOfLife.setCurrentItem(1);
-        viewPagerLoverOfLife.setOnPageChangeListener(new BouncePageChangeListener(
-                viewPagerLoverOfLife, mListViews));
-        viewPagerLoverOfLife.setPageMargin(getResources().getDimensionPixelSize(R.dimen.life_lover_recommended_page_margin));
-        myAdapter.notifyDataSetChanged();
+//        //blank view for bounce effect
+//        View left = new View(viewRoot.getContext());
+//        List<View> mListViews = new ArrayList<View>();
+//        mListViews.add(left);
+//
+//        for (int i = 0; i < 3; i++) {
+//            View view = getActivity().getLayoutInflater().inflate(R.layout.list_item_lover_of_life_recommended, null);
+//
+//            //to set data
+//
+//
+//            mListViews.add(view);
+//        }
+//
+//        View right = new View(viewRoot.getContext());
+//        mListViews.add(right);
+//        MyPagerAdapter myAdapter = new MyPagerAdapter();
+//
+//        myAdapter.setList(mListViews);
+//        viewPagerLoverOfLife = (ViewPager) viewRoot.findViewById(R.id.viewpagerLayout);
+//
+//        viewPagerLoverOfLife.setAdapter(myAdapter);
+//        viewPagerLoverOfLife.setCurrentItem(1);
+//        viewPagerLoverOfLife.setOnPageChangeListener(new BouncePageChangeListener(
+//                viewPagerLoverOfLife, mListViews));
+//        viewPagerLoverOfLife.setPageMargin(getResources().getDimensionPixelSize(R.dimen.life_lover_recommended_page_margin));
+//        myAdapter.notifyDataSetChanged();
 
 
     }
 
     public void setUpViewPagerLoverOfLife(final List<Artist> artists,View rootView) {
+//
+//        //blank view for bounce effect
+//        View left = new View(rootView.getContext());
+//        List<View> mListViews = new ArrayList<View>();
+////        mListViews.add(left);
+//
+//        for (int i = 0; i < artists.size(); i++) {
+//            View view = getActivity().getLayoutInflater().inflate(R.layout.list_item_lover_of_life_recommended, null);
+//            CircleImageView image = (CircleImageView) view.findViewById(R.id.imageViewIcon);
+//            Glide.with(rootView.getContext())
+//                    .load(artists.get(i).getImage())
+//                    .placeholder(R.drawable.banner_loading_spinner)
+//                    .crossFade(300)
+//                    .into(image);
+//
+//            TextView textNickName = (TextView) view.findViewById(R.id.textViewNickName);
+//            TextView textDesc = (TextView) view.findViewById(R.id.textViewDesc);
+//            TextView textArticleCount = (TextView) view.findViewById(R.id.textViewRead);
+//            TextView textFollowerCount = (TextView) view.findViewById(R.id.textViewCollection);
+//
+//            textNickName.setText(artists.get(i).getNickname());
+//            textDesc.setText(artists.get(i).getDesc());
+//
+//            textArticleCount.setText(artists.get(i).getArticle_count());
+//            textFollowerCount.setText(artists.get(i).getFollower_count());
+//            final String artistId=artists.get(i).getId();
+//
+//            //to set data
+//
+//
+//            mListViews.add(view);
+//            view.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//
+//
+//
+//                    Intent intent = new Intent(getActivity(),DetailArtistActivity.class);
+//                    intent.putExtra("id",artistId);
+//                    startActivity(intent);
+//
+//                }
+//            });
+//        }
+//
+////        View right = new View(rootView.getContext());
+////        mListViews.add(right);
+//        MyPagerAdapter myAdapter = new MyPagerAdapter();
+//
+//        myAdapter.setList(mListViews);
+//        viewPagerLoverOfLife = (ViewPager) rootView.findViewById(R.id.viewpagerLayout);
+//
+//        viewPagerLoverOfLife.setAdapter(myAdapter);
+//
+//        viewPagerLoverOfLife.setCurrentItem(0);
+//        viewPagerLoverOfLife.setOnPageChangeListener(new BouncePageChangeListener(
+//                viewPagerLoverOfLife, mListViews));
+//        viewPagerLoverOfLife.setPageMargin(getResources().getDimensionPixelSize(R.dimen.life_lover_recommended_page_margin));
+//        myAdapter.notifyDataSetChanged();
 
-        //blank view for bounce effect
-        View left = new View(rootView.getContext());
-        List<View> mListViews = new ArrayList<View>();
-        mListViews.add(left);
+
+
+        rv = (RecyclerView) view.findViewById(R.id.recyclerview_artists);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        rv.setLayoutManager(linearLayoutManager);
+
+        ArrayList<HashMap<String, Object>> listItemArtist = new ArrayList<HashMap<String, Object>>();
+
 
         for (int i = 0; i < artists.size(); i++) {
-            View view = getActivity().getLayoutInflater().inflate(R.layout.list_item_lover_of_life_recommended, null);
-            CircleImageView image = (CircleImageView) view.findViewById(R.id.imageViewIcon);
-            Glide.with(rootView.getContext())
-                    .load(artists.get(i).getImage())
-                    .placeholder(R.drawable.banner_loading_spinner)
-                    .crossFade(300)
-                    .into(image);
+            HashMap<String, Object> map = new HashMap<String, Object>();
 
-            TextView textNickName = (TextView) view.findViewById(R.id.textViewNickName);
-            TextView textDesc = (TextView) view.findViewById(R.id.textViewDesc);
-            TextView textArticleCount = (TextView) view.findViewById(R.id.textViewRead);
-            TextView textFollowerCount = (TextView) view.findViewById(R.id.textViewCollection);
+            //
 
-            textNickName.setText(artists.get(i).getNickname());
-            textDesc.setText(artists.get(i).getDesc());
+            map.put("imageView", artists.get(i).getImage());
 
-            textArticleCount.setText(artists.get(i).getArticle_count());
-            textFollowerCount.setText(artists.get(i).getFollower_count());
-            final String artistId=artists.get(i).getId();
+            map.put("textViewName", artists.get(i).getNickname());
+            map.put("textViewDesc", artists.get(i).getDesc());
+            map.put("textViewArticleCount", artists.get(i).getArticle_count());
+            map.put("textViewFollowerCount", artists.get(i).getFollower_count());
+            map.put("id",artists.get(i).getId());
 
-            //to set data
-
-
-            mListViews.add(view);
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-
-
-                    Intent intent = new Intent(getActivity(),DetailArtistActivity.class);
-                    intent.putExtra("id",artistId);
-                    startActivity(intent);
-
-                }
-            });
+            listItemArtist.add(map);
         }
 
-        View right = new View(rootView.getContext());
-        mListViews.add(right);
-        MyPagerAdapter myAdapter = new MyPagerAdapter();
+        rv.setAdapter(new RecycleViewArtistsOfHomePageAdapter(getActivity(), listItemArtist));
 
-        myAdapter.setList(mListViews);
-        viewPagerLoverOfLife = (ViewPager) rootView.findViewById(R.id.viewpagerLayout);
 
-        viewPagerLoverOfLife.setAdapter(myAdapter);
-
-        viewPagerLoverOfLife.setCurrentItem(1);
-        viewPagerLoverOfLife.setOnPageChangeListener(new BouncePageChangeListener(
-                viewPagerLoverOfLife, mListViews));
-        viewPagerLoverOfLife.setPageMargin(getResources().getDimensionPixelSize(R.dimen.life_lover_recommended_page_margin));
-        myAdapter.notifyDataSetChanged();
 
 
     }
@@ -750,15 +784,15 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
         @Override
         public void onPageScrolled(int position, float arg1, int arg2) {
-
-            if (position == 0) {
-                myViewPager.setCurrentItem(1);
-            } else if (position >= 3) {
-
-                myViewPager.setCurrentItem(3);
-
-
-            }
+//
+//            if (position == 0) {
+//                myViewPager.setCurrentItem(1);
+//            } else if (position >= 4) {
+//
+//                myViewPager.setCurrentItem(3);
+//
+//
+//            }
 
         }
 
