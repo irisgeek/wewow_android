@@ -54,7 +54,7 @@ public class RemoteImageLoader {
                             if ((result != null) && (RemoteImageLoader.this.listener != null)) {
                                 Drawable bd = RemoteImageLoader.this.getDrawableByBuffer(result);
                                 if (bd != null) {
-                                    Log.d(TAG, String.format("Succeed loading url: %s", RemoteImageLoader.this.url));
+                                    //Log.d(TAG, String.format("Succeed loading url: %s", RemoteImageLoader.this.url));
                                     RemoteImageLoader.this.saveImage(RemoteImageLoader.this.url, result);
                                     RemoteImageLoader.this.listener.onRemoteImageAcquired(bd);
                                 } else {
@@ -80,7 +80,7 @@ public class RemoteImageLoader {
     }
 
     private void saveImage(String url, byte[] buf) {
-        Log.d(TAG, String.format("saveImage %s %d bytes", url, buf.length));
+        //Log.d(TAG, String.format("saveImage %s %d bytes", url, buf.length));
         String fn = this.getImageFilePath(url);
         try {
             FileOutputStream fos = new FileOutputStream(fn);
@@ -121,7 +121,7 @@ public class RemoteImageLoader {
                 sb.append(String.format("%02X", b));
             }
             String fn = String.format("%s/%s", root.getAbsolutePath(), sb.toString());
-            Log.d(TAG, String.format("file %s for url %s", fn, url));
+            //Log.d(TAG, String.format("file %s for url %s", fn, url));
             return fn;
         } catch (NoSuchAlgorithmException e) {
             return null;
