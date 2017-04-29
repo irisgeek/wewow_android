@@ -13,11 +13,20 @@
         android:scaleType="fitXY"
         android:src="@drawable/divider" />
 
-    <ListView
-        android:id="@+id/list_lifelab"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/lifelab_swipe"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp">
 
-    </ListView>
+        <ListView
+            android:id="@+id/list_lifelab"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#ffffff"
+            android:dividerHeight="16dp">
 
+        </ListView>
+    </android.support.v4.widget.SwipeRefreshLayout>
 </LinearLayout>

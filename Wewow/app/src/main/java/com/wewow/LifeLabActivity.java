@@ -5,10 +5,12 @@ import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.HeaderViewListAdapter;
@@ -43,6 +45,8 @@ public class LifeLabActivity extends BaseActivity {
     private int page = 1;
     private static final String TAG = "LifeLabActivity";
     private LabData labData = new LabData();
+    private SwipeRefreshLayout swipe;
+    private View foot;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +58,16 @@ public class LifeLabActivity extends BaseActivity {
     }
 
     private void setupUI() {
+        this.swipe = (SwipeRefreshLayout) this.findViewById(R.id.lifelab_swipe);
+        this.foot = View.inflate(this, R.layout.lifelab_foot, null);
+        this.foot.findViewById(R.id.tv_lab_more).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LifeLabActivity.this.startDataLoading();
+            }
+        });
         this.lvlifelab = (ListView) this.findViewById(R.id.list_lifelab);
+        this.lvlifelab.addFooterView(this.foot);
         this.lvlifelab.setAdapter(new LifeLabAdapter());
         this.lvlifelab.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -66,14 +79,28 @@ public class LifeLabActivity extends BaseActivity {
                 LifeLabActivity.this.startActivity(intent);
             }
         });
-        View foot = View.inflate(this, R.layout.lifelab_foot, null);
-        foot.findViewById(R.id.tv_lab_more).setOnClickListener(new View.OnClickListener() {
+        this.lvlifelab.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
-            public void onClick(View view) {
-                LifeLabActivity.this.startDataLoading();
+            public void onScrollStateChanged(AbsListView absListView, int i) {
+                //
+            }
+
+            @Override
+            public void onScroll(AbsListView absListView, int i, int i1, int i2) {
+                //Log.d(TAG, String.format("onScroll firstVisibleItem:%d visibleItemCount:%d totalItemCount:%d", i, i1, i2));
+                if ((LifeLabActivity.this.labData.getAllCount() == 0) || LifeLabActivity.this.labData.isAllLoaded()) {
+                    LifeLabActivity.this.foot.setVisibility(View.GONE);
+                    Log.w(TAG, String.format("onScroll: allCount:%d  isAllLoaded:%b", LifeLabActivity.this.labData.getAllCount(), LifeLabActivity.this.labData.isAllLoaded()));
+                    return;
+                }
+                LifeLabActivity.this.foot.setVisibility(View.VISIBLE);
+                if (i + i1 == i2) {
+                    Log.d(TAG, "onScroll: Show refresh");
+                    LifeLabActivity.this.swipe.setRefreshing(true);
+                    LifeLabActivity.this.startDataLoading();
+                }
             }
         });
-        this.lvlifelab.addFooterView(foot);
         this.startDataLoading();
     }
 
@@ -142,6 +169,7 @@ public class LifeLabActivity extends BaseActivity {
                     @Override
                     public void taskCompletionResult(byte[] result) {
                         LifeLabActivity.this.toggleProgressDialog(false);
+                        LifeLabActivity.this.swipe.setRefreshing(false);
                         JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
                         if (jobj == null) {
                             Toast.makeText(LifeLabActivity.this, R.string.networkError, Toast.LENGTH_LONG).show();
@@ -200,6 +228,7 @@ public class LifeLabActivity extends BaseActivity {
                 this.pageCount = jobj.getInt("total_pages");
                 this.pagesize = jobj.getInt("pagesize");
                 this.currentPage = jobj.getInt("current_page");
+                this.collectionCount = jobj.getInt("collection_count");
                 JSONArray lst = jobj.getJSONArray("collection_list");
                 for (int i = 0; i < lst.length(); i++) {
                     JSONObject jj = lst.getJSONObject(i);
@@ -246,6 +275,10 @@ public class LifeLabActivity extends BaseActivity {
 
         public LabCollection get(int i) {
             return this.isItemLoaded(i) ? this.collections.get(i) : null;
+        }
+
+        public boolean isAllLoaded() {
+            return this.getCount() == this.getAllCount();
         }
     }
 
