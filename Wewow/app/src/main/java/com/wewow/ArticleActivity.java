@@ -15,7 +15,11 @@ import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.JavascriptInterface;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -33,6 +37,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 public class ArticleActivity extends AppCompatActivity {
 
@@ -43,6 +54,7 @@ public class ArticleActivity extends AppCompatActivity {
     private ImageView logo;
     private LinearLayout discuzContainer;
     private JSONObject data;
+    private ArrayList<String> pictures = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +86,22 @@ public class ArticleActivity extends AppCompatActivity {
         new HttpAsyncTask().execute(params);
     }
 
+    private class ArticleJS {
+        private Pattern imgPattern = Pattern.compile("<img\\s+src=\"(.+?)\"");
+
+        @JavascriptInterface
+        public void onGetPage(String html) {
+            //Log.d(TAG, String.format("onGetPage: %d", html.length()));
+            Matcher m = this.imgPattern.matcher(html);
+            while (m.find()) {
+                //Log.d(TAG, String.format("found image: %s", html.substring(m.start(1), m.end(1))));
+                ArticleActivity.this.pictures.add(html.substring(m.start(1), m.end(1)));
+            }
+        }
+    }
+
+    private ArticleJS js = new ArticleJS();
+
     private void setupUI() {
         this.findViewById(R.id.article_back).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,6 +111,45 @@ public class ArticleActivity extends AppCompatActivity {
         });
         this.title = (TextView) this.findViewById(R.id.article_title);
         this.content = (WebView) this.findViewById(R.id.article_content);
+        WebSettings ws = this.content.getSettings();
+        ws.setJavaScriptEnabled(true);
+        ws.setAllowContentAccess(true);
+        this.content.addJavascriptInterface(this.js, "articlejs");
+        this.content.setWebViewClient(new WebViewClient() {
+
+            @Override
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                //Log.d(TAG, "onPageStarted: " + url);
+                super.onPageStarted(view, url, favicon);
+            }
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                try {
+                    URI u = new URI(url);
+                    if (u.getScheme().equals("wewow")) {
+                        //Log.d(TAG, "shouldOverrideUrlLoading: " + u.getHost() + "  " + u.getQuery());
+                        String[] queries = u.getQuery().split("\\?");
+                        //Log.d(TAG, "clicked: " + queries[0]);
+                        int i = ArticleActivity.this.pictures.indexOf(queries[0].replace("url=", ""));
+                        Intent intent = new Intent(ArticleActivity.this, ShowImageActivity.class);
+                        intent.putExtra(ShowImageActivity.IMAGE_LIST, ArticleActivity.this.pictures);
+                        intent.putExtra(ShowImageActivity.IMAGE_INDEX, i);
+                        ArticleActivity.this.startActivity(intent);
+                        return true;
+                    }
+                    return super.shouldOverrideUrlLoading(view, url);
+                } catch (URISyntaxException e) {
+                    return true;
+                }
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                view.loadUrl("javascript:articlejs.onGetPage(document.documentElement.innerHTML);");
+            }
+        });
         this.logo = (ImageView) this.findViewById(R.id.article_logo);
         this.discuzContainer = (LinearLayout) this.findViewById(R.id.article_discuss_container);
         this.setupFeedback();
