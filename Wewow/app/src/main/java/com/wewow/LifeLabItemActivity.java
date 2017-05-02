@@ -68,12 +68,12 @@ public class LifeLabItemActivity extends Activity {
 
     private void setupUI() {
         this.container = (LinearLayout) this.findViewById(R.id.lifelab_item_container);
-        new RemoteImageLoader(this, this.lc.image, new RemoteImageLoader.RemoteImageListener() {
-            @Override
-            public void onRemoteImageAcquired(Drawable dr) {
-                LifeLabItemActivity.this.findViewById(R.id.lifelab_item_root).setBackground(dr);
-            }
-        });
+//        new RemoteImageLoader(this, this.lc.image, new RemoteImageLoader.RemoteImageListener() {
+//            @Override
+//            public void onRemoteImageAcquired(Drawable dr) {
+//                LifeLabItemActivity.this.findViewById(R.id.lifelab_item_root).setBackground(dr);
+//            }
+//        });
         TextView title = (TextView) this.findViewById(R.id.lifelab_item_title);
         title.setText(this.lc.title);
         ImageView ivback = (ImageView) this.findViewById(R.id.lifelab_item_back);
@@ -112,6 +112,12 @@ public class LifeLabItemActivity extends Activity {
 //                            LifeLabItemActivity.this.adapter.notifyDataSetChanged();
 //                            LifeLabItemActivity.this.expandAll();
                             LifeLabItemActivity.this.display();
+                            new RemoteImageLoader(LifeLabItemActivity.this, x.collection_image, new RemoteImageLoader.RemoteImageListener() {
+                                @Override
+                                public void onRemoteImageAcquired(Drawable dr) {
+                                    LifeLabItemActivity.this.findViewById(R.id.lifelab_item_root).setBackground(dr);
+                                }
+                            });
                         }
                     }
                 },

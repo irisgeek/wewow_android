@@ -30,7 +30,7 @@
 
     <!-- 生活研究所 -->
     <string name="lifelab_title">生活研究所</string>
-    <string name="lifelab_more">加载更多</string>
+    <string name="lifelab_more">...</string>
     <string name="lifelab_item_artist_title">你可能感兴趣的生活家</string>
     <string name="lifelab_item_artist_article">文章 %d</string>
     <string name="lifelab_item_artist_follower">关注者 %d</string>
@@ -163,6 +163,10 @@
 
 
     <string name="growingio_channel">wewow_android</string>
+    <string name="title_activity_show_image">ShowImageActivity</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>
