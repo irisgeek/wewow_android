@@ -341,4 +341,8 @@ public class WebAPIHelper {
         }
         return sb.toString();
     }
+
+    public static Pair<String, String> getHttpFormUrlHeader() {
+        return new Pair<String, String>("Content-Type", "application/x-www-form-urlencoded");
+    }
 }
