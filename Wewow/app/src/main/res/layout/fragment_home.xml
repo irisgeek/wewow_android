@@ -77,9 +77,9 @@
                     android:gravity="center"
                     android:text="@string/ignore"
                     android:id="@+id/textviewIgnore"
-                    android:textColor="#333631"
+                    android:textColor="#69b076"
 
-                    android:textSize="10sp" />
+                    android:textSize="12sp" />
 
                 <TextView
                     android:layout_width="75dp"
@@ -88,8 +88,8 @@
                     android:gravity="center"
                     android:text="@string/download"
                     android:id="@+id/textviewToDownload"
-                    android:textColor="#333631"
-                    android:textSize="10sp" />
+                    android:textColor="#69b076"
+                    android:textSize="12sp" />
             </LinearLayout>
 
         </android.support.v7.widget.CardView>
@@ -207,7 +207,6 @@
                 android:id="@+id/recyclerview_artists"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="12dp"
                 android:layout_centerVertical="true"
                 android:background="#f7f7f7"
                 android:scrollbars="none" />
