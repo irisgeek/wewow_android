@@ -13,6 +13,7 @@ import android.os.Parcelable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
@@ -20,6 +21,7 @@ import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.wewow.dto.LabCollection;
 import com.wewow.utils.CommonUtilities;
@@ -54,6 +56,7 @@ public class LifeLabItemActivity extends Activity {
     private ExpandableListView lvArticles;
     private LinearLayout container;
     private BitmapDrawable picture;
+    private ImageView like;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +99,47 @@ public class LifeLabItemActivity extends Activity {
                     su.setPicture(LifeLabItemActivity.this.picture.getBitmap());
                 }
                 su.share();
+            }
+        });
+        this.like = (ImageView) this.findViewById(R.id.lifelab_fav);
+        this.like.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Drawable.ConstantState notliked = LifeLabItemActivity.this.getResources().getDrawable(R.drawable.favourite_b).getConstantState();
+                Drawable.ConstantState currentlike = LifeLabItemActivity.this.like.getDrawable().getConstantState();
+                final Integer like = notliked.equals(currentlike) ? 1 : 0;
+                ArrayList<Pair<String, String>> fields = new ArrayList<Pair<String, String>>();
+                UserInfo ui = UserInfo.getCurrentUser(LifeLabItemActivity.this);
+                fields.add(new Pair<String, String>("user_id", ui.getId().toString()));
+                fields.add(new Pair<String, String>("token", ui.getToken()));
+                fields.add(new Pair<String, String>("item_type", "collection"));
+                fields.add(new Pair<String, String>("item_id", String.valueOf(LifeLabItemActivity.this.lc.id)));
+                fields.add(new Pair<String, String>("like", like.toString()));
+                ArrayList<Pair<String, String>> headers = new ArrayList<Pair<String, String>>();
+                headers.add(WebAPIHelper.getHttpFormUrlHeader());
+                Object[] params = new Object[]{
+                        String.format("%s/like", CommonUtilities.WS_HOST),
+                        new HttpAsyncTask.TaskDelegate() {
+                            @Override
+                            public void taskCompletionResult(byte[] result) {
+                                JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
+                                try {
+                                    int i = jobj.getJSONObject("result").getInt("code");
+                                    if (i != 0) {
+                                        throw new Exception(String.valueOf(i));
+                                    }
+                                    LifeLabItemActivity.this.like.setImageDrawable(LifeLabItemActivity.this.getResources().getDrawable(like == 1 ? R.drawable.favourite : R.drawable.favourite_b));
+                                } catch (Exception e) {
+                                    Log.e(TAG, String.format("favourite fail: %s", e.getMessage()));
+                                    Toast.makeText(LifeLabItemActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        },
+                        WebAPIHelper.HttpMethod.POST,
+                        WebAPIHelper.buildHttpQuery(fields).getBytes(),
+                        headers
+                };
+                new HttpAsyncTask().execute(params);
             }
         });
         ProgressDialogUtil.getInstance(this).showProgressDialog();
@@ -154,6 +198,7 @@ public class LifeLabItemActivity extends Activity {
             String g = this.lcd.getArticleGroup(i);
             this.addArticleView(g, groupParams, articleParams);
         }
+        this.like.setImageDrawable(this.getResources().getDrawable(this.lcd.liked ? R.drawable.favourite : R.drawable.favourite_b));
     }
 
     private void addArticleView(String group, LinearLayout.LayoutParams groupParams, LinearLayout.LayoutParams articleParams) {
@@ -414,6 +459,7 @@ public class LifeLabItemActivity extends Activity {
         public String share_link;
         public String share_title;
         public String liked_count;
+        public boolean liked;
 
         public static LabCollectionDetail parse(JSONObject jobj) {
             try {
@@ -425,6 +471,7 @@ public class LifeLabItemActivity extends Activity {
                 lcd.daily_topic_section = data.getString("daily_topic_section");
                 lcd.editor = data.getString("editor");
                 lcd.share_link = data.getString("share_link");
+                lcd.liked = data.optString("liked").equals("0") ? false : true;
                 JSONArray jarticles = data.getJSONArray("article_list");
                 for (int i = 0; i < jarticles.length(); i++) {
                     Article article = parseArticle(jarticles.getJSONObject(i));
