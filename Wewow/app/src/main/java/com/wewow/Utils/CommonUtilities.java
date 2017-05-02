@@ -8,6 +8,7 @@ public class CommonUtilities {
     public static final String REQUEST_KEY="";
     public static final String REQUEST_HEADER_PREFIX="Wewow/Android";
     public static final String SUCCESS="success";
+    public static final String DATE="date";
 
     public static final String NETWORK_STATE="network_state";
 
@@ -52,4 +53,6 @@ public class CommonUtilities {
 
     public static final String WX_AppID = "wx30a31e723d2983a2";
     public static final String WX_AppSecret = "2eb4be156bb3d655489c3cf5d93e0187";
+
+    public static final String SHARE_URL="https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzI2MzEyOTkyNQ==&scene=110#wechat_redirect";
 }

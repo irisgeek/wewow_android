@@ -168,5 +168,6 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
-
+    <string name="ads">广告</string>
+    <string name="share_text">生活进阶指南</string>
 </resources>

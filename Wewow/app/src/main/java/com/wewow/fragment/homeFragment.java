@@ -2,7 +2,6 @@ package com.wewow.fragment;
 
 import android.content.Intent;
 import android.os.Handler;
-import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -21,7 +20,6 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
-import android.view.animation.Interpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -36,20 +34,19 @@ import com.bumptech.glide.Glide;
 import com.wewow.DetailArtistActivity;
 import com.wewow.LifeLabItemActivity;
 import com.wewow.R;
+import com.wewow.WebPageActivity;
 import com.wewow.adapter.ListViewAdapter;
 import com.wewow.adapter.RecycleViewArtistsOfHomePageAdapter;
-import com.wewow.adapter.RecycleViewArtistsOfSearchResultAdapter;
+import com.wewow.dto.Ads;
 import com.wewow.dto.Artist;
-import com.wewow.dto.Banner;
 import com.wewow.dto.Institute;
 import com.wewow.dto.LabCollection;
-import com.wewow.dto.collectionCategory;
+import com.wewow.dto.Notification;
 import com.wewow.netTask.ITask;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.FileCacheUtil;
 import com.wewow.utils.SettingUtils;
 import com.wewow.utils.Utils;
-import com.wewow.view.CircleImageView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -59,8 +56,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -81,12 +76,21 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private RecyclerView rv;
     private SwipeRefreshLayout swipeRefreshLayout;
 
+    private CardView cardViewNewVersionAvailable;
+    private CardView cardViewAds;
+
     private TextView textViewHotArtist;
     private TextView textViewLatest;
     private TextView textViewRecommendedInstitute;
+
+    private TextView textViewAds;
+    private TextView textViewAdsIgnore;
     private CardView viewLatest;
+
     private int requestSentCount = 0;
     private View view;
+    private boolean isNotificationShow = false;
+    private boolean isAdsShow = false;
 
 
     public homeFragment() {
@@ -104,7 +108,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        view= inflater.inflate(R.layout.fragment_home, container, false);
+        view = inflater.inflate(R.layout.fragment_home, container, false);
         initData(view);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(this);
@@ -168,7 +172,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            setUpRecommendArtistsAndInstitute(institutes,artists,true,view);
+            setUpRecommendArtistsAndInstitute(institutes, artists, true, view);
         }
     }
 
@@ -181,7 +185,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            setUpLatestInstitue(institute,true,view);
+            setUpLatestInstitue(institute, true, view);
         }
     }
 
@@ -193,14 +197,55 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         viewLatest.startAnimation(contentsMoveToViewLocation(100));
         rv.startAnimation(contentsMoveToViewLocation(100));
         listViewInstituteRecommended.startAnimation(contentsMoveToViewLocation(100));
+
+        if(isNotificationShow)
+        {
+            cardViewNewVersionAvailable.startAnimation(contentsMoveToViewLocation(100));
+        }
+        if(isAdsShow)
+        {
+            cardViewAds.startAnimation(contentsMoveToViewLocation(100));
+        }
     }
+
 
     private void initData(View view) {
 
         textViewHotArtist = (TextView) view.findViewById(R.id.textViewPopularArtist);
         textViewLatest = (TextView) view.findViewById(R.id.textViewLatest);
         textViewRecommendedInstitute = (TextView) view.findViewById(R.id.textViewSelectedInstitute);
-        viewLatest = (CardView)view.findViewById(R.id.cardViewLatest);
+        viewLatest = (CardView) view.findViewById(R.id.cardViewLatest);
+
+        cardViewNewVersionAvailable = (CardView) view.findViewById(R.id.cardViewNewVersionAvailable);
+        cardViewAds = (CardView) view.findViewById(R.id.ads);
+
+        rv = (RecyclerView) view.findViewById(R.id.recyclerview_artists);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        rv.setLayoutManager(linearLayoutManager);
+
+        listViewInstituteRecommended = (ListView) view.findViewById(R.id.listViewSelectedInstitute);
+
+        textViewAds=(TextView) view.findViewById(R.id.textviewAds);
+        textViewAdsIgnore=(TextView) view.findViewById(R.id.textviewAdsIgnore);
+
+        textViewAds.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                textViewAdsIgnore.setVisibility(View.VISIBLE);
+
+            }
+        });
+        textViewAdsIgnore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cardViewAds.setVisibility(View.GONE);
+                textViewAdsIgnore.setVisibility(View.GONE);
+                textViewAds.setVisibility(View.GONE);
+
+            }
+        });
+
 
 
     }
@@ -222,13 +267,15 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                         swipeRefreshLayout.setRefreshing(false);
 
                     } else {
+
+
                         JSONObject jsonObject = new JSONObject(realData);
                         String cacheUpdatedTimeStamp = jsonObject
                                 .getJSONObject("result")
                                 .getJSONObject("data")
                                 .getString("update_at");
 
-                        long cacheUpdatedTime = (long)(Double.parseDouble(cacheUpdatedTimeStamp) * 1000);
+                        long cacheUpdatedTime = (long) (Double.parseDouble(cacheUpdatedTimeStamp) * 1000);
 
                         boolean isCacheDataOutdated = FileCacheUtil
                                 .isCacheDataFailure(CommonUtilities.CACHE_FILE_LATEST_INSTITUTE, getActivity(), cacheUpdatedTime);
@@ -249,6 +296,10 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                         } else {
                             setUpRecommendedArtistsAndInstituesFromCache(view);
                         }
+
+                        getNotificationInfoFromServer();
+                        getAdsInfoFromServer();
+
 
                     }
 
@@ -276,6 +327,225 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     }
 
+    private void getAdsInfoFromServer() {
+
+        requestSentCount++;
+        ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
+        iTask.ads(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(getActivity()), new Callback<JSONObject>() {
+
+            @Override
+            public void success(JSONObject object, Response response) {
+                Ads ads = new Ads();
+
+                try {
+                    String realData = Utils.convertStreamToString(response.getBody().in());
+                    if (!realData.contains(CommonUtilities.SUCCESS)) {
+                        Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+                        swipeRefreshLayout.setRefreshing(false);
+
+                    } else if (realData.contains("content")) {
+                        isAdsShow = true;
+                        ads = parseAdsFromString(realData);
+                        setUpAds(ads, view);
+                    }
+                    else{
+                        requestSentCount--;
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+                    swipeRefreshLayout.setRefreshing(false);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.i("MainActivity", "request banner failed: " + error.toString());
+                Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+                swipeRefreshLayout.setRefreshing(false);
+
+            }
+        });
+    }
+
+    private void setUpAds(final Ads adsItem, View view) {
+        TextView textViewAdsTitle=(TextView)view.findViewById(R.id.textViewAdsTitle);
+        TextView textViewContent=(TextView)view.findViewById(R.id.textViewAdsContent);
+
+        ImageView imageAdsBg=(ImageView)view.findViewById(R.id.imageViewAdsBg);
+
+        textViewAdsTitle.setText(adsItem.getTitle());
+        textViewContent.setText(adsItem.getContent());
+        Glide.with(view.getContext())
+                .load(adsItem.getImage())
+                .placeholder(R.drawable.banner_loading_spinner)
+                .crossFade(300)
+                .into(imageAdsBg);
+        cardViewAds.setVisibility(View.VISIBLE);
+        textViewAds.setVisibility(View.VISIBLE);
+
+
+        requestSentCount--;
+
+        if (requestSentCount == 0 ) {
+            swipeRefreshLayout.setRefreshing(false);
+            LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.layoutHome);
+            linearLayout.setVisibility(View.VISIBLE);
+
+            startAnimation();
+
+        }
+        cardViewAds.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), WebPageActivity.class);
+                intent.putExtra("url",adsItem.getTarget());
+                startActivity(intent);
+
+            }
+        });
+
+    }
+
+    private Ads parseAdsFromString(String realData) throws JSONException {
+
+
+        JSONObject object = new JSONObject(realData);
+        JSONObject result = object.getJSONObject("result").getJSONObject("data");
+
+        Ads ads = new Ads();
+        ads.setId(result.getString("id"));
+        ads.setImage(result.getString("image"));
+        ads.setContent(result.getString("content"));
+        ads.setTarget(result.getString("target"));
+        ads.setTitle(result.getString("title"));
+        ads.setType(result.getString("type"));
+
+        return ads;
+    }
+
+    private void setUpNotification(final Notification notification, View view) {
+
+        TextView textViewAdsTitle=(TextView)view.findViewById(R.id.textViewNewVersionTitle);
+        TextView textViewContent=(TextView)view.findViewById(R.id.textViewDownloadContent);
+        TextView textViewIgnore=(TextView)view.findViewById(R.id.textviewIgnore);
+        TextView textViewToDownload=(TextView)view.findViewById(R.id.textviewToDownload);
+
+        textViewIgnore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                cardViewNewVersionAvailable.setVisibility(View.GONE);
+            }
+        });
+
+        textViewToDownload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), WebPageActivity.class);
+                intent.putExtra("url",notification.getAction_url());
+                startActivity(intent);
+
+            }
+        });
+        textViewIgnore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cardViewNewVersionAvailable.setVisibility(View.GONE);
+            }
+        });
+
+        textViewAdsTitle.setText(notification.getTitle());
+        textViewContent.setText(notification.getText());
+
+        cardViewNewVersionAvailable.setVisibility(View.VISIBLE);
+
+        requestSentCount--;
+
+        if (requestSentCount == 0) {
+            swipeRefreshLayout.setRefreshing(false);
+            LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.layoutHome);
+            linearLayout.setVisibility(View.VISIBLE);
+
+            startAnimation();
+
+        }
+
+
+    }
+
+    private Notification parseNotificationFromString(String realData) throws JSONException {
+
+        JSONObject object = new JSONObject(realData);
+        JSONObject result = object.getJSONObject("result").getJSONObject("data");
+
+        Notification notification = new Notification();
+        notification.setId(result.getString("id"));
+        notification.setImage(result.getString("image"));
+        notification.setDate(result.getString("date"));
+        notification.setAction(result.getString("action"));
+        notification.setTitle(result.getString("title"));
+        notification.setAction_url(result.getString("action_url"));
+        notification.setText(result.getString("text"));
+
+        return notification;
+    }
+
+    private void getNotificationInfoFromServer() {
+
+        requestSentCount++;
+        ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
+        iTask.notification(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(getActivity()), new Callback<JSONObject>() {
+
+            @Override
+            public void success(JSONObject object, Response response) {
+                Notification notification = new Notification();
+
+                try {
+                    String realData = Utils.convertStreamToString(response.getBody().in());
+                    if (!(realData.contains(CommonUtilities.SUCCESS)||realData.contains("sucess"))) {
+                        Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+                        swipeRefreshLayout.setRefreshing(false);
+
+                    } else if (realData.contains(CommonUtilities.DATE)) {
+                        isNotificationShow = true;
+                        notification = parseNotificationFromString(realData);
+                        setUpNotification(notification, view);
+
+                    }
+                    else{
+                        requestSentCount--;
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+                    swipeRefreshLayout.setRefreshing(false);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.i("MainActivity", "request banner failed: " + error.toString());
+                Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+                swipeRefreshLayout.setRefreshing(false);
+
+            }
+        });
+
+    }
+
 
     private void getLatestInstituteFromServer() {
         swipeRefreshLayout.setRefreshing(true);
@@ -296,7 +566,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     } else {
                         institute = parseInstituteFromString(realData);
                         FileCacheUtil.setCache(realData, getActivity(), CommonUtilities.CACHE_FILE_LATEST_INSTITUTE, 0);
-                        setUpLatestInstitue(institute,false,view);
+                        setUpLatestInstitue(institute, false, view);
 
                     }
 
@@ -348,7 +618,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                         institutes = parseInstituteListFromString(realData);
                         artists = parseArtistsListFromString(realData);
 
-                        setUpRecommendArtistsAndInstitute(institutes, artists,false,view);
+                        setUpRecommendArtistsAndInstitute(institutes, artists, false, view);
 
                     }
 
@@ -375,13 +645,13 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         });
     }
 
-    private void setUpRecommendArtistsAndInstitute(List<Institute> institutes, List<Artist> artists,boolean isFromCache,View view) {
-        setUpViewPagerLoverOfLife(artists,view);
-        setUpListViewInstituteRecommend(institutes,view);
+    private void setUpRecommendArtistsAndInstitute(List<Institute> institutes, List<Artist> artists, boolean isFromCache, View view) {
+        setUpViewPagerLoverOfLife(artists, view);
+        setUpListViewInstituteRecommend(institutes, view);
 
         requestSentCount--;
 
-        if (requestSentCount == 0||isFromCache) {
+        if (requestSentCount == 0 || isFromCache) {
             swipeRefreshLayout.setRefreshing(false);
             LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.layoutHome);
             linearLayout.setVisibility(View.VISIBLE);
@@ -438,7 +708,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     }
 
 
-    private void setUpLatestInstitue(final Institute institue ,boolean isFromCache,View view) {
+    private void setUpLatestInstitue(final Institute institue, boolean isFromCache, View view) {
 
         ImageView imageView = (ImageView) view.findViewById(R.id.imageViewLatestInstitue);
         Glide.with(view.getContext())
@@ -450,30 +720,33 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         TextView textViewNum = (TextView) view.findViewById(R.id.textViewNum);
         textViewNum.setText(getActivity().getResources().getString(R.string.number_refix) + institue.getOrder());
 
-        TextView textViewTitle = (TextView)view.findViewById(R.id.textViewTitle);
+        TextView textViewTitle = (TextView) view.findViewById(R.id.textViewTitle);
         textViewTitle.setText(institue.getTitle());
 
-        TextView textViewReadCount = (TextView)view.findViewById(R.id.textViewRead);
+        TextView textViewReadCount = (TextView) view.findViewById(R.id.textViewRead);
         textViewReadCount.setText(institue.getRead_count());
 
-        TextView textViewCollectionCount = (TextView)view.findViewById(R.id.textViewCollection);
+        TextView textViewCollectionCount = (TextView) view.findViewById(R.id.textViewCollection);
         textViewCollectionCount.setText(institue.getLiked_count());
         requestSentCount--;
 
-        if (requestSentCount == 0||isFromCache) {
+        if (requestSentCount == 0 || isFromCache) {
             swipeRefreshLayout.setRefreshing(false);
+            LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.layoutHome);
+            linearLayout.setVisibility(View.VISIBLE);
+
+            startAnimation();
 
         }
-
-        CardView cardView=(CardView)view.findViewById(R.id.cardViewLatest);
+        CardView cardView = (CardView) view.findViewById(R.id.cardViewLatest);
         cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 LabCollection lc = new LabCollection();
-                lc.image=institue.getImage();
-                lc.title=institue.getTitle();
-                lc.id=Long.parseLong(institue.getId());
+                lc.image = institue.getImage();
+                lc.title = institue.getTitle();
+                lc.id = Long.parseLong(institue.getId());
                 Intent intent = new Intent(getActivity(), LifeLabItemActivity.class);
                 intent.putExtra(LifeLabItemActivity.LIFELAB_COLLECTION, lc);
 
@@ -570,7 +843,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     }
 
-    public void setUpViewPagerLoverOfLife(final List<Artist> artists,View rootView) {
+    public void setUpViewPagerLoverOfLife(final List<Artist> artists, View rootView) {
 //
 //        //blank view for bounce effect
 //        View left = new View(rootView.getContext());
@@ -633,10 +906,6 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
 
 
-        rv = (RecyclerView) view.findViewById(R.id.recyclerview_artists);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
-        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        rv.setLayoutManager(linearLayoutManager);
 
         ArrayList<HashMap<String, Object>> listItemArtist = new ArrayList<HashMap<String, Object>>();
 
@@ -652,13 +921,27 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             map.put("textViewDesc", artists.get(i).getDesc());
             map.put("textViewArticleCount", artists.get(i).getArticle_count());
             map.put("textViewFollowerCount", artists.get(i).getFollower_count());
-            map.put("id",artists.get(i).getId());
+            map.put("id", artists.get(i).getId());
 
             listItemArtist.add(map);
         }
 
-        rv.setAdapter(new RecycleViewArtistsOfHomePageAdapter(getActivity(), listItemArtist));
 
+        RecycleViewArtistsOfHomePageAdapter adapterArtists= new RecycleViewArtistsOfHomePageAdapter(getActivity(), listItemArtist);
+
+        adapterArtists.setOnItemClickListener(new RecycleViewArtistsOfHomePageAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                final String artistId=artists.get(position).getId();
+
+                    Intent intent = new Intent(getActivity(),DetailArtistActivity.class);
+                    intent.putExtra("id",artistId);
+                    startActivity(intent);
+
+            }
+
+        });
+        rv.setAdapter(adapterArtists);
 
 
 
@@ -699,9 +982,9 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         swipeRefreshLayout.setRefreshing(false);
     }
 
-    public void setUpListViewInstituteRecommend(List<Institute> institutes,View rootView) {
+    public void setUpListViewInstituteRecommend(List<Institute> institutes, View rootView) {
 
-        listViewInstituteRecommended = (ListView) rootView.findViewById(R.id.listViewSelectedInstitute);
+
 
         ArrayList<HashMap<String, Object>> listItem = new ArrayList<HashMap<String, Object>>();
 
@@ -716,7 +999,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             map.put("textViewTitle", institutes.get(i).getTitle());
             map.put("textViewRead", institutes.get(i).getRead_count());
             map.put("textViewCollection", institutes.get(i).getLiked_count());
-            map.put("id",institutes.get(i).getId());
+            map.put("id", institutes.get(i).getId());
 
             listItem.add(map);
         }
@@ -734,11 +1017,11 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 LabCollection lc = new LabCollection();
-               HashMap<String,Object> map=(HashMap < String, Object >)parent.getAdapter().getItem(position);
+                HashMap<String, Object> map = (HashMap<String, Object>) parent.getAdapter().getItem(position);
 
-                lc.image=map.get("imageView").toString();
-                lc.title=map.get("textViewTitle").toString();
-                lc.id=Long.parseLong(map.get("id").toString());
+                lc.image = map.get("imageView").toString();
+                lc.title = map.get("textViewTitle").toString();
+                lc.id = Long.parseLong(map.get("id").toString());
                 Intent intent = new Intent(getActivity(), LifeLabItemActivity.class);
                 intent.putExtra(LifeLabItemActivity.LIFELAB_COLLECTION, lc);
 

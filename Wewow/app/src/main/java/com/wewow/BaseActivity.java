@@ -34,6 +34,9 @@ package com.wewow;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.design.widget.NavigationView;
@@ -64,6 +67,7 @@ import com.wewow.netTask.ITask;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.DataCleanUtils;
 import com.wewow.utils.FileCacheUtil;
+import com.wewow.utils.ShareUtils;
 import com.wewow.utils.Utils;
 
 import org.json.JSONArray;
@@ -362,6 +366,16 @@ public class BaseActivity extends ActionBarActivity {
                     Intent intentAbout = new Intent(BaseActivity.this, AboutActivity.class);
                     BaseActivity.this.startActivity(intentAbout);
                     break;
+
+                case 9:
+                    ShareUtils su = new ShareUtils(BaseActivity.this);
+                    su.setUrl(CommonUtilities.SHARE_URL);
+                    su.setContent(getResources().getString(R.string.share_text));
+                    Bitmap bmp= BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+                    su.setPicture(bmp);
+                    su.share();
+                    break;
+
                 case 10:
                     //clear cache
                     DataCleanUtils.cleanAllApplicationData(BaseActivity.this);

@@ -664,8 +664,8 @@ public class MainActivity extends BaseActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 Toast.makeText(MainActivity.this, query, Toast.LENGTH_SHORT).show();
-                LinearLayout layout = (LinearLayout) findViewById(R.id.layoutCover);
-                layout.setVisibility(View.GONE);
+//                LinearLayout layout = (LinearLayout) findViewById(R.id.layoutCover);
+//                layout.setVisibility(View.GONE);
 
                 Intent intentSearch= new Intent(MainActivity.this,SearchResultActivity.class);
                 intentSearch.putExtra("key_word",query);
@@ -694,8 +694,8 @@ public class MainActivity extends BaseActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.search) {
-            LinearLayout layout = (LinearLayout) findViewById(R.id.layoutCover);
-            layout.setVisibility(View.VISIBLE);
+//            LinearLayout layout = (LinearLayout) findViewById(R.id.layoutCover);
+//            layout.setVisibility(View.VISIBLE);
             return true;
         }
 

@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.wewow.adapter.ListViewArtistsAdapter;
 import com.wewow.adapter.RecycleViewArticlesOfArtistDetail;
+import com.wewow.adapter.RecycleViewArtistsOfHomePageAdapter;
 import com.wewow.dto.Article;
 import com.wewow.dto.Artist;
 import com.wewow.dto.ArtistDetail;
@@ -235,15 +236,13 @@ public class DetailArtistActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
 
-                if(followed.equals("1"))
-                {
+                if (followed.equals("1")) {
                     imageViewSubscribe.setImageResource(R.drawable.subscribe);
-                }
-                else {
+                } else {
                     imageViewSubscribe.setImageResource(R.drawable.subscribed);
                 }
 
-                postFollowToServer(followed);
+
             }
         });
 
@@ -252,7 +251,7 @@ public class DetailArtistActivity extends BaseActivity {
 
 
         ArrayList<HashMap<String, Object>> listItem = new ArrayList<HashMap<String, Object>>();
-        List<Article> articles=artist.getArticles();
+        final  List<Article> articles=artist.getArticles();
 
 
         for (int i = 0; i < articles.size(); i++) {
@@ -268,17 +267,29 @@ public class DetailArtistActivity extends BaseActivity {
         }
         RecyclerView rv = (RecyclerView) findViewById(R.id.recyclerview);
         rv.setLayoutManager(new LinearLayoutManager(rv.getContext()));
-        rv.setAdapter(new RecycleViewArticlesOfArtistDetail(this,
-                listItem));
+        RecycleViewArticlesOfArtistDetail adapter = new RecycleViewArticlesOfArtistDetail(this,
+                listItem);
+
+        adapter.setOnItemClickListener(new RecycleViewArticlesOfArtistDetail.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                Intent intent = new Intent(DetailArtistActivity.this, ArticleActivity.class);
+                String articleId=articles.get(position).getId();
+                intent.putExtra(ArticleActivity.ARTICLE_ID,Integer.parseInt(articleId));
+                DetailArtistActivity.this.startActivity(intent);
+
+            }
+
+        });
+        rv.setAdapter(adapter);
+
 
 
     }
 
-    private void postFollowToServer(String followed) {
 
 
 
-    }
 
     private void setUpArtistFromCache() {
 
@@ -440,6 +451,7 @@ public class DetailArtistActivity extends BaseActivity {
         artist.setImage(results.getString("image_120_120"));
         artist.setDesc(results.getString("desc"));
         artist.setFollowed(results.getString("followed"));
+
         artistDetail.setArtist(artist);
         List<Article> articles = new ArrayList<Article>();
 

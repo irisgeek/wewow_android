@@ -1,18 +1,33 @@
 package com.wewow.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.wewow.LoginActivity;
 import com.wewow.R;
+import com.wewow.UserInfo;
+import com.wewow.netTask.ITask;
+import com.wewow.utils.CommonUtilities;
+import com.wewow.utils.Utils;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Created by iris on 17/3/23.
@@ -44,7 +59,7 @@ public class ListViewArtistsAdapter extends BaseAdapter
     }
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
+        final ViewHolder holder;
         LayoutInflater inflater = LayoutInflater.from(context);
         if(convertView == null)
         {
@@ -62,7 +77,7 @@ public class ListViewArtistsAdapter extends BaseAdapter
         {
             holder = (ViewHolder)convertView.getTag();
         }
-        HashMap<String, Object> stringObjectHashMap = list.get(position);
+        final HashMap<String, Object> stringObjectHashMap = list.get(position);
         Glide.with(context)
                 .load(stringObjectHashMap.get("imageView").toString())
                 .placeholder(R.drawable.banner_loading_spinner)
@@ -75,10 +90,32 @@ public class ListViewArtistsAdapter extends BaseAdapter
         if(stringObjectHashMap.get("imageViewFollowed").toString().equals("1")) {
             holder.imageViewFollowed.setImageResource(R.drawable.followed);
 
+
+
         }
         else
         {
             holder.imageViewFollowed.setImageResource(R.drawable.follow);
+            holder.imageViewFollowed.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    holder.imageViewFollowed.setImageResource(R.drawable.followed);
+
+                    if(UserInfo.isUserLogged(context)) {
+
+                        postReadToServer(stringObjectHashMap.get("id").toString());
+                    }
+                    else
+                    {
+                        Intent i = new Intent();
+                        i.setClass(context, LoginActivity.class);
+                        context.startActivity(i);
+                    }
+
+                }
+            });
+
+
         }
 
 
@@ -87,6 +124,49 @@ public class ListViewArtistsAdapter extends BaseAdapter
 
 
 }
+
+    private void postReadToServer(String artistId) {
+
+        ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
+
+        String   userId = UserInfo.getCurrentUser(context).getId().toString();
+        String token=UserInfo.getCurrentUser(context).getToken().toString();
+        int read=1;
+
+
+        iTask.followArtist(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(context), userId, artistId, token, read, new Callback<JSONObject>() {
+
+            @Override
+            public void success(JSONObject object, Response response) {
+
+
+                try {
+                    String realData = Utils.convertStreamToString(response.getBody().in());
+                    JSONObject responseObject=new JSONObject(realData);
+
+                    if (!responseObject.getJSONObject("result").getString("code").equals("0")) {
+                        Toast.makeText(context, context.getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+
+
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(context, context.getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Toast.makeText(context, context.getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+    }
 
     static class ViewHolder
     {
