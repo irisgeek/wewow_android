@@ -13,6 +13,7 @@ import android.text.Spanned;
 import android.text.style.URLSpan;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
@@ -23,6 +24,7 @@ import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.wewow.dto.Article;
 import com.wewow.utils.CommonUtilities;
@@ -52,9 +54,11 @@ public class ArticleActivity extends AppCompatActivity {
     private TextView title;
     private WebView content;
     private ImageView logo;
+    private ImageView like;
     private LinearLayout discuzContainer;
     private JSONObject data;
     private ArrayList<String> pictures = new ArrayList<>();
+    private int id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,9 +67,14 @@ public class ArticleActivity extends AppCompatActivity {
         setContentView(R.layout.activity_article);
         this.setupUI();
         Intent i = this.getIntent();
-        int id = i.getIntExtra(ARTICLE_ID, -1);
+        this.id = i.getIntExtra(ARTICLE_ID, -1);
+        ArrayList<Pair<String, String>> fields = new ArrayList<>();
+        fields.add(new Pair<String, String>("article_id", String.valueOf(this.id)));
+        if (UserInfo.isUserLogged(this)) {
+            fields.add(new Pair<String, String>("user_id", UserInfo.getCurrentUser(this).getId().toString()));
+        }
         Object[] params = new Object[]{
-                String.format("%s/article_detail?article_id=%d", CommonUtilities.WS_HOST, id),
+                WebAPIHelper.addUrlParams(String.format("%s/article_detail", CommonUtilities.WS_HOST), fields),
                 new HttpAsyncTask.TaskDelegate() {
                     @Override
                     public void taskCompletionResult(byte[] result) {
@@ -169,6 +178,52 @@ public class ArticleActivity extends AppCompatActivity {
                 su.share();
             }
         });
+        this.like = (ImageView) this.findViewById(R.id.article_fav);
+        this.like.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!UserInfo.isUserLogged(ArticleActivity.this)) {
+                    Intent logini = new Intent(ArticleActivity.this, LoginActivity.class);
+                    ArticleActivity.this.startActivity(logini);
+                    return;
+                }
+                Drawable.ConstantState notliked = ArticleActivity.this.getResources().getDrawable(R.drawable.favourite_b).getConstantState();
+                Drawable.ConstantState currentlike = ArticleActivity.this.like.getDrawable().getConstantState();
+                final Integer like = notliked.equals(currentlike) ? 1 : 0;
+                ArrayList<Pair<String, String>> fields = new ArrayList<Pair<String, String>>();
+                UserInfo ui = UserInfo.getCurrentUser(ArticleActivity.this);
+                fields.add(new Pair<String, String>("user_id", ui.getId().toString()));
+                fields.add(new Pair<String, String>("token", ui.getToken()));
+                fields.add(new Pair<String, String>("item_type", "article"));
+                fields.add(new Pair<String, String>("item_id", String.valueOf(ArticleActivity.this.id)));
+                fields.add(new Pair<String, String>("like", like.toString()));
+                ArrayList<Pair<String, String>> headers = new ArrayList<Pair<String, String>>();
+                headers.add(WebAPIHelper.getHttpFormUrlHeader());
+                Object[] params = new Object[]{
+                        String.format("%s/like", CommonUtilities.WS_HOST),
+                        new HttpAsyncTask.TaskDelegate() {
+                            @Override
+                            public void taskCompletionResult(byte[] result) {
+                                JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
+                                try {
+                                    int i = jobj.getJSONObject("result").getInt("code");
+                                    if (i != 0) {
+                                        throw new Exception(String.valueOf(i));
+                                    }
+                                    ArticleActivity.this.like.setImageDrawable(ArticleActivity.this.getResources().getDrawable(like == 1 ? R.drawable.favourite : R.drawable.favourite_b));
+                                } catch (Exception e) {
+                                    Log.e(TAG, String.format("favourite fail: %s", e.getMessage()));
+                                    Toast.makeText(ArticleActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        },
+                        WebAPIHelper.HttpMethod.POST,
+                        WebAPIHelper.buildHttpQuery(fields).getBytes(),
+                        headers
+                };
+                new HttpAsyncTask().execute(params);
+            }
+        });
         this.findViewById(R.id.share_weibo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -228,6 +283,7 @@ public class ArticleActivity extends AppCompatActivity {
     private void fillContent(JSONObject article) {
         this.data = article;
         this.title.setText(article.optString("title", "No title"));
+        this.like.setImageDrawable(this.getResources().getDrawable(article.optInt("liked", 0) == 1 ? R.drawable.favourite : R.drawable.favourite_b));
         this.content.loadUrl(article.optString("content", "No content"));
         new RemoteImageLoader(this, article.optString("image_750_1112"), new RemoteImageLoader.RemoteImageListener() {
             @Override
