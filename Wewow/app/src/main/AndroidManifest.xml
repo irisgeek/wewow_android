@@ -134,6 +134,10 @@
         <activity
             android:name=".ShowImageActivity"
             android:label="@string/title_activity_show_image"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name=".MyCollectionActivity"
+            android:label="@string/title_activity_my_collection"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"></activity>
     </application>
 

@@ -346,6 +346,17 @@ public class BaseActivity extends ActionBarActivity {
                     }
                     break;
 
+                case 5:
+                    if (UserInfo.isUserLogged(BaseActivity.this)) {
+                        Intent intentCollection = new Intent(BaseActivity.this, MyCollectionActivity.class);
+                        BaseActivity.this.startActivity(intentCollection);
+                    } else {
+                        Intent i = new Intent();
+                        i.setClass(BaseActivity.this, LoginActivity.class);
+                        BaseActivity.this.startActivityForResult(i, LoginActivity.REQUEST_CODE_MY_COLLECTION);
+
+                    }
+                    break;
                 case 6:
 
                     if (UserInfo.isUserLogged(BaseActivity.this)) {

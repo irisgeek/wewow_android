@@ -43,6 +43,10 @@
     <string name="lifepost_nodata">还没有人发表看法</string>
     <string name="lifepost_mycomment">我的评论</string>
 
+    <!-- 收藏 -->
+    <string name="my_collection">我的收藏</string>
+    <string name="articles_collected">文章</string>
+
     <!-- 分享 -->
     <string name="share_unknown">分享类型未知 %d</string>
     <string name="share_wechat_friend">微信好友</string>
@@ -167,6 +171,7 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_my_collection">MyCollectionActivity</string>
 
 
 </resources>
