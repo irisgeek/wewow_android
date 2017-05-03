@@ -105,6 +105,11 @@ public class LifeLabItemActivity extends Activity {
         this.like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (!UserInfo.isUserLogged(LifeLabItemActivity.this)) {
+                    Intent logini = new Intent(LifeLabItemActivity.this, LoginActivity.class);
+                    LifeLabItemActivity.this.startActivity(logini);
+                    return;
+                }
                 Drawable.ConstantState notliked = LifeLabItemActivity.this.getResources().getDrawable(R.drawable.favourite_b).getConstantState();
                 Drawable.ConstantState currentlike = LifeLabItemActivity.this.like.getDrawable().getConstantState();
                 final Integer like = notliked.equals(currentlike) ? 1 : 0;
@@ -143,8 +148,13 @@ public class LifeLabItemActivity extends Activity {
             }
         });
         ProgressDialogUtil.getInstance(this).showProgressDialog();
+        ArrayList<Pair<String,String>> fields = new ArrayList<>();
+        fields.add(new Pair<String, String>("collection_id", String.valueOf(this.lc.id)));
+        if (UserInfo.isUserLogged(this)) {
+            fields.add(new Pair<String, String>("user_id", UserInfo.getCurrentUser(this).getId().toString()));
+        }
         Object[] params = new Object[]{
-                String.format("%s/collection_info?collection_id=%s", CommonUtilities.WS_HOST, this.lc.id),
+                WebAPIHelper.addUrlParams(String.format("%s/collection_info", CommonUtilities.WS_HOST), fields),
                 new HttpAsyncTask.TaskDelegate() {
                     @Override
                     public void taskCompletionResult(byte[] result) {
