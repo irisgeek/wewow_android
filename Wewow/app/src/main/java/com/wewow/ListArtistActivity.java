@@ -57,6 +57,8 @@ public class ListArtistActivity extends BaseActivity implements SwipeRefreshLayo
     private ArrayList<HashMap<String, Object>> listItem;
     private ListViewArtistsAdapter adapter;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private String artistId;
+    private List<Artist> artists;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -294,7 +296,7 @@ public class ListArtistActivity extends BaseActivity implements SwipeRefreshLayo
     private void setUpArtistsFromCache() {
         if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_ARTISTS_LIST, this)) {
             String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_ARTISTS_LIST);
-            List<Artist> artists = new ArrayList<Artist>();
+            artists = new ArrayList<Artist>();
             try {
                 artists = parseArtistsListFromString(fileContent);
             } catch (JSONException e) {
@@ -330,14 +332,13 @@ public class ListArtistActivity extends BaseActivity implements SwipeRefreshLayo
             map.put("textViewArticleCount", artists.get(i).getArticle_count());
             map.put("textViewFollowerCount", artists.get(i).getFollower_count());
             map.put("imageViewFollowed", artists.get(i).getFollowed());
-            map.put("id",artists.get(i).getId());
+            map.put("id", artists.get(i).getId());
 
             listItem.add(map);
         }
 
         listItem.addAll(listItemCopy);
-        if (!refresh)
-        {
+        if (!refresh) {
             adapter = new ListViewArtistsAdapter(this, listItem);
 
             listView.setAdapter(adapter);
@@ -347,11 +348,11 @@ public class ListArtistActivity extends BaseActivity implements SwipeRefreshLayo
                                             @Override
                                             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                                                HashMap<String, Object> stringObjectHashMap = (  HashMap<String, Object>)adapter.getItem(position);
-                                                String artistId=stringObjectHashMap.get("id").toString();
-                                                Intent intent = new Intent(ListArtistActivity.this,DetailArtistActivity.class);
-                                                intent.putExtra("id",artistId);
-                                                startActivity(intent);
+                                                HashMap<String, Object> stringObjectHashMap = (HashMap<String, Object>) adapter.getItem(position);
+                                                artistId = stringObjectHashMap.get("id").toString();
+                                                Intent intent = new Intent(ListArtistActivity.this, DetailArtistActivity.class);
+                                                intent.putExtra("id", artistId);
+                                                startActivityForResult(intent, 0);
                                             }
                                         }
         );
@@ -375,7 +376,7 @@ public class ListArtistActivity extends BaseActivity implements SwipeRefreshLayo
 
             @Override
             public void success(JSONObject object, Response response) {
-                List<Artist> artists = new ArrayList<Artist>();
+                artists = new ArrayList<Artist>();
 
                 try {
                     String realData = Utils.convertStreamToString(response.getBody().in());
@@ -428,8 +429,7 @@ public class ListArtistActivity extends BaseActivity implements SwipeRefreshLayo
         if (!isLastPageLoaded) {
 
             getArtistListFromServer();
-        }
-        else {
+        } else {
             swipeRefreshLayout.setRefreshing(false);
         }
     }
@@ -442,7 +442,7 @@ public class ListArtistActivity extends BaseActivity implements SwipeRefreshLayo
             String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_ARTISTS_LIST);
             JSONObject object = new JSONObject(fileContent);
             String totalPages = object.getJSONObject("result").getJSONObject("data").getString("total_pages");
-            if (currentPage>Integer.parseInt(totalPages)) {
+            if (currentPage > Integer.parseInt(totalPages)) {
 
                 result = true;
             }
@@ -450,5 +450,27 @@ public class ListArtistActivity extends BaseActivity implements SwipeRefreshLayo
 
         return result;
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        boolean udpateArtistList=data.getBooleanExtra("updateList",false);
+        if (requestCode == 0 && resultCode == 0&&udpateArtistList) {
+            List<Artist> updatedArtists = new ArrayList<Artist>();
+            for (Artist artist : artists) {
+                if (artist.getId().equals(artistId)) {
+                    if (artist.getFollowed().equals("1")) {
+                        artist.setFollowed("0");
+                    } else {
+                        artist.setFollowed("1");
+                    }
+
+                }
+                updatedArtists.add(artist);
+            }
+            setUpArtists(updatedArtists,true);
+
+        }
     }
 }

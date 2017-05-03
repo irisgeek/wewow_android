@@ -76,7 +76,6 @@
                         android:layout_gravity="left"
                         android:layout_marginLeft="23dp"
                         android:layout_marginTop="14dp"
-                        android:text="Smooth"
                         android:textColor="#333631"
                         android:textSize="24sp"
                         android:textStyle="bold" />
@@ -88,7 +87,6 @@
                         android:layout_gravity="left"
                         android:layout_marginLeft="23dp"
                         android:layout_marginTop="4dp"
-                        android:text="寻找有趣的活法"
                         android:textColor="#333631"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -106,7 +104,6 @@
                         android:layout_gravity="bottom|right"
                         android:layout_marginBottom="10dp"
                         android:layout_marginRight="23dp"
-                        android:src="@drawable/selector_btn_subscribe"
 
                         />
 

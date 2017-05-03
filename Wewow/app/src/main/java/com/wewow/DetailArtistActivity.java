@@ -62,6 +62,7 @@ public class DetailArtistActivity extends BaseActivity {
 
     private String id;
     private ImageView imageViewSubscribe;
+    private boolean updateArtistList=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -242,6 +243,17 @@ public class DetailArtistActivity extends BaseActivity {
                     imageViewSubscribe.setImageResource(R.drawable.subscribed);
                 }
 
+                if(UserInfo.isUserLogged(DetailArtistActivity.this)) {
+
+                    postReadToServer(artist.getArtist().getId(),Integer.parseInt(followed.equals("1") ? "0" : "1"));
+                }
+                else
+                {
+                    Intent i = new Intent();
+                    i.setClass(DetailArtistActivity.this, LoginActivity.class);
+                    startActivity(i);
+                }
+
 
             }
         });
@@ -287,8 +299,53 @@ public class DetailArtistActivity extends BaseActivity {
 
     }
 
+    private void postReadToServer(String artistId,int read) {
+
+        ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
+
+        String   userId = UserInfo.getCurrentUser(DetailArtistActivity.this).getId().toString();
+        String token=UserInfo.getCurrentUser(DetailArtistActivity.this).getToken().toString();
 
 
+        iTask.followArtist(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(DetailArtistActivity.this), userId, artistId, token, read, new Callback<JSONObject>() {
+
+            @Override
+            public void success(JSONObject object, Response response) {
+
+
+                try {
+                    String realData = Utils.convertStreamToString(response.getBody().in());
+                    JSONObject responseObject=new JSONObject(realData);
+
+                    if (!responseObject.getJSONObject("result").getString("code").equals("0")) {
+                        Toast.makeText(DetailArtistActivity.this, DetailArtistActivity.this.getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+
+
+                    }
+                    else {
+                        updateArtistList=true;
+                        FileCacheUtil.clearCacheData( CommonUtilities.CACHE_FILE_ARTISTS_DETAIL + id,DetailArtistActivity.this);
+
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(DetailArtistActivity.this, DetailArtistActivity.this.getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Toast.makeText(DetailArtistActivity.this, DetailArtistActivity.this.getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+    }
 
 
     private void setUpArtistFromCache() {
@@ -400,7 +457,10 @@ public class DetailArtistActivity extends BaseActivity {
             return true;
         }
         if(id==android.R.id.home) {
-          finish();
+            Intent intent=new Intent();
+            intent.putExtra("updateList",updateArtistList);
+            setResult(0,intent);
+            finish();
             return true;
 
         }
@@ -452,6 +512,7 @@ public class DetailArtistActivity extends BaseActivity {
         artist.setDesc(results.getString("desc"));
         artist.setFollowed(results.getString("followed"));
 
+        artist.setId(results.getString("id"));
         artistDetail.setArtist(artist);
         List<Article> articles = new ArrayList<Article>();
 
@@ -476,7 +537,14 @@ public class DetailArtistActivity extends BaseActivity {
     }
 
 
-
+    @Override
+    public void onBackPressed() {
+        Intent intent=new Intent();
+        intent.putExtra("updateList",updateArtistList);
+        setResult(0,intent);
+        finish();
+        super.onBackPressed();
+    }
 
 
 

@@ -16,6 +16,7 @@ import com.wewow.R;
 import com.wewow.UserInfo;
 import com.wewow.netTask.ITask;
 import com.wewow.utils.CommonUtilities;
+import com.wewow.utils.FileCacheUtil;
 import com.wewow.utils.Utils;
 
 import org.json.JSONException;
@@ -36,6 +37,8 @@ public class ListViewArtistsAdapter extends BaseAdapter
 {
     private Context context;
     private ArrayList<HashMap<String, Object>> list;
+    private String id;
+
     public ListViewArtistsAdapter(Context context, ArrayList<HashMap<String, Object>> list)
     {
         this.context = context;
@@ -103,7 +106,8 @@ public class ListViewArtistsAdapter extends BaseAdapter
 
                     if(UserInfo.isUserLogged(context)) {
 
-                        postReadToServer(stringObjectHashMap.get("id").toString());
+                        id = stringObjectHashMap.get("id").toString();
+                        postReadToServer(id);
                     }
                     else
                     {
@@ -148,6 +152,10 @@ public class ListViewArtistsAdapter extends BaseAdapter
                         Toast.makeText(context, context.getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
 
 
+                    }
+                    else
+                    {
+                        FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_LIST, context);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();

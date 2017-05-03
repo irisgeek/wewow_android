@@ -293,6 +293,7 @@ public class BaseActivity extends ActionBarActivity {
             BaseActivity.this.startActivity(intentFeedback);
 
         } else if (requestCode == LoginActivity.REQUEST_CODE_SUBSCRIBED_ARTISTS) {
+            FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_LIST,this);
             Intent intentSubscribedArtists = new Intent(BaseActivity.this, ListSubscribedArtistActivity.class);
             BaseActivity.this.startActivity(intentSubscribedArtists);
 
