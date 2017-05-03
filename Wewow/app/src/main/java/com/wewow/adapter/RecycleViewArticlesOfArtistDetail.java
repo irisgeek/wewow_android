@@ -26,6 +26,13 @@ public  class RecycleViewArticlesOfArtistDetail
     private final TypedValue mTypedValue = new TypedValue();
     private int mBackground;
     private ArrayList<HashMap<String, Object>> list;
+    public interface OnItemClickListener{
+        void onItemClick(View view,int position);
+    }
+    private OnItemClickListener mOnItemClickListener;
+    public void setOnItemClickListener(OnItemClickListener mOnItemClickListener){
+        this.mOnItemClickListener = mOnItemClickListener;
+    }
 
 
 
@@ -91,6 +98,16 @@ public  class RecycleViewArticlesOfArtistDetail
                 .into(holder.mImageView);
         holder.mTextView.setText(list.get(position).get("title").toString());
 //        holder.textViewCount.setText(list.get(position).get("count").toString());
+        if(mOnItemClickListener != null){
+            //为ItemView设置监听器
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = holder.getLayoutPosition(); // 1
+                    mOnItemClickListener.onItemClick(holder.itemView,position); // 2
+                }
+            });
+        }
 
     }
 

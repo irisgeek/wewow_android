@@ -38,7 +38,6 @@
             <android.support.v4.view.ViewPager
                 android:id="@+id/viewpagerLayoutCategory"
                 android:layout_width="fill_parent"
-                android:layout_marginLeft="12dp"
                 android:background="#f7f7f7"
                 android:clipChildren="false"
                 android:layout_height="wrap_content" />

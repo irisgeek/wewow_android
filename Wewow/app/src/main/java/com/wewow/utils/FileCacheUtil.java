@@ -89,6 +89,19 @@ public class FileCacheUtil {
     }
 
 
+
+    public static void clearCacheData(String cachefile,Context context) {
+        if(isCacheDataExist(cachefile,context))
+        {
+            File data = context.getFileStreamPath(cachefile);
+            data.delete();
+        }
+
+
+    }
+
+
+
     public static boolean isCacheDataFailure(String cachefile,Context context,long cacheTime) {
         boolean failure = false;
         File data = context.getFileStreamPath(cachefile);
