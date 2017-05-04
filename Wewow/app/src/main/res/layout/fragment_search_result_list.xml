@@ -13,7 +13,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -21,7 +21,40 @@
         android:id="@+id/recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+       android:gravity="center_horizontal"
+        android:id="@+id/layoutNoResult"
+        android:visibility="gone"
+        android:orientation="vertical">
+        <ImageView
+            android:layout_marginTop="86dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/search_with_no_result"/>
+        <LinearLayout
+            android:layout_marginTop="24dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:text="@string/search_with_no_result"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:id="@+id/textViewTellWewow"
+                android:text="@string/tell_wewow"
+                android:textColor="#69b076"/>
+
+        </LinearLayout>
+    </LinearLayout>
 
 
 
-</LinearLayout>
+</FrameLayout>

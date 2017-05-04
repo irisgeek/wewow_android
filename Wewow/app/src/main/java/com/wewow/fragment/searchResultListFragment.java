@@ -16,6 +16,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -23,7 +24,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.wewow.FeedbackActivity;
+import com.wewow.ListSubscribedArtistActivity;
+import com.wewow.LoginActivity;
 import com.wewow.R;
+import com.wewow.UserInfo;
 import com.wewow.adapter.ListViewAdapter;
 import com.wewow.adapter.RecycleViewArticlesOfArtistDetail;
 import com.wewow.adapter.RecycleViewArtistsOfSearchResultAdapter;
@@ -76,8 +81,34 @@ public class searchResultListFragment extends Fragment {
         view =inflater.inflate(
                 R.layout.fragment_search_result_list, container, false);
         RecyclerView rv = (RecyclerView) view.findViewById(R.id.recyclerview);
-        setupRecyclerView(rv);
+        if(list!=null&&list.size()>0) {
+            setupRecyclerView(rv);
+        }
+        else
+        {
+            showSearchWithNoResultHint();
+        }
         return view;
+    }
+
+    private void showSearchWithNoResultHint() {
+        TextView textViewTellWewow=(TextView)view.findViewById(R.id.textViewTellWewow);
+        textViewTellWewow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (UserInfo.isUserLogged(getActivity())) {
+                    Intent intentFeedback = new Intent(getActivity(), FeedbackActivity.class);
+                    getActivity().startActivity(intentFeedback);
+                } else {
+                    Intent i = new Intent();
+                    i.setClass(getActivity(), LoginActivity.class);
+                    getActivity().startActivityForResult(i, LoginActivity.REQUEST_CODE_FEEDBACK);
+                }
+            }
+        });
+        LinearLayout layout =(LinearLayout)view.findViewById(R.id.layoutNoResult);
+        layout.setVisibility(View.VISIBLE);
+
     }
 
     public searchResultListFragment() {
@@ -96,6 +127,8 @@ public class searchResultListFragment extends Fragment {
     }
 
     private void setupRecyclerView(RecyclerView recyclerView) {
+        LinearLayout layout =(LinearLayout)view.findViewById(R.id.layoutNoResult);
+        layout.setVisibility(View.GONE);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         if (category.equals(CommonUtilities.RESEARCH_RESULT_CATEGORY_ARTICLE)) {
 
