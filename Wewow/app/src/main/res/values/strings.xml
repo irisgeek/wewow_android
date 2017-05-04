@@ -170,4 +170,7 @@
 
     <string name="ads">广告</string>
     <string name="share_text">生活进阶指南</string>
+
+    <string name="search_with_no_result">没有找到喜欢的内容？</string>
+    <string name="tell_wewow">告诉唯物</string>
 </resources>
