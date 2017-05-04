@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#f7f7f7"
     android:orientation="vertical"
     tools:context="com.wewow.MyCollectionActivity">
 
@@ -48,5 +49,15 @@
         </HorizontalScrollView>
 
     </RelativeLayout>
+
+    <ListView
+        android:id="@+id/mycollection_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:background="#ffffff"
+        android:divider="#f7f7f7"
+        android:dividerHeight="12dp"></ListView>
 
 </LinearLayout>

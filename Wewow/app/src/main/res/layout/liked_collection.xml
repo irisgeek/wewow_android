@@ -4,5 +4,5 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:text="@string/articles_collected"
-    android:textColor="#333631"
+    android:textColor="#7f333631"
     android:textSize="17sp" />
