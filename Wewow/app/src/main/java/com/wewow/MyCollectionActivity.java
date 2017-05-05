@@ -1,6 +1,7 @@
 package com.wewow;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -39,6 +40,7 @@ public class MyCollectionActivity extends BaseActivity {
     private LinearLayout labs_container;
     private JSONObject likedinfo;
     private ListView mycollist;
+    private TextView articleCategory;
     private JSONArray articles = new JSONArray();
 
     @Override
@@ -65,6 +67,8 @@ public class MyCollectionActivity extends BaseActivity {
                 MyCollectionActivity.this.startActivity(ai);
             }
         });
+        this.articleCategory = (TextView) this.findViewById(R.id.article_category);
+        this.articleCategory.setOnClickListener(this.categoryClickListener);
     }
 
     private BaseAdapter listAdpater = new BaseAdapter() {
@@ -107,6 +111,57 @@ public class MyCollectionActivity extends BaseActivity {
         }
     };
 
+    public View.OnClickListener categoryClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            String id = view.getTag().toString();
+            if (id.equals("0")) {
+                MyCollectionActivity.this.articleCategory.setTextColor(Color.parseColor("#333631"));
+                try {
+                    MyCollectionActivity.this.onListDataLoaded(MyCollectionActivity.this.likedinfo.getJSONArray("articles"));
+                } catch (JSONException e) {
+                    //
+                }
+            } else {
+                MyCollectionActivity.this.articleCategory.setTextColor(Color.parseColor("#7f333631"));
+                ArrayList<Pair<String, String>> fields = new ArrayList<>();
+                fields.add(new Pair<String, String>("collection_id", id));
+                if (UserInfo.isUserLogged(MyCollectionActivity.this)) {
+                    fields.add(new Pair<String, String>("user_id", UserInfo.getCurrentUser(MyCollectionActivity.this).getId().toString()));
+                }
+                Object[] params = new Object[]{
+                        WebAPIHelper.addUrlParams(String.format("%s/user_liked_collection_articles", CommonUtilities.WS_HOST), fields),
+                        new HttpAsyncTask.TaskDelegate() {
+                            @Override
+                            public void taskCompletionResult(byte[] result) {
+                                JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
+                                try {
+                                    MyCollectionActivity.this.onListDataLoaded(jobj.getJSONObject("result").getJSONArray("data"));
+                                } catch (JSONException e) {
+                                    Log.e(TAG, String.format("user_liked_collection_articles: %s", e.getMessage()));
+                                }
+                            }
+                        },
+                        WebAPIHelper.HttpMethod.GET
+                };
+                new HttpAsyncTask().execute(params);
+            }
+            this.toggleCategories(view);
+        }
+
+        private void toggleCategories(View view) {
+            int selected = Color.parseColor("#333631");
+            int unselected = Color.parseColor("#7f333631");
+            for (int i = 0; i < MyCollectionActivity.this.labs_container.getChildCount(); i++) {
+                View subView = MyCollectionActivity.this.labs_container.getChildAt(i);
+                if (!(subView instanceof TextView)) {
+                    continue;
+                }
+                ((TextView) subView).setTextColor(subView == view ? selected : unselected);
+            }
+        }
+    };
+
     private void loadData() {
         if (!UserInfo.isUserLogged(this)) {
             Intent i = new Intent(this, LoginActivity.class);
@@ -140,13 +195,13 @@ public class MyCollectionActivity extends BaseActivity {
         this.labs_container.removeAllViews();
         this.likedinfo = jobj;
         try {
-            this.articles = jobj.getJSONArray("articles");
             JSONArray collections = jobj.getJSONArray("collections");
             for (int i = 0; i < collections.length(); i++) {
                 JSONObject collection = collections.getJSONObject(i);
                 TextView col = (TextView) View.inflate(this, R.layout.liked_collection, null);
                 col.setText(collection.optString("collection_title"));
                 col.setTag(collection.optString("collection_id"));
+                col.setOnClickListener(this.categoryClickListener);
                 this.labs_container.addView(col);
                 LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) col.getLayoutParams();
                 lp.gravity = Gravity.CENTER;
@@ -155,10 +210,21 @@ public class MyCollectionActivity extends BaseActivity {
                 lp.setMargins(Utils.dipToPixel(this, 4), 0, 0, 0);
                 col.setLayoutParams(lp);
             }
-            this.listAdpater.notifyDataSetChanged();
+            this.onListDataLoaded(jobj.getJSONArray("articles"));
         } catch (JSONException e) {
             Log.e(TAG, String.format("get collection list fail: %s", e.getMessage()));
             Toast.makeText(MyCollectionActivity.this, R.string.serverError, Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void onListDataLoaded(JSONArray arr) {
+        this.articles = arr;
+        this.mycollist.getHandler().post(new Runnable() {
+            @Override
+            public void run() {
+                MyCollectionActivity.this.mycollist.smoothScrollToPosition(0);
+                MyCollectionActivity.this.listAdpater.notifyDataSetChanged();
+            }
+        });
     }
 }

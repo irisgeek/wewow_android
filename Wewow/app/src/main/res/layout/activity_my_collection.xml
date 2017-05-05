@@ -32,9 +32,11 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/article_category"
                     android:layout_width="75dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
+                    android:tag="0"
                     android:text="@string/articles_collected"
                     android:textColor="#333631"
                     android:textSize="17sp" />
