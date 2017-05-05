@@ -59,7 +59,7 @@ public class MyCollectionActivity extends BaseActivity {
         this.mycollist.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                int id = (Integer)view.getTag();
+                int id = (Integer) view.getTag();
                 Intent ai = new Intent(MyCollectionActivity.this, ArticleActivity.class);
                 ai.putExtra(ArticleActivity.ARTICLE_ID, id);
                 MyCollectionActivity.this.startActivity(ai);
@@ -93,11 +93,11 @@ public class MyCollectionActivity extends BaseActivity {
             new RemoteImageLoader(MyCollectionActivity.this, jobj.optString("image_642_320"), new RemoteImageLoader.RemoteImageListener() {
                 @Override
                 public void onRemoteImageAcquired(Drawable dr) {
-                    BitmapDrawable bdr = (BitmapDrawable) iv.getDrawable();
+                    BitmapDrawable bdr = (BitmapDrawable) iv.getBackground();
                     if (bdr != null) {
                         bdr.getBitmap().recycle();
                     }
-                    iv.setImageDrawable(dr);
+                    iv.setBackground(dr);
                 }
             });
             TextView tv = (TextView) view.findViewById(R.id.mycollection_title);
