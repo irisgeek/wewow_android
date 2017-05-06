@@ -52,15 +52,51 @@
 
     </RelativeLayout>
 
-    <ListView
-        android:id="@+id/mycollection_list"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="4dp"
-        android:background="#ffffff"
-        android:divider="#f7f7f7"
-        android:dividerHeight="12dp"></ListView>
+        android:layout_height="match_parent">
+
+        <ListView
+            android:id="@+id/mycollection_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="4dp"
+            android:background="#ffffff"
+            android:divider="#f7f7f7"
+            android:dividerHeight="12dp"></ListView>
+
+        <FrameLayout
+            android:id="@+id/collection_man_area"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#cfffffff"
+            android:visibility="invisible">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TableLayout
+                    android:id="@+id/coldellist"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                </TableLayout>
+
+                <ImageView
+                    android:id="@+id/collection_unfav"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginRight="4dp"
+                    android:src="@drawable/delcollection" />
+
+            </RelativeLayout>
+        </FrameLayout>
+    </FrameLayout>
 
 </LinearLayout>

@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -19,6 +20,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,6 +41,7 @@ public class MyCollectionActivity extends BaseActivity {
 
     private static final String TAG = "MyCollectionActivity";
     private LinearLayout labs_container;
+    private TableLayout labman_container;
     private JSONObject likedinfo;
     private ListView mycollist;
     private TextView articleCategory;
@@ -50,7 +54,6 @@ public class MyCollectionActivity extends BaseActivity {
         setContentView(R.layout.activity_my_collection);
         this.getSupportActionBar().setTitle(R.string.my_collection);
         this.setupUI();
-        Log.d(TAG, "onCreate: " + this.getSupportActionBar().getTitle());
         this.loadData();
     }
 
@@ -69,6 +72,36 @@ public class MyCollectionActivity extends BaseActivity {
         });
         this.articleCategory = (TextView) this.findViewById(R.id.article_category);
         this.articleCategory.setOnClickListener(this.categoryClickListener);
+        ImageView iv = (ImageView) this.findViewById(R.id.collection_expand);
+        iv.setImageDrawable(this.getResources().getDrawable(R.drawable.expanded));
+        iv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (MyCollectionActivity.this.likedinfo == null) {
+                    return;
+                }
+                ImageView iv = (ImageView) view;
+                Drawable expdr = MyCollectionActivity.this.getResources().getDrawable(R.drawable.expanded);
+                Drawable coldr = MyCollectionActivity.this.getResources().getDrawable(R.drawable.close);
+                if (iv.getDrawable().getConstantState().equals(expdr.getConstantState())) {
+                    iv.setImageDrawable(coldr);
+                    MyCollectionActivity.this.findViewById(R.id.collection_man_area).setVisibility(View.VISIBLE);
+                    Log.d(TAG, "expand: ");
+                } else {
+                    iv.setImageDrawable(expdr);
+                    MyCollectionActivity.this.findViewById(R.id.collection_man_area).setVisibility(View.INVISIBLE);
+                    Log.d(TAG, "collapse: ");
+                }
+
+            }
+        });
+        this.labman_container = (TableLayout) this.findViewById(R.id.coldellist);
+        this.findViewById(R.id.collection_man_area).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //
+            }
+        });
     }
 
     private BaseAdapter listAdpater = new BaseAdapter() {
@@ -192,29 +225,74 @@ public class MyCollectionActivity extends BaseActivity {
     }
 
     private void onDataLoad(JSONObject jobj) {
-        this.labs_container.removeAllViews();
         this.likedinfo = jobj;
         try {
-            JSONArray collections = jobj.getJSONArray("collections");
-            for (int i = 0; i < collections.length(); i++) {
-                JSONObject collection = collections.getJSONObject(i);
-                TextView col = (TextView) View.inflate(this, R.layout.liked_collection, null);
-                col.setText(collection.optString("collection_title"));
-                col.setTag(collection.optString("collection_id"));
-                col.setOnClickListener(this.categoryClickListener);
-                this.labs_container.addView(col);
-                LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) col.getLayoutParams();
-                lp.gravity = Gravity.CENTER;
-                lp.width = Utils.dipToPixel(this, 75);
-                lp.height = LinearLayout.LayoutParams.MATCH_PARENT;
-                lp.setMargins(Utils.dipToPixel(this, 4), 0, 0, 0);
-                col.setLayoutParams(lp);
-            }
+            this.onCollectedLabDataLoad(jobj.getJSONArray("collections"));
             this.onListDataLoaded(jobj.getJSONArray("articles"));
         } catch (JSONException e) {
             Log.e(TAG, String.format("get collection list fail: %s", e.getMessage()));
             Toast.makeText(MyCollectionActivity.this, R.string.serverError, Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void onCollectedLabDataLoad(JSONArray collections) {
+        this.onCollectedLabDataLoad(collections, true);
+    }
+
+    private void onCollectedLabDataLoad(JSONArray collections, boolean showDelete) {
+        this.labs_container.removeAllViews();
+        this.labman_container.removeAllViews();
+        int delrowcount = 3;
+        TableRow tr = null;
+        for (int i = 0; i < collections.length(); i++) {
+            JSONObject collection;
+            try {
+                collection = collections.getJSONObject(i);
+            } catch (JSONException e) {
+                continue;
+            }
+            TextView col = (TextView) View.inflate(this, R.layout.liked_collection, null);
+            col.setText(collection.optString("collection_title"));
+            col.setTag(collection.optString("collection_id"));
+            col.setOnClickListener(this.categoryClickListener);
+            this.labs_container.addView(col);
+            LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) col.getLayoutParams();
+            lp.gravity = Gravity.CENTER;
+            lp.width = Utils.dipToPixel(this, 75);
+            lp.height = LinearLayout.LayoutParams.MATCH_PARENT;
+            lp.setMargins(Utils.dipToPixel(this, 4), 0, 0, 0);
+            col.setLayoutParams(lp);
+
+            if (i % delrowcount == 0) {
+                tr = new TableRow(this);
+                this.labman_container.addView(tr);
+            }
+            this.addDelItem(tr, collection, showDelete);
+            if (i == collections.length() - 1) {
+                //Log.d(TAG, String.format("last index %d", i));
+                for (int j = i; (j + 1) % delrowcount != 0; j++) {
+                    //Log.d(TAG, String.format("supplemnet %d", j));
+                    this.addDelItem(tr, null, showDelete);
+                }
+            }
+        }
+    }
+
+    private void addDelItem(TableRow tr, JSONObject collection, boolean showDelete) {
+        LinearLayout delitem = (LinearLayout) View.inflate(this, R.layout.mycollection_lab_del_item, null);
+        ImageView iv = (ImageView) delitem.findViewById(R.id.img_lab_del);
+        if (collection != null) {
+            TextView tv = (TextView) delitem.findViewById(R.id.lab_del);
+            tv.setText(collection.optString("collection_title"));
+            iv.setTag(collection.optString("collection_id"));
+            iv.setVisibility(showDelete ? View.VISIBLE : View.INVISIBLE);
+        } else {
+            iv.setVisibility(View.INVISIBLE);
+        }
+        tr.addView(delitem);
+        TableRow.LayoutParams tp = (TableRow.LayoutParams) delitem.getLayoutParams();
+        tp.weight = 1;
+        delitem.setLayoutParams(tp);
     }
 
     private void onListDataLoaded(JSONArray arr) {
