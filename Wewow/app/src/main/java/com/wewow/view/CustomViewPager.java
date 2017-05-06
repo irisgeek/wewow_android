@@ -10,27 +10,47 @@ import android.view.MotionEvent;
  */
 public class CustomViewPager extends ViewPager {
 
-    public CustomViewPager(Context context) {
-             super(context);
-       }
+    private boolean isCanScroll = false;
 
-         public CustomViewPager(Context context, AttributeSet attrs) {
-               super(context, attrs);
-           }
-    /**
-     11      * 决定我们是否想要拦截这个手势，如果返回true,
-     12      * onMotionEvent就会接受到事件，并且在其中发生滑动的操作.
-     13      * 所以这段代码的原理是：当ViewPager和SwipeRefreshLayout滑动冲突的时候直接返回true,
-     14      * 使得ViewPager可以正常滑动(至于怎么产生冲突的我也不知道)
-     15      * @param ev
-     16      * @return
-     17      */
-               @Override
-       public boolean onInterceptTouchEvent(MotionEvent ev) {
-             try {
-                     return super.onInterceptTouchEvent(ev);
-                } catch (Exception e) {
-                     return true;
-             }
-            }
+    public CustomViewPager(Context context) {
+        super(context);
+    }
+
+    public CustomViewPager(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    public void setScanScroll(boolean isCanScroll){
+        this.isCanScroll = isCanScroll;
+    }
+    @Override
+    public void scrollTo(int x, int y){
+//        if (isCanScroll){
+        super.scrollTo(x, y);
+//        }
+    }
+
+    @Override
+    public void setCurrentItem(int item) {
+        // TODO Auto-generated method stub
+        super.setCurrentItem(item);
+    }
+    @Override
+    public boolean onTouchEvent(MotionEvent arg0) {
+        // TODO Auto-generated method stub
+        if (isCanScroll) {
+            return super.onTouchEvent(arg0);
+        } else {
+            return false;
+        }
+    }
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent arg0) {
+        // TODO Auto-generated method stub
+        if (isCanScroll) {
+            return super.onInterceptTouchEvent(arg0);
+        } else {
+            return false;
+        }
+    }
 }
