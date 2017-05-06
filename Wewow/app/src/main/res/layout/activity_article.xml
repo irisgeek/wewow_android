@@ -42,7 +42,7 @@
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:layout_centerVertical="true"
-                android:layout_toLeftOf="@+id/lifelab_share"
+                android:layout_toLeftOf="@+id/article_share"
                 android:src="@drawable/favourite_b" />
 
         </RelativeLayout>

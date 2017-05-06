@@ -64,7 +64,7 @@ public class WebAPIHelper {
     }
 
     public static WebAPIHelper getWewowWebAPIHelper(boolean sslcheck) {
-        if (WebAPIHelper.instance == null) {
+        if ((WebAPIHelper.instance == null) || (WebAPIHelper.instance.ignoreSslCheck != sslcheck)) {
             WebAPIHelper.instance = new WebAPIHelper(sslcheck);
             WebAPIHelper.instance.addDefaultHeader("User-Agent", "Wewow/1.6");
         }
@@ -340,5 +340,9 @@ public class WebAPIHelper {
             sb.deleteCharAt(sb.length() - 1);
         }
         return sb.toString();
+    }
+
+    public static Pair<String, String> getHttpFormUrlHeader() {
+        return new Pair<String, String>("Content-Type", "application/x-www-form-urlencoded");
     }
 }
