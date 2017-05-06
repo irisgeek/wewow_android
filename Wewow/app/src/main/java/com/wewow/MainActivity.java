@@ -658,15 +658,17 @@ public class MainActivity extends BaseActivity {
 
             }
         });
-
+        final Menu menuFinal=menu;
         completeText.setThreshold(0);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Toast.makeText(MainActivity.this, query, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MainActivity.this, query, Toast.LENGTH_SHORT).show();
 //                LinearLayout layout = (LinearLayout) findViewById(R.id.layoutCover);
 //                layout.setVisibility(View.GONE);
 
+                MenuItem menuItem = menuFinal.findItem(R.id.search);
+                menuItem.collapseActionView();
                 Intent intentSearch= new Intent(MainActivity.this,SearchResultActivity.class);
                 intentSearch.putExtra("key_word",query);
                 startActivity(intentSearch);
