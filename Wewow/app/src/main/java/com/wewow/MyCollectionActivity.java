@@ -102,11 +102,13 @@ public class MyCollectionActivity extends BaseActivity {
                 //
             }
         });
+        ImageView unfav = (ImageView) this.findViewById(R.id.collection_unfav);
+        final Drawable dumpbin = MyCollectionActivity.this.getResources().getDrawable(R.drawable.delcollection);
+        unfav.setBackground(dumpbin);
         this.findViewById(R.id.collection_unfav).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ImageView iv =(ImageView)view;
-                Drawable dumpbin = MyCollectionActivity.this.getResources().getDrawable(R.drawable.delcollection);
+                ImageView iv = (ImageView) view;
                 if (iv.getBackground().getConstantState().equals(dumpbin.getConstantState())) {
                     iv.setBackground(MyCollectionActivity.this.getResources().getDrawable(R.drawable.delcollectiondone));
                     MyCollectionActivity.this.onCollectedLabDataLoad(MyCollectionActivity.this.likedinfo.optJSONArray("collections"), true);
@@ -308,6 +310,7 @@ public class MyCollectionActivity extends BaseActivity {
             tv.setText(collection.optString("collection_title"));
             iv.setTag(collection.optString("collection_id"));
             iv.setVisibility(showDelete ? View.VISIBLE : View.INVISIBLE);
+            iv.setOnClickListener(this.colDeleteListener);
         } else {
             iv.setVisibility(View.INVISIBLE);
         }
@@ -326,5 +329,62 @@ public class MyCollectionActivity extends BaseActivity {
                 MyCollectionActivity.this.listAdpater.notifyDataSetChanged();
             }
         });
+    }
+
+    private View.OnClickListener colDeleteListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            final String id = view.getTag().toString();
+            ArrayList<Pair<String, String>> fields = new ArrayList<>();
+            UserInfo ui = UserInfo.getCurrentUser(MyCollectionActivity.this);
+            fields.add(new Pair<String, String>("user_id", ui.getId().toString()));
+            fields.add(new Pair<String, String>("token", ui.getToken()));
+            fields.add(new Pair<String, String>("item_type", "collection"));
+            fields.add(new Pair<String, String>("item_id", id));
+            fields.add(new Pair<String, String>("like", "0"));
+            ArrayList<Pair<String, String>> headers = new ArrayList<>();
+            headers.add(WebAPIHelper.getHttpFormUrlHeader());
+            Object[] params = new Object[]{
+                    String.format("%s/like", CommonUtilities.WS_HOST),
+                    new HttpAsyncTask.TaskDelegate() {
+                        @Override
+                        public void taskCompletionResult(byte[] result) {
+                            JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
+                            try {
+                                int i = jobj.getJSONObject("result").getInt("code");
+                                if (i != 0) {
+                                    throw new JSONException(String.format("result: %d", i));
+                                }
+                                MyCollectionActivity.this.onCollectionDeleted(id);
+                            } catch (JSONException e) {
+                                Log.e(TAG, "taskCompletionResult: " + e.getMessage());
+                            }
+                        }
+                    },
+                    WebAPIHelper.HttpMethod.POST,
+                    WebAPIHelper.buildHttpQuery(fields).getBytes(),
+                    headers
+            };
+            new HttpAsyncTask().execute(params);
+        }
+    };
+
+    private void onCollectionDeleted(String id) {
+        try {
+            JSONArray arr = this.likedinfo.getJSONArray("collections");
+            int i = 0;
+            while (i < arr.length()) {
+                JSONObject obj = arr.getJSONObject(i);
+                if (id.equals(obj.optString("collection_id"))) {
+                    arr.remove(i);
+                    this.likedinfo.put("collections", arr);
+                    break;
+                }
+                i++;
+            }
+            this.onCollectedLabDataLoad(arr, true);
+        } catch (JSONException e) {
+            Log.e(TAG, "onCollectionDeleted: " + e.getMessage());
+        }
     }
 }
