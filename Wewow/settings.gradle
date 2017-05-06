@@ -1,1 +1,2 @@
-include ':app'
+include ':app', ':libraryMaterialRefreshLayout'
+project(':libraryMaterialRefreshLayout').projectDir = new File('library')

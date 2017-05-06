@@ -21,6 +21,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.cjj.MaterialRefreshLayout;
+import com.cjj.MaterialRefreshListener;
 import com.wewow.adapter.ListViewArtistsAdapter;
 import com.wewow.dto.Artist;
 import com.wewow.dto.Banner;
@@ -49,40 +51,23 @@ import retrofit.client.Response;
 /**
  * Created by iris on 17/3/24.
  */
-public class ListArtistActivity extends BaseActivity implements SwipeRefreshLayout.OnRefreshListener {
+public class ListArtistActivity extends BaseActivity {
 
 
     private int currentPage = 1;
     private ListView listView;
     private ArrayList<HashMap<String, Object>> listItem;
     private ListViewArtistsAdapter adapter;
-    private SwipeRefreshLayout swipeRefreshLayout;
+    private MaterialRefreshLayout refreshLayout;
     private String artistId;
     private List<Artist> artists;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        Utils.setActivityToBeFullscreen(this);
-
-
         setContentView(R.layout.activity_list_artist);
         initData();
 
-        if (Utils.isNetworkAvailable(this)) {
-
-            checkcacheUpdatedOrNot();
-
-        } else {
-            Toast.makeText(this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
-            swipeRefreshLayout.setRefreshing(false);
-
-            SettingUtils.set(this, CommonUtilities.NETWORK_STATE, false);
-            setUpArtistsFromCache();
-
-        }
         setUpToolBar();
-
     }
 
     private void initData() {
@@ -90,8 +75,64 @@ public class ListArtistActivity extends BaseActivity implements SwipeRefreshLayo
         listView = (ListView) findViewById(R.id.listViewArtists);
 
         listItem = new ArrayList<HashMap<String, Object>>();
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
-        swipeRefreshLayout.setOnRefreshListener(this);
+
+        refreshLayout=(MaterialRefreshLayout) findViewById(R.id.refresh);
+
+        refreshLayout.setShowArrow(false);
+        int[] colors={getResources().getColor(R.color.font_color)};
+        refreshLayout.setProgressColors(colors);
+        refreshLayout.setLoadMore(true);
+        refreshLayout.finishRefreshLoadMore();
+
+        refreshLayout.setMaterialRefreshListener(new MaterialRefreshListener() {
+            @Override
+            public void onRefresh(final MaterialRefreshLayout materialRefreshLayout) {
+                currentPage = 1;
+                if (Utils.isNetworkAvailable(ListArtistActivity.this)) {
+
+                    checkcacheUpdatedOrNot();
+
+                } else {
+                    Toast.makeText(ListArtistActivity.this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
+
+
+                    SettingUtils.set(ListArtistActivity.this, CommonUtilities.NETWORK_STATE, false);
+                    setUpArtistsFromCache();
+
+                }
+
+            }
+
+            @Override
+            public void onfinish() {
+
+                refreshLayout.finishRefreshLoadMore();
+            }
+
+            @Override
+            public void onRefreshLoadMore(MaterialRefreshLayout materialRefreshLayout) {
+
+                boolean isLastPageLoaded = false;
+                try {
+                    isLastPageLoaded = isLastPageLoaded();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                if (!isLastPageLoaded) {
+
+                    getArtistListFromServer();
+                } else {
+                    onfinish();
+                }
+
+
+
+            }
+        });
+
+
+        refreshLayout.autoRefresh();
+
     }
 
     @Override
@@ -237,7 +278,6 @@ public class ListArtistActivity extends BaseActivity implements SwipeRefreshLayo
     }
 
     private void checkcacheUpdatedOrNot() {
-        swipeRefreshLayout.setRefreshing(true);
         ITask iTask = Utils.getItask(com.wewow.utils.CommonUtilities.WS_HOST);
         iTask.updateAt(com.wewow.utils.CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), new Callback<JSONObject>() {
             @Override
@@ -249,7 +289,7 @@ public class ListArtistActivity extends BaseActivity implements SwipeRefreshLayo
                     if (!realData.contains(com.wewow.utils.CommonUtilities.SUCCESS)) {
                         Toast.makeText(ListArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
 
-                        swipeRefreshLayout.setRefreshing(false);
+                        refreshLayout.finishRefresh();
 
                     } else {
                         JSONObject jsonObject = new JSONObject(realData);
@@ -274,12 +314,14 @@ public class ListArtistActivity extends BaseActivity implements SwipeRefreshLayo
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
+                    refreshLayout.finishRefresh();
                     Toast.makeText(ListArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                    swipeRefreshLayout.setRefreshing(false);
+
                 } catch (JSONException e) {
+                    refreshLayout.finishRefresh();
                     Toast.makeText(ListArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
-                    swipeRefreshLayout.setRefreshing(false);
+
                 }
 
             }
@@ -287,7 +329,7 @@ public class ListArtistActivity extends BaseActivity implements SwipeRefreshLayo
             @Override
             public void failure(RetrofitError error) {
                 Toast.makeText(ListArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                swipeRefreshLayout.setRefreshing(false);
+
             }
 
         });
@@ -312,14 +354,16 @@ public class ListArtistActivity extends BaseActivity implements SwipeRefreshLayo
 
         ArrayList<HashMap<String, Object>> listItemCopy = new ArrayList<HashMap<String, Object>>();
         listItemCopy.addAll(listItem);
-        if (refresh) {
+//        if (refresh) {
 
             if (listItem != null && listItem.size() > 0) {
                 listItem.clear();
 
             }
+//
+        if(currentPage!=1) {
+            listItem.addAll(listItemCopy);
         }
-
         for (int i = 0; i < artists.size(); i++) {
             HashMap<String, Object> map = new HashMap<String, Object>();
 
@@ -337,7 +381,7 @@ public class ListArtistActivity extends BaseActivity implements SwipeRefreshLayo
             listItem.add(map);
         }
 
-        listItem.addAll(listItemCopy);
+
         if (!refresh) {
             adapter = new ListViewArtistsAdapter(this, listItem);
 
@@ -358,13 +402,14 @@ public class ListArtistActivity extends BaseActivity implements SwipeRefreshLayo
         );
         adapter.notifyDataSetChanged();
         currentPage++;
-        swipeRefreshLayout.setRefreshing(false);
+        refreshLayout.finishRefresh();
+        refreshLayout.finishRefreshLoadMore();
 
 
     }
 
     private void getArtistListFromServer() {
-        swipeRefreshLayout.setRefreshing(true);
+
         ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
         String userId = "0";
         //check user login or not
@@ -382,7 +427,8 @@ public class ListArtistActivity extends BaseActivity implements SwipeRefreshLayo
                     String realData = Utils.convertStreamToString(response.getBody().in());
                     if (!realData.contains(CommonUtilities.SUCCESS)) {
                         Toast.makeText(ListArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                        swipeRefreshLayout.setRefreshing(false);
+                        refreshLayout.finishRefresh();
+                        refreshLayout.finishRefreshLoadMore();
 
                     } else {
                         artists = parseArtistsListFromString(realData);
@@ -399,11 +445,13 @@ public class ListArtistActivity extends BaseActivity implements SwipeRefreshLayo
                 } catch (IOException e) {
                     e.printStackTrace();
                     Toast.makeText(ListArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                    swipeRefreshLayout.setRefreshing(false);
+                    refreshLayout.finishRefreshLoadMore();
+                    refreshLayout.finishRefresh();
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Toast.makeText(ListArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                    swipeRefreshLayout.setRefreshing(false);
+                    refreshLayout.finishRefreshLoadMore();
+                    refreshLayout.finishRefresh();
                 }
 
             }
@@ -411,28 +459,13 @@ public class ListArtistActivity extends BaseActivity implements SwipeRefreshLayo
             @Override
             public void failure(RetrofitError error) {
                 Toast.makeText(ListArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                swipeRefreshLayout.setRefreshing(false);
+                refreshLayout.finishRefreshLoadMore();
+                refreshLayout.finishRefresh();
 
             }
         });
     }
 
-    @Override
-    public void onRefresh() {
-
-        boolean isLastPageLoaded = false;
-        try {
-            isLastPageLoaded = isLastPageLoaded();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        if (!isLastPageLoaded) {
-
-            getArtistListFromServer();
-        } else {
-            swipeRefreshLayout.setRefreshing(false);
-        }
-    }
 
     private boolean isLastPageLoaded() throws JSONException {
 
