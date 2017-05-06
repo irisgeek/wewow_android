@@ -72,6 +72,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="#cfffffff"
+            android:paddingTop="30dp"
             android:visibility="invisible">
 
             <RelativeLayout
@@ -93,7 +94,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_marginBottom="4dp"
                     android:layout_marginRight="4dp"
-                    android:src="@drawable/delcollection" />
+                    android:background="@drawable/delcollection" />
 
             </RelativeLayout>
         </FrameLayout>

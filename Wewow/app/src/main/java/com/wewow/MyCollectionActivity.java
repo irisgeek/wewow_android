@@ -102,6 +102,20 @@ public class MyCollectionActivity extends BaseActivity {
                 //
             }
         });
+        this.findViewById(R.id.collection_unfav).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ImageView iv =(ImageView)view;
+                Drawable dumpbin = MyCollectionActivity.this.getResources().getDrawable(R.drawable.delcollection);
+                if (iv.getBackground().getConstantState().equals(dumpbin.getConstantState())) {
+                    iv.setBackground(MyCollectionActivity.this.getResources().getDrawable(R.drawable.delcollectiondone));
+                    MyCollectionActivity.this.onCollectedLabDataLoad(MyCollectionActivity.this.likedinfo.optJSONArray("collections"), true);
+                } else {
+                    iv.setBackground(dumpbin);
+                    MyCollectionActivity.this.onCollectedLabDataLoad(MyCollectionActivity.this.likedinfo.optJSONArray("collections"), false);
+                }
+            }
+        });
     }
 
     private BaseAdapter listAdpater = new BaseAdapter() {
@@ -236,7 +250,7 @@ public class MyCollectionActivity extends BaseActivity {
     }
 
     private void onCollectedLabDataLoad(JSONArray collections) {
-        this.onCollectedLabDataLoad(collections, true);
+        this.onCollectedLabDataLoad(collections, false);
     }
 
     private void onCollectedLabDataLoad(JSONArray collections, boolean showDelete) {
@@ -264,8 +278,7 @@ public class MyCollectionActivity extends BaseActivity {
             col.setLayoutParams(lp);
 
             if (i % delrowcount == 0) {
-                tr = new TableRow(this);
-                this.labman_container.addView(tr);
+                tr = this.addTableRow();
             }
             this.addDelItem(tr, collection, showDelete);
             if (i == collections.length() - 1) {
@@ -276,6 +289,15 @@ public class MyCollectionActivity extends BaseActivity {
                 }
             }
         }
+    }
+
+    private TableRow addTableRow() {
+        TableRow tr = new TableRow(this);
+        this.labman_container.addView(tr);
+        TableLayout.LayoutParams lp = (TableLayout.LayoutParams) tr.getLayoutParams();
+        lp.bottomMargin = Utils.dipToPixel(this, 20);
+        tr.setLayoutParams(lp);
+        return tr;
     }
 
     private void addDelItem(TableRow tr, JSONObject collection, boolean showDelete) {

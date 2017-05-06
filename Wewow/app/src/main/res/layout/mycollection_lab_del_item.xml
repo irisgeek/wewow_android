@@ -7,8 +7,10 @@
     <TextView
         android:id="@+id/lab_del"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center" />
+        android:layout_height="40dp"
+        android:gravity="center"
+        android:textColor="#333631"
+        android:textSize="14sp" />
 
     <ImageView
         android:id="@+id/img_lab_del"
