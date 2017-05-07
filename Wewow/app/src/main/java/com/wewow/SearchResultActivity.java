@@ -56,6 +56,9 @@ import retrofit.client.Response;
  */
 public class SearchResultActivity extends BaseActivity {
     private String keyword = "";
+    private FragmentSearchResultAdapter adapter;
+    private ArrayList<ArrayList<HashMap<String, Object>>> list;
+    private boolean refresh=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,7 +111,8 @@ public class SearchResultActivity extends BaseActivity {
         categories.add(CommonUtilities.RESEARCH_RESULT_CATEGORY_ARTIST);
         categories.add(CommonUtilities.RESEARCH_RESULT_CATEGORY_POST);
 
-        ArrayList<ArrayList<HashMap<String, Object>>> list= new ArrayList<ArrayList<HashMap<String, Object>>>();
+
+       list= new ArrayList<ArrayList<HashMap<String, Object>>>();
 
         ArrayList<HashMap<String, Object>> listItemArticle= new ArrayList<HashMap<String, Object>>();
 
@@ -191,9 +195,22 @@ public class SearchResultActivity extends BaseActivity {
         listTitle.add(getResources().getString(R.string.search_result_category_3));
         listTitle.add(getResources().getString(R.string.search_result_category_4));
 
+        List<searchResultListFragment> fgs = new ArrayList<searchResultListFragment>();
+        for(int i=0;i<categories.size();i++)
+        {
+            searchResultListFragment fragment=searchResultListFragment.newInstance(categories.get(i), list.get(i));
+            fgs.add(fragment);
+        }
 
-        FragmentSearchResultAdapter adapter = new FragmentSearchResultAdapter(getSupportFragmentManager(),list,categories,listTitle);
-        viewPager.setAdapter(adapter);
+        if(!refresh) {
+
+            adapter = new FragmentSearchResultAdapter(getSupportFragmentManager(), list, categories, listTitle,fgs);
+            viewPager.setAdapter(adapter);
+        }
+        else {
+            adapter.setFragments(fgs);
+            adapter.notifyDataSetChanged();
+        }
 
 
 
@@ -528,50 +545,26 @@ public class SearchResultActivity extends BaseActivity {
 
                 keyword = testStrings[position];
 
-                if (Utils.isNetworkAvailable(SearchResultActivity.this)) {
-                    //if banner data never cached or outdated
-
-                    checkcacheUpdatedOrNot();
-                } else {
-                    Toast.makeText(SearchResultActivity.this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
-
-                    SettingUtils.set(SearchResultActivity.this, CommonUtilities.NETWORK_STATE, false);
-                    //if banner data cached
-                    if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_SEARCH_RESULT + keyword, SearchResultActivity.this)) {
-                        String fileContent = FileCacheUtil.getCache(SearchResultActivity.this, CommonUtilities.CACHE_FILE_SEARCH_RESULT + keyword);
-                        List<Article> articles = new ArrayList<Article>();
-                        List<Institute> institutes = new ArrayList<Institute>();
-                        List<Artist> artists = new ArrayList<Artist>();
-                        List<Post> posts = new ArrayList<Post>();
-
-                        try {
-                            articles = parseArticleFromString(fileContent);
-                            institutes = parseInstitutesFromString(fileContent);
-                            artists = parseArtistsFromString(fileContent);
-                            posts = parsePostFromString(fileContent);
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        setUpViewPager(articles, institutes, artists, posts);
-                    }
-                }
 
 
             }
         });
 
+        final Menu menuFinal=menu;
         completeText.setThreshold(0);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
 
                 keyword = query;
-
+                refresh=true;
+                MenuItem menuItem = menuFinal.findItem(R.id.search);
+                menuItem.collapseActionView();
+                getSupportActionBar().setTitle(keyword);
                 if (Utils.isNetworkAvailable(SearchResultActivity.this)) {
                     //if banner data never cached or outdated
 
-                    checkcacheUpdatedOrNot();
+                    getSearchInfoFromServer();
                 } else {
                     Toast.makeText(SearchResultActivity.this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
 
