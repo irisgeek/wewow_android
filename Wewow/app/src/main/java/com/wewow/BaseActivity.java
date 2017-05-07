@@ -257,14 +257,14 @@ public class BaseActivity extends ActionBarActivity {
 
             this.tvuserdesc.setText(UserInfo.getCurrentUser(this).getDesc());
         }
-        this.findViewById(R.id.imageViewSetting).setOnClickListener(new View.OnClickListener() {
+        this.findViewById(R.id.userloginarea).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (UserInfo.isUserLogged(BaseActivity.this)) {
                     Intent edIntent = new Intent(BaseActivity.this, UserInfoActivity.class);
                     BaseActivity.this.startActivity(edIntent);
                 } else {
-                    Intent intentMain = new Intent(BaseActivity.this, MainActivity.class);
+                    Intent intentMain = new Intent(BaseActivity.this, LoginActivity.class);
                     BaseActivity.this.startActivityForResult(intentMain, LoginActivity.REQUEST_CODE_LOGIN);
                 }
             }
@@ -293,7 +293,7 @@ public class BaseActivity extends ActionBarActivity {
             BaseActivity.this.startActivity(intentFeedback);
 
         } else if (requestCode == LoginActivity.REQUEST_CODE_SUBSCRIBED_ARTISTS) {
-            FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_LIST,this);
+            FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_LIST, this);
             Intent intentSubscribedArtists = new Intent(BaseActivity.this, ListSubscribedArtistActivity.class);
             BaseActivity.this.startActivity(intentSubscribedArtists);
 
@@ -383,7 +383,7 @@ public class BaseActivity extends ActionBarActivity {
                     ShareUtils su = new ShareUtils(BaseActivity.this);
                     su.setUrl(CommonUtilities.SHARE_URL);
                     su.setContent(getResources().getString(R.string.share_text));
-                    Bitmap bmp= BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+                    Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
                     su.setPicture(bmp);
                     su.share();
                     break;
