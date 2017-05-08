@@ -59,6 +59,7 @@ public class SearchResultActivity extends BaseActivity {
     private FragmentSearchResultAdapter adapter;
     private ArrayList<ArrayList<HashMap<String, Object>>> list;
     private boolean refresh=false;
+    public LinearLayout  progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +68,8 @@ public class SearchResultActivity extends BaseActivity {
 
         Intent intent = getIntent();
         keyword = intent.getExtras().getString("key_word");
+        progressBar=(LinearLayout)findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
 
         if (Utils.isNetworkAvailable(this)) {
             //if banner data never cached or outdated
@@ -221,6 +224,8 @@ public class SearchResultActivity extends BaseActivity {
         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.search_result_category_3)));
         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.search_result_category_4)));
         tabLayout.setupWithViewPager(viewPager);
+
+        progressBar.setVisibility(View.GONE);
 
     }
 
@@ -561,6 +566,7 @@ public class SearchResultActivity extends BaseActivity {
                 MenuItem menuItem = menuFinal.findItem(R.id.search);
                 menuItem.collapseActionView();
                 getSupportActionBar().setTitle(keyword);
+                progressBar.setVisibility(View.VISIBLE);
                 if (Utils.isNetworkAvailable(SearchResultActivity.this)) {
                     //if banner data never cached or outdated
 

@@ -24,10 +24,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 import com.wewow.FeedbackActivity;
 import com.wewow.ListSubscribedArtistActivity;
 import com.wewow.LoginActivity;
 import com.wewow.R;
+import com.wewow.SearchResultActivity;
 import com.wewow.UserInfo;
 import com.wewow.adapter.ListViewAdapter;
 import com.wewow.adapter.RecycleViewArticlesOfArtistDetail;
@@ -81,6 +83,7 @@ public class searchResultListFragment extends Fragment {
         view =inflater.inflate(
                 R.layout.fragment_search_result_list, container, false);
         RecyclerView rv = (RecyclerView) view.findViewById(R.id.recyclerview);
+
         if(list!=null&&list.size()>0) {
             setupRecyclerView(rv);
         }
@@ -121,6 +124,7 @@ public class searchResultListFragment extends Fragment {
         bundle.putSerializable("list", (Serializable) list);
         searchResultListFragment blankFragment = new searchResultListFragment();
         blankFragment.setArguments(bundle);
+
 
 
         return blankFragment;
