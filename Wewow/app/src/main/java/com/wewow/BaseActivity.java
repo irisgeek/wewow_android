@@ -329,7 +329,7 @@ public class BaseActivity extends ActionBarActivity {
             switch (position - 1) {
                 case 0:
                     Intent intentMain = new Intent(BaseActivity.this, MainActivity.class);
-                    BaseActivity.this.startActivityForResult(intentMain, LoginActivity.REQUEST_CODE_LOGIN);
+                     startActivity(intentMain);
                     break;
                 case 1:
                     Intent intent = new Intent(BaseActivity.this, ListArtistActivity.class);
