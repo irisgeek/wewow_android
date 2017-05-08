@@ -237,15 +237,16 @@ public class DetailArtistActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
 
-                if (followed.equals("1")) {
-                    imageViewSubscribe.setImageResource(R.drawable.subscribe);
-                } else {
-                    imageViewSubscribe.setImageResource(R.drawable.subscribed);
-                }
+
 
                 if(UserInfo.isUserLogged(DetailArtistActivity.this)) {
 
                     postReadToServer(artist.getArtist().getId(),Integer.parseInt(followed.equals("1") ? "0" : "1"));
+                    if (followed.equals("1")) {
+                        imageViewSubscribe.setImageResource(R.drawable.subscribe);
+                    } else {
+                        imageViewSubscribe.setImageResource(R.drawable.subscribed);
+                    }
                 }
                 else
                 {
