@@ -124,7 +124,7 @@ public class SearchResultActivity extends BaseActivity {
             HashMap<String, Object> map = new HashMap<String, Object>();
 
             //
-
+            map.put("id",articles.get(i).getId());
             map.put("image", articles.get(i).getImage_642_320());
 
             map.put("title", articles.get(i).getTitle());
@@ -143,6 +143,7 @@ public class SearchResultActivity extends BaseActivity {
             //
 
             Institute institute = institutes.get(i);
+            map.put("id",institute.getId());
             map.put("imageView", institute.getImage());
             map.put("textViewNum",getResources().getString(R.string.number_refix) + institutes.get(i).getOrder());
             map.put("textViewTitle", institutes.get(i).getTitle());

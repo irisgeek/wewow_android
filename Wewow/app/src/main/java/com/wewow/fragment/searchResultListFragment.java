@@ -25,7 +25,11 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
+import com.wewow.ArticleActivity;
+import com.wewow.DetailArtistActivity;
 import com.wewow.FeedbackActivity;
+import com.wewow.LifeLabItemActivity;
+import com.wewow.LifePostActivity;
 import com.wewow.ListSubscribedArtistActivity;
 import com.wewow.LoginActivity;
 import com.wewow.R;
@@ -39,6 +43,7 @@ import com.wewow.adapter.RecycleViewPostOfSearchResultAdapter;
 import com.wewow.dto.Article;
 import com.wewow.dto.Artist;
 import com.wewow.dto.Institute;
+import com.wewow.dto.LabCollection;
 import com.wewow.netTask.ITask;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.FileCacheUtil;
@@ -136,27 +141,85 @@ public class searchResultListFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         if (category.equals(CommonUtilities.RESEARCH_RESULT_CATEGORY_ARTICLE)) {
 
-            recyclerView.setAdapter(new RecycleViewArticlesOfArtistDetail(getActivity(), list));
+
+            RecycleViewArticlesOfArtistDetail adapter = new RecycleViewArticlesOfArtistDetail(getActivity(), list);
+            adapter.setOnItemClickListener(new RecycleViewArticlesOfArtistDetail.OnItemClickListener() {
+                @Override
+                public void onItemClick(View view, int position) {
+                    Intent intent = new Intent(getActivity(), ArticleActivity.class);
+                    String articleId=list.get(position).get("id").toString();
+                    intent.putExtra(ArticleActivity.ARTICLE_ID,Integer.parseInt(articleId));
+                    getActivity().startActivity(intent);
+
+                }
+
+            });
+            recyclerView.setAdapter(adapter);
 
         }
         else
 
         if (category.equals(CommonUtilities.RESEARCH_RESULT_CATEGORY_INSTITUTE)) {
 
-            recyclerView.setAdapter(new RecycleViewInstitutesOfSearchResultAdapter(getActivity(), list));
+            RecycleViewInstitutesOfSearchResultAdapter adapter = new RecycleViewInstitutesOfSearchResultAdapter(getActivity(), list);
+            adapter.setOnItemClickListener(new RecycleViewInstitutesOfSearchResultAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(View view, int position) {
+                    LabCollection lc = new LabCollection();
+                    lc.image = list.get(position).get("imageView").toString();
+                    lc.title =  list.get(position).get("textViewTitle").toString();
+                    lc.id = Long.parseLong(list.get(position).get("id").toString());
+                    Intent intent = new Intent(getActivity(), LifeLabItemActivity.class);
+                    intent.putExtra(LifeLabItemActivity.LIFELAB_COLLECTION, lc);
+
+                    startActivity(intent);
+
+                }
+
+            });
+            recyclerView.setAdapter(adapter);
 
         }
         else
 
         if (category.equals(CommonUtilities.RESEARCH_RESULT_CATEGORY_ARTIST)) {
 
-            recyclerView.setAdapter(new RecycleViewArtistsOfSearchResultAdapter(getActivity(), list));
+
+            RecycleViewArtistsOfSearchResultAdapter adapter = new RecycleViewArtistsOfSearchResultAdapter(getActivity(), list);
+
+            adapter.setOnItemClickListener(new RecycleViewArtistsOfSearchResultAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(View view, int position) {
+                    HashMap<String, Object> stringObjectHashMap = (HashMap<String, Object>) list.get(position);
+                    String artistId = stringObjectHashMap.get("id").toString();
+                    Intent intent = new Intent(getActivity(), DetailArtistActivity.class);
+                    intent.putExtra("id", artistId);
+                    startActivity(intent);
+
+                }
+
+            });
+
+
+            recyclerView.setAdapter(adapter);
 
         }
         else
         if (category.equals(CommonUtilities.RESEARCH_RESULT_CATEGORY_POST)) {
 
-            recyclerView.setAdapter(new RecycleViewPostOfSearchResultAdapter(getActivity(), list));
+            RecycleViewPostOfSearchResultAdapter adapter = new RecycleViewPostOfSearchResultAdapter(getActivity(), list);
+
+            adapter.setOnItemClickListener(new RecycleViewPostOfSearchResultAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(View view, int position) {
+                    Intent intent = new Intent(getActivity(), LifePostActivity.class);
+                    intent.putExtra(LifePostActivity.POST_ID, Integer.parseInt(list.get(position).get("id").toString()));
+                    startActivity(intent);
+
+                }
+
+            });
+            recyclerView.setAdapter(adapter);
 
         }
 
