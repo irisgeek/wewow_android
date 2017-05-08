@@ -167,6 +167,14 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
             }
         });
 
+        this.findViewById(R.id.login_back).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LoginActivity.this.setResult(RESULT_CANCELED);
+                LoginActivity.this.finish();
+            }
+        });
+
         this.setupReqVerifyCode();
         this.btnSendVerifyCode2 = (TextView) this.findViewById(R.id.login_btn_send_verify_code_2);
         this.btnSendVerifyCode2.setOnClickListener(new OnClickListener() {
