@@ -50,7 +50,7 @@ import retrofit.client.Response;
 /**
  * Created by iris on 17/3/13.
  */
-public class categaryFragment  extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class categaryFragment  extends Fragment{
 
 
 
@@ -61,8 +61,7 @@ public class categaryFragment  extends Fragment implements SwipeRefreshLayout.On
     private String[] dummyCollectionCount = {"1203", "1232"};
     private ViewPager viewPagerLoverOfLife;
     private ListView listViewInstituteRecommended;
-    private SwipeRefreshLayout swipeRefreshLayout
-            ;
+
     private View view;
     private String categoryId="";
 
@@ -89,8 +88,6 @@ public class categaryFragment  extends Fragment implements SwipeRefreshLayout.On
         }
         view= inflater.inflate(R.layout.fragment_other_categary, container, false);
 
-        swipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(R.id.swipe_refresh_layout);
-        swipeRefreshLayout.setOnRefreshListener(this);
 //        swipeRefreshLayout.post(new Runnable() {
 //                                    @Override
 //                                    public void run() {
@@ -107,7 +104,7 @@ public class categaryFragment  extends Fragment implements SwipeRefreshLayout.On
 
         } else {
             Toast.makeText(getActivity(), getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
-            swipeRefreshLayout.setRefreshing(false);
+
 
             SettingUtils.set(getActivity(), CommonUtilities.NETWORK_STATE, false);
 
@@ -137,7 +134,6 @@ public class categaryFragment  extends Fragment implements SwipeRefreshLayout.On
     }
 
     private void checkCacheUpdatedOrNot() {
-        swipeRefreshLayout.setRefreshing(true);
 
         ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
         iTask.updateAt(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(getActivity()), new Callback<JSONObject>() {
@@ -150,7 +146,7 @@ public class categaryFragment  extends Fragment implements SwipeRefreshLayout.On
                     String realData = Utils.convertStreamToString(response.getBody().in());
                     if (!realData.contains(CommonUtilities.SUCCESS)) {
                         Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                        swipeRefreshLayout.setRefreshing(false);
+
 
                     } else {
                         JSONObject jsonObject = new JSONObject(realData);
@@ -176,11 +172,11 @@ public class categaryFragment  extends Fragment implements SwipeRefreshLayout.On
                 } catch (IOException e) {
                     e.printStackTrace();
                     Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                    swipeRefreshLayout.setRefreshing(false);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                    swipeRefreshLayout.setRefreshing(false);
+
                 }
 
             }
@@ -189,7 +185,7 @@ public class categaryFragment  extends Fragment implements SwipeRefreshLayout.On
             public void failure(RetrofitError error) {
                 Log.i("MainActivity", "request banner failed: " + error.toString());
                 Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                swipeRefreshLayout.setRefreshing(false);
+
 
             }
         });
@@ -213,7 +209,7 @@ public class categaryFragment  extends Fragment implements SwipeRefreshLayout.On
                     String realData = Utils.convertStreamToString(response.getBody().in());
                     if (!realData.contains(CommonUtilities.SUCCESS)) {
                         Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                        swipeRefreshLayout.setRefreshing(false);
+
 
                     } else {
 
@@ -228,11 +224,11 @@ public class categaryFragment  extends Fragment implements SwipeRefreshLayout.On
                 } catch (IOException e) {
                     e.printStackTrace();
                     Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                    swipeRefreshLayout.setRefreshing(false);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                    swipeRefreshLayout.setRefreshing(false);
+
                 }
 
             }
@@ -240,7 +236,7 @@ public class categaryFragment  extends Fragment implements SwipeRefreshLayout.On
             @Override
             public void failure(RetrofitError error) {
                 Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                swipeRefreshLayout.setRefreshing(false);
+
 
                 Log.i("MainActivity", "request banner failed: " + error.toString());
 
@@ -493,14 +489,11 @@ public class categaryFragment  extends Fragment implements SwipeRefreshLayout.On
 
         //fix bug created by scrollview
         fixListViewHeight(listViewInstituteRecommended);
-        swipeRefreshLayout.setRefreshing(false);
+
 
     }
 
-    @Override
-    public void onRefresh() {
 
-    }
 
 
     private class BouncePageChangeListener implements ViewPager.OnPageChangeListener {

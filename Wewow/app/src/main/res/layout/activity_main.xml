@@ -66,120 +66,29 @@
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
         </android.support.design.widget.CollapsingToolbarLayout>
-            <android.support.design.widget.TabLayout
-                android:id="@+id/tabs"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:background="@android:color/white"
-                app:tabTextAppearance="@style/MyTabLayoutTextAppearance"
-                app:tabSelectedTextColor="@color/tab_text_selected_color"
-                app:tabIndicatorColor="#333631"
-                app:tabMinWidth="@dimen/tab_width"
-                app:tabMode="fixed" />
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tabs"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:background="@android:color/white"
+            app:tabIndicatorColor="#333631"
+            app:tabMinWidth="@dimen/tab_width"
+            app:tabMode="fixed"
+            app:tabSelectedTextColor="@color/tab_text_selected_color"
+            app:tabTextAppearance="@style/MyTabLayoutTextAppearance" />
 
 
     </android.support.design.widget.AppBarLayout>
 
 
-    <!-- navigationBar -->
-
-
-    <android.support.v4.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-       >
-
-
-    <!--<LinearLayout-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="52dp"-->
-    <!--android:background="#ffffff"-->
-    <!--android:orientation="horizontal">-->
-
-    <!--<RelativeLayout-->
-    <!--android:layout_width="72dp"-->
-    <!--android:layout_height="52dp"-->
-    <!--android:gravity="center">-->
-
-    <!--<TextView-->
-    <!--android:id="@+id/textViewHome"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_gravity="center"-->
-    <!--android:text="@string/home" />-->
-    <!--</RelativeLayout>-->
-
-    <!--<LinearLayout-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="52dp"-->
-    <!--android:gravity="center"-->
-    <!--android:orientation="horizontal">-->
-
-    <!--<TextView-->
-    <!--android:id="@+id/textViewTitle1"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-
-    <!--android:layout_weight="1"-->
-    <!--android:text="@string/test1" />-->
-
-    <!--<TextView-->
-    <!--android:id="@+id/textViewTitle2"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_weight="1"-->
-    <!--android:text="@string/test2" />-->
-
-    <!--<TextView-->
-    <!--android:id="@+id/textViewTitle3"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_weight="1"-->
-    <!--android:text="@string/test3" />-->
-
-    <!--<TextView-->
-    <!--android:id="@+id/textViewTitle4"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_weight="1"-->
-    <!--android:text="@string/test4" />-->
-
-    <!--</LinearLayout>-->
-
-
-    <!--</LinearLayout>-->
-
-    <!--<ImageView-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:background="@drawable/divider" />-->
-
     <com.wewow.view.CustomViewPager
         android:id="@+id/pagerTabs"
-        android:layout_width="fill_parent"
-        android:layout_height="1000dp" />
-
-
-    <LinearLayout
-        android:id="@+id/layoutCover"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#88000000"
-        android:orientation="horizontal"
-        android:visibility="gone">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    </LinearLayout>
-    </LinearLayout>
 
-    </android.support.v4.widget.NestedScrollView>
 </android.support.design.widget.CoordinatorLayout>
 
 

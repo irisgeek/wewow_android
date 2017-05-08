@@ -64,7 +64,7 @@ import retrofit.client.Response;
 /**
  * Created by iris on 17/3/13.
  */
-public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class homeFragment extends Fragment {
 
 
     private String[] dummyVols = {"vol.79", "vol.64"};
@@ -74,7 +74,6 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private String[] dummyCollectionCount = {"1203", "1232"};
     private ListView listViewInstituteRecommended;
     private RecyclerView rv;
-    private SwipeRefreshLayout swipeRefreshLayout;
 
     private CardView cardViewNewVersionAvailable;
     private CardView cardViewAds;
@@ -92,7 +91,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private boolean isNotificationShow = false;
     private boolean isAdsShow = false;
 
-
+    public LinearLayout  progressBar;
     public homeFragment() {
 
     }
@@ -110,8 +109,9 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_home, container, false);
         initData(view);
-        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
-        swipeRefreshLayout.setOnRefreshListener(this);
+        progressBar=(LinearLayout)view.findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
+
 
         if (Utils.isNetworkAvailable(getActivity())) {
 
@@ -119,8 +119,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
         } else {
             Toast.makeText(getActivity(), getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
-            swipeRefreshLayout.setRefreshing(false);
-
+            progressBar.setVisibility(View.GONE);
             SettingUtils.set(getActivity(), CommonUtilities.NETWORK_STATE, false);
             setUpLatestInstitueFromCache(view);
             setUpRecommendedArtistsAndInstituesFromCache(view);
@@ -251,7 +250,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     }
 
     private void checkCacheUpdatedOrNot() {
-        swipeRefreshLayout.setRefreshing(true);
+        progressBar.setVisibility(View.VISIBLE);
 
         ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
         iTask.updateAt(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(getActivity()), new Callback<JSONObject>() {
@@ -264,7 +263,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     String realData = Utils.convertStreamToString(response.getBody().in());
                     if (!realData.contains(CommonUtilities.SUCCESS)) {
                         Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                        swipeRefreshLayout.setRefreshing(false);
+                        progressBar.setVisibility(View.GONE);
 
                     } else {
 
@@ -306,11 +305,11 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 } catch (IOException e) {
                     e.printStackTrace();
                     Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                    swipeRefreshLayout.setRefreshing(false);
+                    progressBar.setVisibility(View.GONE);
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                    swipeRefreshLayout.setRefreshing(false);
+                    progressBar.setVisibility(View.GONE);
                 }
 
             }
@@ -319,7 +318,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             public void failure(RetrofitError error) {
                 Log.i("MainActivity", "request banner failed: " + error.toString());
                 Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                swipeRefreshLayout.setRefreshing(false);
+                progressBar.setVisibility(View.GONE);
 
             }
         });
@@ -341,7 +340,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     String realData = Utils.convertStreamToString(response.getBody().in());
                     if (!realData.contains(CommonUtilities.SUCCESS)) {
                         Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                        swipeRefreshLayout.setRefreshing(false);
+                        progressBar.setVisibility(View.GONE);
 
                     } else if (realData.contains("content")) {
                         isAdsShow = true;
@@ -355,11 +354,11 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 } catch (IOException e) {
                     e.printStackTrace();
                     Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                    swipeRefreshLayout.setRefreshing(false);
+                    progressBar.setVisibility(View.GONE);
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                    swipeRefreshLayout.setRefreshing(false);
+                    progressBar.setVisibility(View.GONE);
                 }
 
             }
@@ -368,7 +367,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             public void failure(RetrofitError error) {
                 Log.i("MainActivity", "request banner failed: " + error.toString());
                 Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                swipeRefreshLayout.setRefreshing(false);
+                progressBar.setVisibility(View.GONE);
 
             }
         });
@@ -394,7 +393,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         requestSentCount--;
 
         if (requestSentCount == 0 ) {
-            swipeRefreshLayout.setRefreshing(false);
+            progressBar.setVisibility(View.GONE);
             LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.layoutHome);
             linearLayout.setVisibility(View.VISIBLE);
 
@@ -469,7 +468,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         requestSentCount--;
 
         if (requestSentCount == 0) {
-            swipeRefreshLayout.setRefreshing(false);
+            progressBar.setVisibility(View.GONE);
             LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.layoutHome);
             linearLayout.setVisibility(View.VISIBLE);
 
@@ -511,8 +510,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     String realData = Utils.convertStreamToString(response.getBody().in());
                     if (!(realData.contains(CommonUtilities.SUCCESS)||realData.contains("sucess"))) {
                         Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                        swipeRefreshLayout.setRefreshing(false);
-
+                        progressBar.setVisibility(View.GONE);
                     } else if (realData.contains(CommonUtilities.DATE)) {
                         isNotificationShow = true;
                         notification = parseNotificationFromString(realData);
@@ -526,11 +524,11 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 } catch (IOException e) {
                     e.printStackTrace();
                     Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                    swipeRefreshLayout.setRefreshing(false);
+                    progressBar.setVisibility(View.GONE);
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                    swipeRefreshLayout.setRefreshing(false);
+                    progressBar.setVisibility(View.GONE);
                 }
 
             }
@@ -539,7 +537,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             public void failure(RetrofitError error) {
                 Log.i("MainActivity", "request banner failed: " + error.toString());
                 Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                swipeRefreshLayout.setRefreshing(false);
+                progressBar.setVisibility(View.GONE);
 
             }
         });
@@ -548,7 +546,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
 
     private void getLatestInstituteFromServer() {
-        swipeRefreshLayout.setRefreshing(true);
+        progressBar.setVisibility(View.VISIBLE);
         requestSentCount++;
         ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
         iTask.latestInstite(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(getActivity()), new Callback<JSONObject>() {
@@ -561,7 +559,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     String realData = Utils.convertStreamToString(response.getBody().in());
                     if (!realData.contains(CommonUtilities.SUCCESS)) {
                         Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                        swipeRefreshLayout.setRefreshing(false);
+                        progressBar.setVisibility(View.GONE);
 
                     } else {
                         institute = parseInstituteFromString(realData);
@@ -573,11 +571,11 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 } catch (IOException e) {
                     e.printStackTrace();
                     Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                    swipeRefreshLayout.setRefreshing(false);
+                    progressBar.setVisibility(View.GONE);
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                    swipeRefreshLayout.setRefreshing(false);
+                    progressBar.setVisibility(View.GONE);
                 }
 
             }
@@ -586,7 +584,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             public void failure(RetrofitError error) {
                 Log.i("MainActivity", "request banner failed: " + error.toString());
                 Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                swipeRefreshLayout.setRefreshing(false);
+                progressBar.setVisibility(View.GONE);
 
             }
         });
@@ -610,7 +608,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     String realData = Utils.convertStreamToString(response.getBody().in());
                     if (!realData.contains(CommonUtilities.SUCCESS)) {
                         Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                        swipeRefreshLayout.setRefreshing(false);
+                        progressBar.setVisibility(View.GONE);
 
                     } else {
 
@@ -625,11 +623,11 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 } catch (IOException e) {
                     e.printStackTrace();
                     Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                    swipeRefreshLayout.setRefreshing(false);
+                    progressBar.setVisibility(View.GONE);
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                    swipeRefreshLayout.setRefreshing(false);
+                    progressBar.setVisibility(View.GONE);
                 }
 
             }
@@ -637,7 +635,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             @Override
             public void failure(RetrofitError error) {
                 Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-                swipeRefreshLayout.setRefreshing(false);
+                progressBar.setVisibility(View.GONE);
 
                 Log.i("MainActivity", "request banner failed: " + error.toString());
 
@@ -652,7 +650,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         requestSentCount--;
 
         if (requestSentCount == 0 || isFromCache) {
-            swipeRefreshLayout.setRefreshing(false);
+            progressBar.setVisibility(View.GONE);
             LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.layoutHome);
             linearLayout.setVisibility(View.VISIBLE);
 
@@ -731,7 +729,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         requestSentCount--;
 
         if (requestSentCount == 0 || isFromCache) {
-            swipeRefreshLayout.setRefreshing(false);
+            progressBar.setVisibility(View.GONE);
             LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.layoutHome);
             linearLayout.setVisibility(View.VISIBLE);
 
@@ -979,7 +977,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
         //fix bug created by scrollview
         fixListViewHeight(listViewInstituteRecommended);
-        swipeRefreshLayout.setRefreshing(false);
+        progressBar.setVisibility(View.GONE);
     }
 
     public void setUpListViewInstituteRecommend(List<Institute> institutes, View rootView) {
@@ -1034,20 +1032,7 @@ public class homeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         fixListViewHeight(listViewInstituteRecommended);
     }
 
-    @Override
-    public void onRefresh() {
 
-//        setUpViewPagerLoverOfLife();
-//        setUpListViewInstituteRecommend();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-
-                swipeRefreshLayout.setRefreshing(false);
-            }
-        }, 6000);
-
-    }
 
 
     private class BouncePageChangeListener implements ViewPager.OnPageChangeListener {
