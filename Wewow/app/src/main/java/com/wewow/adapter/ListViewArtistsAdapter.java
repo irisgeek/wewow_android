@@ -102,12 +102,13 @@ public class ListViewArtistsAdapter extends BaseAdapter
             holder.imageViewFollowed.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    holder.imageViewFollowed.setImageResource(R.drawable.followed);
+
 
                     if(UserInfo.isUserLogged(context)) {
 
                         id = stringObjectHashMap.get("id").toString();
                         postReadToServer(id);
+                        holder.imageViewFollowed.setImageResource(R.drawable.followed);
                     }
                     else
                     {
