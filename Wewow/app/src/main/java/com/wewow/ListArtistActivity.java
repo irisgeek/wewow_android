@@ -126,7 +126,6 @@ public class ListArtistActivity extends BaseActivity {
                 }
 
 
-
             }
         });
 
@@ -170,26 +169,58 @@ public class ListArtistActivity extends BaseActivity {
 
 
         AutoCompleteTextView completeText = (SearchView.SearchAutoComplete) searchView.findViewById(R.id.search_src_text);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.list_item_search, R.id.text, testStrings);
+//        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.list_item_search, R.id.text, testStrings);
 
-        completeText.setAdapter(adapter);
-        completeText.setTextColor(getResources().getColor(R.color.search_text_view_color));
-        completeText.setHintTextColor(getResources().getColor(R.color.search_text_view_hint_color));
+//        completeText.setAdapter(adapter);
+        completeText.setTextColor(getResources().getColor(R.color.search_hot_search_words));
+        completeText.setHintTextColor(getResources().getColor(R.color.search_text_view_hint_color_of_artist_list));
         completeText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 searchView.setQuery(testStrings[position], true);
             }
         });
-
+        final Menu menuFinal=menu;
         completeText.setThreshold(0);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Toast.makeText(ListArtistActivity.this, query, Toast.LENGTH_SHORT).show();
+
+
+                MenuItem menuItem = menuFinal.findItem(R.id.search);
+                menuItem.collapseActionView();
+
+                List<Artist> artistsBySearch=new ArrayList<Artist>();
+                for(Artist artist:artists)
+                {
+                    if (artist.getNickname().contains(query))
+                    {
+                        artistsBySearch.add(artist);
+                    }
+                }
+                listItem.clear();
+
+                for (int i = 0; i < artistsBySearch.size(); i++) {
+                    HashMap<String, Object> map = new HashMap<String, Object>();
+
+                    //
+
+                    map.put("imageView", artistsBySearch.get(i).getImage());
+
+                    map.put("textViewName", artistsBySearch.get(i).getNickname());
+                    map.put("textViewDesc", artistsBySearch.get(i).getDesc());
+                    map.put("textViewArticleCount", artistsBySearch.get(i).getArticle_count());
+                    map.put("textViewFollowerCount", artistsBySearch.get(i).getFollower_count());
+                    map.put("imageViewFollowed", artistsBySearch.get(i).getFollowed());
+                    map.put("id", artistsBySearch.get(i).getId());
+
+                    listItem.add(map);
+                }
+                adapter.notifyDataSetChanged();
+
 //                LinearLayout layout = (LinearLayout) findViewById(R.id.layoutCover);
 //                layout.setVisibility(View.GONE);
-                return false;
+                return true;
             }
 
             @Override

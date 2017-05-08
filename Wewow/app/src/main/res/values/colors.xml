@@ -12,6 +12,8 @@
 
     <color name="search_text_view_color">#ffffff</color>
     <color name="search_text_view_hint_color">#91ffffff</color>
+
+    <color name="search_text_view_hint_color_of_artist_list">#7c7d7a</color>
     <color name="search_hot_search">#7c7d7a</color>
     <color name="search_hot_search_words">#333631</color>
 
