@@ -26,7 +26,13 @@ public  class RecycleViewPostOfSearchResultAdapter
     private int mBackground;
     private ArrayList<HashMap<String, Object>> list;
 
-
+    public interface OnItemClickListener{
+        void onItemClick(View view,int position);
+    }
+    private OnItemClickListener mOnItemClickListener;
+    public void setOnItemClickListener(OnItemClickListener mOnItemClickListener){
+        this.mOnItemClickListener = mOnItemClickListener;
+    }
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
 
@@ -76,6 +82,16 @@ public  class RecycleViewPostOfSearchResultAdapter
                 .into(holder.imageView);
         holder.textViewTitle.setText(stringObjectHashMap.get("textViewTitle").toString());
 //        holder.textViewNum.setText(stringObjectHashMap.get("textViewNum").toString());
+        if(mOnItemClickListener != null){
+            //为ItemView设置监听器
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = holder.getLayoutPosition(); // 1
+                    mOnItemClickListener.onItemClick(holder.itemView,position); // 2
+                }
+            });
+        }
 
     }
 
