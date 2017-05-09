@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/loading_view_layout"
+    android:layout_gravity="center_horizontal"
+    android:layout_width="60dp"
+    android:layout_height="60dp"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar
+        android:id="@+id/progress"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center_horizontal"
+        android:visibility="visible"
+        app:mlpb_progress_color="@color/font_color"
+        app:mlpb_progress_stoke_width="3dp" />
+
+</LinearLayout>

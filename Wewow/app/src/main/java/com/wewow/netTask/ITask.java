@@ -46,7 +46,7 @@ public interface ITask {
     //artist detail
     @GET("/artist_mini")
     void artistDetail(@Header("User-Agent") String headerContentType, @Query("user_id") String userId,
-                      @Query("artist_id") String artistId, Callback<JSONObject> callback);
+                      @Query("artist_id") String artistId, @Query("page") int page, Callback<JSONObject> callback);
 
     @GET("/user_followed_mini")
     void artistsSubscribed(@Header("User-Agent") String headerContentType, @Query("user_id") String userId,

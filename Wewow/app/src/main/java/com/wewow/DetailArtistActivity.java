@@ -35,8 +35,10 @@ import com.wewow.dto.ArtistDetail;
 import com.wewow.netTask.ITask;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.FileCacheUtil;
+import com.wewow.utils.LoadMoreListener;
 import com.wewow.utils.SettingUtils;
 import com.wewow.utils.Utils;
+import com.wewow.view.RecyclerViewUpRefresh;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -57,12 +59,17 @@ import android.support.v7.widget.RecyclerView;
 /**
  * Created by iris on 17/3/24.
  */
-public class DetailArtistActivity extends BaseActivity {
+public class DetailArtistActivity extends BaseActivity implements LoadMoreListener {
 
 
     private String id;
     private ImageView imageViewSubscribe;
     private boolean updateArtistList=false;
+    private int currentPage = 1;
+    private RecyclerViewUpRefresh rv;
+    private ArrayList<HashMap<String, Object>> listItem;
+    private RecycleViewArticlesOfArtistDetail adapter;
+    private String totalPages;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,10 +79,13 @@ public class DetailArtistActivity extends BaseActivity {
         setContentView(R.layout.activity_detail_artist);
         Intent getIntent = getIntent();
         id = getIntent.getStringExtra("id");
+        listItem = new ArrayList<HashMap<String, Object>>();
 
 //        initData();
-        RecyclerView rv = (RecyclerView)findViewById(R.id.recyclerview);
+        rv = (RecyclerViewUpRefresh)findViewById(R.id.recyclerview);
         rv.setLayoutManager(new LinearLayoutManager(rv.getContext()));
+        rv.setCanloadMore(true);
+        rv.setLoadMoreListener(this);
 
         if (Utils.isNetworkAvailable(this)) {
 
@@ -111,7 +121,7 @@ public class DetailArtistActivity extends BaseActivity {
                     String realData = Utils.convertStreamToString(response.getBody().in());
                     if (!realData.contains(com.wewow.utils.CommonUtilities.SUCCESS)) {
                         Toast.makeText(DetailArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-
+                        rv.loadMoreComplete();
 
                     } else {
                         JSONObject jsonObject = new JSONObject(realData);
@@ -125,7 +135,7 @@ public class DetailArtistActivity extends BaseActivity {
                                 .isCacheDataFailure(CommonUtilities.CACHE_FILE_ARTISTS_DETAIL + id, DetailArtistActivity.this, cacheUpdatedTime);
 
                         if (isCacheDataOutdated) {
-                            getArtistFromServer();
+                            getArtistFromServer(false);
                         } else {
                             setUpArtistFromCache();
 //                            setUpListViewDummy();
@@ -136,11 +146,13 @@ public class DetailArtistActivity extends BaseActivity {
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
+                    rv.loadMoreComplete();
                     Toast.makeText(DetailArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
 //                    swipeRefreshLayout.setRefreshing(false);
                 } catch (JSONException e) {
                     Toast.makeText(DetailArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
+                    rv.loadMoreComplete();
 //                    swipeRefreshLayout.setRefreshing(false);
                 }
 
@@ -148,6 +160,7 @@ public class DetailArtistActivity extends BaseActivity {
 
             @Override
             public void failure(RetrofitError error) {
+                rv.loadMoreComplete();
                 Toast.makeText(DetailArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
 //                swipeRefreshLayout.setRefreshing(false);
             }
@@ -157,7 +170,7 @@ public class DetailArtistActivity extends BaseActivity {
 
     }
 
-    private void getArtistFromServer() {
+    private void getArtistFromServer(final boolean refresh) {
 
         ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
         String userId = "0";
@@ -168,7 +181,7 @@ public class DetailArtistActivity extends BaseActivity {
             userToken=UserInfo.getCurrentUser(DetailArtistActivity.this).getToken();
 
         }
-        iTask.artistDetail(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), userId, id, new Callback<JSONObject>() {
+        iTask.artistDetail(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), userId, id, currentPage, new Callback<JSONObject>() {
 
             @Override
             public void success(JSONObject object, Response response) {
@@ -179,12 +192,18 @@ public class DetailArtistActivity extends BaseActivity {
                     if (!realData.contains(CommonUtilities.SUCCESS)) {
                         Toast.makeText(DetailArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
 //                        swipeRefreshLayout.setRefreshing(false);
+                        rv.loadMoreComplete();
 
                     } else {
-                        artist = parseArtistFromString(realData);
+                        if (refresh) {
+                            artist = parseArticlesFromString(realData);
+                        } else {
+                            artist = parseArtistFromString(realData);
+                            FileCacheUtil.setCache(realData, DetailArtistActivity.this, CommonUtilities.CACHE_FILE_ARTISTS_DETAIL + id, 0);
+                        }
 
-                        FileCacheUtil.setCache(realData, DetailArtistActivity.this, CommonUtilities.CACHE_FILE_ARTISTS_DETAIL + id, 0);
-                        setUpArtist(artist);
+
+                        setUpArtist(artist, refresh);
 
 
                     }
@@ -193,10 +212,12 @@ public class DetailArtistActivity extends BaseActivity {
                     e.printStackTrace();
                     Toast.makeText(DetailArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
 //                    swipeRefreshLayout.setRefreshing(false);
+                    rv.loadMoreComplete();
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Toast.makeText(DetailArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
 //                    swipeRefreshLayout.setRefreshing(false);
+                    rv.loadMoreComplete();
                 }
 
             }
@@ -205,65 +226,76 @@ public class DetailArtistActivity extends BaseActivity {
             public void failure(RetrofitError error) {
                 Toast.makeText(DetailArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
 //                swipeRefreshLayout.setRefreshing(false);
+                rv.loadMoreComplete();
 
             }
         });
     }
 
-    private void setUpArtist(final ArtistDetail artist) {
+    private void setUpArtist(final ArtistDetail artist,boolean refresh) {
 
-        ImageView imageView=(ImageView)findViewById(R.id.imageViewIcon);
-        Glide.with(this)
+      if(!refresh) {
+          ImageView imageView = (ImageView) findViewById(R.id.imageViewIcon);
+          Glide.with(this)
 
-        .load(artist.getArtist().getImage()).crossFade().fitCenter().placeholder(R.drawable.banner_loading_spinner).placeholder(R.drawable.banner_loading_spinner).into(imageView);
+                  .load(artist.getArtist().getImage()).crossFade().fitCenter().placeholder(R.drawable.banner_loading_spinner).placeholder(R.drawable.banner_loading_spinner).into(imageView);
 
-        TextView textViewNickName=(TextView)findViewById(R.id.textViewNickName);
-        textViewNickName.setText(artist.getArtist().getNickname());
+          TextView textViewNickName = (TextView) findViewById(R.id.textViewNickName);
+          textViewNickName.setText(artist.getArtist().getNickname());
 
-        TextView textViewDesc=(TextView)findViewById(R.id.textViewDesc);
-        textViewDesc.setText(artist.getArtist().getDesc());
+          TextView textViewDesc = (TextView) findViewById(R.id.textViewDesc);
+          textViewDesc.setText(artist.getArtist().getDesc());
 
-        imageViewSubscribe=(ImageView) findViewById(R.id.imageViewSubscribe);
-        final String followed = artist.getArtist().getFollowed();
-        if(followed.equals("1"))
-        {
-            imageViewSubscribe.setImageResource(R.drawable.subscribed);
+          imageViewSubscribe = (ImageView) findViewById(R.id.imageViewSubscribe);
+          final String followed = artist.getArtist().getFollowed();
+          if (followed.equals("1")) {
+              imageViewSubscribe.setImageResource(R.drawable.subscribed);
+          } else {
+              imageViewSubscribe.setImageResource(R.drawable.subscribe);
+          }
+
+          imageViewSubscribe.setOnClickListener(new View.OnClickListener() {
+              @Override
+              public void onClick(View v) {
+
+
+                  if (UserInfo.isUserLogged(DetailArtistActivity.this)) {
+
+                      postReadToServer(artist.getArtist().getId(), Integer.parseInt(followed.equals("1") ? "0" : "1"));
+                      if (followed.equals("1")) {
+                          imageViewSubscribe.setImageResource(R.drawable.subscribe);
+                      } else {
+                          imageViewSubscribe.setImageResource(R.drawable.subscribed);
+                      }
+                  } else {
+                      Intent i = new Intent();
+                      i.setClass(DetailArtistActivity.this, LoginActivity.class);
+                      startActivity(i);
+                  }
+
+
+              }
+          });
+
+          TextView textViewCount = (TextView) findViewById(R.id.textViewCount);
+          textViewCount.setText(artist.getArtist().getFollower_count() + getResources().getString(R.string.subscriber));
+      }
+
+        ArrayList<HashMap<String, Object>> listItemCopy = new ArrayList<HashMap<String, Object>>();
+        listItemCopy.addAll(listItem);
+//        if (refresh) {
+
+        if (listItem != null && listItem.size() > 0) {
+            listItem.clear();
+
         }
-        else {
-            imageViewSubscribe.setImageResource(R.drawable.subscribe);
+//
+        if(currentPage!=1) {
+            listItem.addAll(listItemCopy);
         }
 
-        imageViewSubscribe.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
 
-
-                if(UserInfo.isUserLogged(DetailArtistActivity.this)) {
-
-                    postReadToServer(artist.getArtist().getId(),Integer.parseInt(followed.equals("1") ? "0" : "1"));
-                    if (followed.equals("1")) {
-                        imageViewSubscribe.setImageResource(R.drawable.subscribe);
-                    } else {
-                        imageViewSubscribe.setImageResource(R.drawable.subscribed);
-                    }
-                }
-                else
-                {
-                    Intent i = new Intent();
-                    i.setClass(DetailArtistActivity.this, LoginActivity.class);
-                    startActivity(i);
-                }
-
-
-            }
-        });
-
-        TextView textViewCount=(TextView)findViewById(R.id.textViewCount);
-        textViewCount.setText(artist.getArtist().getFollower_count()+getResources().getString(R.string.subscriber));
-
-
-        ArrayList<HashMap<String, Object>> listItem = new ArrayList<HashMap<String, Object>>();
         final  List<Article> articles=artist.getArticles();
 
 
@@ -278,10 +310,19 @@ public class DetailArtistActivity extends BaseActivity {
        //todo
             listItem.add(map);
         }
-        RecyclerView rv = (RecyclerView) findViewById(R.id.recyclerview);
-        rv.setLayoutManager(new LinearLayoutManager(rv.getContext()));
-        RecycleViewArticlesOfArtistDetail adapter = new RecycleViewArticlesOfArtistDetail(this,
-                listItem);
+
+        if (!refresh) {
+
+             adapter = new RecycleViewArticlesOfArtistDetail(this,
+                    listItem);
+
+            rv.setAdapter(adapter);
+        }
+        else
+        {
+            adapter.notifyDataSetChanged();
+        }
+
 
         adapter.setOnItemClickListener(new RecycleViewArticlesOfArtistDetail.OnItemClickListener() {
             @Override
@@ -294,8 +335,8 @@ public class DetailArtistActivity extends BaseActivity {
             }
 
         });
-        rv.setAdapter(adapter);
-
+        currentPage++;
+        rv.loadMoreComplete();
 
 
     }
@@ -360,7 +401,7 @@ public class DetailArtistActivity extends BaseActivity {
                 e.printStackTrace();
             }
 
-            setUpArtist(artist);
+            setUpArtist(artist,false);
         }
     }
 
@@ -537,6 +578,34 @@ public class DetailArtistActivity extends BaseActivity {
         return artistDetail;
     }
 
+    private ArtistDetail parseArticlesFromString(String realData) throws JSONException {
+
+        ArtistDetail artistDetail = new ArtistDetail();
+
+        JSONObject object = new JSONObject(realData);
+
+        List<Article> articles = new ArrayList<Article>();
+
+
+        JSONArray array = object.getJSONObject("result").getJSONObject("data").getJSONArray("article_list");
+
+        for (int i = 0; i < array.length(); i++) {
+            Article article = new Article();
+
+            JSONObject result = array.getJSONObject(i);
+            article.setId(result.getString("id"));
+            article.setImage_284_160(result.getString("image_284_160"));
+            article.setImage_320_160(result.getString("image_320_160"));
+            article.setTitle(result.getString("title"));
+            article.setWewow_category(result.getString("wewow_category"));
+
+            articles.add(article);
+        }
+        artistDetail.setArticles(articles);
+
+        return artistDetail;
+    }
+
 
     @Override
     public void onBackPressed() {
@@ -548,5 +617,40 @@ public class DetailArtistActivity extends BaseActivity {
     }
 
 
+    @Override
+    public void onLoadMore() {
 
+        boolean isLastPageLoaded = false;
+        try {
+            isLastPageLoaded = isLastPageLoaded();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if (!isLastPageLoaded) {
+
+            getArtistFromServer(true);
+        } else {
+            rv.loadMoreComplete();
+        }
+
+
+    }
+
+    private boolean isLastPageLoaded() throws JSONException {
+
+        boolean result = false;
+
+        if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_ARTISTS_DETAIL+id, this)) {
+            String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_ARTISTS_DETAIL+id);
+            JSONObject object = new JSONObject(fileContent);
+            totalPages = object.getJSONObject("result").getJSONObject("data").getString("total_pages");
+            if (currentPage > Integer.parseInt(totalPages)) {
+
+                result = true;
+            }
+        }
+
+        return result;
+
+    }
 }

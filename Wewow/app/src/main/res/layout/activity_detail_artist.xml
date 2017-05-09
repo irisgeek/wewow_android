@@ -136,12 +136,26 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+    <!--<com.cjj.MaterialRefreshLayout-->
+        <!--xmlns:android="http://schemas.android.com/apk/res/android"-->
+        <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
+        <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:id="@+id/refresh"-->
+        <!--app:overlay="false"-->
+        <!--app:progress_size_type="normal"-->
+        <!--app:wave_height_type="normal"-->
+        <!--app:wave_show="false"-->
+        <!--app:isLoadMore="true">-->
+    <com.wewow.view.RecyclerViewUpRefresh xmlns:android="http://schemas.android.com/apk/res/android"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:id="@+id/recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="12dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        />
 
 
+    <!--</com.cjj.MaterialRefreshLayout>-->
 </android.support.design.widget.CoordinatorLayout>
