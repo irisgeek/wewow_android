@@ -6,15 +6,28 @@
     android:orientation="vertical"
     tools:context="com.wewow.LoginActivity">
 
-    <TextView
-        android:id="@+id/logintitle"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
         android:layout_marginTop="14sp"
-        android:fontFamily="PingFangSC-Regular"
-        android:text="@string/login_title"
-        android:textSize="16sp" />
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/login_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:src="@drawable/back_b" />
+
+        <TextView
+            android:id="@+id/logintitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:fontFamily="PingFangSC-Regular"
+            android:text="@string/login_title"
+            android:textSize="16sp" />
+    </LinearLayout>
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
@@ -306,9 +319,9 @@
                 android:layout_weight="1"
                 android:background="@null"
                 android:text="@string/login_send_verify_code_2"
-                android:visibility="invisible"
                 android:textColor="#7c7d7a"
-                android:textSize="12sp" />
+                android:textSize="12sp"
+                android:visibility="invisible" />
         </LinearLayout>
 
     </RelativeLayout>
