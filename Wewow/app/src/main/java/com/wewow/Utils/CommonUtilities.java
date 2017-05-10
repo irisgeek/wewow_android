@@ -12,6 +12,7 @@ public class CommonUtilities {
 
     public static final String NETWORK_STATE="network_state";
 
+
     // cache_time :1 day
     public static final long CACHE_TIME=24*60*60*1000;
 
@@ -28,6 +29,14 @@ public class CommonUtilities {
     public static final String CACHE_FILE_SEARCH_RESULT="cache_file_search_result";
 
     public static final String CACHE_FILE_SUBJECT="cache_file_subject";
+
+    public static final String CACHE_FILE_NOTIFICATION="cache_file_notification";
+    public static final String NOTIFICATION_READ="notification_read";
+    public static final String CACHE_FILE_ADS="cache_file_ads";
+    public static final String ADS_READ="ads_read";
+
+
+
 
     public static final String RESEARCH_RESULT_CATEGORY_ARTICLE="article";
     public static final String RESEARCH_RESULT_CATEGORY_INSTITUTE="institute";

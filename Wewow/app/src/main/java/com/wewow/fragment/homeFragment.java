@@ -238,9 +238,14 @@ public class homeFragment extends Fragment {
         textViewAdsIgnore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                cardViewAds.clearAnimation();
+                textViewAdsIgnore.clearAnimation();
+                textViewAds.clearAnimation();
                 cardViewAds.setVisibility(View.GONE);
                 textViewAdsIgnore.setVisibility(View.GONE);
                 textViewAds.setVisibility(View.GONE);
+
+                SettingUtils.set(getActivity(), CommonUtilities.ADS_READ, true);
 
             }
         });
@@ -343,11 +348,32 @@ public class homeFragment extends Fragment {
                         progressBar.setVisibility(View.GONE);
 
                     } else if (realData.contains("content")) {
-                        isAdsShow = true;
+                        if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_ADS, getActivity())) {
+                            String fileContent = FileCacheUtil.getCache(getActivity(), CommonUtilities.CACHE_FILE_ADS);
+                            if(fileContent.equals(realData))
+                            {
+                                boolean result=SettingUtils.get(getActivity(), CommonUtilities.ADS_READ, false);
+                                if(!result)
+                                {
+                                    isAdsShow=true;
+                                }
+
+                            }
+                            else
+                            {
+                                SettingUtils.set(getActivity(), CommonUtilities.ADS_READ, false);
+                                FileCacheUtil.setCache(realData,getActivity(), CommonUtilities.CACHE_FILE_ADS,0);
+                                isAdsShow=true;
+                            }
+                        }
+                        else {
+                            SettingUtils.set(getActivity(), CommonUtilities.ADS_READ, false);
+                            FileCacheUtil.setCache(realData,getActivity(), CommonUtilities.CACHE_FILE_ADS,0);
+                            isAdsShow=true;
+                        }
                         ads = parseAdsFromString(realData);
                         setUpAds(ads, view);
-                    }
-                    else{
+                    } else {
                         requestSentCount--;
                     }
 
@@ -386,8 +412,10 @@ public class homeFragment extends Fragment {
                 .placeholder(R.drawable.banner_loading_spinner)
                 .crossFade(300)
                 .into(imageAdsBg);
-        cardViewAds.setVisibility(View.VISIBLE);
-        textViewAds.setVisibility(View.VISIBLE);
+        if(isAdsShow) {
+            cardViewAds.setVisibility(View.VISIBLE);
+            textViewAds.setVisibility(View.VISIBLE);
+        }
 
 
         requestSentCount--;
@@ -403,8 +431,9 @@ public class homeFragment extends Fragment {
         cardViewAds.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                SettingUtils.set(getActivity(), CommonUtilities.ADS_READ, true);
                 Intent intent = new Intent(getActivity(), WebPageActivity.class);
-                intent.putExtra("url",adsItem.getTarget());
+                intent.putExtra("url", adsItem.getTarget());
                 startActivity(intent);
 
             }
@@ -447,6 +476,7 @@ public class homeFragment extends Fragment {
         textViewToDownload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                SettingUtils.set(getActivity(), CommonUtilities.NOTIFICATION_READ, true);
                 Intent intent = new Intent(getActivity(), WebPageActivity.class);
                 intent.putExtra("url",notification.getAction_url());
                 startActivity(intent);
@@ -456,14 +486,18 @@ public class homeFragment extends Fragment {
         textViewIgnore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                cardViewNewVersionAvailable.clearAnimation();
+                SettingUtils.set(getActivity(), CommonUtilities.NOTIFICATION_READ, true);
                 cardViewNewVersionAvailable.setVisibility(View.GONE);
             }
         });
 
         textViewAdsTitle.setText(notification.getTitle());
         textViewContent.setText(notification.getText());
+        if(isNotificationShow) {
 
-        cardViewNewVersionAvailable.setVisibility(View.VISIBLE);
+            cardViewNewVersionAvailable.setVisibility(View.VISIBLE);
+        }
 
         requestSentCount--;
 
@@ -512,7 +546,36 @@ public class homeFragment extends Fragment {
                         Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
                         progressBar.setVisibility(View.GONE);
                     } else if (realData.contains(CommonUtilities.DATE)) {
-                        isNotificationShow = true;
+
+                        if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_NOTIFICATION, getActivity())) {
+                            String fileContent = FileCacheUtil.getCache(getActivity(), CommonUtilities.CACHE_FILE_NOTIFICATION);
+
+                            String savedId=new JSONObject(fileContent).getJSONObject("result").getJSONObject("data")
+                                    .get("id").toString();
+                            String newId=new JSONObject(realData).getJSONObject("result").getJSONObject("data")
+                                    .get("id").toString();
+                            if(savedId.equals(newId))
+                            {
+                                boolean result=SettingUtils.get(getActivity(), CommonUtilities.NOTIFICATION_READ, false);
+                                if(!result)
+                                {
+                                   isNotificationShow=true;
+                                }
+
+                            }
+                            else
+                            {
+                                SettingUtils.set(getActivity(), CommonUtilities.NOTIFICATION_READ, false);
+                                FileCacheUtil.setCache(realData,getActivity(), CommonUtilities.CACHE_FILE_NOTIFICATION,0);
+                                isNotificationShow=true;
+                            }
+                        }
+                        else {
+                            SettingUtils.set(getActivity(), CommonUtilities.NOTIFICATION_READ, false);
+                            FileCacheUtil.setCache(realData,getActivity(), CommonUtilities.CACHE_FILE_NOTIFICATION,0);
+                            isNotificationShow=true;
+                        }
+
                         notification = parseNotificationFromString(realData);
                         setUpNotification(notification, view);
 
@@ -1178,4 +1241,21 @@ public class homeFragment extends Fragment {
 
     }
 
+    @Override
+    public void onResume() {
+        if(SettingUtils.get(getActivity(), CommonUtilities.NOTIFICATION_READ, false)) {
+
+            cardViewNewVersionAvailable.clearAnimation();
+            cardViewNewVersionAvailable.setVisibility(View.GONE);
+        }
+        if(SettingUtils.get(getActivity(), CommonUtilities.ADS_READ, false)) {
+            cardViewAds.clearAnimation();
+            textViewAds.clearAnimation();
+            cardViewAds.setVisibility(View.GONE);
+            textViewAds.setVisibility(View.GONE);
+        }
+
+        super.onResume();
+
+    }
 }

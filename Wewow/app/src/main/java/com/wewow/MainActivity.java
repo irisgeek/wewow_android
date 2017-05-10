@@ -35,6 +35,7 @@ package com.wewow;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.PagerAdapter;
@@ -129,6 +130,12 @@ public class MainActivity extends BaseActivity {
         viewPager = (ViewPager) findViewById(R.id.viewPager);
 
         Utils.regitsterNetSateBroadcastReceiver(this);
+        CollapsingToolbarLayout collapsingToolbar =
+                (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        collapsingToolbar.setTitle(getResources().getString(R.string.home));
+        collapsingToolbar.setExpandedTitleColor(getResources().getColor(R.color.transparent));
+        collapsingToolbar.setCollapsedTitleTextColor(getResources().getColor(R.color.font_color));
+
 //        setUpNavigationTabDummy(null);
 
 //        setUpNavigationTab();

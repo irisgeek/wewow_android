@@ -117,7 +117,7 @@
                         android:layout_gravity="bottom|right"
                         android:layout_marginBottom="7dp"
                         android:layout_marginRight="23dp"
-                        android:text="321订阅者"
+
                         android:textColor="#333631" />
 
                 </LinearLayout>
