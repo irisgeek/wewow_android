@@ -27,6 +27,7 @@
     <string name="login_huawei_prompt_gotit">我知道了</string>
     <string name="login_huawei_connecting">连接华为移动服务</string>
     <string name="login_huawei_cancel">华为登录已取消</string>
+    <string name="login_3rd_party">其他方式登录</string>
 
     <!-- 生活研究所 -->
     <string name="lifelab_title">生活研究所</string>

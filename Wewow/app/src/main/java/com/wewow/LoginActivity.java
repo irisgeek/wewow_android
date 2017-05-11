@@ -4,6 +4,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.util.Pair;
@@ -22,6 +25,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -58,8 +62,10 @@ import com.tencent.mm.opensdk.openapi.IWXAPIEventHandler;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.tencent.mm.opensdk.modelmsg.SendAuth;
 
+import com.wewow.utils.BlurBuilder;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
+import com.wewow.utils.PhotoUtils;
 import com.wewow.utils.ProgressDialogUtil;
 import com.wewow.utils.WebAPIHelper;
 import com.wewow.wxapi.WXEntryActivity;
@@ -81,6 +87,8 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
     public static final int REQUEST_CODE_FEEDBACK = 2;
     public static final int REQUEST_CODE_SUBSCRIBED_ARTISTS = 3;
     public static final int REQUEST_CODE_MY_COLLECTION = 4;
+
+    public static final String BACKGROUND = "BACKGROUND";
 
     public static final int RESPONSE_CODE_MOILE = 1;
     public static final int RESPONSE_CODE_WECHAT = 2;
@@ -118,6 +126,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
         @Override
         public void onFinish() {
             LoginActivity.this.btnSendVerifyCode2.setVisibility(View.VISIBLE);
+            LoginActivity.this.tvVerifyCountdown.setVisibility(View.GONE);
         }
     };
 
@@ -126,6 +135,12 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         this.initView();
+        Intent i = this.getIntent();
+        if (i.hasExtra(BACKGROUND)) {
+            byte[] data = i.getByteArrayExtra(BACKGROUND);
+            Bitmap bm = BitmapFactory.decodeByteArray(data, 0, data.length);
+            this.getWindow().getDecorView().setBackground(new BitmapDrawable(bm));
+        }
     }
 
     @Override
@@ -177,12 +192,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
 
         this.setupReqVerifyCode();
         this.btnSendVerifyCode2 = (TextView) this.findViewById(R.id.login_btn_send_verify_code_2);
-        this.btnSendVerifyCode2.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //
-            }
-        });
+        this.btnSendVerifyCode2.setOnClickListener(this.sendVerifyCodeListener);
 
         this.setupInputVerifyCode();
         this.setupLogin();
@@ -304,40 +314,42 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
      */
     private void setupReqVerifyCode() {
         this.btnSendVerifyCode = (Button) this.findViewById(R.id.login_btn_send_verify_code);
-        this.btnSendVerifyCode.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Object[] params = new Object[]{
-                        String.format("%s/getcode?phone=%s", CommonUtilities.WS_HOST, LoginActivity.this.edtPhoneNo.getText().toString()),
-                        new HttpAsyncTask.TaskDelegate() {
-                            private static final String TAG = "ReqCodeTaskDeletegate";
+        this.btnSendVerifyCode.setOnClickListener(this.sendVerifyCodeListener);
+    }
 
-                            @Override
-                            public void taskCompletionResult(byte[] result) {
-                                try {
-                                    ProgressDialogUtil.getInstance(LoginActivity.this).finishProgressDialog();
-                                    String x = new String(result, "utf-8");
-                                    Log.d(TAG, String.format("return: %s", x));
-                                    JSONObject jobj = new JSONObject(x).getJSONObject("result");
-                                    if (jobj.getInt("code") == 0) {
-                                        LoginActivity.this.switchVerifyCodeView(false);
-                                    } else {
-                                        Toast.makeText(LoginActivity.this, jobj.getString("message"), Toast.LENGTH_LONG).show();
-                                        LoginActivity.this.switchVerifyCodeView(false);
-                                    }
-                                } catch (UnsupportedEncodingException e) {
-                                    Log.e(TAG, String.format("web response encoding error: %s", e.getMessage()));
-                                } catch (JSONException e) {
-                                    Log.e(TAG, String.format("jsonparse error: %s", e.getMessage()));
+    private OnClickListener sendVerifyCodeListener = new OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Object[] params = new Object[]{
+                    String.format("%s/getcode?phone=%s", CommonUtilities.WS_HOST, LoginActivity.this.edtPhoneNo.getText().toString()),
+                    new HttpAsyncTask.TaskDelegate() {
+                        private static final String TAG = "ReqCodeTaskDeletegate";
+
+                        @Override
+                        public void taskCompletionResult(byte[] result) {
+                            try {
+                                ProgressDialogUtil.getInstance(LoginActivity.this).finishProgressDialog();
+                                String x = new String(result, "utf-8");
+                                Log.d(TAG, String.format("return: %s", x));
+                                JSONObject jobj = new JSONObject(x).getJSONObject("result");
+                                if (jobj.getInt("code") == 0) {
+                                    LoginActivity.this.switchVerifyCodeView(false);
+                                } else {
+                                    Toast.makeText(LoginActivity.this, jobj.getString("message"), Toast.LENGTH_LONG).show();
+                                    LoginActivity.this.switchVerifyCodeView(false);
                                 }
+                            } catch (UnsupportedEncodingException e) {
+                                Log.e(TAG, String.format("web response encoding error: %s", e.getMessage()));
+                            } catch (JSONException e) {
+                                Log.e(TAG, String.format("jsonparse error: %s", e.getMessage()));
                             }
                         }
-                };
-                ProgressDialogUtil.getInstance(LoginActivity.this).showProgressDialog();
-                new HttpAsyncTask().execute(params);
-            }
-        });
-    }
+                    }
+            };
+            ProgressDialogUtil.getInstance(LoginActivity.this).showProgressDialog();
+            new HttpAsyncTask().execute(params);
+        }
+    };
 
     private void switchVerifyCodeView(boolean showStart) {
         this.startView.setVisibility(showStart ? View.VISIBLE : View.GONE);
@@ -346,6 +358,8 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
             this.tvNumberSent.setText(String.format(this.getString(R.string.login_verifycode_sent), this.edtPhoneNo.getText().toString()));
             this.verifyTimer.start();
             this.findViewById(R.id.login_txt_code_1).requestFocus();
+            this.btnSendVerifyCode2.setVisibility(View.GONE);
+            this.tvVerifyCountdown.setVisibility(View.VISIBLE);
         } else {
             this.verifyTimer.cancel();
             this.btnSendVerifyCode2.setVisibility(View.INVISIBLE);

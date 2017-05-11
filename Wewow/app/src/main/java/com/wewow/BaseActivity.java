@@ -67,6 +67,7 @@ import com.wewow.netTask.ITask;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.DataCleanUtils;
 import com.wewow.utils.FileCacheUtil;
+import com.wewow.utils.LoginUtils;
 import com.wewow.utils.ShareUtils;
 import com.wewow.utils.Utils;
 
@@ -264,8 +265,7 @@ public class BaseActivity extends ActionBarActivity {
                     Intent edIntent = new Intent(BaseActivity.this, UserInfoActivity.class);
                     BaseActivity.this.startActivity(edIntent);
                 } else {
-                    Intent intentMain = new Intent(BaseActivity.this, LoginActivity.class);
-                    BaseActivity.this.startActivityForResult(intentMain, LoginActivity.REQUEST_CODE_LOGIN);
+                    LoginUtils.startLogin(BaseActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
                 }
             }
         });
@@ -315,9 +315,7 @@ public class BaseActivity extends ActionBarActivity {
             //selectItem(position);
             Log.d("BaseActivity", String.format("onItemClick: %d", position));
             if (position == 0) {
-                Intent i = new Intent();
-                i.setClass(BaseActivity.this, LoginActivity.class);
-                BaseActivity.this.startActivityForResult(i, LoginActivity.REQUEST_CODE_LOGIN);
+                LoginUtils.startLogin(BaseActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
                 return;
             }
 
@@ -329,7 +327,7 @@ public class BaseActivity extends ActionBarActivity {
             switch (position - 1) {
                 case 0:
                     Intent intentMain = new Intent(BaseActivity.this, MainActivity.class);
-                     startActivity(intentMain);
+                    startActivity(intentMain);
                     break;
                 case 1:
                     Intent intent = new Intent(BaseActivity.this, ListArtistActivity.class);
@@ -345,9 +343,7 @@ public class BaseActivity extends ActionBarActivity {
                         Intent intentFeedback = new Intent(BaseActivity.this, FeedbackActivity.class);
                         BaseActivity.this.startActivity(intentFeedback);
                     } else {
-                        Intent i = new Intent();
-                        i.setClass(BaseActivity.this, LoginActivity.class);
-                        BaseActivity.this.startActivityForResult(i, LoginActivity.REQUEST_CODE_FEEDBACK);
+                        LoginUtils.startLogin(BaseActivity.this, LoginActivity.REQUEST_CODE_FEEDBACK);
                     }
                     break;
 
@@ -356,10 +352,7 @@ public class BaseActivity extends ActionBarActivity {
                         Intent intentCollection = new Intent(BaseActivity.this, MyCollectionActivity.class);
                         BaseActivity.this.startActivity(intentCollection);
                     } else {
-                        Intent i = new Intent();
-                        i.setClass(BaseActivity.this, LoginActivity.class);
-                        BaseActivity.this.startActivityForResult(i, LoginActivity.REQUEST_CODE_MY_COLLECTION);
-
+                        LoginUtils.startLogin(BaseActivity.this, LoginActivity.REQUEST_CODE_MY_COLLECTION);
                     }
                     break;
                 case 6:
@@ -368,10 +361,7 @@ public class BaseActivity extends ActionBarActivity {
                         Intent intentSubscribedArtists = new Intent(BaseActivity.this, ListSubscribedArtistActivity.class);
                         BaseActivity.this.startActivity(intentSubscribedArtists);
                     } else {
-                        Intent i = new Intent();
-                        i.setClass(BaseActivity.this, LoginActivity.class);
-                        BaseActivity.this.startActivityForResult(i, LoginActivity.REQUEST_CODE_SUBSCRIBED_ARTISTS);
-
+                        LoginUtils.startLogin(BaseActivity.this, LoginActivity.REQUEST_CODE_SUBSCRIBED_ARTISTS);
                     }
                     break;
                 case 7:
