@@ -658,7 +658,9 @@ public class MainActivity extends BaseActivity {
         completeText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                searchView.setQuery(testStrings[position], true);
+                if(position!=0) {
+                    searchView.setQuery(testStrings[position], true);
+                }
 //                Intent intentSearch= new Intent(MainActivity.this,SearchResultActivity.class);
 //                intentSearch.putExtra("key_word",testStrings[position]);
 //                startActivity(intentSearch);

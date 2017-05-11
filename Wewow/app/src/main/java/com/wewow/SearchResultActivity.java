@@ -12,14 +12,19 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wewow.adapter.FragmentAdapter;
@@ -43,6 +48,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.nio.InvalidMarkException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -445,11 +451,84 @@ public class SearchResultActivity extends BaseActivity {
 
 
     private void setUpToolBar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        toolbar.setNavigationIcon(R.drawable.selector_btn_back);
-        getSupportActionBar().setTitle(keyword);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
+//        toolbar.setNavigationIcon(R.drawable.selector_btn_back);
+//        getSupportActionBar().setTitle(keyword);
+        final EditText editText=(EditText)findViewById(R.id.editTextSearch);
+        editText.setText(keyword);
+        editText.setSelection(editText.length());
+        editText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editText.setText("");
+            }
+        });
+        editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 
+            @Override
+            public boolean onEditorAction(TextView arg0, int arg1, KeyEvent arg2) {
+                if (arg1 == EditorInfo.IME_ACTION_DONE) {
+                   search(editText);
+                    InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE); imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+                }
+                return false;
+            }
+        });
+        ImageView imageViewSearch=(ImageView)findViewById(R.id.btnSearch);
+        imageViewSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE); imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+                search(editText);
+
+
+
+            }
+        });
+        ImageView imageViewBack=(ImageView)findViewById(R.id.btnBack);
+        imageViewBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+
+            }
+        });
+
+    }
+
+    private void search(EditText editText) {
+        keyword = editText.getText().toString().trim();
+        refresh=true;
+        progressBar.setVisibility(View.VISIBLE);
+        if (Utils.isNetworkAvailable(SearchResultActivity.this)) {
+            //if banner data never cached or outdated
+
+            getSearchInfoFromServer();
+        } else {
+            Toast.makeText(SearchResultActivity.this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
+
+            SettingUtils.set(SearchResultActivity.this, CommonUtilities.NETWORK_STATE, false);
+            //if banner data cached
+            if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_SEARCH_RESULT + keyword, SearchResultActivity.this)) {
+                String fileContent = FileCacheUtil.getCache(SearchResultActivity.this, CommonUtilities.CACHE_FILE_SEARCH_RESULT + keyword);
+                List<Article> articles = new ArrayList<Article>();
+                List<Institute> institutes = new ArrayList<Institute>();
+                List<Artist> artists = new ArrayList<Artist>();
+                List<Post> posts = new ArrayList<Post>();
+
+                try {
+                    articles = parseArticleFromString(fileContent);
+                    institutes = parseInstitutesFromString(fileContent);
+                    artists = parseArtistsFromString(fileContent);
+                    posts = parsePostFromString(fileContent);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                setUpViewPager(articles, institutes, artists, posts);
+            }
+        }
     }
 
 
@@ -491,125 +570,125 @@ public class SearchResultActivity extends BaseActivity {
         }
     }
 
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        // Handle action bar item clicks here. The action bar will
+//        // automatically handle clicks on the Home/Up button, so long
+//        // as you specify a parent activity in AndroidManifest.xml.
+//        int id = item.getItemId();
+//
+//        //noinspection SimplifiableIfStatement
+//        if (id == R.id.search) {
+////            LinearLayout layout = (LinearLayout) findViewById(R.id.layoutCover);
+////            layout.setVisibility(View.VISIBLE);
+//            return true;
+//        }
+//        if(id==android.R.id.home) {
+//            finish();
+//            return true;
+//
+//        }
+//
+//        return super.onOptionsItemSelected(item);
+//    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.search) {
-//            LinearLayout layout = (LinearLayout) findViewById(R.id.layoutCover);
-//            layout.setVisibility(View.VISIBLE);
-            return true;
-        }
-        if(id==android.R.id.home) {
-            finish();
-            return true;
-
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.toolbar, menu);
-        MenuItem menuItem = menu.findItem(R.id.search);
-        menuItem.setVisible(true);
-
-        SearchManager searchManager =
-                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        final SearchView searchView =
-                (SearchView) menu.findItem(R.id.search).getActionView();
-
-        searchView.setQueryHint(getResources().getString(R.string.search_hint));
-
-
-        ((ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_button)).setImageResource(R.drawable.selector_btn_search);
-
-
-        final String[] testStrings = getResources().getStringArray(R.array.test_array);
-//        int completeTextId = searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
-//        AutoCompleteTextView completeText = (AutoCompleteTextView) searchView
-//                .findViewById(completeTextId) ;
-
-
-        AutoCompleteTextView completeText = (SearchView.SearchAutoComplete) searchView.findViewById(R.id.search_src_text);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.list_item_search, R.id.text, testStrings);
-
-        completeText.setAdapter(adapter);
-        completeText.setTextColor(getResources().getColor(R.color.search_text_view_color));
-        completeText.setHintTextColor(getResources().getColor(R.color.search_text_view_hint_color));
-
-        completeText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                searchView.setQuery(testStrings[position], true);
-
-                keyword = testStrings[position];
-
-
-
-            }
-        });
-
-        final Menu menuFinal=menu;
-        completeText.setThreshold(0);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-
-                keyword = query;
-                refresh=true;
-                MenuItem menuItem = menuFinal.findItem(R.id.search);
-                menuItem.collapseActionView();
-                getSupportActionBar().setTitle(keyword);
-                progressBar.setVisibility(View.VISIBLE);
-                if (Utils.isNetworkAvailable(SearchResultActivity.this)) {
-                    //if banner data never cached or outdated
-
-                    getSearchInfoFromServer();
-                } else {
-                    Toast.makeText(SearchResultActivity.this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
-
-                    SettingUtils.set(SearchResultActivity.this, CommonUtilities.NETWORK_STATE, false);
-                    //if banner data cached
-                    if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_SEARCH_RESULT + keyword, SearchResultActivity.this)) {
-                        String fileContent = FileCacheUtil.getCache(SearchResultActivity.this, CommonUtilities.CACHE_FILE_SEARCH_RESULT + keyword);
-                        List<Article> articles = new ArrayList<Article>();
-                        List<Institute> institutes = new ArrayList<Institute>();
-                        List<Artist> artists = new ArrayList<Artist>();
-                        List<Post> posts = new ArrayList<Post>();
-
-                        try {
-                            articles = parseArticleFromString(fileContent);
-                            institutes = parseInstitutesFromString(fileContent);
-                            artists = parseArtistsFromString(fileContent);
-                            posts = parsePostFromString(fileContent);
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        setUpViewPager(articles, institutes, artists, posts);
-                    }
-                }
-
-
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-        });
-
-        searchView.setSearchableInfo(
-                searchManager.getSearchableInfo(getComponentName()));
-        return true;
-    }
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        // Inflate the menu; this adds items to the action bar if it is present.
+//        getMenuInflater().inflate(R.menu.toolbar, menu);
+//        MenuItem menuItem = menu.findItem(R.id.search);
+//        menuItem.setVisible(true);
+//
+//        SearchManager searchManager =
+//                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+//        final SearchView searchView =
+//                (SearchView) menu.findItem(R.id.search).getActionView();
+//
+//        searchView.setQueryHint(getResources().getString(R.string.search_hint));
+//
+//
+//        ((ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_button)).setImageResource(R.drawable.selector_btn_search);
+//
+//
+//        final String[] testStrings = getResources().getStringArray(R.array.test_array);
+////        int completeTextId = searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
+////        AutoCompleteTextView completeText = (AutoCompleteTextView) searchView
+////                .findViewById(completeTextId) ;
+//
+//
+//        AutoCompleteTextView completeText = (SearchView.SearchAutoComplete) searchView.findViewById(R.id.search_src_text);
+//        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.list_item_search, R.id.text, testStrings);
+//
+//        completeText.setAdapter(adapter);
+//        completeText.setTextColor(getResources().getColor(R.color.search_text_view_color));
+//        completeText.setHintTextColor(getResources().getColor(R.color.search_text_view_hint_color));
+//
+//        completeText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                searchView.setQuery(testStrings[position], true);
+//
+//                keyword = testStrings[position];
+//
+//
+//
+//            }
+//        });
+//
+//        final Menu menuFinal=menu;
+//        completeText.setThreshold(0);
+//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//            @Override
+//            public boolean onQueryTextSubmit(String query) {
+//
+//                keyword = query;
+//                refresh=true;
+//                MenuItem menuItem = menuFinal.findItem(R.id.search);
+//                menuItem.collapseActionView();
+//                getSupportActionBar().setTitle(keyword);
+//                progressBar.setVisibility(View.VISIBLE);
+//                if (Utils.isNetworkAvailable(SearchResultActivity.this)) {
+//                    //if banner data never cached or outdated
+//
+//                    getSearchInfoFromServer();
+//                } else {
+//                    Toast.makeText(SearchResultActivity.this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
+//
+//                    SettingUtils.set(SearchResultActivity.this, CommonUtilities.NETWORK_STATE, false);
+//                    //if banner data cached
+//                    if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_SEARCH_RESULT + keyword, SearchResultActivity.this)) {
+//                        String fileContent = FileCacheUtil.getCache(SearchResultActivity.this, CommonUtilities.CACHE_FILE_SEARCH_RESULT + keyword);
+//                        List<Article> articles = new ArrayList<Article>();
+//                        List<Institute> institutes = new ArrayList<Institute>();
+//                        List<Artist> artists = new ArrayList<Artist>();
+//                        List<Post> posts = new ArrayList<Post>();
+//
+//                        try {
+//                            articles = parseArticleFromString(fileContent);
+//                            institutes = parseInstitutesFromString(fileContent);
+//                            artists = parseArtistsFromString(fileContent);
+//                            posts = parsePostFromString(fileContent);
+//
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//                        setUpViewPager(articles, institutes, artists, posts);
+//                    }
+//                }
+//
+//
+//                return true;
+//            }
+//
+//            @Override
+//            public boolean onQueryTextChange(String newText) {
+//                return false;
+//            }
+//        });
+//
+//        searchView.setSearchableInfo(
+//                searchManager.getSearchableInfo(getComponentName()));
+//        return true;
+//    }
 
 }
