@@ -310,9 +310,9 @@ public class LifeLabItemActivity extends Activity {
             tv = (TextView) itemView.findViewById(R.id.lifelab_item_artist_desc);
             tv.setText(a.desc);
             tv = (TextView) itemView.findViewById(R.id.lifelab_item_artist_articlecount);
-            tv.setText(String.format(this.getString(R.string.lifelab_item_artist_article), 0));
+            tv.setText(String.format(this.getString(R.string.lifelab_item_artist_article), a.article_count));
             tv = (TextView) itemView.findViewById(R.id.lifelab_item_artist_follower);
-            tv.setText(String.format(this.getString(R.string.lifelab_item_artist_follower), 0));
+            tv.setText(String.format(this.getString(R.string.lifelab_item_artist_follower), a.follow_count));
             final ImageView iv = (ImageView) itemView.findViewById(R.id.lifelab_item_artist_logo);
             new RemoteImageLoader(this, a.image, new RemoteImageLoader.RemoteImageListener() {
                 @Override
@@ -449,6 +449,8 @@ public class LifeLabItemActivity extends Activity {
             public int id;
             public String image;
             public String nickname;
+            public int follow_count;
+            public int article_count;
         }
 
         public static class Post {
@@ -543,6 +545,8 @@ public class LifeLabItemActivity extends Activity {
             a.desc = jobj.getString("desc");
             a.image = jobj.getString("image");
             a.nickname = jobj.getString("nickname");
+            a.follow_count = jobj.optInt("follow_count");
+            a.article_count = jobj.optInt("article_count");
             return a;
         }
 
