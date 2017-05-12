@@ -220,7 +220,7 @@ public class LifeLabItemActivity extends Activity {
         for (int i = 0; i < cc; i++) {
             LabCollectionDetail.Article a = this.lcd.getArticle(group, i);
             View itemView = View.inflate(this, R.layout.lifelab_item_article, null);
-            itemView.setBackgroundColor(i % 2 == 0 ? Color.rgb(252, 230, 194) : Color.WHITE);
+//            itemView.setBackgroundColor(i % 2 == 0 ? Color.rgb(252, 230, 194) : Color.WHITE);
             itemView.setTag(a.id);
             tv = (TextView) itemView.findViewById(R.id.lifelab_item_article_category);
             tv.setText(a.wewow_category);
