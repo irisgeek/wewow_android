@@ -179,4 +179,8 @@
 
     <string name="search_with_no_result">没有找到喜欢的内容？</string>
     <string name="tell_wewow">告诉唯物</string>
+    <string name="submitted">\u63d0\u4ea4\u6210\u529f</string>
+    <string name="no_content">内容不能为空</string>
+
+
 </resources>
