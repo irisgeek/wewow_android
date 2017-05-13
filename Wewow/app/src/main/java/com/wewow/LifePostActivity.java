@@ -91,7 +91,12 @@ public class LifePostActivity extends AppCompatActivity {
         this.addpost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(LifePostActivity.this, "new Post", Toast.LENGTH_LONG).show();
+                Intent i = new Intent(LifePostActivity.this, AddPostActivity.class);
+                BitmapDrawable bdr = (BitmapDrawable) LifePostActivity.this.contentView.getBackground();
+                if (bdr != null) {
+                    i.putExtra(AddPostActivity.BACK_GROUND, Utils.getBitmapBytes(bdr.getBitmap()));
+                }
+                LifePostActivity.this.startActivity(i);
             }
         });
         this.findViewById(R.id.lifepost_share).setOnClickListener(new View.OnClickListener() {
