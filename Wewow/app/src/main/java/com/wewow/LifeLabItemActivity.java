@@ -265,7 +265,7 @@ public class LifeLabItemActivity extends Activity {
         tv = (TextView) view.findViewById(R.id.tv_lifelab_item_discuz_topic);
         tv.setText(p.title);
         tv = (TextView) view.findViewById(R.id.tv_lifelab_item_discuz_count);
-        tv.setText(this.lcd.liked_count);
+        tv.setText(this.lcd.liked_count + getString(R.string.discuss_people_number));
         final ImageView iv = (ImageView) view.findViewById(R.id.iv_lifelab_item_discuz);
         new RemoteImageLoader(this, p.image_664_250, new RemoteImageLoader.RemoteImageListener() {
             @Override
@@ -300,8 +300,8 @@ public class LifeLabItemActivity extends Activity {
         LinearLayout r = (LinearLayout) view.findViewById(R.id.lifelab_item_artist_container);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.setMargins(0, Utils.dipToPixel(this, 10), Utils.dipToPixel(this, 8), Utils.dipToPixel(this, 10));
-        LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(Utils.dipToPixel(this, 256), ViewGroup.LayoutParams.WRAP_CONTENT);
-        params1.setMargins(Utils.dipToPixel(this, 10), 0, 0, 0);
+        LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params1.setMargins(Utils.dipToPixel(this, 8), 0, 0, 0);
         for (int i = 0; i < this.lcd.getArtistCount(); i++) {
             View itemView = View.inflate(this, R.layout.lifelab_item_artist, null);
             LabCollectionDetail.Artist a = this.lcd.getArtist(i);
@@ -310,9 +310,9 @@ public class LifeLabItemActivity extends Activity {
             tv = (TextView) itemView.findViewById(R.id.lifelab_item_artist_desc);
             tv.setText(a.desc);
             tv = (TextView) itemView.findViewById(R.id.lifelab_item_artist_articlecount);
-            tv.setText(String.format(this.getString(R.string.lifelab_item_artist_article), a.article_count));
+            tv.setText(a.article_count + "");
             tv = (TextView) itemView.findViewById(R.id.lifelab_item_artist_follower);
-            tv.setText(String.format(this.getString(R.string.lifelab_item_artist_follower), a.follow_count));
+            tv.setText(a.follow_count + "");
             final ImageView iv = (ImageView) itemView.findViewById(R.id.lifelab_item_artist_logo);
             new RemoteImageLoader(this, a.image, new RemoteImageLoader.RemoteImageListener() {
                 @Override

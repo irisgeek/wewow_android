@@ -19,8 +19,10 @@
 
     <color name="feedback_text">#9b9b9b</color>
     <color name="transparent">#00ffffff</color>
-    <color name="white">#ffffff</color>
 
+    <color name="white">#ffffff</color>
+    <color name="text_gray_drak">#333631</color>
+    <color name="text_gray">#555853</color>
 
 
 
