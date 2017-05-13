@@ -1,6 +1,7 @@
 package com.wewow;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -20,6 +21,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wewow.utils.BlurBuilder;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
 import com.wewow.utils.ProgressDialogUtil;
@@ -117,7 +119,11 @@ public class LifePostActivity extends AppCompatActivity {
             new RemoteImageLoader(this, topic.optString("image"), new RemoteImageLoader.RemoteImageListener() {
                 @Override
                 public void onRemoteImageAcquired(Drawable dr) {
-                    LifePostActivity.this.contentView.setBackground(dr);
+                    BitmapDrawable bdr = (BitmapDrawable) dr;
+                    Bitmap bm = bdr.getBitmap();
+                    Bitmap blurMap = BlurBuilder.blur(LifePostActivity.this, bm);
+                    bm.recycle();
+                    LifePostActivity.this.contentView.setBackground(new BitmapDrawable(LifePostActivity.this.getResources(), blurMap));
                 }
             });
             this.comments = jobj.getJSONArray("comments");
