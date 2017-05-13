@@ -143,6 +143,10 @@
         <activity
             android:name=".MyCollectionActivity"
             android:label="@string/title_activity_my_collection"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name=".AddPostActivity"
+            android:label="@string/title_activity_add_post"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"></activity>
     </application>
 

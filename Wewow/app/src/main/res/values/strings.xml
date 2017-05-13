@@ -43,6 +43,10 @@
     <string name="article_feedback_link">反馈给我们</string>
     <string name="lifepost_nodata">还没有人发表看法</string>
     <string name="lifepost_mycomment">我的评论</string>
+    <string name="lifepost_title">⽣活帖</string>
+    <string name="addpost_title">说说我的想法</string>
+    <string name="addpost_quit_prompt">现在退出的话，输入的文字就都白费了，确定吗？</string>
+    <string name="addpost_counter_max">140</string>
 
     <!-- 收藏 -->
     <string name="my_collection">我的收藏</string>
@@ -181,6 +185,7 @@
     <string name="tell_wewow">告诉唯物</string>
     <string name="submitted">\u63d0\u4ea4\u6210\u529f</string>
     <string name="no_content">内容不能为空</string>
+    <string name="title_activity_add_post">AddPostActivity</string>
 
 
 </resources>

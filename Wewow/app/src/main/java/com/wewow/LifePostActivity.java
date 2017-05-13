@@ -49,6 +49,7 @@ public class LifePostActivity extends AppCompatActivity {
     private ImageView addpost;
     private JSONArray comments = new JSONArray();
     private UserInfo user;
+    private int postId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,10 +58,10 @@ public class LifePostActivity extends AppCompatActivity {
         Utils.setActivityToBeFullscreen(this);
         this.setupUI();
         Intent i = this.getIntent();
-        int postid = i.getIntExtra(POST_ID, -1);
+        postId = i.getIntExtra(POST_ID, -1);
         this.user = UserInfo.isUserLogged(this) ? UserInfo.getCurrentUser(this) : UserInfo.getAnonymouUser();
         Object[] params = new Object[]{
-                String.format("%s/daily_topic?user_id=%d&daily_topic_id=%d", CommonUtilities.WS_HOST, LifePostActivity.this.user.getId(), postid),
+                String.format("%s/daily_topic?user_id=%d&daily_topic_id=%d", CommonUtilities.WS_HOST, LifePostActivity.this.user.getId(), postId),
                 new HttpAsyncTask.TaskDelegate() {
                     @Override
                     public void taskCompletionResult(byte[] result) {
@@ -96,6 +97,7 @@ public class LifePostActivity extends AppCompatActivity {
                 if (bdr != null) {
                     i.putExtra(AddPostActivity.BACK_GROUND, Utils.getBitmapBytes(bdr.getBitmap()));
                 }
+                i.putExtra(AddPostActivity.TOPIC_ID, LifePostActivity.this.postId);
                 LifePostActivity.this.startActivity(i);
             }
         });
