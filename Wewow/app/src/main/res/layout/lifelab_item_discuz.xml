@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginLeft="8dp"
-    android:layout_marginRight="8dp"
-    android:orientation="vertical">
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_marginLeft="8dp"
+              android:layout_marginRight="8dp"
+              android:orientation="vertical">
 
     <TextView
         android:id="@+id/lifelab_item_discuz_title"
@@ -13,8 +13,10 @@
         android:background="@color/white"
         android:gravity="center_vertical"
         android:paddingLeft="10dp"
-        android:textColor="#ff333631"
-        android:textSize="20sp" />
+        android:textColor="@color/text_gray_drak"
+        android:textSize="16sp"/>
+
+    <include layout="@layout/view_line"/>
 
     <LinearLayout
         android:id="@+id/lifelab_item_discuz_area"
@@ -29,28 +31,28 @@
         <ImageView
             android:id="@+id/iv_lifelab_item_discuz"
             android:layout_width="96dp"
-            android:layout_height="96dp" />
+            android:layout_height="96dp"/>
 
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:paddingLeft="18dp">
+            android:paddingEnd="10dp"
+            android:paddingStart="18dp">
 
             <TextView
                 android:id="@+id/tv_lifelab_item_discuz_topic"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:textSize="16sp" />
+                android:textColor="@color/text_gray_drak"
+                android:textSize="17sp"/>
 
             <TextView
                 android:id="@+id/tv_lifelab_item_discuz_count"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
                 android:layout_alignParentBottom="true"
-                android:textSize="14sp" />
+                android:textSize="12sp"/>
 
         </RelativeLayout>
 

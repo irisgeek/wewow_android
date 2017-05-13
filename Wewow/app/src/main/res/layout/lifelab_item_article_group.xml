@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginLeft="8dp"
-    android:layout_marginRight="8dp"
-    android:layout_marginTop="6dp"
-    android:orientation="vertical">
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_marginLeft="8dp"
+              android:layout_marginRight="8dp"
+              android:layout_marginTop="6dp"
+              android:orientation="vertical">
 
     <TextView
         android:id="@+id/lifelab_item_group_title"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:background="#ffffffff"
+        android:background="@color/white"
         android:gravity="center_vertical"
         android:paddingLeft="10dp"
-        android:textColor="#ff333631"
-        android:textSize="20sp" />
+        android:textColor="@color/text_gray_drak"
+        android:textSize="16sp"/>
 
+    <include layout="@layout/view_line"/>
 </LinearLayout>
