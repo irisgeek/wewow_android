@@ -219,7 +219,7 @@ public class BaseActivity extends ActionBarActivity {
             map.put("menuText", planetTitles[i]);
             if (i == 3) {
                 map.put("new", feedbackUpdate);
-            } else if (i == 6) {
+            } else if (i == 5) {
                 map.put("new", artistUpdate);
             } else {
                 map.put("new", "0");

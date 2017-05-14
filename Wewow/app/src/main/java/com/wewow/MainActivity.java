@@ -128,6 +128,7 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         context = this;
         viewPager = (ViewPager) findViewById(R.id.viewPager);
+        float density=Utils.getSceenDensity(this);
 
         Utils.regitsterNetSateBroadcastReceiver(this);
         CollapsingToolbarLayout collapsingToolbar =

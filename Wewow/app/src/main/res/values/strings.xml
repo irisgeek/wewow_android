@@ -186,4 +186,10 @@
     <string name="no_content">内容不能为空</string>
 
 
+    <string name="choose">请选择</string>
+    <string name="camera">相机</string>
+    <string name="gallery">相册</string>
+    <string name="cancel">取消</string>
+
+
 </resources>

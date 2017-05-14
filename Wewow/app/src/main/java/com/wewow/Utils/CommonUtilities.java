@@ -5,7 +5,10 @@ package com.wewow.utils;
  */
 public class CommonUtilities {
     public static final String WS_HOST ="https://api-tw.wewow.com.cn";
+    public static final String OOS_ENDPOINT ="http://oss-cn-beijing.aliyuncs.com";
+    public static final String BUCKETNAME ="wewow";
     public static final String REQUEST_KEY="";
+    public static final String FILE_DIR="\"data/\"";
     public static final String REQUEST_HEADER_PREFIX="Wewow/Android";
     public static final String SUCCESS="success";
     public static final String DATE="date";
@@ -24,7 +27,7 @@ public class CommonUtilities {
     public static final String CACHE_FILE_ARTISTS_DETAIL="cache_file_artists_detail";
     public static final String CACHE_FILE_SUBSCRIBED_ARTISTS_LIST="cache_file_subscribed_artists_list";
     public static final String CACHE_FILE_CATEGORY_ARTISTS_AND_INSTITUTES="cache_file_category_artists_and_institute";
-
+    public static final String CACHE_FILE_TOKEN="cache_file_token";
     public static final String CACHE_FILE_FEEDBACKS="cache_file_feedbacks";
     public static final String CACHE_FILE_SEARCH_RESULT="cache_file_search_result";
 

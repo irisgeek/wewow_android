@@ -70,6 +70,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
     private ArrayList<HashMap<String, Object>> listItem;
     private RecycleViewArticlesOfArtistDetail adapter;
     private String totalPages;
+    private String followed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -247,7 +248,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
           textViewDesc.setText(artist.getArtist().getDesc());
 
           imageViewSubscribe = (ImageView) findViewById(R.id.imageViewSubscribe);
-          final String followed = artist.getArtist().getFollowed();
+          followed = artist.getArtist().getFollowed();
           if (followed.equals("1")) {
               imageViewSubscribe.setImageResource(R.drawable.subscribed);
           } else {
@@ -341,7 +342,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
 
     }
 
-    private void postReadToServer(String artistId,int read) {
+    private void postReadToServer(String artistId,final int read) {
 
         ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
 
@@ -366,7 +367,17 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
                     }
                     else {
                         updateArtistList=true;
+                        if(read==0)
+                        {
+                           followed="0";
+
+                        }
+                        else {
+                            followed="1";
+                        }
                         FileCacheUtil.clearCacheData( CommonUtilities.CACHE_FILE_ARTISTS_DETAIL + id,DetailArtistActivity.this);
+                        FileCacheUtil.clearCacheData( CommonUtilities.CACHE_FILE_SUBSCRIBED_ARTISTS_LIST,DetailArtistActivity.this);
+                        FileCacheUtil.clearCacheData( CommonUtilities.CACHE_FILE_ARTISTS_LIST,DetailArtistActivity.this);
 
                     }
 
@@ -500,7 +511,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
         }
         if(id==android.R.id.home) {
             Intent intent=new Intent();
-            intent.putExtra("updateList",updateArtistList);
+            intent.putExtra("followed", followed);
             setResult(0,intent);
             finish();
             return true;
@@ -610,7 +621,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
     @Override
     public void onBackPressed() {
         Intent intent=new Intent();
-        intent.putExtra("updateList",updateArtistList);
+        intent.putExtra("followed",followed);
         setResult(0,intent);
         finish();
         super.onBackPressed();

@@ -119,6 +119,10 @@ public interface ITask {
     void subject(@Header("User-Agent") String headerContentType, @Query("subject_id") String subjectId,
                  Callback<JSONObject> callback);
 
+    @GET("/gen_token")
+    void getTokenToUploadFiles(@Header("User-Agent") String headerContentType,
+                 Callback<JSONObject> callback);
+
 
 }
 
