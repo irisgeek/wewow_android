@@ -50,6 +50,9 @@
     <string name="lifepost_del_comment_success">删除成功</string>
     <string name="lifepost_impeach_comment_success">举报成功</string>
 
+    <string name="discuss_people_number">人参与讨论</string>
+    <string name="lifelab_item_feedback">反馈</string>
+
     <!-- 收藏 -->
     <string name="my_collection">我的收藏</string>
     <string name="articles_collected">文章</string>
@@ -188,6 +191,12 @@
     <string name="submitted">\u63d0\u4ea4\u6210\u529f</string>
     <string name="no_content">内容不能为空</string>
     <string name="title_activity_add_post">AddPostActivity</string>
+
+
+    <string name="choose">请选择</string>
+    <string name="camera">相机</string>
+    <string name="gallery">相册</string>
+    <string name="cancel">取消</string>
 
 
 </resources>

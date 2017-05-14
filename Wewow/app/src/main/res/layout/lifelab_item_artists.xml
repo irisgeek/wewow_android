@@ -12,12 +12,12 @@
         android:layout_marginTop="20dp"
         android:text="@string/lifelab_item_artist_title"
         android:textColor="#ffffffff"
-        android:textSize="20sp" />
+        android:textSize="17sp" />
 
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp">
+        android:scrollbars="none">
 
         <LinearLayout
             android:id="@+id/lifelab_item_artist_container"
