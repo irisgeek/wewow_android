@@ -1,5 +1,8 @@
 package com.wewow;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -272,7 +275,13 @@ public class LifePostActivity extends AppCompatActivity {
     private View.OnClickListener commentCopyListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-
+            JSONObject jobj = (JSONObject) view.getTag();
+            String s = jobj.optString("content");
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clip = ClipData.newPlainText("", s);
+            clipboard.setPrimaryClip(clip);
+            String msg = LifePostActivity.this.getString(R.string.share_copylink_result, LifePostActivity.this.getString(R.string.share_result_succeed));
+            Toast.makeText(LifePostActivity.this, msg, Toast.LENGTH_LONG).show();
         }
     };
 
