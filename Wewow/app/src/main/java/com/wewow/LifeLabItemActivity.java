@@ -202,20 +202,20 @@ public class LifeLabItemActivity extends Activity {
         int gc = this.lcd.getArticleGroupCount() > 2 ? 2 : this.lcd.getArticleGroupCount();
         LinearLayout.LayoutParams groupParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         groupParams.setMargins(Utils.dipToPixel(this, 8), Utils.dipToPixel(this, 6), Utils.dipToPixel(this, 8), 0);
-        LinearLayout.LayoutParams articleParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        articleParams.setMargins(Utils.dipToPixel(this, 8), 0, Utils.dipToPixel(this, 8), 0);
         for (int i = 0; i < gc; i++) {
             String g = this.lcd.getArticleGroup(i);
-            this.addArticleView(g, groupParams, articleParams);
+            this.addArticleView(g, groupParams);
         }
         this.like.setImageDrawable(this.getResources().getDrawable(this.lcd.liked ? R.drawable.favourite : R.drawable.favourite_b));
     }
 
-    private void addArticleView(String group, LinearLayout.LayoutParams groupParams, LinearLayout.LayoutParams articleParams) {
+    private void addArticleView(String group, LinearLayout.LayoutParams groupParams) {
         View groupView = View.inflate(this, R.layout.lifelab_item_article_group, null);
         TextView tv = (TextView) groupView.findViewById(R.id.lifelab_item_group_title);
         tv.setText(group);
-        container.addView(groupView, groupParams);
+        View cardview = View.inflate(this, R.layout.cardview_lifelab_item, null);
+        LinearLayout item_container = (LinearLayout) cardview.findViewById(R.id.item_container);
+        item_container.addView(groupView);
         int cc = this.lcd.getArticleCount(group) > 2 ? 2 : this.lcd.getArticleCount(group);
         for (int i = 0; i < cc; i++) {
             LabCollectionDetail.Article a = this.lcd.getArticle(group, i);
@@ -238,8 +238,9 @@ public class LifeLabItemActivity extends Activity {
                 }
             });
             itemView.setOnClickListener(this.articleClickListener);
-            container.addView(itemView, articleParams);
+            item_container.addView(itemView);
         }
+        container.addView(cardview, groupParams);
     }
 
     private View.OnClickListener articleClickListener = new View.OnClickListener() {
