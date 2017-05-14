@@ -1,8 +1,10 @@
 package com.wewow.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.view.View;
 
 import com.wewow.ShareActivity;
 
@@ -71,6 +73,15 @@ public class ShareUtils {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             this.picture.compress(Bitmap.CompressFormat.PNG, 100, baos);
             intent.putExtra(ShareActivity.SHARE_IMAGE, baos.toByteArray());
+        }
+        if (this.context instanceof Activity) {
+            Activity act = (Activity) context;
+            View v = act.findViewById(android.R.id.content);
+            if (v != null) {
+                Bitmap bm = BlurBuilder.blur(v);
+                byte[] buf = Utils.getBitmapBytes(bm);
+                intent.putExtra(ShareActivity.BACK_GROUND, buf);
+            }
         }
         this.context.startActivity(intent);
     }
