@@ -52,6 +52,7 @@
 
     <string name="discuss_people_number">人参与讨论</string>
     <string name="lifelab_item_feedback">反馈</string>
+    <string name="lifelab_item_share">分享</string>
 
     <!-- 收藏 -->
     <string name="my_collection">我的收藏</string>
