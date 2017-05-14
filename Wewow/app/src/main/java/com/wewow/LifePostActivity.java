@@ -50,6 +50,7 @@ public class LifePostActivity extends AppCompatActivity {
     private JSONArray comments = new JSONArray();
     private UserInfo user;
     private int postId;
+    private JSONObject daily_topic;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +111,8 @@ public class LifePostActivity extends AppCompatActivity {
                 if (bd != null) {
                     su.setPicture(bd.getBitmap());
                 }
+                su.setUrl(LifePostActivity.this.daily_topic.optString("share_link"));
+                Log.d(TAG, LifePostActivity.this.daily_topic.optString("share_link"));
                 su.share();
             }
         });
@@ -120,10 +123,10 @@ public class LifePostActivity extends AppCompatActivity {
             return;
         }
         try {
-            JSONObject topic = jobj.getJSONObject("daily_topic");
-            this.title.setText(topic.optString("title"));
-            this.desc.setText(topic.optString("content"));
-            new RemoteImageLoader(this, topic.optString("image"), new RemoteImageLoader.RemoteImageListener() {
+            this.daily_topic = jobj.getJSONObject("daily_topic");
+            this.title.setText(daily_topic.optString("title"));
+            this.desc.setText(daily_topic.optString("content"));
+            new RemoteImageLoader(this, daily_topic.optString("image"), new RemoteImageLoader.RemoteImageListener() {
                 @Override
                 public void onRemoteImageAcquired(Drawable dr) {
                     BitmapDrawable bdr = (BitmapDrawable) dr;
@@ -191,6 +194,23 @@ public class LifePostActivity extends AppCompatActivity {
                 view.findViewById(R.id.lifepost_mycomment).setVisibility(View.VISIBLE);
                 v.setBackgroundColor(Color.argb(255, 252, 211, 145));
             }
+            View normalPanel = view.findViewById(R.id.normal_area);
+            View menuPanel = view.findViewById(R.id.comment_menu);
+            normalPanel.setVisibility(View.VISIBLE);
+            menuPanel.setVisibility(View.GONE);
+            Pair<View, View> menuHolder = new Pair<>(normalPanel, menuPanel);
+            ImageView moreaction = (ImageView) view.findViewById(R.id.comment_moreaction);
+            moreaction.setTag(menuHolder);
+            moreaction.setOnClickListener(LifePostActivity.this.openMenuListener);
+            ImageView close = (ImageView) view.findViewById(R.id.post_close);
+            close.setTag(menuHolder);
+            close.setOnClickListener(LifePostActivity.this.closeMenuListener);
+            ImageView share = (ImageView) view.findViewById(R.id.post_share);
+            share.setTag(jobj);
+            share.setOnClickListener(LifePostActivity.this.commentShareListener);
+            ImageView copy = (ImageView) view.findViewById(R.id.post_copy);
+            copy.setTag(jobj);
+            copy.setOnClickListener(LifePostActivity.this.commentCopyListener);
             return view;
         }
     };
@@ -228,6 +248,46 @@ public class LifePostActivity extends AppCompatActivity {
                     headers
             };
             new HttpAsyncTask().execute(params);
+        }
+    };
+
+    private View.OnClickListener openMenuListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Pair<View, View> menuHolder = (Pair<View, View>) view.getTag();
+            menuHolder.second.setVisibility(View.VISIBLE);
+            menuHolder.first.setVisibility(View.GONE);
+        }
+    };
+
+    private View.OnClickListener closeMenuListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Pair<View, View> menuHolder = (Pair<View, View>) view.getTag();
+            menuHolder.second.setVisibility(View.GONE);
+            menuHolder.first.setVisibility(View.VISIBLE);
+        }
+    };
+
+    private View.OnClickListener commentCopyListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+
+        }
+    };
+
+    private View.OnClickListener commentShareListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            JSONObject jobj = (JSONObject) view.getTag();
+            ShareUtils su = new ShareUtils(LifePostActivity.this);
+            su.setContent(jobj.optString("content"));
+            BitmapDrawable bdr = (BitmapDrawable) LifePostActivity.this.contentView.getBackground();
+            if (bdr != null) {
+                su.setPicture(bdr.getBitmap());
+            }
+            su.setUrl(LifePostActivity.this.daily_topic.optString("share_link"));
+            su.share();
         }
     };
 }
