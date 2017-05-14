@@ -57,6 +57,7 @@ public class LifeLabItemActivity extends Activity {
     private LinearLayout container;
     private BitmapDrawable picture;
     private ImageView like;
+    private TextView lifelab_fav_count;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +71,7 @@ public class LifeLabItemActivity extends Activity {
     }
 
     private void setupUI() {
+        lifelab_fav_count = (TextView) findViewById(R.id.lifelab_fav_count);
         this.container = (LinearLayout) this.findViewById(R.id.lifelab_item_container);
 //        new RemoteImageLoader(this, this.lc.image, new RemoteImageLoader.RemoteImageListener() {
 //            @Override
@@ -102,7 +104,7 @@ public class LifeLabItemActivity extends Activity {
             }
         });
         this.like = (ImageView) this.findViewById(R.id.lifelab_fav);
-        this.like.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.layout_lifelab_fav).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (!UserInfo.isUserLogged(LifeLabItemActivity.this)) {
@@ -110,7 +112,7 @@ public class LifeLabItemActivity extends Activity {
                     LifeLabItemActivity.this.startActivity(logini);
                     return;
                 }
-                Drawable.ConstantState notliked = LifeLabItemActivity.this.getResources().getDrawable(R.drawable.favourite_b).getConstantState();
+                Drawable.ConstantState notliked = LifeLabItemActivity.this.getResources().getDrawable(R.drawable.mark).getConstantState();
                 Drawable.ConstantState currentlike = LifeLabItemActivity.this.like.getDrawable().getConstantState();
                 final Integer like = notliked.equals(currentlike) ? 1 : 0;
                 ArrayList<Pair<String, String>> fields = new ArrayList<Pair<String, String>>();
@@ -133,7 +135,7 @@ public class LifeLabItemActivity extends Activity {
                                     if (i != 0) {
                                         throw new Exception(String.valueOf(i));
                                     }
-                                    LifeLabItemActivity.this.like.setImageDrawable(LifeLabItemActivity.this.getResources().getDrawable(like == 1 ? R.drawable.favourite : R.drawable.favourite_b));
+                                    LifeLabItemActivity.this.like.setImageDrawable(LifeLabItemActivity.this.getResources().getDrawable(like == 1 ? R.drawable.favourite : R.drawable.mark));
                                 } catch (Exception e) {
                                     Log.e(TAG, String.format("favourite fail: %s", e.getMessage()));
                                     Toast.makeText(LifeLabItemActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
@@ -199,23 +201,25 @@ public class LifeLabItemActivity extends Activity {
 //                return true;
 //            }
 //        });
+        lifelab_fav_count.setVisibility(lcd.liked_count == 0 ? View.GONE : View.VISIBLE);
+        lifelab_fav_count.setText(lcd.liked_count + "");
         int gc = this.lcd.getArticleGroupCount() > 2 ? 2 : this.lcd.getArticleGroupCount();
         LinearLayout.LayoutParams groupParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         groupParams.setMargins(Utils.dipToPixel(this, 8), Utils.dipToPixel(this, 6), Utils.dipToPixel(this, 8), 0);
-        LinearLayout.LayoutParams articleParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        articleParams.setMargins(Utils.dipToPixel(this, 8), 0, Utils.dipToPixel(this, 8), 0);
         for (int i = 0; i < gc; i++) {
             String g = this.lcd.getArticleGroup(i);
-            this.addArticleView(g, groupParams, articleParams);
+            this.addArticleView(g, groupParams);
         }
-        this.like.setImageDrawable(this.getResources().getDrawable(this.lcd.liked ? R.drawable.favourite : R.drawable.favourite_b));
+        this.like.setImageDrawable(this.getResources().getDrawable(this.lcd.liked ? R.drawable.favourite : R.drawable.mark));
     }
 
-    private void addArticleView(String group, LinearLayout.LayoutParams groupParams, LinearLayout.LayoutParams articleParams) {
+    private void addArticleView(String group, LinearLayout.LayoutParams groupParams) {
         View groupView = View.inflate(this, R.layout.lifelab_item_article_group, null);
         TextView tv = (TextView) groupView.findViewById(R.id.lifelab_item_group_title);
         tv.setText(group);
-        container.addView(groupView, groupParams);
+        View cardview = View.inflate(this, R.layout.cardview_lifelab_item, null);
+        LinearLayout item_container = (LinearLayout) cardview.findViewById(R.id.item_container);
+        item_container.addView(groupView);
         int cc = this.lcd.getArticleCount(group) > 2 ? 2 : this.lcd.getArticleCount(group);
         for (int i = 0; i < cc; i++) {
             LabCollectionDetail.Article a = this.lcd.getArticle(group, i);
@@ -238,8 +242,9 @@ public class LifeLabItemActivity extends Activity {
                 }
             });
             itemView.setOnClickListener(this.articleClickListener);
-            container.addView(itemView, articleParams);
+            item_container.addView(itemView);
         }
+        container.addView(cardview, groupParams);
     }
 
     private View.OnClickListener articleClickListener = new View.OnClickListener() {
@@ -265,7 +270,7 @@ public class LifeLabItemActivity extends Activity {
         tv = (TextView) view.findViewById(R.id.tv_lifelab_item_discuz_topic);
         tv.setText(p.title);
         tv = (TextView) view.findViewById(R.id.tv_lifelab_item_discuz_count);
-        tv.setText(this.lcd.liked_count + getString(R.string.discuss_people_number));
+        tv.setText(p.comment_count + getString(R.string.discuss_people_number));
         final ImageView iv = (ImageView) view.findViewById(R.id.iv_lifelab_item_discuz);
         new RemoteImageLoader(this, p.image_664_250, new RemoteImageLoader.RemoteImageListener() {
             @Override
@@ -299,12 +304,12 @@ public class LifeLabItemActivity extends Activity {
         View view = View.inflate(this, R.layout.lifelab_item_artists, null);
         LinearLayout r = (LinearLayout) view.findViewById(R.id.lifelab_item_artist_container);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.setMargins(0, Utils.dipToPixel(this, 10), Utils.dipToPixel(this, 8), Utils.dipToPixel(this, 10));
+        params.setMargins(0, Utils.dipToPixel(this, 8), 0, Utils.dipToPixel(this, 5));
         LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params1.setMargins(Utils.dipToPixel(this, 8), 0, 0, 0);
+        params1.setMargins(Utils.dipToPixel(this, 4), Utils.dipToPixel(this, 2), Utils.dipToPixel(this, 4), Utils.dipToPixel(this, 5));
         for (int i = 0; i < this.lcd.getArtistCount(); i++) {
             View itemView = View.inflate(this, R.layout.lifelab_item_artist, null);
-            LabCollectionDetail.Artist a = this.lcd.getArtist(i);
+            final LabCollectionDetail.Artist a = this.lcd.getArtist(i);
             TextView tv = (TextView) itemView.findViewById(R.id.lifelab_item_artist_name);
             tv.setText(a.nickname);
             tv = (TextView) itemView.findViewById(R.id.lifelab_item_artist_desc);
@@ -326,6 +331,14 @@ public class LifeLabItemActivity extends Activity {
                     }
                 }
             });
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(LifeLabItemActivity.this,DetailArtistActivity.class);
+                    intent.putExtra("id",a.id);
+                    startActivity(intent);
+                }
+            });
             r.addView(itemView, params1);
         }
         this.container.addView(view, params);
@@ -335,6 +348,11 @@ public class LifeLabItemActivity extends Activity {
         View view = View.inflate(this, R.layout.lifelab_item_foot, null);
         TextView tv = (TextView) view.findViewById(R.id.lifelab_item_desc);
         tv.setText(String.format(this.getString(R.string.lifelab_item_desc), this.lcd.editor));
+        tv = (TextView) view.findViewById(R.id.lifelab_foot_collect_count);
+        tv.setVisibility(lcd.liked_count == 0 ? View.GONE : View.VISIBLE);
+        tv.setText(lcd.liked_count + "");
+        ImageView iv = (ImageView) view.findViewById(R.id.lifelab_foot_collect);
+        iv.setImageResource(lcd.liked ? R.drawable.favourite : R.drawable.mark);
         this.container.addView(view);
     }
 
@@ -457,6 +475,7 @@ public class LifeLabItemActivity extends Activity {
             public int id;
             public String title;
             public String image_664_250;
+            public int comment_count;
         }
 
         private List<Artist> artists = new ArrayList<Artist>();
@@ -470,7 +489,7 @@ public class LifeLabItemActivity extends Activity {
         public String editor;
         public String share_link;
         public String share_title;
-        public String liked_count;
+        public int liked_count;
         public boolean liked;
 
         public static LabCollectionDetail parse(JSONObject jobj) {
@@ -507,7 +526,7 @@ public class LifeLabItemActivity extends Activity {
                     lcd.posts.add(post);
                 }
                 lcd.share_title = data.getString("share_title");
-                lcd.liked_count = data.getString("liked_count");
+                lcd.liked_count = data.optInt("liked_count");
                 lcd.addTestArtist();
                 return lcd;
             } catch (JSONException e) {
@@ -555,6 +574,7 @@ public class LifeLabItemActivity extends Activity {
             p.id = jobj.getInt("id");
             p.image_664_250 = jobj.getString("image_664_250");
             p.title = jobj.getString("title");
+            p.comment_count = jobj.optInt("comment_count");
             return p;
         }
 
