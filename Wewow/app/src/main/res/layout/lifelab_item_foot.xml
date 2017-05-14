@@ -44,30 +44,45 @@
                 android:textSize="12sp"/>
         </LinearLayout>
 
-        <LinearLayout
+
+        <RelativeLayout
+            android:id="@+id/layout_lifelab_foot_collect"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
-            android:gravity="center_horizontal"
-            android:orientation="vertical">
+            android:layout_marginStart="30dp">
 
             <ImageView
-                android:id="@+id/lifelab_item_foot_collect"
+                android:id="@+id/lifelab_foot_collect"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
+                android:layout_marginEnd="30dp"
                 android:src="@drawable/mark"/>
+
+            <TextView
+                android:id="@+id/lifelab_foot_collect_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:background="@drawable/shape_lifelab_fav_bg"
+                android:paddingEnd="4dp"
+                android:paddingStart="4dp"
+                android:textColor="@color/white"
+                android:textSize="9sp"
+                android:visibility="gone"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/lifelab_foot_collect"
+                android:layout_marginStart="2dp"
                 android:layout_marginTop="2dp"
                 android:shadowColor="@color/text_gray"
                 android:shadowRadius="15"
                 android:text="@string/collection"
                 android:textColor="@color/white"
                 android:textSize="12sp"/>
-        </LinearLayout>
+        </RelativeLayout>
+
 
         <LinearLayout
             android:layout_width="wrap_content"
