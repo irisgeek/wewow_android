@@ -124,6 +124,25 @@ public class ShareActivity extends Activity implements IWeiboHandler.Response {
                 ShareActivity.this.shareWechatCircle();
             }
         });
+        findViewById(R.id.share_more).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+//                if (intent.hasExtra(SHARE_IMAGE)){
+//                    sendIntent.setType("image/*");
+//                    intent.putExtra(Intent.EXTRA_STREAM, uri);
+//                }else{
+                sendIntent.setType("text/plain");
+//                }
+                String content = intent.getStringExtra(SHARE_CONTEXT);
+                if(intent.hasExtra(SHARE_URL)){
+                    content = intent.getStringExtra(SHARE_CONTEXT) + " " + intent.getStringExtra(SHARE_URL);
+                }
+                sendIntent.putExtra(Intent.EXTRA_TEXT, content);
+                startActivity(Intent.createChooser(sendIntent, "选择分享方式"));
+            }
+        });
         if (this.getIntent().hasExtra(BACK_GROUND)) {
             byte[] buf = this.getIntent().getByteArrayExtra(BACK_GROUND);
             Bitmap bm = BitmapFactory.decodeByteArray(buf, 0, buf.length);
