@@ -41,7 +41,7 @@ import retrofit.client.OkClient;
 /**
  * Created by iris on 17/3/2.
  */
-public class Utils {
+public class    Utils {
 
     /**
      * Converts pixel to dip.
@@ -60,6 +60,14 @@ public class Utils {
         activity.getWindowManager().getDefaultDisplay().getSize(size);
         int screenWidth = size.x;
         return pixelToDip(activity, screenWidth);
+    }
+
+    public static float getSceenDensity(Context mContext)
+    {
+        DisplayMetrics displayMetrics = mContext.getResources()
+                .getDisplayMetrics();
+        return  displayMetrics.density;
+
     }
 
     /**

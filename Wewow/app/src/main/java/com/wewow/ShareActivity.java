@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -49,6 +50,7 @@ public class ShareActivity extends Activity implements IWeiboHandler.Response {
     public static final String SHARE_URL = "SHARE_URL";
     public static final String SHARE_CONTEXT = "SHARE_CONTEXT";
     public static final String SHARE_IMAGE = "SHARE_IMAGE";
+    public static final String BACK_GROUND = "BACK_GROUND";
     private IWeiboShareAPI api;
 
     private int shareType;
@@ -122,6 +124,11 @@ public class ShareActivity extends Activity implements IWeiboHandler.Response {
                 ShareActivity.this.shareWechatCircle();
             }
         });
+        if (this.getIntent().hasExtra(BACK_GROUND)) {
+            byte[] buf = this.getIntent().getByteArrayExtra(BACK_GROUND);
+            Bitmap bm = BitmapFactory.decodeByteArray(buf, 0, buf.length);
+            this.findViewById(android.R.id.content).setBackground(new BitmapDrawable(bm));
+        }
     }
 
     private void shareWeibo() {

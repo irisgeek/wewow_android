@@ -5,11 +5,14 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -18,9 +21,27 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.alibaba.sdk.android.oss.ClientException;
+import com.alibaba.sdk.android.oss.OSS;
+import com.alibaba.sdk.android.oss.OSSClient;
+import com.alibaba.sdk.android.oss.ServiceException;
+import com.alibaba.sdk.android.oss.callback.OSSCompletedCallback;
+import com.alibaba.sdk.android.oss.callback.OSSProgressCallback;
+import com.alibaba.sdk.android.oss.common.auth.OSSCredentialProvider;
+import com.alibaba.sdk.android.oss.common.auth.OSSPlainTextAKSKCredentialProvider;
+import com.alibaba.sdk.android.oss.internal.OSSAsyncTask;
+import com.alibaba.sdk.android.oss.model.PutObjectRequest;
+import com.alibaba.sdk.android.oss.model.PutObjectResult;
+import com.cjj.MaterialRefreshLayout;
+import com.cjj.MaterialRefreshListener;
+import com.vansuita.pickimage.bean.PickResult;
+import com.vansuita.pickimage.bundle.PickSetup;
+import com.vansuita.pickimage.dialog.PickImageDialog;
+import com.vansuita.pickimage.listeners.IPickResult;
 import com.wewow.adapter.ListViewArtistsAdapter;
 import com.wewow.adapter.ListViewFeedbackAdapter;
 import com.wewow.dto.Feedback;
+import com.wewow.dto.Token;
 import com.wewow.netTask.ITask;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.FileCacheUtil;
@@ -43,14 +64,16 @@ import retrofit.client.Response;
 /**
  * Created by iris on 17/4/13.
  */
-public class FeedbackActivity extends BaseActivity implements SwipeRefreshLayout.OnRefreshListener {
+public class FeedbackActivity extends BaseActivity{
 
 
     private int currentPage = 1;
     private ListView listView;
+    private MaterialRefreshLayout refreshLayout;
     private ArrayList<HashMap<String, Object>> listItem;
     private ListViewFeedbackAdapter adapter;
-    private SwipeRefreshLayout swipeRefreshLayout;
+    private Token token;
+    private PickImageDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,20 +84,20 @@ public class FeedbackActivity extends BaseActivity implements SwipeRefreshLayout
         setContentView(R.layout.activity_feed_back);
         initData();
 
-        if (Utils.isNetworkAvailable(this)) {
-
-            checkcacheUpdatedOrNot();
-
-        } else {
-            Toast.makeText(this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
-            swipeRefreshLayout.setRefreshing(false);
-
-            SettingUtils.set(this, CommonUtilities.NETWORK_STATE, false);
-            setUpFeedbacksFromCache();
-
-        }
+//        if (Utils.isNetworkAvailable(this)) {
+//
+//            checkcacheUpdatedOrNot();
+//
+//        } else {
+//            Toast.makeText(this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
+//            refreshLayout.finishRefresh();
+//
+//            SettingUtils.set(this, CommonUtilities.NETWORK_STATE, false);
+//            setUpFeedbacksFromCache();
+//
+//        }
         setUpToolBar();
-
+        getToken();
 
     }
 
@@ -83,8 +106,64 @@ public class FeedbackActivity extends BaseActivity implements SwipeRefreshLayout
         listView = (ListView) findViewById(R.id.listViewFeedbacks);
 
         listItem = new ArrayList<HashMap<String, Object>>();
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
-        swipeRefreshLayout.setOnRefreshListener(this);
+        refreshLayout = (MaterialRefreshLayout) findViewById(R.id.refresh);
+
+
+        refreshLayout.setShowArrow(false);
+        int[] colors = {getResources().getColor(R.color.font_color)};
+        refreshLayout.setProgressColors(colors);
+
+        refreshLayout.setMaterialRefreshListener(new MaterialRefreshListener() {
+            @Override
+            public void onRefresh(final MaterialRefreshLayout materialRefreshLayout) {
+//                currentPage = 1;
+                if (currentPage == 1) {
+                    if (Utils.isNetworkAvailable(FeedbackActivity.this)) {
+
+//                        checkcacheUpdatedOrNot();
+
+                        getFeedbackFromServer();
+
+                    } else {
+                        Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
+                        refreshLayout.finishRefresh();
+
+                        SettingUtils.set(FeedbackActivity.this, CommonUtilities.NETWORK_STATE, false);
+//                        setUpFeedbacksFromCache();
+
+                    }
+                } else {
+
+                    boolean isLastPageLoaded = false;
+                    try {
+                        isLastPageLoaded = isLastPageLoaded();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    if (!isLastPageLoaded) {
+
+                        getFeedbackFromServer();
+                    } else {
+                        refreshLayout.finishRefresh();
+                    }
+                }
+
+            }
+
+            @Override
+            public void onfinish() {
+
+                refreshLayout.finishRefreshLoadMore();
+            }
+
+            @Override
+            public void onRefreshLoadMore(MaterialRefreshLayout materialRefreshLayout) {
+
+            }
+        });
+
+
+        refreshLayout.autoRefresh();
     }
 
     @Override
@@ -177,8 +256,28 @@ public class FeedbackActivity extends BaseActivity implements SwipeRefreshLayout
         return feedbacks;
     }
 
+    private Feedback parseFeedbackSent(String realData) throws JSONException {
+
+        Feedback feedback = new Feedback();
+
+        JSONObject object = new JSONObject(realData);
+        JSONObject result = object.getJSONObject("result").getJSONObject("data");
+
+
+        feedback.setId(result.getString("id"));
+        feedback.setContent(result.getString("content"));
+        feedback.setImage_height(result.getString("image_height"));
+        feedback.setFrom(result.getString("from"));
+        feedback.setContent_type(result.getString("content_type"));
+        feedback.setTime(result.getString("time"));
+        feedback.setReply_to(result.getString("reply_to"));
+        feedback.setImage_width(result.getString("image_width"));
+
+
+        return feedback;
+    }
+
     private void checkcacheUpdatedOrNot() {
-        swipeRefreshLayout.setRefreshing(true);
         ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
         iTask.updateAt(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), new Callback<JSONObject>() {
             @Override
@@ -190,7 +289,7 @@ public class FeedbackActivity extends BaseActivity implements SwipeRefreshLayout
                     if (!realData.contains(CommonUtilities.SUCCESS)) {
                         Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
 
-                        swipeRefreshLayout.setRefreshing(false);
+                        refreshLayout.finishRefresh();
 
                     } else {
                         JSONObject jsonObject = new JSONObject(realData);
@@ -216,11 +315,11 @@ public class FeedbackActivity extends BaseActivity implements SwipeRefreshLayout
                 } catch (IOException e) {
                     e.printStackTrace();
                     Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                    swipeRefreshLayout.setRefreshing(false);
+                    refreshLayout.finishRefresh();
                 } catch (JSONException e) {
                     Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
-                    swipeRefreshLayout.setRefreshing(false);
+                    refreshLayout.finishRefresh();
                 }
 
             }
@@ -228,7 +327,7 @@ public class FeedbackActivity extends BaseActivity implements SwipeRefreshLayout
             @Override
             public void failure(RetrofitError error) {
                 Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                swipeRefreshLayout.setRefreshing(false);
+                refreshLayout.finishRefresh();
             }
 
         });
@@ -244,38 +343,75 @@ public class FeedbackActivity extends BaseActivity implements SwipeRefreshLayout
                 e.printStackTrace();
             }
 
-            setUpFeedbacks(feedbacks, false);
+//            setUpFeedbacks(feedbacks, false);
         }
     }
 
-    private void setUpFeedbacks(List<Feedback> feedbacks, boolean refresh) {
+    private void getToken()
+    {
 
-
-        ArrayList<HashMap<String, Object>> listItemCopy = new ArrayList<HashMap<String, Object>>();
-        listItemCopy.addAll(listItem);
-        if (refresh) {
-
-            if (listItem != null && listItem.size() > 0) {
-                listItem.clear();
-
+        if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_TOKEN, this)) {
+            String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_TOKEN);
+            try {
+                token = parseTokenFromString(fileContent);
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
+
+        }
+        else
+        {
+            getTokenFromServer();
         }
 
-        for (int i = 0; i < feedbacks.size(); i++) {
-            HashMap<String, Object> map = new HashMap<String, Object>();
+    }
 
-            //
-
-            map.put("from", feedbacks.get(i).getFrom());
-            map.put("content_type", feedbacks.get(i).getContent_type());
-            map.put("imageView", feedbacks.get(i).getContent());
-            map.put("textView", feedbacks.get(i).getContent());
+    private void setUpFeedbacks(List<Feedback> feedbacks, boolean refresh, boolean feedbackSent) {
 
 
-            listItem.add(map);
+        if (feedbackSent) {
+
+            for (int i = 0; i < feedbacks.size(); i++) {
+                HashMap<String, Object> map = new HashMap<String, Object>();
+
+                //
+
+                map.put("from", feedbacks.get(i).getFrom());
+                map.put("content_type", feedbacks.get(i).getContent_type());
+                map.put("imageView", feedbacks.get(i).getContent());
+                map.put("textView", feedbacks.get(i).getContent());
+
+
+                listItem.add(map);
+            }
+
+        } else {
+            ArrayList<HashMap<String, Object>> listItemCopy = new ArrayList<HashMap<String, Object>>();
+            listItemCopy.addAll(listItem);
+            if (refresh) {
+
+                if (listItem != null && listItem.size() > 0) {
+                    listItem.clear();
+
+                }
+            }
+
+            for (int i = 0; i < feedbacks.size(); i++) {
+                HashMap<String, Object> map = new HashMap<String, Object>();
+
+                //
+
+                map.put("from", feedbacks.get(i).getFrom());
+                map.put("content_type", feedbacks.get(i).getContent_type());
+                map.put("imageView", feedbacks.get(i).getContent());
+                map.put("textView", feedbacks.get(i).getContent());
+
+
+                listItem.add(map);
+            }
+
+            listItem.addAll(listItemCopy);
         }
-
-        listItem.addAll(listItemCopy);
         if (!refresh) {
             adapter = new ListViewFeedbackAdapter(this, listItem);
 
@@ -296,9 +432,17 @@ public class FeedbackActivity extends BaseActivity implements SwipeRefreshLayout
         );
         adapter.notifyDataSetChanged();
         currentPage++;
-//        setUpButtons();
-        swipeRefreshLayout.setRefreshing(false);
-
+        setUpButtons();
+        refreshLayout.finishRefresh();
+        if ((!refresh)||feedbackSent) {
+            listView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
+            listView.setStackFromBottom(true);
+        }
+        else
+        {
+            listView.setTranscriptMode(ListView.TRANSCRIPT_MODE_DISABLED);
+            listView.setStackFromBottom(true);
+        }
 
     }
 
@@ -307,7 +451,19 @@ public class FeedbackActivity extends BaseActivity implements SwipeRefreshLayout
         buttonSendPic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                choosePic();
+//                choosePic();
+                dialog=PickImageDialog.build(new PickSetup()
+                        .setTitle(getResources().getString(R.string.choose))
+                        .setCameraButtonText(getResources().getString(R.string.camera))
+                        .setGalleryButtonText(getResources().getString(R.string.gallery))
+                        .setCancelText(getResources().getString(R.string.cancel))
+                ).setOnPickResult(new IPickResult() {
+                    @Override
+                    public void onPickResult(PickResult pickResult) {
+                        dialog.dismiss();
+
+                    }
+                }).show(FeedbackActivity.this);
             }
         });
 
@@ -315,7 +471,9 @@ public class FeedbackActivity extends BaseActivity implements SwipeRefreshLayout
         buttonSendText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 SendText();
+
             }
         });
     }
@@ -326,55 +484,66 @@ public class FeedbackActivity extends BaseActivity implements SwipeRefreshLayout
 
         UserInfo currentUser = UserInfo.getCurrentUser(FeedbackActivity.this);
         String userId = currentUser.getId().toString();
-        String token=currentUser.getToken().toString();
-        EditText textContent=(EditText) findViewById(R.id.editTextContent);
-        String content=textContent.getText().toString();
-
-
-        iTask.feedbackText(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), userId,token,content ,"0","", new Callback<JSONObject>() {
-
+        String token = currentUser.getToken().toString();
+        final EditText textContent = (EditText) findViewById(R.id.editTextContent);
+        textContent.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void success(JSONObject object, Response response) {
-                List<Feedback> feedbacks = new ArrayList<Feedback>();
+            public void onClick(View v) {
+                textContent.setText("");
+            }
+        });
+        String content = textContent.getText().toString();
+        if(!content.trim().equals("")) {
+            textContent.setText("");
+            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(textContent.getWindowToken(), 0);
 
-                try {
-                    String realData = Utils.convertStreamToString(response.getBody().in());
-                    if (!realData.contains(CommonUtilities.SUCCESS)) {
-                        Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                        swipeRefreshLayout.setRefreshing(false);
+            iTask.feedbackText(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), userId, token, content, "0", "", new Callback<JSONObject>() {
 
-                    } else {
-                        feedbacks = parseFeedbackFromString(realData);
+                @Override
+                public void success(JSONObject object, Response response) {
+                    List<Feedback> feedbacks = new ArrayList<Feedback>();
 
-                        if (currentPage > 1) {
-                            setUpFeedbacks(feedbacks, true);
+                    try {
+                        String realData = Utils.convertStreamToString(response.getBody().in());
+
+                        JSONObject result = new JSONObject(realData).getJSONObject("result");
+                        String code = result.get("code").toString();
+                        String message = result.get("message").toString();
+                        if (!code.equals("0")) {
+                            Toast.makeText(FeedbackActivity.this, message, Toast.LENGTH_SHORT).show();
+
+
                         } else {
-                            FileCacheUtil.setCache(realData, FeedbackActivity.this, CommonUtilities.CACHE_FILE_FEEDBACKS, 0);
-                            setUpFeedbacks(feedbacks, false);
+
+                            Feedback feedback = parseFeedbackSent(realData);
+                            feedbacks.add(feedback);
+                            setUpFeedbacks(feedbacks, true, true);
                         }
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
 
                     }
 
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                    swipeRefreshLayout.setRefreshing(false);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                    swipeRefreshLayout.setRefreshing(false);
                 }
 
-            }
+                @Override
+                public void failure(RetrofitError error) {
+                    Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
 
-            @Override
-            public void failure(RetrofitError error) {
-                Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                swipeRefreshLayout.setRefreshing(false);
 
-            }
-        });
-
+                }
+            });
+        }
+        else {
+            Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.no_content), Toast.LENGTH_SHORT).show();
+        }
 
     }
 
@@ -383,8 +552,109 @@ public class FeedbackActivity extends BaseActivity implements SwipeRefreshLayout
 
     }
 
+    private void updloadImage()
+    {
+        String endpoint = "http://oss-cn-beijing.aliyuncs.com";
+
+
+
+    }
+
+    public void asyncPutObjectFromLocalFile(String filePath) {
+
+
+        OSSCredentialProvider credentialProvider = new OSSPlainTextAKSKCredentialProvider(token.getAccessKeyId(),token.getAccessKeySecret());
+
+        OSS oss = new OSSClient(getApplicationContext(), CommonUtilities.OOS_ENDPOINT, credentialProvider);
+        // 构造上传请求
+        PutObjectRequest put = new PutObjectRequest(CommonUtilities.BUCKETNAME, "textImage", filePath);
+
+        // 异步上传时可以设置进度回调
+        put.setProgressCallback(new OSSProgressCallback<PutObjectRequest>() {
+            @Override
+            public void onProgress(PutObjectRequest request, long currentSize, long totalSize) {
+                Log.d("PutObject", "currentSize: " + currentSize + " totalSize: " + totalSize);
+            }
+        });
+
+        OSSAsyncTask task = oss.asyncPutObject(put, new OSSCompletedCallback<PutObjectRequest, PutObjectResult>() {
+            @Override
+            public void onSuccess(PutObjectRequest request, PutObjectResult result) {
+                Log.d("PutObject", "UploadSuccess");
+
+                Log.d("ETag", result.getETag());
+                Log.d("RequestId", result.getRequestId());
+            }
+
+            @Override
+            public void onFailure(PutObjectRequest request, ClientException clientExcepion, ServiceException serviceException) {
+                // 请求异常
+                if (clientExcepion != null) {
+                    // 本地异常如网络异常等
+                    clientExcepion.printStackTrace();
+                }
+                if (serviceException != null) {
+                    // 服务异常
+                    Log.e("ErrorCode", serviceException.getErrorCode());
+                    Log.e("RequestId", serviceException.getRequestId());
+                    Log.e("HostId", serviceException.getHostId());
+                    Log.e("RawMessage", serviceException.getRawMessage());
+                }
+            }
+        });
+    }
+
+
+    private void getTokenFromServer()
+    {
+        ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
+
+        iTask.getTokenToUploadFiles(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), new Callback<JSONObject>() {
+
+            @Override
+            public void success(JSONObject object, Response response) {
+                token = new Token();
+
+                try {
+                    String realData = Utils.convertStreamToString(response.getBody().in());
+                    if (!realData.contains(CommonUtilities.SUCCESS)) {
+                        Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+
+
+                    } else {
+                        token = parseTokenFromString(realData);
+
+                            FileCacheUtil.setCache(realData, FeedbackActivity.this, CommonUtilities.CACHE_FILE_TOKEN, 0);
+
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+                    refreshLayout.finishRefresh();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+                    refreshLayout.finishRefresh();
+                }
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+                refreshLayout.finishRefresh();
+
+            }
+        });
+
+    }
+
+    private Token parseTokenFromString(String realData) throws JSONException {
+        return null;
+    }
+
     private void getFeedbackFromServer() {
-        swipeRefreshLayout.setRefreshing(true);
         ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
         String userId = "0";
         //check user login or not
@@ -402,16 +672,16 @@ public class FeedbackActivity extends BaseActivity implements SwipeRefreshLayout
                     String realData = Utils.convertStreamToString(response.getBody().in());
                     if (!realData.contains(CommonUtilities.SUCCESS)) {
                         Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                        swipeRefreshLayout.setRefreshing(false);
+                        refreshLayout.finishRefresh();
 
                     } else {
                         feedbacks = parseFeedbackFromString(realData);
 
                         if (currentPage > 1) {
-                            setUpFeedbacks(feedbacks, true);
+                            setUpFeedbacks(feedbacks, true,false);
                         } else {
                             FileCacheUtil.setCache(realData, FeedbackActivity.this, CommonUtilities.CACHE_FILE_FEEDBACKS, 0);
-                            setUpFeedbacks(feedbacks, false);
+                            setUpFeedbacks(feedbacks, false,false);
                         }
 
                     }
@@ -419,11 +689,11 @@ public class FeedbackActivity extends BaseActivity implements SwipeRefreshLayout
                 } catch (IOException e) {
                     e.printStackTrace();
                     Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                    swipeRefreshLayout.setRefreshing(false);
+                    refreshLayout.finishRefresh();
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                    swipeRefreshLayout.setRefreshing(false);
+                    refreshLayout.finishRefresh();
                 }
 
             }
@@ -431,27 +701,10 @@ public class FeedbackActivity extends BaseActivity implements SwipeRefreshLayout
             @Override
             public void failure(RetrofitError error) {
                 Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                swipeRefreshLayout.setRefreshing(false);
+                refreshLayout.finishRefresh();
 
             }
         });
-    }
-
-    @Override
-    public void onRefresh() {
-
-        boolean isLastPageLoaded = false;
-        try {
-            isLastPageLoaded = isLastPageLoaded();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        if (!isLastPageLoaded) {
-
-            getFeedbackFromServer();
-        } else {
-            swipeRefreshLayout.setRefreshing(false);
-        }
     }
 
     private boolean isLastPageLoaded() throws JSONException {
@@ -471,4 +724,6 @@ public class FeedbackActivity extends BaseActivity implements SwipeRefreshLayout
         return result;
 
     }
+
+
 }

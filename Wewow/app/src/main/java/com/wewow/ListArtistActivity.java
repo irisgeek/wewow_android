@@ -1,21 +1,16 @@
 package com.wewow;
 
 
-import android.app.ListActivity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.LabeledIntent;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -25,9 +20,6 @@ import com.cjj.MaterialRefreshLayout;
 import com.cjj.MaterialRefreshListener;
 import com.wewow.adapter.ListViewArtistsAdapter;
 import com.wewow.dto.Artist;
-import com.wewow.dto.Banner;
-import com.wewow.dto.Institute;
-import com.wewow.dto.collectionCategory;
 import com.wewow.netTask.ITask;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.FileCacheUtil;
@@ -42,7 +34,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -60,7 +51,8 @@ public class ListArtistActivity extends BaseActivity {
     private ListViewArtistsAdapter adapter;
     private MaterialRefreshLayout refreshLayout;
     private String artistId;
-    private List<Artist> artists;
+    private List<Artist> artistsTemp;
+    private List<Artist> allArtists;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,6 +70,7 @@ public class ListArtistActivity extends BaseActivity {
 
         refreshLayout=(MaterialRefreshLayout) findViewById(R.id.refresh);
 
+
         refreshLayout.setShowArrow(false);
         int[] colors={getResources().getColor(R.color.font_color)};
         refreshLayout.setProgressColors(colors);
@@ -90,7 +83,8 @@ public class ListArtistActivity extends BaseActivity {
                 currentPage = 1;
                 if (Utils.isNetworkAvailable(ListArtistActivity.this)) {
 
-                    checkcacheUpdatedOrNot();
+//                    checkcacheUpdatedOrNot();
+                    getArtistListFromServer();
 
                 } else {
                     Toast.makeText(ListArtistActivity.this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
@@ -191,7 +185,7 @@ public class ListArtistActivity extends BaseActivity {
                 menuItem.collapseActionView();
 
                 List<Artist> artistsBySearch=new ArrayList<Artist>();
-                for(Artist artist:artists)
+                for(Artist artist: artistsTemp)
                 {
                     if (artist.getNickname().contains(query))
                     {
@@ -369,14 +363,14 @@ public class ListArtistActivity extends BaseActivity {
     private void setUpArtistsFromCache() {
         if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_ARTISTS_LIST, this)) {
             String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_ARTISTS_LIST);
-            artists = new ArrayList<Artist>();
+            artistsTemp = new ArrayList<Artist>();
             try {
-                artists = parseArtistsListFromString(fileContent);
+                artistsTemp = parseArtistsListFromString(fileContent);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
-            setUpArtists(artists, false);
+            setUpArtists(artistsTemp, false);
         }
     }
 
@@ -384,6 +378,12 @@ public class ListArtistActivity extends BaseActivity {
 
 
         ArrayList<HashMap<String, Object>> listItemCopy = new ArrayList<HashMap<String, Object>>();
+
+        if(allArtists==null) {
+            allArtists = new ArrayList<Artist>();
+        }
+        allArtists.addAll(artists);
+
         listItemCopy.addAll(listItem);
 //        if (refresh) {
 
@@ -439,6 +439,37 @@ public class ListArtistActivity extends BaseActivity {
 
     }
 
+    private void updateArtists(List<Artist> artists) {
+
+
+        if (listItem != null && listItem.size() > 0) {
+            listItem.clear();
+
+        }
+
+        for (int i = 0; i < artists.size(); i++) {
+            HashMap<String, Object> map = new HashMap<String, Object>();
+
+            //
+
+            map.put("imageView", artists.get(i).getImage());
+
+            map.put("textViewName", artists.get(i).getNickname());
+            map.put("textViewDesc", artists.get(i).getDesc());
+            map.put("textViewArticleCount", artists.get(i).getArticle_count());
+            map.put("textViewFollowerCount", artists.get(i).getFollower_count());
+            map.put("imageViewFollowed", artists.get(i).getFollowed());
+            map.put("id", artists.get(i).getId());
+
+            listItem.add(map);
+        }
+
+        adapter.notifyDataSetChanged();
+
+
+
+    }
+
     private void getArtistListFromServer() {
 
         ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
@@ -452,7 +483,7 @@ public class ListArtistActivity extends BaseActivity {
 
             @Override
             public void success(JSONObject object, Response response) {
-                artists = new ArrayList<Artist>();
+                artistsTemp = new ArrayList<Artist>();
 
                 try {
                     String realData = Utils.convertStreamToString(response.getBody().in());
@@ -462,13 +493,13 @@ public class ListArtistActivity extends BaseActivity {
                         refreshLayout.finishRefreshLoadMore();
 
                     } else {
-                        artists = parseArtistsListFromString(realData);
+                        artistsTemp = parseArtistsListFromString(realData);
 
                         if (currentPage > 1) {
-                            setUpArtists(artists, true);
+                            setUpArtists(artistsTemp, true);
                         } else {
                             FileCacheUtil.setCache(realData, ListArtistActivity.this, CommonUtilities.CACHE_FILE_ARTISTS_LIST, 0);
-                            setUpArtists(artists, false);
+                            setUpArtists(artistsTemp, false);
                         }
 
                     }
@@ -519,21 +550,16 @@ public class ListArtistActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        boolean udpateArtistList=data.getBooleanExtra("updateList",false);
-        if (requestCode == 0 && resultCode == 0&&udpateArtistList) {
+        String followed=data.getStringExtra("followed").toString();
+        if (requestCode == 0 && resultCode == 0) {
             List<Artist> updatedArtists = new ArrayList<Artist>();
-            for (Artist artist : artists) {
+            for (Artist artist : allArtists) {
                 if (artist.getId().equals(artistId)) {
-                    if (artist.getFollowed().equals("1")) {
-                        artist.setFollowed("0");
-                    } else {
-                        artist.setFollowed("1");
-                    }
-
+                   artist.setFollowed(followed);
                 }
                 updatedArtists.add(artist);
             }
-            setUpArtists(updatedArtists,true);
+            updateArtists(updatedArtists);
 
         }
     }

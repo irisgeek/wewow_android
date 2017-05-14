@@ -18,12 +18,20 @@ public class BlurBuilder {
     private static final float BLUR_RADIUS = 7.5f;
 
     public static Bitmap blur(View v) {
+        return blur(v, BITMAP_SCALE, BLUR_RADIUS);
+    }
+
+    public static Bitmap blur(View v, float scale, float radius) {
         return blur(v.getContext(), getScreenshot(v));
     }
 
     public static Bitmap blur(Context ctx, Bitmap image) {
-        int width = Math.round(image.getWidth() * BITMAP_SCALE);
-        int height = Math.round(image.getHeight() * BITMAP_SCALE);
+        return blur(ctx, image, BITMAP_SCALE, BLUR_RADIUS);
+    }
+
+    public static Bitmap blur(Context ctx, Bitmap image, float scale, float radius) {
+        int width = Math.round(image.getWidth() * scale);
+        int height = Math.round(image.getHeight() * scale);
 
         Bitmap inputBitmap = Bitmap.createScaledBitmap(image, width, height, false);
         Bitmap outputBitmap = Bitmap.createBitmap(inputBitmap);
@@ -32,7 +40,7 @@ public class BlurBuilder {
         ScriptIntrinsicBlur theIntrinsic = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs));
         Allocation tmpIn = Allocation.createFromBitmap(rs, inputBitmap);
         Allocation tmpOut = Allocation.createFromBitmap(rs, outputBitmap);
-        theIntrinsic.setRadius(BLUR_RADIUS);
+        theIntrinsic.setRadius(radius);
         theIntrinsic.setInput(tmpIn);
         theIntrinsic.forEach(tmpOut);
         tmpOut.copyTo(outputBitmap);

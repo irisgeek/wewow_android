@@ -43,6 +43,13 @@
     <string name="article_feedback_link">反馈给我们</string>
     <string name="lifepost_nodata">还没有人发表看法</string>
     <string name="lifepost_mycomment">我的评论</string>
+    <string name="lifepost_title">⽣活帖</string>
+    <string name="addpost_title">说说我的想法</string>
+    <string name="addpost_quit_prompt">现在退出的话，输入的文字就都白费了，确定吗？</string>
+    <string name="addpost_counter_max">140</string>
+    <string name="lifepost_del_comment_success">删除成功</string>
+    <string name="lifepost_impeach_comment_success">举报成功</string>
+
     <string name="discuss_people_number">人参与讨论</string>
     <string name="lifelab_item_feedback">反馈</string>
     <string name="lifelab_item_share">分享</string>
@@ -182,4 +189,15 @@
 
     <string name="search_with_no_result">没有找到喜欢的内容？</string>
     <string name="tell_wewow">告诉唯物</string>
+    <string name="submitted">\u63d0\u4ea4\u6210\u529f</string>
+    <string name="no_content">内容不能为空</string>
+    <string name="title_activity_add_post">AddPostActivity</string>
+
+
+    <string name="choose">请选择</string>
+    <string name="camera">相机</string>
+    <string name="gallery">相册</string>
+    <string name="cancel">取消</string>
+
+
 </resources>

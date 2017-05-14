@@ -63,7 +63,8 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
 
         if (Utils.isNetworkAvailable(this)) {
 
-            checkcacheUpdatedOrNot();
+//            checkcacheUpdatedOrNot();
+            getArtistListFromServer();
 
         } else {
             Toast.makeText(this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();

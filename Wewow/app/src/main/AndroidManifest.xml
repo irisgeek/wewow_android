@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.wewow">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -24,6 +25,17 @@
             android:authorities="com.wewow.hms.update.provider"
             android:exported="false"
             android:grantUriPermissions="true" />
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}.com.vansuita.pickimage.provider"
+            android:exported="false"
+            android:grantUriPermissions="true"
+            tools:replace="android:authorities">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/picker_provider_paths" />
+        </provider>
 
         <activity
             android:name=".MainActivity"
@@ -143,6 +155,10 @@
         <activity
             android:name=".MyCollectionActivity"
             android:label="@string/title_activity_my_collection"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name=".AddPostActivity"
+            android:label="@string/title_activity_add_post"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"></activity>
     </application>
 
