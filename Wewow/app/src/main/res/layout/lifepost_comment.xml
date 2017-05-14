@@ -53,28 +53,77 @@
         android:textColor="#333631"
         android:textSize="16sp" />
 
-    <RelativeLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="44dp"
-        android:orientation="horizontal"
-        android:paddingLeft="14dp"
-        android:paddingRight="14dp">
+        android:layout_height="44dp">
 
-        <TextView
-            android:id="@+id/lifepost_comment_author"
+        <RelativeLayout
+            android:id="@+id/normal_area"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:textColor="#333631"
-            android:textSize="13sp" />
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:paddingLeft="14dp"
+            android:paddingRight="14dp">
 
-        <ImageView
-            android:layout_width="32dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:src="@drawable/more" />
+            <TextView
+                android:id="@+id/lifepost_comment_author"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:textColor="#333631"
+                android:textSize="13sp" />
 
-    </RelativeLayout>
+            <ImageView
+                android:id="@+id/comment_moreaction"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/more" />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/comment_menu"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/post_close"
+                android:layout_width="match_parent"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:src="@drawable/closemenu" />
+
+            <ImageView
+                android:id="@+id/post_share"
+                android:layout_width="match_parent"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:src="@drawable/sharecomment" />
+
+            <ImageView
+                android:id="@+id/post_copy"
+                android:layout_width="match_parent"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:src="@drawable/copytext" />
+
+            <ImageView
+                android:id="@+id/post_delete"
+                android:layout_width="match_parent"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:src="@drawable/impeach" />
+
+        </LinearLayout>
+
+    </FrameLayout>
 
 </LinearLayout>
