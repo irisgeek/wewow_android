@@ -54,6 +54,7 @@ public class LifePostActivity extends AppCompatActivity {
     private UserInfo user;
     private int postId;
     private JSONObject daily_topic;
+    private ListView listComments;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,9 +143,9 @@ public class LifePostActivity extends AppCompatActivity {
             this.comments = jobj.getJSONArray("comments");
             if (this.comments.length() > 0) {
                 this.findViewById(R.id.lifepost_nodata_area).setVisibility(View.GONE);
-                ListView lv = (ListView) this.findViewById(R.id.lifepost_comments);
-                lv.setVisibility(View.VISIBLE);
-                lv.setAdapter(this.adapter);
+                this.listComments = (ListView) this.findViewById(R.id.lifepost_comments);
+                this.listComments.setVisibility(View.VISIBLE);
+                this.listComments.setAdapter(this.adapter);
             }
         } catch (JSONException e) {
             Log.e(TAG, "onDataLoad: fail");
@@ -152,6 +153,7 @@ public class LifePostActivity extends AppCompatActivity {
     }
 
     private BaseAdapter adapter = new BaseAdapter() {
+
         @Override
         public int getCount() {
             return LifePostActivity.this.comments.length();
@@ -202,18 +204,28 @@ public class LifePostActivity extends AppCompatActivity {
             normalPanel.setVisibility(View.VISIBLE);
             menuPanel.setVisibility(View.GONE);
             Pair<View, View> menuHolder = new Pair<>(normalPanel, menuPanel);
+
             ImageView moreaction = (ImageView) view.findViewById(R.id.comment_moreaction);
             moreaction.setTag(menuHolder);
             moreaction.setOnClickListener(LifePostActivity.this.openMenuListener);
+
             ImageView close = (ImageView) view.findViewById(R.id.post_close);
             close.setTag(menuHolder);
             close.setOnClickListener(LifePostActivity.this.closeMenuListener);
+
             ImageView share = (ImageView) view.findViewById(R.id.post_share);
             share.setTag(jobj);
             share.setOnClickListener(LifePostActivity.this.commentShareListener);
+
             ImageView copy = (ImageView) view.findViewById(R.id.post_copy);
             copy.setTag(jobj);
             copy.setOnClickListener(LifePostActivity.this.commentCopyListener);
+
+            ImageView impeach = (ImageView) view.findViewById(R.id.post_delete);
+            impeach.setImageDrawable(LifePostActivity.this.getResources().getDrawable(author.equals(LifePostActivity.this.user.getNickname()) ? R.drawable.deletepost : R.drawable.impeach));
+            impeach.setTag(jobj);
+            impeach.setOnClickListener(LifePostActivity.this.commentImpeachListener);
+
             return view;
         }
     };
@@ -297,6 +309,86 @@ public class LifePostActivity extends AppCompatActivity {
             }
             su.setUrl(LifePostActivity.this.daily_topic.optString("share_link"));
             su.share();
+        }
+    };
+
+    private View.OnClickListener commentImpeachListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            JSONObject jobj = (JSONObject) view.getTag();
+            String author = jobj.optString("user");
+            Object[] params;
+            if (author.equals(LifePostActivity.this.user.getNickname())) {
+                ArrayList<Pair<String, String>> fields = new ArrayList<>();
+                fields.add(new Pair<String, String>("user_id", LifePostActivity.this.user.getId().toString()));
+                final int id = jobj.optInt("id");
+                fields.add(new Pair<String, String>("comment_id", String.valueOf(id)));
+                fields.add(new Pair<String, String>("token", LifePostActivity.this.user.getToken()));
+                ArrayList<Pair<String, String>> headers = new ArrayList<>();
+                headers.add(WebAPIHelper.getHttpFormUrlHeader());
+                params = new Object[]{
+                        String.format("%s/comment_del", CommonUtilities.WS_HOST),
+                        new HttpAsyncTask.TaskDelegate() {
+                            @Override
+                            public void taskCompletionResult(byte[] result) {
+                                ProgressDialogUtil.getInstance(LifePostActivity.this).finishProgressDialog();
+                                JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
+                                try {
+                                    int code = jobj.getJSONObject("result").getInt("code");
+                                    if (code != 0) {
+                                        throw new Exception(String.format("delete comment returns %d", code));
+                                    }
+                                    for (int i = 0; i < LifePostActivity.this.comments.length(); i++) {
+                                        if (id == LifePostActivity.this.comments.getJSONObject(i).optInt("id")) {
+                                            LifePostActivity.this.comments.remove(i);
+                                            LifePostActivity.this.adapter.notifyDataSetChanged();
+                                            break;
+                                        }
+                                    }
+                                    Toast.makeText(LifePostActivity.this, R.string.lifepost_del_comment_success, Toast.LENGTH_LONG).show();
+                                } catch (Exception e) {
+                                    Log.e(TAG, String.format("delete comment fail: %s", e.getMessage()));
+                                    Toast.makeText(LifePostActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        },
+                        WebAPIHelper.HttpMethod.POST,
+                        WebAPIHelper.buildHttpQuery(fields).getBytes(),
+                        headers
+                };
+            } else {
+                ArrayList<Pair<String, String>> fields = new ArrayList<>();
+                fields.add(new Pair<String, String>("user_id", LifePostActivity.this.user.getId().toString()));
+                fields.add(new Pair<String, String>("comment_id", String.valueOf(jobj.optInt("id"))));
+                fields.add(new Pair<String, String>("token", LifePostActivity.this.user.getToken()));
+                ArrayList<Pair<String, String>> headers = new ArrayList<>();
+                headers.add(WebAPIHelper.getHttpFormUrlHeader());
+                params = new Object[]{
+                        String.format("%s/report", CommonUtilities.WS_HOST),
+                        new HttpAsyncTask.TaskDelegate() {
+                            @Override
+                            public void taskCompletionResult(byte[] result) {
+                                ProgressDialogUtil.getInstance(LifePostActivity.this).finishProgressDialog();
+                                JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
+                                try {
+                                    int code = jobj.getJSONObject("result").getInt("code");
+                                    if (code != 0) {
+                                        throw new Exception(String.format("delete comment returns %d", code));
+                                    }
+                                    Toast.makeText(LifePostActivity.this, R.string.lifepost_impeach_comment_success, Toast.LENGTH_LONG).show();
+                                } catch (Exception e) {
+                                    Log.e(TAG, String.format("impeach comment fail: %s", e.getMessage()));
+                                    Toast.makeText(LifePostActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        },
+                        WebAPIHelper.HttpMethod.POST,
+                        WebAPIHelper.buildHttpQuery(fields).getBytes(),
+                        headers
+                };
+            }
+            ProgressDialogUtil.getInstance(LifePostActivity.this).showProgressDialog();
+            new HttpAsyncTask().execute(params);
         }
     };
 }
