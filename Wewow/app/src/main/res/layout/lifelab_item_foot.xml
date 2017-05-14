@@ -11,7 +11,9 @@
         android:layout_gravity="center"
         android:layout_marginBottom="16dp"
         android:layout_marginTop="30dp"
-        android:textColor="#ffffffff"/>
+        android:shadowColor="@color/text_gray"
+        android:shadowRadius="15"
+        android:textColor="@color/white"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -35,9 +37,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:textSize="12sp"
+                android:shadowColor="@color/text_gray"
+                android:shadowRadius="15"
                 android:text="@string/lifelab_item_feedback"
-                android:textColor="@color/white"/>
+                android:textColor="@color/white"
+                android:textSize="12sp"/>
         </LinearLayout>
 
         <LinearLayout
@@ -58,9 +62,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:textSize="12sp"
+                android:shadowColor="@color/text_gray"
+                android:shadowRadius="15"
                 android:text="@string/collection"
-                android:textColor="@color/white"/>
+                android:textColor="@color/white"
+                android:textSize="12sp"/>
         </LinearLayout>
 
         <LinearLayout
@@ -78,9 +84,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:textSize="12sp"
+                android:shadowColor="@color/text_gray"
+                android:shadowRadius="15"
                 android:text="@string/lifelab_item_share"
-                android:textColor="@color/white"/>
+                android:textColor="@color/white"
+                android:textSize="12sp"/>
         </LinearLayout>
 
     </LinearLayout>

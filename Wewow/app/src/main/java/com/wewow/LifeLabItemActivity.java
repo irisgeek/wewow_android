@@ -299,12 +299,12 @@ public class LifeLabItemActivity extends Activity {
         View view = View.inflate(this, R.layout.lifelab_item_artists, null);
         LinearLayout r = (LinearLayout) view.findViewById(R.id.lifelab_item_artist_container);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.setMargins(0, Utils.dipToPixel(this, 10), Utils.dipToPixel(this, 8), Utils.dipToPixel(this, 10));
+        params.setMargins(0, Utils.dipToPixel(this, 8), 0, Utils.dipToPixel(this, 5));
         LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params1.setMargins(Utils.dipToPixel(this, 8), 0, 0, 0);
+        params1.setMargins(Utils.dipToPixel(this, 4), Utils.dipToPixel(this, 2), Utils.dipToPixel(this, 4), Utils.dipToPixel(this, 5));
         for (int i = 0; i < this.lcd.getArtistCount(); i++) {
             View itemView = View.inflate(this, R.layout.lifelab_item_artist, null);
-            LabCollectionDetail.Artist a = this.lcd.getArtist(i);
+            final LabCollectionDetail.Artist a = this.lcd.getArtist(i);
             TextView tv = (TextView) itemView.findViewById(R.id.lifelab_item_artist_name);
             tv.setText(a.nickname);
             tv = (TextView) itemView.findViewById(R.id.lifelab_item_artist_desc);
@@ -324,6 +324,14 @@ public class LifeLabItemActivity extends Activity {
                     if (bd != null) {
                         bd.getBitmap().recycle();
                     }
+                }
+            });
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(LifeLabItemActivity.this,DetailArtistActivity.class);
+                    intent.putExtra("id",a.id);
+                    startActivity(intent);
                 }
             });
             r.addView(itemView, params1);

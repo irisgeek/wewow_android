@@ -51,7 +51,8 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="25dp"
             android:layout_marginLeft="19dp"
-            android:text="abc"
+            android:shadowColor="@color/text_gray"
+            android:shadowRadius="15"
             android:textColor="#ffffffff"
             android:textSize="36sp"/>
 
