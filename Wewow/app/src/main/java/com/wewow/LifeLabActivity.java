@@ -159,7 +159,7 @@ public class LifeLabActivity extends BaseActivity {
     }
 
     private void loadRemoteData() {
-        this.toggleProgressDialog(true);
+        //this.toggleProgressDialog(true);
         List<Pair<String, String>> ps = new ArrayList<Pair<String, String>>();
         ps.add(new Pair<String, String>("page", String.valueOf(this.labData.getPageToLoad())));
         Object[] params = new Object[]{
@@ -168,7 +168,7 @@ public class LifeLabActivity extends BaseActivity {
 
                     @Override
                     public void taskCompletionResult(byte[] result) {
-                        LifeLabActivity.this.toggleProgressDialog(false);
+                        //LifeLabActivity.this.toggleProgressDialog(false);
                         LifeLabActivity.this.swipe.setRefreshing(false);
                         JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
                         if (jobj == null) {
