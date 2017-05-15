@@ -47,6 +47,7 @@ public class LifeLabActivity extends BaseActivity {
     private LabData labData = new LabData();
     private SwipeRefreshLayout swipe;
     private View foot;
+    private boolean isLoading = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +97,11 @@ public class LifeLabActivity extends BaseActivity {
                 LifeLabActivity.this.foot.setVisibility(View.VISIBLE);
                 if (i + i1 == i2) {
                     Log.d(TAG, "onScroll: Show refresh");
+                    if (LifeLabActivity.this.labData.isAllLoaded()) {
+                        LifeLabActivity.this.foot.setVisibility(View.GONE);
+                    } else {
+                        LifeLabActivity.this.foot.setVisibility(View.VISIBLE);
+                    }
                     LifeLabActivity.this.swipe.setRefreshing(true);
                     LifeLabActivity.this.startDataLoading();
                 }
@@ -160,6 +166,10 @@ public class LifeLabActivity extends BaseActivity {
 
     private void loadRemoteData() {
         //this.toggleProgressDialog(true);
+        if (this.isLoading) {
+            return;
+        }
+        this.isLoading = true;
         List<Pair<String, String>> ps = new ArrayList<Pair<String, String>>();
         ps.add(new Pair<String, String>("page", String.valueOf(this.labData.getPageToLoad())));
         Object[] params = new Object[]{
@@ -186,6 +196,7 @@ public class LifeLabActivity extends BaseActivity {
                         } catch (JSONException e) {
                             Toast.makeText(LifeLabActivity.this, R.string.serverError, Toast.LENGTH_LONG).show();
                         }
+                        LifeLabActivity.this.isLoading = false;
                     }
                 },
                 WebAPIHelper.HttpMethod.GET,
@@ -223,7 +234,8 @@ public class LifeLabActivity extends BaseActivity {
 
         }
 
-        public void addData(JSONObject jobj) {
+        public synchronized void addData(JSONObject jobj) {
+            Log.d(TAG, String.format("before add allcount: %d  count: %d ", this.getAllCount(), this.getCount()));
             try {
                 this.pageCount = jobj.getInt("total_pages");
                 this.pagesize = jobj.getInt("pagesize");
@@ -247,13 +259,14 @@ public class LifeLabActivity extends BaseActivity {
             } catch (JSONException e) {
                 Log.e(TAG, "addData fail");
             }
+            Log.d(TAG, String.format("after add allcount: %d  count: %d ", this.getAllCount(), this.getCount()));
         }
 
         public int getCurrentPage() {
             return this.currentPage;
         }
 
-        public int getPageToLoad() {
+        public synchronized int getPageToLoad() {
             return this.currentPage <= 0 ? 1 : this.currentPage + 1;
         }
 
