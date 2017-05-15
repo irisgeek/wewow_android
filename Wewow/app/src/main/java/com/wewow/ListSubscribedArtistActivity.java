@@ -364,7 +364,7 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
 
     }
 
-    private void postReadToServer(String artistId) {
+    private void postReadToServer(final String artistId) {
 
         ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
 
@@ -384,8 +384,12 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
                     String code=new JSONObject(realData).getJSONObject("result").get("code").toString();
                     if (!code.equals("0")) {
                         Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-
-
+                    }
+                    else
+                    {
+                        FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_LIST, ListSubscribedArtistActivity.this);
+                        FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_DETAIL+artistId, ListSubscribedArtistActivity.this);
+                        FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_SUBSCRIBED_ARTISTS_LIST, ListSubscribedArtistActivity.this);
                     }
 
                 } catch (IOException e) {

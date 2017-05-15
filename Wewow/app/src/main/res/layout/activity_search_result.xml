@@ -53,6 +53,14 @@
                 android:layout_marginLeft="17dp"
 
                 android:src="@drawable/selector_btn_back"/>
+            <LinearLayout
+                android:layout_width="244dp"
+                android:layout_height="match_parent"
+                android:layout_weight="3"
+                android:layout_gravity="bottom"
+                android:orientation="vertical"
+                >
+
             <EditText
                 android:id="@+id/editTextSearch"
                 android:layout_width="244dp"
@@ -64,6 +72,15 @@
                 android:theme="@style/MyEditText"
                 android:layout_gravity="bottom"
                 android:layout_height="match_parent" />
+                <ImageView
+                    android:layout_marginLeft="17dp"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:src="#ffffff"/>
+
+            </LinearLayout>
 
             <ImageView
                 android:id="@+id/btnSearch"
