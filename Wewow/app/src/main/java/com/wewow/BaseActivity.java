@@ -39,16 +39,19 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -59,6 +62,8 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.wewow.adapter.ListViewMenuAdapter;
 import com.wewow.dto.Artist;
 import com.wewow.dto.Feedback;
@@ -100,6 +105,7 @@ public class BaseActivity extends ActionBarActivity {
     private NavigationView mainNavView;
 
     private TextView tvusername, tvuserdesc;
+    private MaterialDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -380,7 +386,34 @@ public class BaseActivity extends ActionBarActivity {
 
                 case 10:
                     //clear cache
-                    DataCleanUtils.cleanAllApplicationData(BaseActivity.this);
+                    dialog = new MaterialDialog.Builder(BaseActivity.this)
+
+                            .content(R.string.clear_cache_alert_content)
+                            .positiveColor(getResources().getColor(R.color.font_color))
+                            .negativeColor(getResources().getColor(R.color.font_color))
+                            .positiveText(R.string.confirm)
+                            .negativeText(R.string.cancel)
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    // TODO
+                                    dialog.dismiss();
+                                    DataCleanUtils.cleanAllApplicationData(BaseActivity.this);
+                                    showCacheClearedToast();
+
+
+                                }
+                            })
+
+                            .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    // TODO
+                                    dialog.dismiss();
+                                }
+                            })
+                            .show();
+
                     break;
                 case 11:
                     Log.d("BaseActivity", "Logout");
@@ -393,6 +426,19 @@ public class BaseActivity extends ActionBarActivity {
                     break;
             }
         }
+    }
+
+    private void showCacheClearedToast() {
+
+        LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.clear_cache_toast_view,
+                null);
+
+        Toast toast = new Toast(getApplicationContext());
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.setDuration(Toast.LENGTH_SHORT);
+        toast.setView(layout);
+        toast.show();
     }
 
     private void selectItem(int position) {
