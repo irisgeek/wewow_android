@@ -40,8 +40,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:choiceMode="singleChoice"
-                    android:divider="#e2e2e2"
-                    android:dividerHeight="1dp"
+                    android:divider="#00ffffff"
 
                     android:scrollbars="none"/>
                 </com.cjj.MaterialRefreshLayout>
