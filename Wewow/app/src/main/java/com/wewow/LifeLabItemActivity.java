@@ -1,22 +1,17 @@
 package com.wewow;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -36,7 +31,6 @@ import com.wewow.utils.WebAPIHelper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -527,23 +521,10 @@ public class LifeLabItemActivity extends Activity {
                 }
                 lcd.share_title = data.getString("share_title");
                 lcd.liked_count = data.optInt("liked_count");
-                lcd.addTestArtist();
                 return lcd;
             } catch (JSONException e) {
                 Log.e(TAG, "parse fail");
                 return null;
-            }
-        }
-
-        private void addTestArtist() {
-            if (this.artists.size() == 0) {
-                for (int i = 0; i < 3; i++) {
-                    Artist artist = new Artist();
-                    artist.nickname = String.format("生活家%d", i);
-                    artist.desc = String.format("生活家描述%d", i);
-                    artist.image = this.collection_image;
-                    this.artists.add(artist);
-                }
             }
         }
 
