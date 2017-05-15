@@ -1,13 +1,19 @@
 package com.wewow;
 
 import android.app.ProgressDialog;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.util.Pair;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -45,6 +51,7 @@ public class LifeLabActivity extends BaseActivity {
     private int page = 1;
     private static final String TAG = "LifeLabActivity";
     private LabData labData = new LabData();
+    private LabData filteredLabData = new LabData();
     private SwipeRefreshLayout swipe;
     private View foot;
     private boolean isLoading = false;
@@ -89,19 +96,15 @@ public class LifeLabActivity extends BaseActivity {
             @Override
             public void onScroll(AbsListView absListView, int i, int i1, int i2) {
                 //Log.d(TAG, String.format("onScroll firstVisibleItem:%d visibleItemCount:%d totalItemCount:%d", i, i1, i2));
-                if ((LifeLabActivity.this.labData.getAllCount() == 0) || LifeLabActivity.this.labData.isAllLoaded()) {
+                if ((LifeLabActivity.this.filteredLabData.getAllCount() == 0) || LifeLabActivity.this.filteredLabData.isAllLoaded()) {
                     LifeLabActivity.this.foot.setVisibility(View.GONE);
-                    Log.w(TAG, String.format("onScroll: allCount:%d  isAllLoaded:%b", LifeLabActivity.this.labData.getAllCount(), LifeLabActivity.this.labData.isAllLoaded()));
+                    Log.w(TAG, String.format("onScroll: allCount:%d  isAllLoaded:%b", LifeLabActivity.this.filteredLabData.getAllCount(), LifeLabActivity.this.filteredLabData.isAllLoaded()));
                     return;
                 }
                 LifeLabActivity.this.foot.setVisibility(View.VISIBLE);
                 if (i + i1 == i2) {
                     Log.d(TAG, "onScroll: Show refresh");
-                    if (LifeLabActivity.this.labData.isAllLoaded()) {
-                        LifeLabActivity.this.foot.setVisibility(View.GONE);
-                    } else {
-                        LifeLabActivity.this.foot.setVisibility(View.VISIBLE);
-                    }
+                    LifeLabActivity.this.foot.setVisibility(View.VISIBLE);
                     LifeLabActivity.this.swipe.setRefreshing(true);
                     LifeLabActivity.this.startDataLoading();
                 }
@@ -114,12 +117,12 @@ public class LifeLabActivity extends BaseActivity {
 
         @Override
         public int getCount() {
-            return LifeLabActivity.this.labData.getCount();
+            return LifeLabActivity.this.filteredLabData.getCount();
         }
 
         @Override
         public Object getItem(int i) {
-            return LifeLabActivity.this.labData.get(i);
+            return LifeLabActivity.this.filteredLabData.get(i);
         }
 
         @Override
@@ -217,6 +220,7 @@ public class LifeLabActivity extends BaseActivity {
 
     private void newDataLoad(JSONObject data) {
         this.labData.addData(data);
+        this.filteredLabData = this.labData.filter("");
         ListAdapter la = this.lvlifelab.getAdapter();
         LifeLabAdapter adp = (LifeLabAdapter) (la instanceof LifeLabAdapter ? la : ((HeaderViewListAdapter) la).getWrappedAdapter());
         adp.notifyDataSetChanged();
@@ -224,7 +228,7 @@ public class LifeLabActivity extends BaseActivity {
 
     private class LabData {
 
-        private List<LabCollection> collections = new ArrayList<LabCollection>();
+        private ArrayList<LabCollection> collections = new ArrayList<LabCollection>();
         private int pagesize = 10;
         private int collectionCount = 0;
         private int pageCount = 0;
@@ -293,6 +297,27 @@ public class LifeLabActivity extends BaseActivity {
         public boolean isAllLoaded() {
             return this.getCount() == this.getAllCount();
         }
+
+        public LabData filter(String query) {
+            LabData ld = new LabData();
+            if (query.trim().isEmpty()) {
+                ld.collections = (ArrayList<LabCollection>) this.collections.clone();
+                ld.collectionCount = this.collectionCount;
+            } else {
+                for (int i = 0; i < this.collections.size(); i++) {
+                    LabCollection lab = this.collections.get(i);
+                    if (lab.title.contains(query)) {
+                        ld.collections.add(lab);
+                    }
+                }
+                ld.collectionCount = ld.collections.size();
+            }
+            ld.currentPage = this.currentPage;
+            ld.pageCount = this.pageCount;
+            ld.pagesize = this.pagesize;
+            return ld;
+        }
+
     }
 
     private void loadItemImage(final ImageView target, final LabCollection data) {
@@ -306,5 +331,56 @@ public class LifeLabActivity extends BaseActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.toolbar, menu);
+        MenuItem menuItem = menu.findItem(R.id.search);
+        MenuItemCompat.setOnActionExpandListener(menuItem, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem menuItem) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+                LifeLabActivity.this.searchLab("");
+                return true;
+            }
+        });
+        menuItem.setVisible(true);
+
+        SearchManager searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        final SearchView searchView =
+                (SearchView) menu.findItem(R.id.search).getActionView();
+
+        searchView.setQueryHint(getResources().getString(R.string.search_hint));
+        ((ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_button)).setImageResource(R.drawable.selector_btn_search);
+        searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getComponentName()));
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                LifeLabActivity.this.searchLab(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+        return true;
+    }
+
+    private void searchLab(String query) {
+        this.filteredLabData = this.labData.filter(query);
+        ListAdapter la = this.lvlifelab.getAdapter();
+        LifeLabAdapter adp = (LifeLabAdapter) (la instanceof LifeLabAdapter ? la : ((HeaderViewListAdapter) la).getWrappedAdapter());
+        adp.notifyDataSetChanged();
     }
 }
