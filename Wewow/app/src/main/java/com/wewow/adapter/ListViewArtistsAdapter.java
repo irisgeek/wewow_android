@@ -130,7 +130,7 @@ public class ListViewArtistsAdapter extends BaseAdapter
 
 }
 
-    private void postReadToServer(String artistId) {
+    private void postReadToServer(final String artistId) {
 
         ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
 
@@ -157,6 +157,9 @@ public class ListViewArtistsAdapter extends BaseAdapter
                     else
                     {
                         FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_LIST, context);
+                        FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_DETAIL+artistId, context);
+                        FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_SUBSCRIBED_ARTISTS_LIST, context);
+
                     }
                 } catch (IOException e) {
                     e.printStackTrace();

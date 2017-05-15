@@ -1,9 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:layout_width="304dp"
+    android:layout_height="172dp">
+    <ImageView
+        android:layout_width="304dp"
+        android:layout_height="172dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/cover2"/>
+
+
+<LinearLayout
     android:id="@+id/userloginarea"
     android:layout_width="304dp"
     android:layout_height="172dp"
-    android:background="@drawable/dummy_latest_life_institue"
+
     android:orientation="vertical">
 
     <ImageView
@@ -20,7 +31,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="17dp"
-        android:layout_marginTop="45dp"
+        android:layout_marginTop="58dp"
         android:text="@string/login_gologin"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
@@ -36,3 +47,4 @@
         android:textColor="#FFFFFF"
         android:textSize="14sp" />
 </LinearLayout>
+    </FrameLayout>

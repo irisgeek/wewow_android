@@ -64,13 +64,14 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
 
     private String id;
     private ImageView imageViewSubscribe;
-    private boolean updateArtistList=false;
+    private boolean updateArtistList = false;
     private int currentPage = 1;
     private RecyclerViewUpRefresh rv;
     private ArrayList<HashMap<String, Object>> listItem;
     private RecycleViewArticlesOfArtistDetail adapter;
     private String totalPages;
     private String followed;
+    private ArtistDetail artistCurrent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +84,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
         listItem = new ArrayList<HashMap<String, Object>>();
 
 //        initData();
-        rv = (RecyclerViewUpRefresh)findViewById(R.id.recyclerview);
+        rv = (RecyclerViewUpRefresh) findViewById(R.id.recyclerview);
         rv.setLayoutManager(new LinearLayoutManager(rv.getContext()));
         rv.setCanloadMore(true);
         rv.setLoadMoreListener(this);
@@ -106,8 +107,6 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
 
 
     }
-
-
 
 
     private void checkcacheUpdatedOrNot() {
@@ -175,11 +174,11 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
 
         ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
         String userId = "0";
-        String userToken="0";
+        String userToken = "0";
         //check user login or not
         if (UserInfo.isUserLogged(DetailArtistActivity.this)) {
             userId = UserInfo.getCurrentUser(DetailArtistActivity.this).getId().toString();
-            userToken=UserInfo.getCurrentUser(DetailArtistActivity.this).getToken();
+            userToken = UserInfo.getCurrentUser(DetailArtistActivity.this).getToken();
 
         }
         iTask.artistDetail(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), userId, id, currentPage, new Callback<JSONObject>() {
@@ -233,54 +232,55 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
         });
     }
 
-    private void setUpArtist(final ArtistDetail artist,boolean refresh) {
+    private void setUpArtist(final ArtistDetail artist, boolean refresh) {
+        artistCurrent=artist;
 
-      if(!refresh) {
-          ImageView imageView = (ImageView) findViewById(R.id.imageViewIcon);
-          Glide.with(this)
+        if (!refresh) {
+            ImageView imageView = (ImageView) findViewById(R.id.imageViewIcon);
+            Glide.with(this)
 
-                  .load(artist.getArtist().getImage()).crossFade().fitCenter().placeholder(R.drawable.banner_loading_spinner).placeholder(R.drawable.banner_loading_spinner).into(imageView);
+                    .load(artist.getArtist().getImage()).crossFade().fitCenter().placeholder(R.drawable.banner_loading_spinner).placeholder(R.drawable.banner_loading_spinner).into(imageView);
 
-          TextView textViewNickName = (TextView) findViewById(R.id.textViewNickName);
-          textViewNickName.setText(artist.getArtist().getNickname());
+            TextView textViewNickName = (TextView) findViewById(R.id.textViewNickName);
+            textViewNickName.setText(artist.getArtist().getNickname());
 
-          TextView textViewDesc = (TextView) findViewById(R.id.textViewDesc);
-          textViewDesc.setText(artist.getArtist().getDesc());
+            TextView textViewDesc = (TextView) findViewById(R.id.textViewDesc);
+            textViewDesc.setText(artist.getArtist().getDesc());
 
-          imageViewSubscribe = (ImageView) findViewById(R.id.imageViewSubscribe);
-          followed = artist.getArtist().getFollowed();
-          if (followed.equals("1")) {
-              imageViewSubscribe.setImageResource(R.drawable.subscribed);
-          } else {
-              imageViewSubscribe.setImageResource(R.drawable.subscribe);
-          }
+            imageViewSubscribe = (ImageView) findViewById(R.id.imageViewSubscribe);
+            followed = artist.getArtist().getFollowed();
+            if (followed.equals("1")) {
+                imageViewSubscribe.setImageResource(R.drawable.subscribed);
+            } else {
+                imageViewSubscribe.setImageResource(R.drawable.subscribe);
+            }
 
-          imageViewSubscribe.setOnClickListener(new View.OnClickListener() {
-              @Override
-              public void onClick(View v) {
-
-
-                  if (UserInfo.isUserLogged(DetailArtistActivity.this)) {
-
-                      postReadToServer(artist.getArtist().getId(), Integer.parseInt(followed.equals("1") ? "0" : "1"));
-                      if (followed.equals("1")) {
-                          imageViewSubscribe.setImageResource(R.drawable.subscribe);
-                      } else {
-                          imageViewSubscribe.setImageResource(R.drawable.subscribed);
-                      }
-                  } else {
-                      Intent i = new Intent();
-                      i.setClass(DetailArtistActivity.this, LoginActivity.class);
-                      startActivity(i);
-                  }
+            imageViewSubscribe.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
 
-              }
-          });
+                    if (UserInfo.isUserLogged(DetailArtistActivity.this)) {
 
-          TextView textViewCount = (TextView) findViewById(R.id.textViewCount);
-          textViewCount.setText(artist.getArtist().getFollower_count() + getResources().getString(R.string.subscriber));
-      }
+                        postReadToServer(artist.getArtist().getId(), Integer.parseInt(followed.equals("1") ? "0" : "1"));
+                        if (followed.equals("1")) {
+                            imageViewSubscribe.setImageResource(R.drawable.subscribe);
+                        } else {
+                            imageViewSubscribe.setImageResource(R.drawable.subscribed);
+                        }
+                    } else {
+                        Intent i = new Intent();
+                        i.setClass(DetailArtistActivity.this, LoginActivity.class);
+                        startActivityForResult(i, LoginActivity.REQUEST_CODE_ARTIST_DETAIL);
+                    }
+
+
+                }
+            });
+
+            TextView textViewCount = (TextView) findViewById(R.id.textViewCount);
+            textViewCount.setText(artist.getArtist().getFollower_count() + getResources().getString(R.string.subscriber));
+        }
 
         ArrayList<HashMap<String, Object>> listItemCopy = new ArrayList<HashMap<String, Object>>();
         listItemCopy.addAll(listItem);
@@ -291,13 +291,12 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
 
         }
 //
-        if(currentPage!=1) {
+        if (currentPage != 1) {
             listItem.addAll(listItemCopy);
         }
 
 
-
-        final  List<Article> articles=artist.getArticles();
+        final List<Article> articles = artist.getArticles();
 
 
         for (int i = 0; i < articles.size(); i++) {
@@ -308,19 +307,17 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
             map.put("image", articles.get(i).getImage_320_160());
 
             map.put("title", articles.get(i).getTitle());
-       //todo
+            //todo
             listItem.add(map);
         }
 
         if (!refresh) {
 
-             adapter = new RecycleViewArticlesOfArtistDetail(this,
+            adapter = new RecycleViewArticlesOfArtistDetail(this,
                     listItem);
 
             rv.setAdapter(adapter);
-        }
-        else
-        {
+        } else {
             adapter.notifyDataSetChanged();
         }
 
@@ -329,8 +326,8 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
             @Override
             public void onItemClick(View view, int position) {
                 Intent intent = new Intent(DetailArtistActivity.this, ArticleActivity.class);
-                String articleId=articles.get(position).getId();
-                intent.putExtra(ArticleActivity.ARTICLE_ID,Integer.parseInt(articleId));
+                String articleId = articles.get(position).getId();
+                intent.putExtra(ArticleActivity.ARTICLE_ID, Integer.parseInt(articleId));
                 DetailArtistActivity.this.startActivity(intent);
 
             }
@@ -342,12 +339,12 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
 
     }
 
-    private void postReadToServer(String artistId,final int read) {
+    private void postReadToServer(String artistId, final int read) {
 
         ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
 
-        String   userId = UserInfo.getCurrentUser(DetailArtistActivity.this).getId().toString();
-        String token=UserInfo.getCurrentUser(DetailArtistActivity.this).getToken().toString();
+        String userId = UserInfo.getCurrentUser(DetailArtistActivity.this).getId().toString();
+        String token = UserInfo.getCurrentUser(DetailArtistActivity.this).getToken().toString();
 
 
         iTask.followArtist(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(DetailArtistActivity.this), userId, artistId, token, read, new Callback<JSONObject>() {
@@ -358,26 +355,23 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
 
                 try {
                     String realData = Utils.convertStreamToString(response.getBody().in());
-                    JSONObject responseObject=new JSONObject(realData);
+                    JSONObject responseObject = new JSONObject(realData);
 
                     if (!responseObject.getJSONObject("result").getString("code").equals("0")) {
-                        Toast.makeText(DetailArtistActivity.this, DetailArtistActivity.this.getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(DetailArtistActivity.this, responseObject.getJSONObject("result").getString("message").toString(), Toast.LENGTH_SHORT).show();
 
 
-                    }
-                    else {
-                        updateArtistList=true;
-                        if(read==0)
-                        {
-                           followed="0";
+                    } else {
+                        updateArtistList = true;
+                        if (read == 0) {
+                            followed = "0";
 
+                        } else {
+                            followed = "1";
                         }
-                        else {
-                            followed="1";
-                        }
-                        FileCacheUtil.clearCacheData( CommonUtilities.CACHE_FILE_ARTISTS_DETAIL + id,DetailArtistActivity.this);
-                        FileCacheUtil.clearCacheData( CommonUtilities.CACHE_FILE_SUBSCRIBED_ARTISTS_LIST,DetailArtistActivity.this);
-                        FileCacheUtil.clearCacheData( CommonUtilities.CACHE_FILE_ARTISTS_LIST,DetailArtistActivity.this);
+                        FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_DETAIL + id, DetailArtistActivity.this);
+                        FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_SUBSCRIBED_ARTISTS_LIST, DetailArtistActivity.this);
+                        FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_LIST, DetailArtistActivity.this);
 
                     }
 
@@ -403,16 +397,16 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
 
     private void setUpArtistFromCache() {
 
-        if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_ARTISTS_DETAIL+id, this)) {
-            String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_ARTISTS_DETAIL+id);
-           ArtistDetail artist= new ArtistDetail();
+        if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_ARTISTS_DETAIL + id, this)) {
+            String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_ARTISTS_DETAIL + id);
+            ArtistDetail artist = new ArtistDetail();
             try {
                 artist = parseArtistFromString(fileContent);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
-            setUpArtist(artist,false);
+            setUpArtist(artist, false);
         }
     }
 
@@ -509,10 +503,10 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
 //            layout.setVisibility(View.VISIBLE);
             return true;
         }
-        if(id==android.R.id.home) {
-            Intent intent=new Intent();
+        if (id == android.R.id.home) {
+            Intent intent = new Intent();
             intent.putExtra("followed", followed);
-            setResult(0,intent);
+            setResult(0, intent);
             finish();
             return true;
 
@@ -620,9 +614,9 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
 
     @Override
     public void onBackPressed() {
-        Intent intent=new Intent();
-        intent.putExtra("followed",followed);
-        setResult(0,intent);
+        Intent intent = new Intent();
+        intent.putExtra("followed", followed);
+        setResult(0, intent);
         finish();
         super.onBackPressed();
     }
@@ -651,8 +645,8 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
 
         boolean result = false;
 
-        if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_ARTISTS_DETAIL+id, this)) {
-            String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_ARTISTS_DETAIL+id);
+        if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_ARTISTS_DETAIL + id, this)) {
+            String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_ARTISTS_DETAIL + id);
             JSONObject object = new JSONObject(fileContent);
             totalPages = object.getJSONObject("result").getJSONObject("data").getString("total_pages");
             if (currentPage > Integer.parseInt(totalPages)) {
@@ -664,4 +658,21 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
         return result;
 
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == LoginActivity.REQUEST_CODE_ARTIST_DETAIL&&resultCode!=LoginActivity.RESULT_CANCELED) {
+            postReadToServer(artistCurrent.getArtist().getId(), Integer.parseInt(followed.equals("1") ? "0" : "1"));
+            if (followed.equals("1")) {
+                imageViewSubscribe.setImageResource(R.drawable.subscribe);
+            } else {
+                imageViewSubscribe.setImageResource(R.drawable.subscribed);
+            }
+
+        }
+    }
+
 }
+
+

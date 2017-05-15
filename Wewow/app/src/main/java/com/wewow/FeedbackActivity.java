@@ -617,7 +617,8 @@ public class FeedbackActivity extends BaseActivity{
 
                 try {
                     String realData = Utils.convertStreamToString(response.getBody().in());
-                    if (!realData.contains(CommonUtilities.SUCCESS)) {
+                   String status= new JSONObject(realData).get("status").toString();
+                    if (!status.equals("200")) {
                         Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
 
 
@@ -651,7 +652,14 @@ public class FeedbackActivity extends BaseActivity{
     }
 
     private Token parseTokenFromString(String realData) throws JSONException {
-        return null;
+        Token token=new Token();
+        JSONObject data=new JSONObject(realData).getJSONObject("data");
+        token.setAccessKeyId(data.get("AccessKeyId").toString());
+        token.setAccessKeySecret(data.get("AccessKeySecret").toString());
+        token.setExpiration(data.get("Expiration").toString());
+        token.setSecurityToken(data.get("SecurityToken").toString());
+
+        return token;
     }
 
     private void getFeedbackFromServer() {

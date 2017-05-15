@@ -87,6 +87,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
     public static final int REQUEST_CODE_FEEDBACK = 2;
     public static final int REQUEST_CODE_SUBSCRIBED_ARTISTS = 3;
     public static final int REQUEST_CODE_MY_COLLECTION = 4;
+    public static final int REQUEST_CODE_ARTIST_DETAIL = 5;
 
     public static final String BACKGROUND = "BACKGROUND";
 

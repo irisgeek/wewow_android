@@ -364,13 +364,13 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
 
     }
 
-    private void postReadToServer(String artistId) {
+    private void postReadToServer(final String artistId) {
 
         ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
 
           String   userId = UserInfo.getCurrentUser(ListSubscribedArtistActivity.this).getId().toString();
         String token=UserInfo.getCurrentUser(this).getToken().toString();
-        String read="1";
+        final String read="1";
 
 
         iTask.artist_read(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), userId, token,artistId,read, new Callback<JSONObject>() {
@@ -381,16 +381,24 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
 
                 try {
                     String realData = Utils.convertStreamToString(response.getBody().in());
-                    if (!realData.contains(CommonUtilities.SUCCESS)) {
+                    String code=new JSONObject(realData).getJSONObject("result").get("code").toString();
+                    if (!code.equals("0")) {
                         Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-
-
+                    }
+                    else
+                    {
+                        FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_LIST, ListSubscribedArtistActivity.this);
+                        FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_DETAIL+artistId, ListSubscribedArtistActivity.this);
+                        FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_SUBSCRIBED_ARTISTS_LIST, ListSubscribedArtistActivity.this);
                     }
 
                 } catch (IOException e) {
                     e.printStackTrace();
                     Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
 
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
                 }
 
             }

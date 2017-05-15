@@ -10,6 +10,8 @@ import java.io.File;
 import android.content.Context;
 import android.os.Environment;
 
+import com.wewow.SearchResultActivity;
+
 
 public class DataCleanUtils {
     public static void cleanInternalCache(Context context) {
@@ -65,7 +67,8 @@ public class DataCleanUtils {
     public static void cleanAllApplicationData(Context context) {
         cleanInternalCache(context);
         cleanExternalCache(context);
-        cleanSharedPreference(context);
+//        cleanSharedPreference(context);
+        SettingUtils.clear(context);
         cleanFiles(context);
 
     }

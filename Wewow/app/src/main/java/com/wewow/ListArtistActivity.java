@@ -88,7 +88,7 @@ public class ListArtistActivity extends BaseActivity {
 
                 } else {
                     Toast.makeText(ListArtistActivity.this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
-
+                    refreshLayout.finishRefresh();
 
                     SettingUtils.set(ListArtistActivity.this, CommonUtilities.NETWORK_STATE, false);
                     setUpArtistsFromCache();

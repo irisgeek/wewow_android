@@ -86,7 +86,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="left"
                         android:layout_marginLeft="23dp"
-                        android:maxEms="18"
+                        android:maxEms="14"
                         android:maxLines="2"
                         android:ellipsize="end"
                         android:layout_marginTop="4dp"
