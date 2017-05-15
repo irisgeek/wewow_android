@@ -370,7 +370,7 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
 
           String   userId = UserInfo.getCurrentUser(ListSubscribedArtistActivity.this).getId().toString();
         String token=UserInfo.getCurrentUser(this).getToken().toString();
-        String read="1";
+        final String read="1";
 
 
         iTask.artist_read(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), userId, token,artistId,read, new Callback<JSONObject>() {
@@ -381,7 +381,8 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
 
                 try {
                     String realData = Utils.convertStreamToString(response.getBody().in());
-                    if (!realData.contains(CommonUtilities.SUCCESS)) {
+                    String code=new JSONObject(realData).getJSONObject("result").get("code").toString();
+                    if (!code.equals("0")) {
                         Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
 
 
@@ -391,6 +392,9 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
                     e.printStackTrace();
                     Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
 
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
                 }
 
             }
