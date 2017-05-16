@@ -38,6 +38,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -110,6 +112,7 @@ public class LifeLabActivity extends BaseActivity {
                 }
             }
         });
+        this.swipe.setRefreshing(true);
         this.startDataLoading();
     }
 
@@ -246,6 +249,7 @@ public class LifeLabActivity extends BaseActivity {
                 this.currentPage = jobj.getInt("current_page");
                 this.collectionCount = jobj.getInt("collection_count");
                 JSONArray lst = jobj.getJSONArray("collection_list");
+                ArrayList<LabCollection> l = new ArrayList<>();
                 for (int i = 0; i < lst.length(); i++) {
                     JSONObject jj = lst.getJSONObject(i);
                     LabCollection lc = new LabCollection();
@@ -258,13 +262,27 @@ public class LifeLabActivity extends BaseActivity {
                     lc.read_count = jj.getString("read_count");
                     lc.image_642_320 = jj.getString("image_642_320");
                     lc.image_688_316 = jj.getString("image_688_316");
-                    this.collections.add(lc);
+                    l.add(lc);
                 }
+                this.collections.addAll(this.sort(l));
             } catch (JSONException e) {
                 Log.e(TAG, "addData fail");
             }
             Log.d(TAG, String.format("after add allcount: %d  count: %d ", this.getAllCount(), this.getCount()));
         }
+
+        private List<LabCollection> sort(ArrayList<LabCollection> list) {
+            LabCollection[] arr = list.toArray(new LabCollection[]{});
+            Arrays.sort(arr, this.comparator);
+            return Arrays.asList(arr);
+        }
+
+        private Comparator<LabCollection> comparator = new Comparator<LabCollection>() {
+            @Override
+            public int compare(LabCollection t0, LabCollection t1) {
+                return t0.order > t1.order ? -1 : 1;
+            }
+        };
 
         public int getCurrentPage() {
             return this.currentPage;
