@@ -210,7 +210,7 @@ public class ArticleActivity extends AppCompatActivity {
                                     if (i != 0) {
                                         throw new Exception(String.valueOf(i));
                                     }
-                                    ArticleActivity.this.like.setImageDrawable(ArticleActivity.this.getResources().getDrawable(like == 1 ? R.drawable.favourite : R.drawable.favourite_b));
+                                    ArticleActivity.this.like.setImageDrawable(ArticleActivity.this.getResources().getDrawable(like == 1 ? R.drawable.marked_b : R.drawable.mark_b));
                                 } catch (Exception e) {
                                     Log.e(TAG, String.format("favourite fail: %s", e.getMessage()));
                                     Toast.makeText(ArticleActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
@@ -283,7 +283,7 @@ public class ArticleActivity extends AppCompatActivity {
     private void fillContent(JSONObject article) {
         this.data = article;
         this.title.setText(article.optString("title", "No title"));
-        this.like.setImageDrawable(this.getResources().getDrawable(article.optInt("liked", 0) == 1 ? R.drawable.favourite : R.drawable.favourite_b));
+        this.like.setImageDrawable(this.getResources().getDrawable(article.optInt("liked", 0) == 1 ? R.drawable.marked_b : R.drawable.mark_b));
         this.content.loadUrl(article.optString("content", "No content"));
         new RemoteImageLoader(this, article.optString("image_750_1112"), new RemoteImageLoader.RemoteImageListener() {
             @Override
@@ -291,7 +291,7 @@ public class ArticleActivity extends AppCompatActivity {
                 ArticleActivity.this.logo.setImageDrawable(dr);
             }
         });
-        this.fillComments(article.optJSONArray("comment_list"));
+        this.fillComments(article.optJSONObject("rel_data").optJSONArray("comment_list"));
     }
 
     private void fillComments(JSONArray comments) {
@@ -303,7 +303,7 @@ public class ArticleActivity extends AppCompatActivity {
             for (int i = 0; i < cc; i++) {
                 JSONObject comment = comments.getJSONObject(i);
                 View itemView = View.inflate(this, R.layout.article_comment, null);
-                itemView.setBackgroundColor(i % 2 == 0 ? Color.argb(255, 216, 219, 223) : Color.WHITE);
+//                itemView.setBackgroundColor(i % 2 == 0 ? Color.argb(255, 216, 219, 223) : Color.WHITE);
                 TextView tv = (TextView) itemView.findViewById(R.id.article_comment_author);
                 tv.setText(comment.optString("user", "no author"));
                 tv = (TextView) itemView.findViewById(R.id.article_comment_date);
