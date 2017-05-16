@@ -1,26 +1,28 @@
 package com.wewow;
 
-import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
+import android.text.TextUtils;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.boycy815.pinchimageview.PinchImageView;
 import com.wewow.utils.RemoteImageLoader;
 import com.wewow.utils.Utils;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class ShowImageActivity extends ActionBarActivity {
 
@@ -36,6 +38,7 @@ public class ShowImageActivity extends ActionBarActivity {
     private ViewPager pager;
     private int screenWidth;
     private int pictureHeight;
+    private String imgPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +83,7 @@ public class ShowImageActivity extends ActionBarActivity {
             @Override
             public void onPageSelected(int position) {
                 ShowImageActivity.this.imageOrder.setText(String.valueOf(position + 1));
+                index = position;
             }
 
             @Override
@@ -88,6 +92,57 @@ public class ShowImageActivity extends ActionBarActivity {
             }
         });
         this.pager.setCurrentItem(this.index);
+
+        imgPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath() + "/Wewow";
+        new File(imgPath).mkdirs();
+
+        findViewById(R.id.iv_download_img).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String url = pictures.get(index);
+                if(!TextUtils.isEmpty(url)){
+                    new RemoteImageLoader(ShowImageActivity.this, url, new RemoteImageLoader.RemoteImageListener() {
+                        @Override
+                        public void onRemoteImageAcquired(Drawable dr) {
+                            Bitmap bitmap = ((BitmapDrawable) dr).getBitmap();
+                            File file = new File(imgPath + "/" + System.currentTimeMillis() + ".jpg");
+                            FileOutputStream fos = null;
+                            try {
+                                fos = new FileOutputStream(file);
+                                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                                fos.flush();
+                                showToast("保存成功");
+                                Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                                intent.setData(Uri.fromFile(file));
+                                sendBroadcast(intent);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                showToast("保存失败");
+                            } finally {
+                                try {
+                                    bitmap.recycle();
+                                    fos.close();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
+                }else{
+                    showToast("保存失败");
+                }
+            }
+        });
+        findViewById(R.id.iv_back).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
+    private void showToast(String str){
+        Toast t = Toast.makeText(this, str, Toast.LENGTH_SHORT);
+        t.show();
+    }
 }
