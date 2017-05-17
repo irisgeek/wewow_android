@@ -29,6 +29,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="15dp"
+                    android:padding="5dp"
                     android:foregroundGravity="center"
                     android:src="@drawable/back_b"/>
 
@@ -39,18 +40,38 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginRight="10dp"
+                    android:padding="5dp"
+                    android:layout_marginRight="13dp"
                     android:src="@drawable/share_b"/>
 
-                <ImageView
-                    android:id="@+id/article_fav"
+                <FrameLayout
+                    android:id="@+id/layout_article_fav"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginRight="20dp"
-                    android:layout_toLeftOf="@+id/article_share"
-                    android:src="@drawable/mark_b"/>
+                    android:layout_height="match_parent"
+                    android:layout_toLeftOf="@+id/article_share">
 
+                    <ImageView
+                        android:id="@+id/article_fav"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginEnd="12dp"
+                        android:padding="5dp"
+                        android:src="@drawable/mark_b"/>
+
+                    <TextView
+                        android:id="@+id/article_fav_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:layout_marginTop="13dp"
+                        android:background="@drawable/shape_lifelab_fav_bg"
+                        android:paddingEnd="4dp"
+                        android:paddingStart="4dp"
+                        android:textColor="@color/white"
+                        android:textSize="9sp"
+                        android:visibility="gone"/>
+                </FrameLayout>
             </RelativeLayout>
         </android.support.v7.widget.CardView>
 
@@ -205,6 +226,7 @@
                         </LinearLayout>
 
                         <LinearLayout
+                            android:id="@+id/share_more"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="50dp"
@@ -280,15 +302,27 @@
 
         </android.support.v7.widget.CardView>
 
-        <TextView
-            android:id="@+id/article_feedback_link"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
             android:layout_marginTop="6dp"
             android:layout_marginBottom="14dp"
-            android:gravity="center_horizontal"
-            android:text="@string/article_feedback"
-            android:textColor="#333631"
-            android:textSize="12sp"/>
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/article_feedback"
+                android:textColor="#333631"
+                android:textSize="12sp"/>
+
+            <TextView
+                android:id="@+id/article_feedback_link"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/article_feedback_link"
+                android:textColor="@color/menu_checked_color"
+                android:textSize="12sp"/>
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>
