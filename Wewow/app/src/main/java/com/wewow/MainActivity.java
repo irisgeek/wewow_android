@@ -35,13 +35,17 @@ package com.wewow;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.media.Image;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.GestureDetectorCompat;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -71,6 +75,7 @@ import com.wewow.dto.Institute;
 import com.wewow.dto.LabCollection;
 import com.wewow.dto.collectionCategory;
 import com.wewow.netTask.ITask;
+import com.wewow.utils.AppBarStateChangeListener;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.FileCacheUtil;
 import com.wewow.utils.SettingUtils;
@@ -80,6 +85,7 @@ import com.wewow.view.CustomViewPager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -117,6 +123,12 @@ public class MainActivity extends BaseActivity {
     private Context context;
 
     private boolean onPauseCalled = false;
+    private ImageView imageViewHome;
+    private ImageView imageViewSearch;
+    private TextView textTitle;
+    private AutoCompleteTextView searchView;
+    private boolean isSearchViewShown = false;
+    private boolean isAppBarFolded = false;
 
 
     @Override
@@ -128,7 +140,7 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         context = this;
         viewPager = (ViewPager) findViewById(R.id.viewPager);
-        float density=Utils.getSceenDensity(this);
+        float density = Utils.getSceenDensity(this);
 
         Utils.regitsterNetSateBroadcastReceiver(this);
         CollapsingToolbarLayout collapsingToolbar =
@@ -137,6 +149,7 @@ public class MainActivity extends BaseActivity {
         collapsingToolbar.setExpandedTitleColor(getResources().getColor(R.color.transparent));
         collapsingToolbar.setCollapsedTitleTextColor(getResources().getColor(R.color.font_color));
 
+        initAppBar();
 //        setUpNavigationTabDummy(null);
 
 //        setUpNavigationTab();
@@ -174,10 +187,168 @@ public class MainActivity extends BaseActivity {
 
         }
 
-
+        setUpToolBar();
 //        setUpScrollView();
 
 
+    }
+
+    private void initAppBar() {
+        imageViewHome = (ImageView) findViewById(R.id.btnBack);
+        imageViewSearch = (ImageView) findViewById(R.id.btnSearch);
+        textTitle = (TextView) findViewById(R.id.textTitle);
+
+
+        searchView = (AutoCompleteTextView) findViewById(R.id.editTextSearch);
+        imageViewHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!isSearchViewShown) {
+                    drawerLayout.openDrawer(GravityCompat.START);
+                } else {
+                    searchView.setVisibility(View.GONE);
+                    searchView.setText("");
+                    imageViewHome.setImageResource(R.drawable.selector_btn_menu);
+                    isSearchViewShown = false;
+                    if (isAppBarFolded) {
+                        textTitle.setVisibility(View.VISIBLE);
+                        imageViewHome.setImageResource(R.drawable.menu_b);
+                    }
+                }
+
+            }
+        });
+
+
+        imageViewSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String queryText = searchView.getText().toString().trim();
+                if (!isSearchViewShown) {
+                    if(isAppBarFolded) {
+                        imageViewHome.setImageResource(R.drawable.back_b);
+                    }
+                    else
+                    {
+                        imageViewHome.setImageResource(R.drawable.selector_btn_back);
+                    }
+                    searchView.setVisibility(View.GONE);
+                   textTitle.setVisibility(View.GONE);
+                    final String[] testStrings = getResources().getStringArray(R.array.test_array);
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.list_item_search, R.id.text, testStrings);
+
+                    searchView.setAdapter(adapter);
+                    searchView.setThreshold(0);
+                    searchView.showDropDown();
+                    searchView.setTextColor(getResources().getColor(R.color.search_text_view_color));
+                    searchView.setHintTextColor(getResources().getColor(R.color.search_text_view_hint_color));
+                    searchView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            if (position != 0) {
+                                searchView.setText(testStrings[position], true);
+                                imageViewSearch.performClick();
+                            }
+//
+
+                        }
+                    });
+                    searchView.setThreshold(0);
+
+                    isSearchViewShown = true;
+                    searchView.performClick();
+                } else {
+
+
+                    if (!queryText.equals("")) {
+                        searchView.setText("");
+                        searchView.setVisibility(View.GONE);
+                        Intent intentSearch = new Intent(MainActivity.this, SearchResultActivity.class);
+                        intentSearch.putExtra("key_word", queryText);
+                        startActivity(intentSearch);
+                        if (isAppBarFolded) {
+                            imageViewHome.setImageResource(R.drawable.menu_b);
+                        }
+                        else {
+                            imageViewHome.setImageResource(R.drawable.selector_btn_menu);
+                        }
+
+                        isSearchViewShown = false;
+                        if (isAppBarFolded) {
+                            textTitle.setVisibility(View.VISIBLE);
+                        }
+                    } else {
+
+                        if(isAppBarFolded) {
+                            imageViewHome.setImageResource(R.drawable.back_b);
+                        }
+                        else
+                        {
+                            imageViewHome.setImageResource(R.drawable.selector_btn_back);
+                        }
+                               searchView.setVisibility(View.VISIBLE);
+//                        searchView.setHint(getResources().getString(R.string.search_hint));
+                        textTitle.setVisibility(View.GONE);
+                        final String[] testStrings = getResources().getStringArray(R.array.test_array);
+                        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.list_item_search, R.id.text, testStrings);
+
+                        searchView.setAdapter(adapter);
+                        searchView.showDropDown();
+                        searchView.setTextColor(getResources().getColor(R.color.search_text_view_color));
+                        searchView.setHintTextColor(getResources().getColor(R.color.search_text_view_hint_color));
+                        searchView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                if (position != 0) {
+                                    searchView.setText(testStrings[position], true);
+                                    imageViewSearch.performClick();
+                                }
+//
+
+                            }
+                        });
+                        searchView.setThreshold(0);
+
+                        isSearchViewShown = true;
+                    }
+
+                }
+
+            }
+        });
+
+
+        AppBarLayout mAppBarLayout = (AppBarLayout) findViewById(R.id.appbar);
+        mAppBarLayout.addOnOffsetChangedListener(new AppBarStateChangeListener() {
+            @Override
+            public void onStateChanged(AppBarLayout appBarLayout, State state) {
+                Log.d("STATE", state.name());
+                if (state == State.EXPANDED) {
+
+                    imageViewHome.setImageResource(R.drawable.selector_btn_menu);
+                    imageViewSearch.setImageResource(R.drawable.selector_btn_search);
+                    textTitle.setVisibility(View.GONE);
+                    searchView.setVisibility(View.VISIBLE);
+                    isAppBarFolded = false;
+                    //展开状态
+
+                } else if (state == State.COLLAPSED) {
+                    imageViewHome.setImageResource(R.drawable.menu_b);
+                    imageViewSearch.setImageResource(R.drawable.search_b);
+                    textTitle.setVisibility(View.VISIBLE);
+                    searchView.setVisibility(View.GONE);
+
+                    isAppBarFolded = true;
+                    //折叠状态
+
+                } else {
+
+                    //中间状态
+
+                }
+            }
+        });
     }
 
     private void checkcacheUpdatedOrNot() {
@@ -332,7 +503,7 @@ public class MainActivity extends BaseActivity {
             ids.add(category.getId());
         }
 
-        setUpTabs(list,ids);
+        setUpTabs(list, ids);
 
     }
 
@@ -373,11 +544,11 @@ public class MainActivity extends BaseActivity {
     }
 
 
-    private void setUpTabs(List<String> titles,List<String> ids) {
+    private void setUpTabs(List<String> titles, List<String> ids) {
 
 
         CustomViewPager viewPagerTabs = (CustomViewPager) findViewById(R.id.pagerTabs);
-        adapter = new FragmentAdapter(getSupportFragmentManager(), titles,ids);
+        adapter = new FragmentAdapter(getSupportFragmentManager(), titles, ids);
         viewPagerTabs.setAdapter(adapter);
         viewPagerTabs.setOffscreenPageLimit(5);
         mTabLayout.setupWithViewPager(viewPagerTabs);
@@ -387,8 +558,6 @@ public class MainActivity extends BaseActivity {
         viewPager.requestFocus();
 
     }
-
-
 
 
     public void fixListViewHeight(ListView listView) {
@@ -438,7 +607,7 @@ public class MainActivity extends BaseActivity {
                     .crossFade(300)
                     .into(imageBanner);
             pageview.add(view);
-            final int j=i;
+            final int j = i;
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -617,8 +786,7 @@ public class MainActivity extends BaseActivity {
             banner.setImage(result.getString("image"));
             banner.setType(result.getString("type"));
             banner.setTitle(result.getString("title"));
-            if(banner.getType().equals("html"))
-            {
+            if (banner.getType().equals("html")) {
                 banner.setUrl(result.getString("url"));
             }
             banners.add(banner);
@@ -629,71 +797,71 @@ public class MainActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.toolbar, menu);
-        MenuItem menuItem = menu.findItem(R.id.search);
-        menuItem.setVisible(true);
-
-        SearchManager searchManager =
-                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        final SearchView searchView =
-                (SearchView) menu.findItem(R.id.search).getActionView();
-
-        searchView.setQueryHint(getResources().getString(R.string.search_hint));
-
-
-        ((ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_button)).setImageResource(R.drawable.selector_btn_search);
-
-
-        final String[] testStrings = getResources().getStringArray(R.array.test_array);
-//        int completeTextId = searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
-//        AutoCompleteTextView completeText = (AutoCompleteTextView) searchView
-//                .findViewById(completeTextId) ;
-
-
-        AutoCompleteTextView completeText = (SearchView.SearchAutoComplete) searchView.findViewById(R.id.search_src_text);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.list_item_search, R.id.text, testStrings);
-
-        completeText.setAdapter(adapter);
-        completeText.setTextColor(getResources().getColor(R.color.search_text_view_color));
-        completeText.setHintTextColor(getResources().getColor(R.color.search_text_view_hint_color));
-        completeText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(position!=0) {
-                    searchView.setQuery(testStrings[position], true);
-                }
+//        getMenuInflater().inflate(R.menu.toolbar, menu);
+//        MenuItem menuItem = menu.findItem(R.id.search);
+//        menuItem.setVisible(true);
+//
+//        SearchManager searchManager =
+//                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+//        final SearchView searchView =
+//                (SearchView) menu.findItem(R.id.search).getActionView();
+//
+//        searchView.setQueryHint(getResources().getString(R.string.search_hint));
+//
+//
+//        ((ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_button)).setImageResource(R.drawable.selector_btn_search);
+//
+//
+//        final String[] testStrings = getResources().getStringArray(R.array.test_array);
+////        int completeTextId = searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
+////        AutoCompleteTextView completeText = (AutoCompleteTextView) searchView
+////                .findViewById(completeTextId) ;
+//
+//
+//        AutoCompleteTextView completeText = (SearchView.SearchAutoComplete) searchView.findViewById(R.id.search_src_text);
+//        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.list_item_search, R.id.text, testStrings);
+//
+//        completeText.setAdapter(adapter);
+//        completeText.setTextColor(getResources().getColor(R.color.search_text_view_color));
+//        completeText.setHintTextColor(getResources().getColor(R.color.search_text_view_hint_color));
+//        completeText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                if(position!=0) {
+//                    searchView.setQuery(testStrings[position], true);
+//                }
+////                Intent intentSearch= new Intent(MainActivity.this,SearchResultActivity.class);
+////                intentSearch.putExtra("key_word",testStrings[position]);
+////                startActivity(intentSearch);
+//
+//            }
+//        });
+//        final Menu menuFinal=menu;
+//        completeText.setThreshold(0);
+//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//            @Override
+//            public boolean onQueryTextSubmit(String query) {
+////                Toast.makeText(MainActivity.this, query, Toast.LENGTH_SHORT).show();
+////                LinearLayout layout = (LinearLayout) findViewById(R.id.layoutCover);
+////                layout.setVisibility(View.GONE);
+//
+//                MenuItem menuItem = menuFinal.findItem(R.id.search);
+//                menuItem.collapseActionView();
 //                Intent intentSearch= new Intent(MainActivity.this,SearchResultActivity.class);
-//                intentSearch.putExtra("key_word",testStrings[position]);
+//                intentSearch.putExtra("key_word",query);
 //                startActivity(intentSearch);
-
-            }
-        });
-        final Menu menuFinal=menu;
-        completeText.setThreshold(0);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-//                Toast.makeText(MainActivity.this, query, Toast.LENGTH_SHORT).show();
-//                LinearLayout layout = (LinearLayout) findViewById(R.id.layoutCover);
-//                layout.setVisibility(View.GONE);
-
-                MenuItem menuItem = menuFinal.findItem(R.id.search);
-                menuItem.collapseActionView();
-                Intent intentSearch= new Intent(MainActivity.this,SearchResultActivity.class);
-                intentSearch.putExtra("key_word",query);
-                startActivity(intentSearch);
-
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-        });
-
-        searchView.setSearchableInfo(
-                searchManager.getSearchableInfo(getComponentName()));
+//
+//                return true;
+//            }
+//
+//            @Override
+//            public boolean onQueryTextChange(String newText) {
+//                return false;
+//            }
+//        });
+//
+//        searchView.setSearchableInfo(
+//                searchManager.getSearchableInfo(getComponentName()));
         return true;
     }
 
@@ -744,7 +912,6 @@ public class MainActivity extends BaseActivity {
     }
 
 
-
     private ViewPager.OnPageChangeListener mPageChangeListener = new ViewPager.OnPageChangeListener() {
         @Override
         public void onPageSelected(int position) {
@@ -761,5 +928,12 @@ public class MainActivity extends BaseActivity {
         public void onPageScrollStateChanged(int state) {
         }
     };
+
+    private void setUpToolBar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationIcon(null);
+
+    }
 
 }
