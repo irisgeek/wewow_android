@@ -536,7 +536,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
             listItem.add(map);
         }
 
-        listView.setAdapter(new ListViewArtistsAdapter(this, listItem));
+//        listView.setAdapter(new ListViewArtistsAdapter(this, listItem));
     }
 
     private void setUpToolBar() {

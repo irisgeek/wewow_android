@@ -25,6 +25,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -33,52 +34,55 @@ import retrofit.client.Response;
 /**
  * Created by iris on 17/3/23.
  */
-public class ListViewArtistsAdapter extends BaseAdapter
-{
+public class ListViewArtistsAdapter extends BaseAdapter {
     private Context context;
     private ArrayList<HashMap<String, Object>> list;
     private String id;
+    private List<String> followStatus;
 
-    public ListViewArtistsAdapter(Context context, ArrayList<HashMap<String, Object>> list)
-    {
+    public ListViewArtistsAdapter(Context context, ArrayList<HashMap<String, Object>> list,List<String> followStatus) {
         this.context = context;
-        this.list=list;
+        this.list = list;
+       this.followStatus=followStatus;
+
 
     }
+
     @Override
     public int getCount() {
         // How many items are in the data set represented by this Adapter.(在此适配器中所代表的数据集中的条目数)
         return list.size();
     }
+
     @Override
     public Object getItem(int position) {
         // Get the data item associated with the specified position in the data set.(获取数据集中与指定索引对应的数据项)
         return list.get(position);
     }
+
     @Override
     public long getItemId(int position) {
         // Get the row id associated with the specified position in the list.(取在列表中与指定索引对应的行id)
         return 0;
     }
+
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, final ViewGroup parent) {
         final ViewHolder holder;
         LayoutInflater inflater = LayoutInflater.from(context);
-        if(convertView == null)
-        {
+        if (convertView == null) {
             holder = new ViewHolder();
             convertView = inflater.inflate(R.layout.list_item_lover_of_life, null);
-            holder.imageView = (ImageView)convertView.findViewById(R.id.imageViewIcon);
-            holder.textViewName = (TextView)convertView.findViewById(R.id.textViewNickName);
-            holder.textViewDesc= (TextView)convertView.findViewById(R.id.textViewDesc);
-            holder.textViewArticleCount=(TextView)convertView.findViewById(R.id.textViewArticle);
-            holder.textViewFollowerCount=(TextView)convertView.findViewById(R.id.textViewFollow);
-            holder.imageViewFollowed=(ImageView)convertView.findViewById(R.id.imageViewFollowed);
+            holder.imageView = (ImageView) convertView.findViewById(R.id.imageViewIcon);
+            holder.textViewName = (TextView) convertView.findViewById(R.id.textViewNickName);
+            holder.textViewDesc = (TextView) convertView.findViewById(R.id.textViewDesc);
+            holder.textViewArticleCount = (TextView) convertView.findViewById(R.id.textViewArticle);
+            holder.textViewFollowerCount = (TextView) convertView.findViewById(R.id.textViewFollow);
+            holder.imageViewFollowed = (ImageView) convertView.findViewById(R.id.imageViewFollowed);
 
             convertView.setTag(holder);
-        }else
-        {
-            holder = (ViewHolder)convertView.getTag();
+        } else {
+            holder = (ViewHolder) convertView.getTag();
         }
         final HashMap<String, Object> stringObjectHashMap = list.get(position);
         Glide.with(context)
@@ -90,53 +94,42 @@ public class ListViewArtistsAdapter extends BaseAdapter
         holder.textViewDesc.setText(stringObjectHashMap.get("textViewDesc").toString());
         holder.textViewArticleCount.setText(stringObjectHashMap.get("textViewArticleCount").toString());
         holder.textViewFollowerCount.setText(stringObjectHashMap.get("textViewFollowerCount").toString());
-        if(stringObjectHashMap.get("imageViewFollowed").toString().equals("1")) {
+        if (followStatus.get(position).toString().equals("1")) {
             holder.imageViewFollowed.setImageResource(R.drawable.followed);
-
-
-
-        }
-        else
-        {
+        } else {
             holder.imageViewFollowed.setImageResource(R.drawable.follow);
-            holder.imageViewFollowed.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-
-                    if(UserInfo.isUserLogged(context)) {
-
-                        id = stringObjectHashMap.get("id").toString();
-                        postReadToServer(id);
-                        holder.imageViewFollowed.setImageResource(R.drawable.followed);
-                    }
-                    else
-                    {
-                        Intent i = new Intent();
-                        i.setClass(context, LoginActivity.class);
-                        context.startActivity(i);
-                    }
-
-                }
-            });
-
-
         }
+        holder.imageViewFollowed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                if (UserInfo.isUserLogged(context)) {
+
+                    id = stringObjectHashMap.get("id").toString();
+                    postReadToServer(holder,position, id, followStatus.get(position).equals("1") ? 0 : 1);
+
+                } else {
+                    Intent i = new Intent();
+                    i.setClass(context, LoginActivity.class);
+                    context.startActivity(i);
+                }
+
+            }
+        });
 
 
         return convertView;
 
 
+    }
 
-}
-
-    private void postReadToServer(final String artistId) {
+    private void postReadToServer(final ViewHolder holder,final int position, final String artistId, final int read) {
 
         ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
 
-        String   userId = UserInfo.getCurrentUser(context).getId().toString();
-        String token=UserInfo.getCurrentUser(context).getToken().toString();
-        int read=1;
+        String userId = UserInfo.getCurrentUser(context).getId().toString();
+        String token = UserInfo.getCurrentUser(context).getToken().toString();
 
 
         iTask.followArtist(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(context), userId, artistId, token, read, new Callback<JSONObject>() {
@@ -147,17 +140,18 @@ public class ListViewArtistsAdapter extends BaseAdapter
 
                 try {
                     String realData = Utils.convertStreamToString(response.getBody().in());
-                    JSONObject responseObject=new JSONObject(realData);
+                    JSONObject responseObject = new JSONObject(realData);
 
                     if (!responseObject.getJSONObject("result").getString("code").equals("0")) {
-                        Toast.makeText(context, context.getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, responseObject.getJSONObject("result").getString("message"), Toast.LENGTH_SHORT).show();
 
 
-                    }
-                    else
-                    {
+                    } else {
+                        followStatus.set(position, read == 0 ? "0" : "1");
+                        holder.imageViewFollowed.setImageResource( read == 0 ?R.drawable.follow:R.drawable.followed);
+                        notifyDataSetChanged();
                         FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_LIST, context);
-                        FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_DETAIL+artistId, context);
+                        FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_DETAIL + artistId, context);
                         FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_SUBSCRIBED_ARTISTS_LIST, context);
 
                     }
@@ -180,8 +174,7 @@ public class ListViewArtistsAdapter extends BaseAdapter
 
     }
 
-    static class ViewHolder
-    {
+    static class ViewHolder {
         public ImageView imageView;
         public TextView textViewName;
         public TextView textViewDesc;
