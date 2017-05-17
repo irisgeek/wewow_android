@@ -4,12 +4,14 @@ package com.wewow;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
@@ -18,6 +20,7 @@ import android.widget.Toast;
 
 import com.cjj.MaterialRefreshLayout;
 import com.cjj.MaterialRefreshListener;
+import com.jaeger.library.StatusBarUtil;
 import com.wewow.adapter.ListViewArtistsAdapter;
 import com.wewow.dto.Artist;
 import com.wewow.netTask.ITask;
@@ -34,6 +37,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -57,6 +61,7 @@ public class ListArtistActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_artist);
+        StatusBarUtil.setColor(this,getResources().getColor(R.color.white),50);
         initData();
 
         setUpToolBar();

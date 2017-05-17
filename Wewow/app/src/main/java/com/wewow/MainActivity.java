@@ -69,6 +69,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.growingio.android.sdk.collection.GrowingIO;
+import com.jaeger.library.StatusBarUtil;
 import com.wewow.adapter.FragmentAdapter;
 import com.wewow.dto.Banner;
 import com.wewow.dto.Institute;
@@ -129,6 +130,7 @@ public class MainActivity extends BaseActivity {
     private AutoCompleteTextView searchView;
     private boolean isSearchViewShown = false;
     private boolean isAppBarFolded = false;
+    private Toolbar toolbar;
 
 
     @Override
@@ -136,7 +138,7 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 //        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 //        Utils.setActivityToBeFullscreen(this);
-
+        StatusBarUtil.setTranslucent(this, 127);
         setContentView(R.layout.activity_main);
         context = this;
         viewPager = (ViewPager) findViewById(R.id.viewPager);
@@ -331,6 +333,7 @@ public class MainActivity extends BaseActivity {
                     textTitle.setVisibility(View.GONE);
                     searchView.setVisibility(View.VISIBLE);
                     isAppBarFolded = false;
+                    toolbar.setBackgroundColor(getResources().getColor(R.color.transparent));
                     //展开状态
 
                 } else if (state == State.COLLAPSED) {
@@ -339,11 +342,14 @@ public class MainActivity extends BaseActivity {
                     textTitle.setVisibility(View.VISIBLE);
                     searchView.setVisibility(View.GONE);
 
+                    toolbar.setBackgroundColor(getResources().getColor(R.color.white    ));
+
                     isAppBarFolded = true;
+
                     //折叠状态
 
                 } else {
-
+                    toolbar.setBackgroundColor(getResources().getColor(R.color.transparent));
                     //中间状态
 
                 }
@@ -930,7 +936,7 @@ public class MainActivity extends BaseActivity {
     };
 
     private void setUpToolBar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(null);
 

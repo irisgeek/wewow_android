@@ -71,6 +71,7 @@ dependencies {
     compile 'com.lsjwzh:materialloadingprogressbar:0.5.8-RELEASE'
     compile 'com.github.jrvansuita:PickImage:2.1.0'
     compile 'com.afollestad.material-dialogs:core:0.9.4.4'
+    compile 'com.jaeger.statusbarutil:library:1.4.0'
 
 
 }

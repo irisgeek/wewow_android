@@ -27,6 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jaeger.library.StatusBarUtil;
 import com.wewow.adapter.FragmentAdapter;
 import com.wewow.adapter.FragmentSearchResultAdapter;
 import com.wewow.dto.Article;
@@ -71,6 +72,7 @@ public class SearchResultActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_result);
+        StatusBarUtil.setColor(this, getResources().getColor(R.color.menu_checked_color));
 
         Intent intent = getIntent();
         keyword = intent.getExtras().getString("key_word");
