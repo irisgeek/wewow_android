@@ -57,11 +57,13 @@ public class ListArtistActivity extends BaseActivity {
     private String artistId;
     private List<Artist> artistsTemp;
     private List<Artist> allArtists;
+    private boolean isHeaderAdded=false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_artist);
-        StatusBarUtil.setColor(this,getResources().getColor(R.color.white),50);
+        StatusBarUtil.setColor(this, getResources().getColor(R.color.white), 50);
         initData();
 
         setUpToolBar();
@@ -422,6 +424,12 @@ public class ListArtistActivity extends BaseActivity {
             adapter = new ListViewArtistsAdapter(this, listItem);
 
             listView.setAdapter(adapter);
+//            if(!isHeaderAdded) {
+//
+//                isHeaderAdded=true;
+////                View view = View.inflate(this, R.layout.list_header_artist, null);
+////                listView.addHeaderView(view);
+//            }
 
         }
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
