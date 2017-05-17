@@ -41,7 +41,7 @@ import java.util.Map;
  * Created by suncjs on 2017/4/8.
  */
 
-public class LifeLabItemActivity extends Activity {
+public class LifeLabItemActivity extends Activity implements View.OnClickListener {
 
     private static final String TAG = "LifeLabItemActivity";
     public static final String LIFELAB_COLLECTION = "LIFELAB_COLLECTION";
@@ -50,8 +50,8 @@ public class LifeLabItemActivity extends Activity {
     private ExpandableListView lvArticles;
     private LinearLayout container;
     private BitmapDrawable picture;
-    private ImageView like;
-    private TextView lifelab_fav_count;
+    private ImageView like, lifelab_foot_collect;
+    private TextView lifelab_fav_count, lifelab_foot_collect_count;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,67 +82,9 @@ public class LifeLabItemActivity extends Activity {
                 LifeLabItemActivity.this.finish();
             }
         });
-        this.findViewById(R.id.lifelab_share).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (LifeLabItemActivity.this.lcd == null) {
-                    return;
-                }
-                ShareUtils su = new ShareUtils(LifeLabItemActivity.this);
-                su.setContent(LifeLabItemActivity.this.lcd.share_title);
-                su.setUrl(LifeLabItemActivity.this.lcd.share_link);
-                if (LifeLabItemActivity.this.picture != null) {
-                    su.setPicture(LifeLabItemActivity.this.picture.getBitmap());
-                }
-                su.share();
-            }
-        });
+        findViewById(R.id.lifelab_share).setOnClickListener(this);
         this.like = (ImageView) this.findViewById(R.id.lifelab_fav);
-        findViewById(R.id.layout_lifelab_fav).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!UserInfo.isUserLogged(LifeLabItemActivity.this)) {
-                    Intent logini = new Intent(LifeLabItemActivity.this, LoginActivity.class);
-                    LifeLabItemActivity.this.startActivity(logini);
-                    return;
-                }
-                Drawable.ConstantState notliked = LifeLabItemActivity.this.getResources().getDrawable(R.drawable.mark).getConstantState();
-                Drawable.ConstantState currentlike = LifeLabItemActivity.this.like.getDrawable().getConstantState();
-                final Integer like = notliked.equals(currentlike) ? 1 : 0;
-                ArrayList<Pair<String, String>> fields = new ArrayList<Pair<String, String>>();
-                UserInfo ui = UserInfo.getCurrentUser(LifeLabItemActivity.this);
-                fields.add(new Pair<String, String>("user_id", ui.getId().toString()));
-                fields.add(new Pair<String, String>("token", ui.getToken()));
-                fields.add(new Pair<String, String>("item_type", "collection"));
-                fields.add(new Pair<String, String>("item_id", String.valueOf(LifeLabItemActivity.this.lc.id)));
-                fields.add(new Pair<String, String>("like", like.toString()));
-                ArrayList<Pair<String, String>> headers = new ArrayList<Pair<String, String>>();
-                headers.add(WebAPIHelper.getHttpFormUrlHeader());
-                Object[] params = new Object[]{
-                        String.format("%s/like", CommonUtilities.WS_HOST),
-                        new HttpAsyncTask.TaskDelegate() {
-                            @Override
-                            public void taskCompletionResult(byte[] result) {
-                                JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
-                                try {
-                                    int i = jobj.getJSONObject("result").getInt("code");
-                                    if (i != 0) {
-                                        throw new Exception(String.valueOf(i));
-                                    }
-                                    LifeLabItemActivity.this.like.setImageDrawable(LifeLabItemActivity.this.getResources().getDrawable(like == 1 ? R.drawable.favourite : R.drawable.mark));
-                                } catch (Exception e) {
-                                    Log.e(TAG, String.format("favourite fail: %s", e.getMessage()));
-                                    Toast.makeText(LifeLabItemActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-                                }
-                            }
-                        },
-                        WebAPIHelper.HttpMethod.POST,
-                        WebAPIHelper.buildHttpQuery(fields).getBytes(),
-                        headers
-                };
-                new HttpAsyncTask().execute(params);
-            }
-        });
+        findViewById(R.id.layout_lifelab_fav).setOnClickListener(this);
         ProgressDialogUtil.getInstance(this).showProgressDialog();
         ArrayList<Pair<String,String>> fields = new ArrayList<>();
         fields.add(new Pair<String, String>("collection_id", String.valueOf(this.lc.id)));
@@ -342,12 +284,89 @@ public class LifeLabItemActivity extends Activity {
         View view = View.inflate(this, R.layout.lifelab_item_foot, null);
         TextView tv = (TextView) view.findViewById(R.id.lifelab_item_desc);
         tv.setText(String.format(this.getString(R.string.lifelab_item_desc), this.lcd.editor));
-        tv = (TextView) view.findViewById(R.id.lifelab_foot_collect_count);
-        tv.setVisibility(lcd.liked_count == 0 ? View.GONE : View.VISIBLE);
-        tv.setText(lcd.liked_count + "");
-        ImageView iv = (ImageView) view.findViewById(R.id.lifelab_foot_collect);
-        iv.setImageResource(lcd.liked ? R.drawable.favourite : R.drawable.mark);
+        lifelab_foot_collect_count = (TextView) view.findViewById(R.id.lifelab_foot_collect_count);
+        lifelab_foot_collect_count.setVisibility(lcd.liked_count == 0 ? View.GONE : View.VISIBLE);
+        lifelab_foot_collect_count.setText(lcd.liked_count + "");
+        lifelab_foot_collect = (ImageView) view.findViewById(R.id.lifelab_foot_collect);
+        lifelab_foot_collect.setImageResource(lcd.liked ? R.drawable.favourite : R.drawable.mark);
         this.container.addView(view);
+
+        findViewById(R.id.layout_footer_feedback).setOnClickListener(this);
+        findViewById(R.id.layout_footer_share).setOnClickListener(this);
+        findViewById(R.id.layout_lifelab_foot_collect).setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.layout_footer_feedback:
+                startActivity(new Intent(LifeLabItemActivity.this, FeedbackActivity.class));
+                break;
+            case R.id.lifelab_share:
+            case R.id.layout_footer_share:
+                if (LifeLabItemActivity.this.lcd == null) {
+                    return;
+                }
+                ShareUtils su = new ShareUtils(LifeLabItemActivity.this);
+                su.setContent(LifeLabItemActivity.this.lcd.share_title);
+                su.setUrl(LifeLabItemActivity.this.lcd.share_link);
+                if (LifeLabItemActivity.this.picture != null) {
+                    su.setPicture(LifeLabItemActivity.this.picture.getBitmap());
+                }
+                su.share();
+                break;
+            case R.id.layout_lifelab_fav:
+            case R.id.layout_lifelab_foot_collect:
+                    if (!UserInfo.isUserLogged(LifeLabItemActivity.this)) {
+                        Intent logini = new Intent(LifeLabItemActivity.this, LoginActivity.class);
+                        LifeLabItemActivity.this.startActivity(logini);
+                        return;
+                    }
+                    Drawable.ConstantState notliked = LifeLabItemActivity.this.getResources().getDrawable(R.drawable.mark).getConstantState();
+                    Drawable.ConstantState currentlike = LifeLabItemActivity.this.like.getDrawable().getConstantState();
+                    final Integer like = notliked.equals(currentlike) ? 1 : 0;
+                    ArrayList<Pair<String, String>> fields = new ArrayList<>();
+                    UserInfo ui = UserInfo.getCurrentUser(LifeLabItemActivity.this);
+                    fields.add(new Pair<>("user_id", ui.getId().toString()));
+                    fields.add(new Pair<>("token", ui.getToken()));
+                    fields.add(new Pair<>("item_type", "collection"));
+                    fields.add(new Pair<>("item_id", String.valueOf(LifeLabItemActivity.this.lc.id)));
+                    fields.add(new Pair<>("like", like.toString()));
+                    ArrayList<Pair<String, String>> headers = new ArrayList<Pair<String, String>>();
+                    headers.add(WebAPIHelper.getHttpFormUrlHeader());
+                    Object[] params = new Object[]{
+                            String.format("%s/like", CommonUtilities.WS_HOST),
+                            new HttpAsyncTask.TaskDelegate() {
+                                @Override
+                                public void taskCompletionResult(byte[] result) {
+                                    JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
+                                    try {
+                                        int i = jobj.getJSONObject("result").getInt("code");
+                                        if (i != 0) {
+                                            throw new Exception(String.valueOf(i));
+                                        }
+                                        LifeLabItemActivity.this.like.setImageDrawable(LifeLabItemActivity.this.getResources().getDrawable(like == 1 ? R.drawable.marked : R.drawable.mark));
+                                        lifelab_foot_collect.setImageDrawable(LifeLabItemActivity.this.getResources().getDrawable(like == 1 ? R.drawable.marked : R.drawable.mark));
+                                        if(like == 1){
+                                            lcd.liked_count += 1;
+                                        }else{
+                                            lcd.liked_count -= 1;
+                                        }
+                                        lifelab_fav_count.setText(lcd.liked_count + "");
+                                        lifelab_foot_collect_count.setText(lcd.liked_count + "");
+                                    } catch (Exception e) {
+                                        Log.e(TAG, String.format("favourite fail: %s", e.getMessage()));
+                                        Toast.makeText(LifeLabItemActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                            },
+                            WebAPIHelper.HttpMethod.POST,
+                            WebAPIHelper.buildHttpQuery(fields).getBytes(),
+                            headers
+                    };
+                    new HttpAsyncTask().execute(params);
+                break;
+        }
     }
 
     /*
