@@ -8,7 +8,7 @@
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="match_parent"
-        android:layout_height="271dp"
+        android:layout_height="244dp"
         android:background="@color/white"
         android:fitsSystemWindows="true"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
@@ -16,7 +16,7 @@
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="219dp"
+            android:layout_height="192dp"
             app:collapsedTitleTextAppearance="@style/TextAppearance"
             android:fitsSystemWindows="true"
             app:statusBarScrim="#00ffffff"
@@ -35,7 +35,7 @@
                 <RelativeLayout
                     android:id="@+id/layoutBanner"
                     android:layout_width="wrap_content"
-                    android:layout_height="219dp"
+                    android:layout_height="192dp"
                     android:layout_gravity="top">
 
                     <android.support.v4.view.ViewPager
