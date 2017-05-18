@@ -1,5 +1,6 @@
 package com.wewow.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -111,7 +112,7 @@ public class ListViewArtistsAdapter extends BaseAdapter {
                     postReadToServer(holder,position, id, followStatus.get(position).equals("1") ? 0 : 1);
 
                 } else {
-                    LoginUtils.startLogin(context, LoginActivity.REQUEST_CODE_LOGIN);
+                    LoginUtils.startLogin((Activity) context, LoginActivity.REQUEST_CODE_LOGIN);
                 }
 
             }
@@ -147,7 +148,7 @@ public class ListViewArtistsAdapter extends BaseAdapter {
 
                     } else {
                         followStatus.set(position, read == 0 ? "0" : "1");
-                        holder.imageViewFollowed.setImageResource( read == 0 ?R.drawable.follow:R.drawable.followed);
+                        holder.imageViewFollowed.setImageResource(read == 0 ? R.drawable.follow : R.drawable.followed);
                         notifyDataSetChanged();
                         FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_LIST, context);
                         FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_DETAIL + artistId, context);
