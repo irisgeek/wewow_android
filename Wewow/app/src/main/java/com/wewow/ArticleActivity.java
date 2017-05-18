@@ -2,22 +2,15 @@ package com.wewow;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.style.URLSpan;
-import android.text.style.UnderlineSpan;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.Pair;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
-import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -26,13 +19,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.wewow.dto.Article;
+import com.wewow.utils.BlurBuilder;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
 import com.wewow.utils.LoginUtils;
 import com.wewow.utils.ProgressDialogUtil;
 import com.wewow.utils.RemoteImageLoader;
-import com.wewow.utils.ShareUtils;
 import com.wewow.utils.Utils;
 import com.wewow.utils.WebAPIHelper;
 
@@ -40,10 +32,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,10 +48,12 @@ public class ArticleActivity extends AppCompatActivity {
     private WebView content;
     private ImageView logo;
     private ImageView like;
+    private TextView article_fav_count;
     private LinearLayout discuzContainer;
     private JSONObject data;
     private ArrayList<String> pictures = new ArrayList<>();
     private int id;
+    private int likedCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,28 +160,38 @@ public class ArticleActivity extends AppCompatActivity {
         this.findViewById(R.id.article_share).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ShareUtils su = new ShareUtils(ArticleActivity.this);
                 if (ArticleActivity.this.data == null) {
                     return;
                 }
-                su.setUrl(ArticleActivity.this.data.optString("share_link"));
-                su.setContent(ArticleActivity.this.data.optString("title"));
+                Intent intent = new Intent(ArticleActivity.this, ShareActivity.class);
+                intent.putExtra(ShareActivity.SHARE_TYPE, ShareActivity.SHARE_TYPE_TOSELECT);
+                intent.putExtra(ShareActivity.SHARE_CONTEXT, data.optString("title"));
+                intent.putExtra(ShareActivity.SHARE_URL, data.optString("share_link"));
                 BitmapDrawable bd = (BitmapDrawable) ArticleActivity.this.logo.getDrawable();
                 if (bd != null) {
-                    su.setPicture(bd.getBitmap());
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    bd.getBitmap().compress(Bitmap.CompressFormat.PNG, 100, baos);
+                    intent.putExtra(ShareActivity.SHARE_IMAGE, baos.toByteArray());
                 }
-                su.share();
+                View v = findViewById(android.R.id.content);
+                if (v != null) {
+                    Bitmap bm = BlurBuilder.blur(v);
+                    byte[] buf = Utils.getBitmapBytes(bm);
+                    intent.putExtra(ShareActivity.BACK_GROUND, buf);
+                }
+                startActivity(intent);
             }
         });
         this.like = (ImageView) this.findViewById(R.id.article_fav);
-        this.like.setOnClickListener(new View.OnClickListener() {
+        article_fav_count = (TextView) findViewById(R.id.article_fav_count);
+        findViewById(R.id.layout_article_fav).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (!UserInfo.isUserLogged(ArticleActivity.this)) {
                     LoginUtils.startLogin(ArticleActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
                     return;
                 }
-                Drawable.ConstantState notliked = ArticleActivity.this.getResources().getDrawable(R.drawable.favourite_b).getConstantState();
+                Drawable.ConstantState notliked = ArticleActivity.this.getResources().getDrawable(R.drawable.mark_b).getConstantState();
                 Drawable.ConstantState currentlike = ArticleActivity.this.like.getDrawable().getConstantState();
                 final Integer like = notliked.equals(currentlike) ? 1 : 0;
                 ArrayList<Pair<String, String>> fields = new ArrayList<Pair<String, String>>();
@@ -211,6 +215,12 @@ public class ArticleActivity extends AppCompatActivity {
                                         throw new Exception(String.valueOf(i));
                                     }
                                     ArticleActivity.this.like.setImageDrawable(ArticleActivity.this.getResources().getDrawable(like == 1 ? R.drawable.marked_b : R.drawable.mark_b));
+                                    if(like == 1){
+                                        likedCount += 1;
+                                    }else{
+                                        likedCount -= 1;
+                                    }
+                                    article_fav_count.setText(likedCount + "");
                                 } catch (Exception e) {
                                     Log.e(TAG, String.format("favourite fail: %s", e.getMessage()));
                                     Toast.makeText(ArticleActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
@@ -278,12 +288,26 @@ public class ArticleActivity extends AppCompatActivity {
                 ArticleActivity.this.startActivity(i);
             }
         });
+        findViewById(R.id.share_more).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.setType("text/plain");
+                String content = data.optString("title", "no title") + " " + data.optString("share_link", "no link");
+                sendIntent.putExtra(Intent.EXTRA_TEXT, content);
+                startActivity(Intent.createChooser(sendIntent, "选择分享方式"));
+            }
+        });
     }
 
     private void fillContent(JSONObject article) {
         this.data = article;
         this.title.setText(article.optString("title", "No title"));
         this.like.setImageDrawable(this.getResources().getDrawable(article.optInt("liked", 0) == 1 ? R.drawable.marked_b : R.drawable.mark_b));
+        likedCount = article.optInt("liked_count");
+        article_fav_count.setText(likedCount + "");
+        article_fav_count.setVisibility(likedCount == 0 ? View.GONE : View.VISIBLE);
         this.content.loadUrl(article.optString("content", "No content"));
         new RemoteImageLoader(this, article.optString("image_750_1112"), new RemoteImageLoader.RemoteImageListener() {
             @Override
@@ -321,12 +345,14 @@ public class ArticleActivity extends AppCompatActivity {
 
     private void setupFeedback() {
         TextView tv = (TextView) this.findViewById(R.id.article_feedback_link);
-        CharSequence cs = tv.getText();
-        String link = this.getString(R.string.article_feedback_link);
-        SpannableStringBuilder ssb = new SpannableStringBuilder(cs);
-        SpannableString ss = new SpannableString(link);
-        ss.setSpan(new UnderlineSpan(), 0, link.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-        ssb.append(ss);
-        tv.setText(ssb);
+        tv.getPaint().setFlags(Paint. UNDERLINE_TEXT_FLAG );
+        tv.getPaint().setAntiAlias(true);
+
+        tv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(ArticleActivity.this, FeedbackActivity.class));
+            }
+        });
     }
 }
