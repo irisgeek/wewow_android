@@ -71,7 +71,7 @@ public  class RecycleViewInstitutesOfSearchResultAdapter
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.list_item_life_institue_recommended, parent, false);
+                .inflate(R.layout.list_item_life_institue_of_categories, parent, false);
         view.setBackgroundResource(mBackground);
         return new ViewHolder(view);
     }

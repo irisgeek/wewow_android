@@ -36,6 +36,7 @@ import com.wewow.netTask.ITask;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.FileCacheUtil;
 import com.wewow.utils.LoadMoreListener;
+import com.wewow.utils.LoginUtils;
 import com.wewow.utils.SettingUtils;
 import com.wewow.utils.Utils;
 import com.wewow.view.RecyclerViewUpRefresh;
@@ -269,9 +270,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
                             imageViewSubscribe.setImageResource(R.drawable.subscribed);
                         }
                     } else {
-                        Intent i = new Intent();
-                        i.setClass(DetailArtistActivity.this, LoginActivity.class);
-                        startActivityForResult(i, LoginActivity.REQUEST_CODE_ARTIST_DETAIL);
+                        LoginUtils.startLogin(DetailArtistActivity.this, LoginActivity.REQUEST_CODE_ARTIST_DETAIL);
                     }
 
 
@@ -536,7 +535,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
             listItem.add(map);
         }
 
-        listView.setAdapter(new ListViewArtistsAdapter(this, listItem));
+//        listView.setAdapter(new ListViewArtistsAdapter(this, listItem));
     }
 
     private void setUpToolBar() {

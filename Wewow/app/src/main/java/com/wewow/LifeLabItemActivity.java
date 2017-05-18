@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.wewow.dto.LabCollection;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
+import com.wewow.utils.LoginUtils;
 import com.wewow.utils.PhotoUtils;
 import com.wewow.utils.ProgressDialogUtil;
 import com.wewow.utils.RemoteImageLoader;
@@ -84,9 +85,11 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
         });
         findViewById(R.id.lifelab_share).setOnClickListener(this);
         this.like = (ImageView) this.findViewById(R.id.lifelab_fav);
+
         findViewById(R.id.layout_lifelab_fav).setOnClickListener(this);
+
         ProgressDialogUtil.getInstance(this).showProgressDialog();
-        ArrayList<Pair<String,String>> fields = new ArrayList<>();
+        ArrayList<Pair<String, String>> fields = new ArrayList<>();
         fields.add(new Pair<String, String>("collection_id", String.valueOf(this.lc.id)));
         if (UserInfo.isUserLogged(this)) {
             fields.add(new Pair<String, String>("user_id", UserInfo.getCurrentUser(this).getId().toString()));
@@ -270,8 +273,8 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(LifeLabItemActivity.this,DetailArtistActivity.class);
-                    intent.putExtra("id",a.id);
+                    Intent intent = new Intent(LifeLabItemActivity.this, DetailArtistActivity.class);
+                    intent.putExtra("id", a.id);
                     startActivity(intent);
                 }
             });

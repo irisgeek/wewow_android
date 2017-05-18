@@ -57,6 +57,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -989,6 +990,7 @@ public class homeFragment extends Fragment {
 
 
         RecycleViewArtistsOfHomePageAdapter adapterArtists= new RecycleViewArtistsOfHomePageAdapter(getActivity(), listItemArtist);
+        OverScrollDecoratorHelper.setUpOverScroll(rv, OverScrollDecoratorHelper.ORIENTATION_HORIZONTAL);
 
         adapterArtists.setOnItemClickListener(new RecycleViewArtistsOfHomePageAdapter.OnItemClickListener() {
             @Override

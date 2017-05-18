@@ -23,6 +23,7 @@ import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 import com.wewow.utils.BlurBuilder;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
+import com.wewow.utils.LoginUtils;
 import com.wewow.utils.ProgressDialogUtil;
 import com.wewow.utils.RemoteImageLoader;
 import com.wewow.utils.Utils;
@@ -195,8 +196,7 @@ public class ArticleActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (!UserInfo.isUserLogged(ArticleActivity.this)) {
-                    Intent logini = new Intent(ArticleActivity.this, LoginActivity.class);
-                    ArticleActivity.this.startActivity(logini);
+                    LoginUtils.startLogin(ArticleActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
                     return;
                 }
                 Drawable.ConstantState notliked = ArticleActivity.this.getResources().getDrawable(R.drawable.mark_b).getConstantState();

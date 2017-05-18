@@ -7,6 +7,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,15 +26,21 @@ import com.wewow.DetailArtistActivity;
 import com.wewow.LifeLabItemActivity;
 import com.wewow.R;
 import com.wewow.adapter.ListViewAdapter;
+import com.wewow.adapter.RecycleViewArticlesOfArtistDetail;
+import com.wewow.adapter.RecycleViewArtistsOfHomePageAdapter;
+import com.wewow.adapter.RecycleViewInstitutesOfSearchResultAdapter;
+import com.wewow.dto.Article;
 import com.wewow.dto.Artist;
 import com.wewow.dto.Institute;
 import com.wewow.dto.LabCollection;
 import com.wewow.netTask.ITask;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.FileCacheUtil;
+import com.wewow.utils.LoadMoreListener;
 import com.wewow.utils.SettingUtils;
 import com.wewow.utils.Utils;
 import com.wewow.view.CircleImageView;
+import com.wewow.view.RecyclerViewUpRefresh;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,6 +51,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -50,7 +59,7 @@ import retrofit.client.Response;
 /**
  * Created by iris on 17/3/13.
  */
-public class categaryFragment  extends Fragment{
+public class categaryFragment  extends Fragment implements LoadMoreListener {
 
 
 
@@ -64,7 +73,13 @@ public class categaryFragment  extends Fragment{
 
     private View view;
     private String categoryId="";
-
+    private RecyclerView rv;
+    private String totalPages;
+    private int currentPage=1;
+    private RecyclerViewUpRefresh rvInstitue;
+    private ArrayList<HashMap<String, Object>> listItem;
+    private RecycleViewInstitutesOfSearchResultAdapter adapter;
+    private boolean refresh=false;
 
     public categaryFragment() {
 
@@ -87,6 +102,7 @@ public class categaryFragment  extends Fragment{
             categoryId = bundle.getString("id");
         }
         view= inflater.inflate(R.layout.fragment_other_categary, container, false);
+        initData();
 
 //        swipeRefreshLayout.post(new Runnable() {
 //                                    @Override
@@ -113,6 +129,21 @@ public class categaryFragment  extends Fragment{
 //        setUpViewPagerLoverOfLife(view);
 //        setUpListViewInstituteRecommend(view);
         return view;
+
+    }
+
+    private void initData() {
+        listItem = new ArrayList<HashMap<String, Object>>();
+
+        rv = (RecyclerView) view.findViewById(R.id.recyclerview_artists);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        rv.setLayoutManager(linearLayoutManager);
+
+        rvInstitue = (RecyclerViewUpRefresh)view.findViewById(R.id.recyclerview);
+        rvInstitue.setLayoutManager(new LinearLayoutManager(rv.getContext()));
+        rvInstitue.setCanloadMore(true);
+        rvInstitue.setLoadMoreListener(this);
 
     }
 
@@ -155,13 +186,13 @@ public class categaryFragment  extends Fragment{
                                 .getJSONObject("data")
                                 .getString("update_at");
 
-                        long cacheUpdatedTime = (long)(Double.parseDouble(cacheUpdatedTimeStamp) * 1000);
+                        long cacheUpdatedTime = (long) (Double.parseDouble(cacheUpdatedTimeStamp) * 1000);
 
                         boolean isCacheDataOutdated = FileCacheUtil
-                                .isCacheDataFailure(CommonUtilities.CACHE_FILE_CATEGORY_ARTISTS_AND_INSTITUTES+categoryId, getActivity(), cacheUpdatedTime);
+                                .isCacheDataFailure(CommonUtilities.CACHE_FILE_CATEGORY_ARTISTS_AND_INSTITUTES + categoryId, getActivity(), cacheUpdatedTime);
 
                         if (isCacheDataOutdated) {
-                            getDataFromServer();
+                            getDataFromServer(false);
                         } else {
                             setUpArtistsAndInstituesFromCache(view);
                         }
@@ -193,10 +224,10 @@ public class categaryFragment  extends Fragment{
 
     }
 
-    private void getDataFromServer() {
+    private void getDataFromServer(final boolean refresh) {
 
         ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
-        iTask.categoryArtistsAndInstitutes(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(getActivity()), categoryId, new Callback<JSONObject>() {
+        iTask.categoryArtistsAndInstitutes(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(getActivity()), categoryId, currentPage, new Callback<JSONObject>() {
 
             @Override
             public void success(JSONObject object, Response response) {
@@ -209,14 +240,17 @@ public class categaryFragment  extends Fragment{
                     String realData = Utils.convertStreamToString(response.getBody().in());
                     if (!realData.contains(CommonUtilities.SUCCESS)) {
                         Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+                        rvInstitue.loadMoreComplete();
 
 
                     } else {
 
-                        FileCacheUtil.setCache(realData, getActivity(), CommonUtilities.CACHE_FILE_CATEGORY_ARTISTS_AND_INSTITUTES+categoryId, 0);
+                        if (!refresh) {
+
+                            FileCacheUtil.setCache(realData, getActivity(), CommonUtilities.CACHE_FILE_CATEGORY_ARTISTS_AND_INSTITUTES + categoryId, 0);
+                        }
                         institutes = parseInstituteListFromString(realData);
                         artists = parseArtistsListFromString(realData);
-
                         setUpArtistsAndInstitute(institutes, artists, false, view);
 
                     }
@@ -224,11 +258,11 @@ public class categaryFragment  extends Fragment{
                 } catch (IOException e) {
                     e.printStackTrace();
                     Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-
+                    rvInstitue.loadMoreComplete();
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-
+                    rvInstitue.loadMoreComplete();
                 }
 
             }
@@ -236,7 +270,7 @@ public class categaryFragment  extends Fragment{
             @Override
             public void failure(RetrofitError error) {
                 Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-
+                rvInstitue.loadMoreComplete();
 
                 Log.i("MainActivity", "request banner failed: " + error.toString());
 
@@ -253,9 +287,19 @@ public class categaryFragment  extends Fragment{
 
     public void setUpListViewInstituteRecommend(List<Institute> institutes,View rootView) {
 
-        listViewInstituteRecommended = (ListView) rootView.findViewById(R.id.listViewSelectedInstituteCategory);
+        ArrayList<HashMap<String, Object>> listItemCopy = new ArrayList<HashMap<String, Object>>();
+        listItemCopy.addAll(listItem);
 
-        ArrayList<HashMap<String, Object>> listItem = new ArrayList<HashMap<String, Object>>();
+
+        if (listItem != null && listItem.size() > 0) {
+            listItem.clear();
+
+        }
+
+        if (currentPage != 1) {
+            listItem.addAll(listItemCopy);
+        }
+
 
         for (int i = 0; i < institutes.size(); i++) {
             HashMap<String, Object> map = new HashMap<String, Object>();
@@ -263,107 +307,141 @@ public class categaryFragment  extends Fragment{
             //
 
             Institute institute = institutes.get(i);
+            map.put("id",institute.getId());
             map.put("imageView", institute.getImage());
-            map.put("textViewNum", getActivity().getResources().getString(R.string.number_refix) + institutes.get(i).getOrder());
+            map.put("textViewNum",getResources().getString(R.string.number_refix) + institutes.get(i).getOrder());
             map.put("textViewTitle", institutes.get(i).getTitle());
             map.put("textViewRead", institutes.get(i).getRead_count());
             map.put("textViewCollection", institutes.get(i).getLiked_count());
-            map.put("id",institutes.get(i).getId());
 
             listItem.add(map);
         }
-        ListViewAdapter listItemAdapter = new ListViewAdapter(rootView.getContext(), listItem);
-
-//        SimpleAdapter listItemAdapter = new SimpleAdapter(getActivity(), listItem,//data source
-//                R.layout.list_item_life_institue_recommended,
-//
-//                new String[]{"image","textVol", "textTitle", "textReadCount", "textCollectionCount"},
-//                //ids
-//                new int[]{R.id.imageViewInstitue,R.id.textViewNum, R.id.textViewTitle, R.id.textViewRead, R.id.textViewCollection}
-//        );
-        listViewInstituteRecommended.setAdapter(listItemAdapter);
-        listViewInstituteRecommended.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                LabCollection lc = new LabCollection();
-                HashMap<String, Object> map = (HashMap<String, Object>) parent.getAdapter().getItem(position);
-
-                lc.image = map.get("imageView").toString();
-                lc.title = map.get("textViewTitle").toString();
-                lc.id = Long.parseLong(map.get("id").toString());
-                Intent intent = new Intent(getActivity(), LifeLabItemActivity.class);
-                intent.putExtra(LifeLabItemActivity.LIFELAB_COLLECTION, lc);
-
-                startActivity(intent);
-            }
-        });
-        listItemAdapter.notifyDataSetChanged();
-
-        //fix bug created by scrollview
-        fixListViewHeight(listViewInstituteRecommended);
-    }
 
 
-    public void setUpViewPagerLoverOfLife(List<Artist> artists,View rootView) {
 
-        //blank view for bounce effect
-        View left = new View(rootView.getContext());
-        List<View> mListViews = new ArrayList<View>();
-        mListViews.add(left);
+        if (!refresh) {
 
-        for (int i = 0; i < artists.size(); i++) {
-            View view = getActivity().getLayoutInflater().inflate(R.layout.list_item_lover_of_life_recommended, null);
-            CircleImageView image = (CircleImageView) view.findViewById(R.id.imageViewIcon);
-            Glide.with(rootView.getContext())
-                    .load(artists.get(i).getImage())
-                    .placeholder(R.drawable.banner_loading_spinner)
-                    .crossFade(300)
-                    .into(image);
+            adapter = new RecycleViewInstitutesOfSearchResultAdapter(getActivity(),
+                    listItem);
 
-            TextView textNickName = (TextView) view.findViewById(R.id.textViewNickName);
-            TextView textDesc = (TextView) view.findViewById(R.id.textViewDesc);
-            TextView textArticleCount = (TextView) view.findViewById(R.id.textViewRead);
-            TextView textFollowerCount = (TextView) view.findViewById(R.id.textViewCollection);
-
-            textNickName.setText(artists.get(i).getNickname());
-            textDesc.setText(artists.get(i).getDesc());
-
-            textArticleCount.setText(artists.get(i).getArticle_count());
-            textFollowerCount.setText(artists.get(i).getFollower_count());
-
-
-            final String artistId=artists.get(i).getId();
-
-            //to set data
-
-
-            mListViews.add(view);
-            view.setOnClickListener(new View.OnClickListener() {
+            adapter.setOnItemClickListener(new RecycleViewInstitutesOfSearchResultAdapter.OnItemClickListener() {
                 @Override
-                public void onClick(View v) {
+                public void onItemClick(View view, int position) {
+                    LabCollection lc = new LabCollection();
+                    lc.image = listItem.get(position).get("imageView").toString();
+                    lc.title =  listItem.get(position).get("textViewTitle").toString();
+                    lc.id = Long.parseLong(listItem.get(position).get("id").toString());
+                    Intent intent = new Intent(getActivity(), LifeLabItemActivity.class);
+                    intent.putExtra(LifeLabItemActivity.LIFELAB_COLLECTION, lc);
 
-
-                    Intent intent = new Intent(getActivity(), DetailArtistActivity.class);
-                    intent.putExtra("id", artistId);
                     startActivity(intent);
 
                 }
+
             });
+            rvInstitue.setAdapter(adapter);
+
+        } else {
+            adapter.notifyDataSetChanged();
         }
 
-        View right = new View(rootView.getContext());
-        mListViews.add(right);
-        MyPagerAdapter myAdapter = new MyPagerAdapter();
+        currentPage++;
+        rvInstitue.loadMoreComplete();
 
-        myAdapter.setList(mListViews);
-        viewPagerLoverOfLife = (ViewPager) rootView.findViewById(R.id.viewpagerLayoutCategory);
 
-        viewPagerLoverOfLife.setAdapter(myAdapter);
-        viewPagerLoverOfLife.setCurrentItem(1);
-        viewPagerLoverOfLife.setOnPageChangeListener(new BouncePageChangeListener(
-                viewPagerLoverOfLife, mListViews));
-        viewPagerLoverOfLife.setPageMargin(getResources().getDimensionPixelSize(R.dimen.life_lover_recommended_page_margin));
-        myAdapter.notifyDataSetChanged();
+//
+//
+//        listViewInstituteRecommended = (ListView) rootView.findViewById(R.id.listViewSelectedInstituteCategory);
+//
+//        ArrayList<HashMap<String, Object>> listItem = new ArrayList<HashMap<String, Object>>();
+//
+//        for (int i = 0; i < institutes.size(); i++) {
+//            HashMap<String, Object> map = new HashMap<String, Object>();
+//
+//            //
+//
+//            Institute institute = institutes.get(i);
+//            map.put("imageView", institute.getImage());
+//            map.put("textViewNum", getActivity().getResources().getString(R.string.number_refix) + institutes.get(i).getOrder());
+//            map.put("textViewTitle", institutes.get(i).getTitle());
+//            map.put("textViewRead", institutes.get(i).getRead_count());
+//            map.put("textViewCollection", institutes.get(i).getLiked_count());
+//            map.put("id",institutes.get(i).getId());
+//
+//            listItem.add(map);
+//        }
+//        ListViewAdapter listItemAdapter = new ListViewAdapter(rootView.getContext(), listItem);
+//
+////        SimpleAdapter listItemAdapter = new SimpleAdapter(getActivity(), listItem,//data source
+////                R.layout.list_item_life_institue_recommended,
+////
+////                new String[]{"image","textVol", "textTitle", "textReadCount", "textCollectionCount"},
+////                //ids
+////                new int[]{R.id.imageViewInstitue,R.id.textViewNum, R.id.textViewTitle, R.id.textViewRead, R.id.textViewCollection}
+////        );
+//        listViewInstituteRecommended.setAdapter(listItemAdapter);
+//        listViewInstituteRecommended.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                LabCollection lc = new LabCollection();
+//                HashMap<String, Object> map = (HashMap<String, Object>) parent.getAdapter().getItem(position);
+//
+//                lc.image = map.get("imageView").toString();
+//                lc.title = map.get("textViewTitle").toString();
+//                lc.id = Long.parseLong(map.get("id").toString());
+//                Intent intent = new Intent(getActivity(), LifeLabItemActivity.class);
+//                intent.putExtra(LifeLabItemActivity.LIFELAB_COLLECTION, lc);
+//
+//                startActivity(intent);
+//            }
+//        });
+//        listItemAdapter.notifyDataSetChanged();
+//
+//        //fix bug created by scrollview
+//        fixListViewHeight(listViewInstituteRecommended);
+    }
+
+
+    public void setUpViewPagerLoverOfLife(final List<Artist> artists, View rootView) {
+
+
+        ArrayList<HashMap<String, Object>> listItemArtist = new ArrayList<HashMap<String, Object>>();
+
+
+        for (int i = 0; i < artists.size(); i++) {
+            HashMap<String, Object> map = new HashMap<String, Object>();
+
+            //
+
+            map.put("imageView", artists.get(i).getImage());
+
+            map.put("textViewName", artists.get(i).getNickname());
+            map.put("textViewDesc", artists.get(i).getDesc());
+            map.put("textViewArticleCount", artists.get(i).getArticle_count());
+            map.put("textViewFollowerCount", artists.get(i).getFollower_count());
+            map.put("id", artists.get(i).getId());
+
+            listItemArtist.add(map);
+        }
+
+
+        RecycleViewArtistsOfHomePageAdapter adapterArtists= new RecycleViewArtistsOfHomePageAdapter(getActivity(), listItemArtist);
+        OverScrollDecoratorHelper.setUpOverScroll(rv, OverScrollDecoratorHelper.ORIENTATION_HORIZONTAL);
+
+        adapterArtists.setOnItemClickListener(new RecycleViewArtistsOfHomePageAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                final String artistId=artists.get(position).getId();
+
+                Intent intent = new Intent(getActivity(),DetailArtistActivity.class);
+                intent.putExtra("id",artistId);
+                startActivity(intent);
+
+            }
+
+        });
+        rv.setAdapter(adapterArtists);
+
 
 
     }
@@ -424,75 +502,6 @@ public class categaryFragment  extends Fragment{
         super.onActivityCreated(savedInstanceState);
 
     }
-
-    public void setUpViewPagerLoverOfLifeDummy(View viewRoot) {
-
-        //blank view for bounce effect
-        View left = new View(viewRoot.getContext());
-        List<View> mListViews = new ArrayList<View>();
-        mListViews.add(left);
-
-        for (int i = 0; i < 3; i++) {
-            View view = getActivity().getLayoutInflater().inflate(R.layout.list_item_lover_of_life_recommended, null);
-
-            //to set data
-
-
-            mListViews.add(view);
-        }
-
-        View right = new View(viewRoot.getContext());
-        mListViews.add(right);
-        MyPagerAdapter myAdapter = new MyPagerAdapter();
-
-        myAdapter.setList(mListViews);
-      viewPagerLoverOfLife = (ViewPager)viewRoot.findViewById(R.id.viewpagerLayoutCategory);
-
-        viewPagerLoverOfLife.setAdapter(myAdapter);
-        myAdapter.notifyDataSetChanged();
-        viewPagerLoverOfLife.setCurrentItem(1);
-        viewPagerLoverOfLife.setOnPageChangeListener(new BouncePageChangeListener(
-                viewPagerLoverOfLife, mListViews));
-        viewPagerLoverOfLife.setPageMargin(getResources().getDimensionPixelSize(R.dimen.life_lover_recommended_page_margin));
-
-
-    }
-    public void setUpListViewInstituteRecommendDummy(View view) {
-
-       listViewInstituteRecommended = (ListView) view.findViewById(R.id.listViewSelectedInstituteCategory);
-
-        ArrayList<HashMap<String, Object>> listItem = new ArrayList<HashMap<String, Object>>();
-
-        for (int i = 0; i < 2; i++) {
-            HashMap<String, Object> map = new HashMap<String, Object>();
-
-            //
-
-
-            map.put("textVol", dummyVols[i]);
-            map.put("textTitle", dummyTitles[i]);
-            map.put("textReadCount", dummyReadCount[i]);
-            map.put("textCollectionCount", dummyCollectionCount[i]);
-
-            listItem.add(map);
-        }
-
-        SimpleAdapter listItemAdapter = new SimpleAdapter(view.getContext(), listItem,//data source
-                R.layout.list_item_life_institue_recommended,
-
-                new String[]{"textVol", "textTitle", "textReadCount", "textCollectionCount"},
-                //ids
-                new int[]{R.id.textViewNum, R.id.textViewTitle, R.id.textViewRead, R.id.textViewCollection}
-        );
-        listViewInstituteRecommended.setAdapter(listItemAdapter);
-        listItemAdapter.notifyDataSetChanged();
-
-        //fix bug created by scrollview
-        fixListViewHeight(listViewInstituteRecommended);
-
-
-    }
-
 
 
 
@@ -637,6 +646,42 @@ public class categaryFragment  extends Fragment{
         params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
         listView.setLayoutParams(params);
 
+    }
+
+    @Override
+    public void onLoadMore() {
+
+        boolean isLastPageLoaded = false;
+        try {
+            isLastPageLoaded = isLastPageLoaded();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if (!isLastPageLoaded) {
+
+            getDataFromServer(true);
+        } else {
+            rvInstitue.loadMoreComplete();
+        }
+
+
+    }
+
+    private boolean isLastPageLoaded() throws JSONException {
+
+        boolean result = false;
+
+        if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_CATEGORY_ARTISTS_AND_INSTITUTES + categoryId, getActivity())) {
+            String fileContent = FileCacheUtil.getCache(getActivity(), CommonUtilities.CACHE_FILE_CATEGORY_ARTISTS_AND_INSTITUTES + categoryId);
+            JSONObject object = new JSONObject(fileContent);
+            totalPages = object.getJSONObject("result").getJSONObject("data").getString("total_pages");
+            if (currentPage > Integer.parseInt(totalPages)) {
+
+                result = true;
+            }
+        }
+
+        return result;
     }
 
 }

@@ -221,7 +221,7 @@ public class FeedbackActivity extends BaseActivity{
             listItem.add(map);
         }
 
-        listView.setAdapter(new ListViewArtistsAdapter(this, listItem));
+//        listView.setAdapter(new ListViewArtistsAdapter(this, listItem));
     }
 
     private void setUpToolBar() {

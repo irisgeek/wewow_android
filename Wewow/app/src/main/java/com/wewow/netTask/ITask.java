@@ -58,7 +58,7 @@ public interface ITask {
                       @Query("artist_id") String artistId, @Query("token") String token, @Query("follow") int follow, Callback<JSONObject> callback);
 
     @GET("/index_category_collections")
-    void categoryArtistsAndInstitutes(@Header("User-Agent") String headerContentType, @Query("collection_category_id") String id,
+    void categoryArtistsAndInstitutes(@Header("User-Agent") String headerContentType, @Query("collection_category_id") String id,@Query("page") int page,
                                       Callback<JSONObject> callback);
 
     //feedback

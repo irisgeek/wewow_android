@@ -4,12 +4,14 @@ package com.wewow;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
@@ -18,6 +20,7 @@ import android.widget.Toast;
 
 import com.cjj.MaterialRefreshLayout;
 import com.cjj.MaterialRefreshListener;
+import com.jaeger.library.StatusBarUtil;
 import com.wewow.adapter.ListViewArtistsAdapter;
 import com.wewow.dto.Artist;
 import com.wewow.netTask.ITask;
@@ -34,6 +37,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -53,10 +57,15 @@ public class ListArtistActivity extends BaseActivity {
     private String artistId;
     private List<Artist> artistsTemp;
     private List<Artist> allArtists;
+    private boolean isHeaderAdded = false;
+    private ArrayList<String> followStatus;
+    private int totalPages = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_artist);
+        StatusBarUtil.setColor(this, getResources().getColor(R.color.white), 50);
         initData();
 
         setUpToolBar();
@@ -65,14 +74,14 @@ public class ListArtistActivity extends BaseActivity {
     private void initData() {
 
         listView = (ListView) findViewById(R.id.listViewArtists);
-
+        followStatus = new ArrayList<String>();
         listItem = new ArrayList<HashMap<String, Object>>();
-
-        refreshLayout=(MaterialRefreshLayout) findViewById(R.id.refresh);
+        allArtists = new ArrayList<Artist>();
+        refreshLayout = (MaterialRefreshLayout) findViewById(R.id.refresh);
 
 
         refreshLayout.setShowArrow(false);
-        int[] colors={getResources().getColor(R.color.font_color)};
+        int[] colors = {getResources().getColor(R.color.font_color)};
         refreshLayout.setProgressColors(colors);
         refreshLayout.setLoadMore(true);
         refreshLayout.finishRefreshLoadMore();
@@ -116,6 +125,7 @@ public class ListArtistActivity extends BaseActivity {
 
                     getArtistListFromServer();
                 } else {
+                    adapter.notifyDataSetChanged();
                     onfinish();
                 }
 
@@ -174,7 +184,7 @@ public class ListArtistActivity extends BaseActivity {
                 searchView.setQuery(testStrings[position], true);
             }
         });
-        final Menu menuFinal=menu;
+        final Menu menuFinal = menu;
         completeText.setThreshold(0);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -184,11 +194,9 @@ public class ListArtistActivity extends BaseActivity {
                 MenuItem menuItem = menuFinal.findItem(R.id.search);
                 menuItem.collapseActionView();
 
-                List<Artist> artistsBySearch=new ArrayList<Artist>();
-                for(Artist artist: artistsTemp)
-                {
-                    if (artist.getNickname().contains(query))
-                    {
+                List<Artist> artistsBySearch = new ArrayList<Artist>();
+                for (Artist artist : artistsTemp) {
+                    if (artist.getNickname().contains(query)) {
                         artistsBySearch.add(artist);
                     }
                 }
@@ -268,7 +276,7 @@ public class ListArtistActivity extends BaseActivity {
             listItem.add(map);
         }
 
-        listView.setAdapter(new ListViewArtistsAdapter(this, listItem));
+//        listView.setAdapter(new ListViewArtistsAdapter(this, listItem));
     }
 
     private void setUpToolBar() {
@@ -378,23 +386,23 @@ public class ListArtistActivity extends BaseActivity {
 
 
         ArrayList<HashMap<String, Object>> listItemCopy = new ArrayList<HashMap<String, Object>>();
-
-        if(allArtists==null) {
-            allArtists = new ArrayList<Artist>();
-        }
-        allArtists.addAll(artists);
+        ArrayList<Artist> artistsCopy = new ArrayList<Artist>();
+        artistsCopy.addAll(allArtists);
 
         listItemCopy.addAll(listItem);
 //        if (refresh) {
 
-            if (listItem != null && listItem.size() > 0) {
-                listItem.clear();
+        if (listItem != null && listItem.size() > 0) {
+            listItem.clear();
+            allArtists.clear();
 
-            }
-//
-        if(currentPage!=1) {
-            listItem.addAll(listItemCopy);
         }
+//
+        if (currentPage != 1) {
+            listItem.addAll(listItemCopy);
+            allArtists.addAll(artistsCopy);
+        }
+
         for (int i = 0; i < artists.size(); i++) {
             HashMap<String, Object> map = new HashMap<String, Object>();
 
@@ -411,12 +419,27 @@ public class ListArtistActivity extends BaseActivity {
 
             listItem.add(map);
         }
+        allArtists.addAll(artists);
 
+
+        if (followStatus != null && followStatus.size() > 0) {
+            followStatus.clear();
+        }
+        for (HashMap<String, Object> objectHashMap : listItem) {
+            String status = objectHashMap.get("imageViewFollowed").toString();
+            followStatus.add(status);
+        }
 
         if (!refresh) {
-            adapter = new ListViewArtistsAdapter(this, listItem);
+            adapter = new ListViewArtistsAdapter(this, listItem, followStatus);
 
             listView.setAdapter(adapter);
+//            if(!isHeaderAdded) {
+//
+//                isHeaderAdded=true;
+////                View view = View.inflate(this, R.layout.list_header_artist, null);
+////                listView.addHeaderView(view);
+//            }
 
         }
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -427,7 +450,7 @@ public class ListArtistActivity extends BaseActivity {
                                                 artistId = stringObjectHashMap.get("id").toString();
                                                 Intent intent = new Intent(ListArtistActivity.this, DetailArtistActivity.class);
                                                 intent.putExtra("id", artistId);
-                                                startActivityForResult(intent, 0);
+                                                startActivityForResult(intent, 8);
                                             }
                                         }
         );
@@ -464,8 +487,15 @@ public class ListArtistActivity extends BaseActivity {
             listItem.add(map);
         }
 
-        adapter.notifyDataSetChanged();
+        if (followStatus != null && followStatus.size() > 0) {
+            followStatus.clear();
+        }
+        for (HashMap<String, Object> objectHashMap : listItem) {
+            String status = objectHashMap.get("imageViewFollowed").toString();
+            followStatus.add(status);
+        }
 
+        adapter.notifyDataSetChanged();
 
 
     }
@@ -494,6 +524,8 @@ public class ListArtistActivity extends BaseActivity {
 
                     } else {
                         artistsTemp = parseArtistsListFromString(realData);
+                        JSONObject objectData = new JSONObject(realData);
+                        totalPages = Integer.parseInt(objectData.getJSONObject("result").getJSONObject("data").getString("total_pages"));
 
                         if (currentPage > 1) {
                             setUpArtists(artistsTemp, true);
@@ -533,15 +565,12 @@ public class ListArtistActivity extends BaseActivity {
 
         boolean result = false;
 
-        if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_ARTISTS_LIST, this)) {
-            String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_ARTISTS_LIST);
-            JSONObject object = new JSONObject(fileContent);
-            String totalPages = object.getJSONObject("result").getJSONObject("data").getString("total_pages");
-            if (currentPage > Integer.parseInt(totalPages)) {
 
-                result = true;
-            }
+        if (currentPage > totalPages) {
+
+            result = true;
         }
+
 
         return result;
 
@@ -550,16 +579,24 @@ public class ListArtistActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        String followed=data.getStringExtra("followed").toString();
-        if (requestCode == 0 && resultCode == 0) {
-            List<Artist> updatedArtists = new ArrayList<Artist>();
-            for (Artist artist : allArtists) {
-                if (artist.getId().equals(artistId)) {
-                   artist.setFollowed(followed);
+
+        if (requestCode == 8 && resultCode == 0) {
+//            List<Artist> updatedArtists = new ArrayList<Artist>();
+//            for (Artist artist : allArtists) {
+//                if (artist.getId().equals(artistId)) {
+//                   artist.setFollowed(followed);
+//                }
+//                updatedArtists.add(artist);
+//            }
+//            updateArtists(updatedArtists);
+            String followed = data.getStringExtra("followed").toString();
+            for (int i = 0; i < allArtists.size(); i++) {
+                if (allArtists.get(i).getId().equals(artistId)) {
+                    followStatus.set(i, followed.equals("1") ? "1" : "0");
+
                 }
-                updatedArtists.add(artist);
             }
-            updateArtists(updatedArtists);
+            adapter.notifyDataSetChanged();
 
         }
     }
