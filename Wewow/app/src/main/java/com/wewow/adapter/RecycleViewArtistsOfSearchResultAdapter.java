@@ -71,7 +71,7 @@ public  class RecycleViewArtistsOfSearchResultAdapter
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.list_item_lover_of_life, parent, false);
+                .inflate(R.layout.list_item_lover_of_life_search_result, parent, false);
         view.setBackgroundResource(mBackground);
         return new ViewHolder(view);
     }
