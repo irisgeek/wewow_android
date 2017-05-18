@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="257dp"
-    android:layout_height="93dp"
+    android:layout_height="80dp"
     android:background="#f7f7f7"
     android:gravity="center_vertical">
 
@@ -10,7 +10,7 @@
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
         card_view:cardBackgroundColor="#ffffff"
         android:layout_width="match_parent"
-        android:layout_height="86dp"
+        android:layout_height="74dp"
         android:layout_gravity="center"
         android:layout_marginLeft="14dp"
         android:layout_marginRight="2dp"
@@ -33,7 +33,7 @@
         android:orientation="vertical"
         android:layout_marginTop="16dp"
         android:layout_gravity="bottom"
-        android:layout_marginLeft="48dp">
+        android:layout_marginLeft="86dp">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -41,7 +41,6 @@
             android:text="Smooth"
             android:textColor="#333631"
             android:layout_gravity="left"
-            android:layout_marginLeft="32dp"
             android:textStyle="bold"
             android:id="@+id/textViewNickName"/>
 
@@ -52,7 +51,6 @@
             android:text="寻找有趣的活法"
             android:textColor="#333631"
             android:layout_gravity="left"
-            android:layout_marginLeft="32dp"
             android:id="@+id/textViewDesc"/>
         </LinearLayout>
 
@@ -62,8 +60,8 @@
             android:layout_height="wrap_content"
            android:layout_gravity="bottom"
 
-            android:layout_marginBottom="5dp"
-            android:layout_marginLeft="80dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="86dp"
             android:orientation="horizontal">
 
             <TextView

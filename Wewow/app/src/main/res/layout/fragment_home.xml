@@ -32,8 +32,8 @@
             android:layout_width="match_parent"
             android:layout_height="160dp"
             android:layout_gravity="center"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
             android:layout_marginTop="12dp"
             android:orientation="vertical"
             android:visibility="gone"
@@ -99,8 +99,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
             android:layout_marginTop="12dp"
             android:orientation="vertical"
             android:visibility="gone"
@@ -198,7 +198,7 @@
 
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="94dp"
+            android:layout_height="80dp"
             android:layout_marginTop="12dp">
 
 
@@ -228,8 +228,8 @@
             android:layout_width="match_parent"
             android:layout_height="158dp"
             android:layout_gravity="center"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
             android:layout_marginTop="12dp"
             android:orientation="horizontal"
             android:id="@+id/cardViewLatest"
@@ -270,7 +270,7 @@
                         android:id="@+id/textViewNum"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="12dp"
+                        android:layout_marginLeft="16dp"
                         android:layout_marginTop="8dp"
                         android:text="vol.130"
                         android:textColor="#ffffff"
@@ -281,7 +281,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/textViewNum"
-                        android:layout_marginLeft="12dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginLeft="16dp"
                         android:text="清洁厨房水槽"
                         android:textColor="#FFFFFF"
                         android:textSize="24sp" />
@@ -302,7 +303,7 @@
                             android:layout_marginLeft="12dp"
                             android:text="@string/read"
                             android:textColor="#FFFFFF"
-                            android:textSize="12sp" />
+                            android:textSize="10sp" />
 
                         <TextView
                             android:id="@+id/textViewRead"
@@ -311,7 +312,7 @@
                             android:layout_marginLeft="4dp"
                             android:text="8109"
                             android:textColor="#FFFFFF"
-                            android:textSize="12sp" />
+                            android:textSize="10sp" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -319,7 +320,7 @@
                             android:layout_marginLeft="12dp"
                             android:text="@string/collection"
                             android:textColor="#FFFFFF"
-                            android:textSize="12sp" />
+                            android:textSize="10sp" />
 
                         <TextView
                             android:id="@+id/textViewCollection"
@@ -328,7 +329,7 @@
                             android:layout_marginLeft="4dp"
                             android:text="1329"
                             android:textColor="#FFFFFF"
-                            android:textSize="12sp" />
+                            android:textSize="10sp" />
 
                     </LinearLayout>
 
