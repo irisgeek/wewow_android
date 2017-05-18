@@ -7,6 +7,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +26,7 @@ import com.wewow.DetailArtistActivity;
 import com.wewow.LifeLabItemActivity;
 import com.wewow.R;
 import com.wewow.adapter.ListViewAdapter;
+import com.wewow.adapter.RecycleViewArtistsOfHomePageAdapter;
 import com.wewow.dto.Artist;
 import com.wewow.dto.Institute;
 import com.wewow.dto.LabCollection;
@@ -43,6 +46,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -64,7 +68,7 @@ public class categaryFragment  extends Fragment{
 
     private View view;
     private String categoryId="";
-
+    private RecyclerView rv;
 
     public categaryFragment() {
 
@@ -87,6 +91,7 @@ public class categaryFragment  extends Fragment{
             categoryId = bundle.getString("id");
         }
         view= inflater.inflate(R.layout.fragment_other_categary, container, false);
+        initData();
 
 //        swipeRefreshLayout.post(new Runnable() {
 //                                    @Override
@@ -114,6 +119,15 @@ public class categaryFragment  extends Fragment{
 //        setUpListViewInstituteRecommend(view);
         return view;
 
+    }
+
+    private void initData() {
+
+
+        rv = (RecyclerView) view.findViewById(R.id.recyclerview_artists);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        rv.setLayoutManager(linearLayoutManager);
     }
 
     private void setUpArtistsAndInstituesFromCache(View view) {
@@ -304,66 +318,46 @@ public class categaryFragment  extends Fragment{
     }
 
 
-    public void setUpViewPagerLoverOfLife(List<Artist> artists,View rootView) {
+    public void setUpViewPagerLoverOfLife(final List<Artist> artists, View rootView) {
 
-        //blank view for bounce effect
-        View left = new View(rootView.getContext());
-        List<View> mListViews = new ArrayList<View>();
-        mListViews.add(left);
+
+        ArrayList<HashMap<String, Object>> listItemArtist = new ArrayList<HashMap<String, Object>>();
+
 
         for (int i = 0; i < artists.size(); i++) {
-            View view = getActivity().getLayoutInflater().inflate(R.layout.list_item_lover_of_life_recommended, null);
-            CircleImageView image = (CircleImageView) view.findViewById(R.id.imageViewIcon);
-            Glide.with(rootView.getContext())
-                    .load(artists.get(i).getImage())
-                    .placeholder(R.drawable.banner_loading_spinner)
-                    .crossFade(300)
-                    .into(image);
+            HashMap<String, Object> map = new HashMap<String, Object>();
 
-            TextView textNickName = (TextView) view.findViewById(R.id.textViewNickName);
-            TextView textDesc = (TextView) view.findViewById(R.id.textViewDesc);
-            TextView textArticleCount = (TextView) view.findViewById(R.id.textViewRead);
-            TextView textFollowerCount = (TextView) view.findViewById(R.id.textViewCollection);
+            //
 
-            textNickName.setText(artists.get(i).getNickname());
-            textDesc.setText(artists.get(i).getDesc());
+            map.put("imageView", artists.get(i).getImage());
 
-            textArticleCount.setText(artists.get(i).getArticle_count());
-            textFollowerCount.setText(artists.get(i).getFollower_count());
+            map.put("textViewName", artists.get(i).getNickname());
+            map.put("textViewDesc", artists.get(i).getDesc());
+            map.put("textViewArticleCount", artists.get(i).getArticle_count());
+            map.put("textViewFollowerCount", artists.get(i).getFollower_count());
+            map.put("id", artists.get(i).getId());
 
-
-            final String artistId=artists.get(i).getId();
-
-            //to set data
-
-
-            mListViews.add(view);
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-
-                    Intent intent = new Intent(getActivity(), DetailArtistActivity.class);
-                    intent.putExtra("id", artistId);
-                    startActivity(intent);
-
-                }
-            });
+            listItemArtist.add(map);
         }
 
-        View right = new View(rootView.getContext());
-        mListViews.add(right);
-        MyPagerAdapter myAdapter = new MyPagerAdapter();
 
-        myAdapter.setList(mListViews);
-        viewPagerLoverOfLife = (ViewPager) rootView.findViewById(R.id.viewpagerLayoutCategory);
+        RecycleViewArtistsOfHomePageAdapter adapterArtists= new RecycleViewArtistsOfHomePageAdapter(getActivity(), listItemArtist);
+        OverScrollDecoratorHelper.setUpOverScroll(rv, OverScrollDecoratorHelper.ORIENTATION_HORIZONTAL);
 
-        viewPagerLoverOfLife.setAdapter(myAdapter);
-        viewPagerLoverOfLife.setCurrentItem(1);
-        viewPagerLoverOfLife.setOnPageChangeListener(new BouncePageChangeListener(
-                viewPagerLoverOfLife, mListViews));
-        viewPagerLoverOfLife.setPageMargin(getResources().getDimensionPixelSize(R.dimen.life_lover_recommended_page_margin));
-        myAdapter.notifyDataSetChanged();
+        adapterArtists.setOnItemClickListener(new RecycleViewArtistsOfHomePageAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                final String artistId=artists.get(position).getId();
+
+                Intent intent = new Intent(getActivity(),DetailArtistActivity.class);
+                intent.putExtra("id",artistId);
+                startActivity(intent);
+
+            }
+
+        });
+        rv.setAdapter(adapterArtists);
+
 
 
     }
@@ -425,38 +419,6 @@ public class categaryFragment  extends Fragment{
 
     }
 
-    public void setUpViewPagerLoverOfLifeDummy(View viewRoot) {
-
-        //blank view for bounce effect
-        View left = new View(viewRoot.getContext());
-        List<View> mListViews = new ArrayList<View>();
-        mListViews.add(left);
-
-        for (int i = 0; i < 3; i++) {
-            View view = getActivity().getLayoutInflater().inflate(R.layout.list_item_lover_of_life_recommended, null);
-
-            //to set data
-
-
-            mListViews.add(view);
-        }
-
-        View right = new View(viewRoot.getContext());
-        mListViews.add(right);
-        MyPagerAdapter myAdapter = new MyPagerAdapter();
-
-        myAdapter.setList(mListViews);
-      viewPagerLoverOfLife = (ViewPager)viewRoot.findViewById(R.id.viewpagerLayoutCategory);
-
-        viewPagerLoverOfLife.setAdapter(myAdapter);
-        myAdapter.notifyDataSetChanged();
-        viewPagerLoverOfLife.setCurrentItem(1);
-        viewPagerLoverOfLife.setOnPageChangeListener(new BouncePageChangeListener(
-                viewPagerLoverOfLife, mListViews));
-        viewPagerLoverOfLife.setPageMargin(getResources().getDimensionPixelSize(R.dimen.life_lover_recommended_page_margin));
-
-
-    }
     public void setUpListViewInstituteRecommendDummy(View view) {
 
        listViewInstituteRecommended = (ListView) view.findViewById(R.id.listViewSelectedInstituteCategory);
