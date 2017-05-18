@@ -19,6 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 import com.wewow.utils.BlurBuilder;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
@@ -50,6 +51,8 @@ public class ArticleActivity extends AppCompatActivity {
     private ImageView like;
     private TextView article_fav_count;
     private LinearLayout discuzContainer;
+    CircleProgressBar progressBar;
+    View layout_content;
     private JSONObject data;
     private ArrayList<String> pictures = new ArrayList<>();
     private int id;
@@ -115,6 +118,8 @@ public class ArticleActivity extends AppCompatActivity {
         });
         this.title = (TextView) this.findViewById(R.id.article_title);
         this.content = (WebView) this.findViewById(R.id.article_content);
+        progressBar = (CircleProgressBar) findViewById(R.id.progressBar);
+        layout_content = findViewById(R.id.layout_content);
         WebSettings ws = this.content.getSettings();
         ws.setJavaScriptEnabled(true);
         ws.setAllowContentAccess(true);
@@ -152,6 +157,9 @@ public class ArticleActivity extends AppCompatActivity {
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 view.loadUrl("javascript:articlejs.onGetPage(document.documentElement.innerHTML);");
+                layout_content.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.GONE);
+                findViewById(R.id.scrollview).scrollTo(0,0);
             }
         });
         this.logo = (ImageView) this.findViewById(R.id.article_logo);
