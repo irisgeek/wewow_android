@@ -17,6 +17,7 @@ import com.wewow.UserInfo;
 import com.wewow.netTask.ITask;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.FileCacheUtil;
+import com.wewow.utils.LoginUtils;
 import com.wewow.utils.Utils;
 
 import org.json.JSONException;
@@ -110,9 +111,7 @@ public class ListViewArtistsAdapter extends BaseAdapter {
                     postReadToServer(holder,position, id, followStatus.get(position).equals("1") ? 0 : 1);
 
                 } else {
-                    Intent i = new Intent();
-                    i.setClass(context, LoginActivity.class);
-                    context.startActivity(i);
+                    LoginUtils.startLogin(context, LoginActivity.REQUEST_CODE_LOGIN);
                 }
 
             }

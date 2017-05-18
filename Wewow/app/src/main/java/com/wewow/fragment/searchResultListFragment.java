@@ -47,6 +47,7 @@ import com.wewow.dto.LabCollection;
 import com.wewow.netTask.ITask;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.FileCacheUtil;
+import com.wewow.utils.LoginUtils;
 import com.wewow.utils.SettingUtils;
 import com.wewow.utils.Utils;
 import com.wewow.view.CircleImageView;
@@ -108,9 +109,7 @@ public class searchResultListFragment extends Fragment {
                     Intent intentFeedback = new Intent(getActivity(), FeedbackActivity.class);
                     getActivity().startActivity(intentFeedback);
                 } else {
-                    Intent i = new Intent();
-                    i.setClass(getActivity(), LoginActivity.class);
-                    getActivity().startActivityForResult(i, LoginActivity.REQUEST_CODE_FEEDBACK);
+                    LoginUtils.startLogin(getActivity(), LoginActivity.REQUEST_CODE_FEEDBACK);
                 }
             }
         });

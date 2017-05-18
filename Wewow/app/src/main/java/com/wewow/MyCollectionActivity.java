@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
+import com.wewow.utils.LoginUtils;
 import com.wewow.utils.RemoteImageLoader;
 import com.wewow.utils.Utils;
 import com.wewow.utils.WebAPIHelper;
@@ -213,8 +214,7 @@ public class MyCollectionActivity extends BaseActivity {
 
     private void loadData() {
         if (!UserInfo.isUserLogged(this)) {
-            Intent i = new Intent(this, LoginActivity.class);
-            this.startActivity(i);
+            LoginUtils.startLogin(this, LoginActivity.REQUEST_CODE_LOGIN);
             this.finish();
             return;
         }
