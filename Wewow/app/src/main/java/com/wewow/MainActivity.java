@@ -71,7 +71,6 @@ import com.bumptech.glide.Glide;
 import com.growingio.android.sdk.collection.GrowingIO;
 import com.jaeger.library.StatusBarUtil;
 import com.wewow.adapter.FragmentAdapter;
-import com.wewow.adapter.ListViewSearchHotWordsAdapter;
 import com.wewow.dto.Banner;
 import com.wewow.dto.Institute;
 import com.wewow.dto.LabCollection;
@@ -140,7 +139,7 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 //        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 //        Utils.setActivityToBeFullscreen(this);
-        StatusBarUtil.setTranslucent(this, 127);
+        StatusBarUtil.setTranslucent(this, 50);
         setContentView(R.layout.activity_main);
         context = this;
         viewPager = (ViewPager) findViewById(R.id.viewPager);
