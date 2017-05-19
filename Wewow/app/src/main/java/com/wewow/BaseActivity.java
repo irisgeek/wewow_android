@@ -310,7 +310,7 @@ public class BaseActivity extends ActionBarActivity {
     private void setUpToolBar() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setNavigationIcon(R.drawable.selector_btn_menu);
+        toolbar.setNavigationIcon(R.drawable.menu_b);
         getSupportActionBar().setTitle(" ");
 
     }

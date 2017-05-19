@@ -227,7 +227,7 @@ public class FeedbackActivity extends BaseActivity{
     private void setUpToolBar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setNavigationIcon(R.drawable.selector_btn_back);
+        toolbar.setNavigationIcon(R.drawable.back_b);
         getSupportActionBar().setTitle(getResources().getString(R.string.talk_to_wewow));
 
     }
