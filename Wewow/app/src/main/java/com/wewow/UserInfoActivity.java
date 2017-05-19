@@ -36,6 +36,8 @@ public class UserInfoActivity extends Activity {
     private HashMap<Integer, ImageView> covers = new HashMap<>();
     private int coverCount = 6;
 
+    public static final int REQUEST_CODE_MENU = 9;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,7 +59,12 @@ public class UserInfoActivity extends Activity {
             iv.setOnClickListener(this.imageClickListener);
             iv.setTag(i);
         }
-        this.selectedCover = this.covers.get(Integer.valueOf(this.user.getBackground_id()));
+        int key = Integer.valueOf(this.user.getBackground_id());
+        if(key<1)
+        {
+            key=1;
+        }
+        this.selectedCover = this.covers.get(key);
         this.selectedCover.setVisibility(View.VISIBLE);
         this.findViewById(R.id.userinfo_item_back).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -160,6 +167,7 @@ public class UserInfoActivity extends Activity {
                             Toast.makeText(UserInfoActivity.this, R.string.userinfo_update_fail, Toast.LENGTH_LONG).show();
                         }
                         UserInfoActivity.this.finish();
+                        setResult(0);
                     }
                 },
                 WebAPIHelper.HttpMethod.POST,

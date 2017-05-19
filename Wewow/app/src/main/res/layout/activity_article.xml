@@ -1,328 +1,349 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#f7f7f7"
-            tools:context="com.wewow.ArticleActivity">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/article_container"
+    <ScrollView
+        android:id="@+id/scrollview"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <android.support.v7.widget.CardView
-            xmlns:card_view="http://schemas.android.com/apk/res-auto"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="4dp" >
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="59dp"
-                android:background="#ffffff">
-
-                <ImageView
-                    android:id="@+id/article_back"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="15dp"
-                    android:padding="5dp"
-                    android:foregroundGravity="center"
-                    android:src="@drawable/back_b"/>
+        android:layout_height="match_parent"
+        android:background="#f7f7f7"
+        tools:context="com.wewow.ArticleActivity">
 
 
-                <ImageView
-                    android:id="@+id/article_share"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:padding="5dp"
-                    android:layout_marginRight="13dp"
-                    android:src="@drawable/share_b"/>
-
-                <FrameLayout
-                    android:id="@+id/layout_article_fav"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_toLeftOf="@+id/article_share">
-
-                    <ImageView
-                        android:id="@+id/article_fav"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginEnd="12dp"
-                        android:padding="5dp"
-                        android:src="@drawable/mark_b"/>
-
-                    <TextView
-                        android:id="@+id/article_fav_count"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="end"
-                        android:layout_marginTop="13dp"
-                        android:background="@drawable/shape_lifelab_fav_bg"
-                        android:paddingEnd="4dp"
-                        android:paddingStart="4dp"
-                        android:textColor="@color/white"
-                        android:textSize="9sp"
-                        android:visibility="gone"/>
-                </FrameLayout>
-            </RelativeLayout>
-        </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.CardView
-            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        <LinearLayout
+            android:id="@+id/article_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="8dp"
-            card_view:cardCornerRadius="2dp">
+            android:orientation="vertical">
 
-            <LinearLayout
+            <android.support.v7.widget.CardView
+                xmlns:card_view="http://schemas.android.com/apk/res-auto"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#ffffff"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/article_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="15dp"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"/>
-
-                <ImageView
-                    android:id="@+id/article_logo"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:scaleType="centerCrop"/>
-
-                <WebView
-                    android:id="@+id/article_content"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
-                        android:gravity="center_horizontal"
-                        android:text="@string/article_share_title"
-                        android:textColor="#333631"
-                        android:textSize="14sp"/>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="26dp"
-                        android:gravity="center_horizontal"
-                        android:orientation="horizontal">
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <ImageView
-                                android:id="@+id/share_wechat_friend"
-                                android:layout_width="44dp"
-                                android:layout_height="44dp"
-                                android:layout_marginBottom="12dp"
-                                android:src="@drawable/sharewechatfriend"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/share_wechat_friend"
-                                android:textColor="#333631"
-                                android:textSize="10sp"/>
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="50dp"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <ImageView
-                                android:id="@+id/share_wechat_circle"
-                                android:layout_width="44dp"
-                                android:layout_height="44dp"
-                                android:layout_marginBottom="11dp"
-                                android:src="@drawable/sharewechatcircle"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/share_wechat_circle"
-                                android:textColor="#333631"
-                                android:textSize="10sp"/>
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="50dp"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <ImageView
-                                android:id="@+id/share_weibo"
-                                android:layout_width="44dp"
-                                android:layout_height="44dp"
-                                android:layout_marginBottom="11dp"
-                                android:src="@drawable/shareweibo"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/share_weibo"
-                                android:textColor="#333631"
-                                android:textSize="10sp"/>
-                        </LinearLayout>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="30dp"
-                        android:layout_marginTop="17dp"
-                        android:gravity="center_horizontal"
-                        android:orientation="horizontal">
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <ImageView
-                                android:id="@+id/share_copylink"
-                                android:layout_width="44dp"
-                                android:layout_height="44dp"
-                                android:layout_marginBottom="11dp"
-                                android:src="@drawable/copylink"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/share_copy_link"
-                                android:textColor="#333631"
-                                android:textSize="10sp"/>
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/share_more"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="50dp"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical">
-
-                            <ImageView
-                                android:layout_width="44dp"
-                                android:layout_height="44dp"
-                                android:layout_marginBottom="11dp"
-                                android:src="@drawable/sharemore"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/share_more"
-                                android:textColor="#333631"
-                                android:textSize="10sp"/>
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="44dp"
-                            android:layout_height="44dp"
-                            android:layout_marginLeft="50dp"
-                            android:orientation="vertical"/>
-
-                    </LinearLayout>
-
-                </LinearLayout>
+                android:layout_height="wrap_content"
+                android:paddingBottom="4dp">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:layout_marginTop="12dp"
-                    android:orientation="horizontal">
+                    android:layout_height="59dp"
+                    android:background="#ffffff">
 
-                    <TextView
+                    <ImageView
+                        android:id="@+id/article_back"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:paddingLeft="16dp"
-                        android:text="@string/article_hot_discuss"
-                        android:textColor="#333631"
+                        android:layout_marginLeft="15dp"
+                        android:foregroundGravity="center"
+                        android:padding="5dp"
+                        android:src="@drawable/back_b"/>
+
+
+                    <ImageView
+                        android:id="@+id/article_share"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="13dp"
+                        android:padding="5dp"
+                        android:src="@drawable/share_b"/>
+
+                    <FrameLayout
+                        android:id="@+id/layout_article_fav"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_toLeftOf="@+id/article_share">
+
+                        <ImageView
+                            android:id="@+id/article_fav"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginEnd="12dp"
+                            android:padding="5dp"
+                            android:src="@drawable/mark_b"/>
+
+                        <TextView
+                            android:id="@+id/article_fav_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end"
+                            android:layout_marginTop="13dp"
+                            android:background="@drawable/shape_lifelab_fav_bg"
+                            android:paddingEnd="4dp"
+                            android:paddingStart="4dp"
+                            android:textColor="@color/white"
+                            android:textSize="9sp"
+                            android:visibility="gone"/>
+                    </FrameLayout>
+                </RelativeLayout>
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="8dp"
+                card_view:cardCornerRadius="2dp">
+
+                <LinearLayout
+                    android:id="@+id/layout_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#ffffff"
+                    android:orientation="vertical"
+                    android:visibility="invisible">
+
+                    <TextView
+                        android:id="@+id/article_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="15dp"
+                        android:textColor="@color/black"
                         android:textSize="16sp"/>
 
                     <ImageView
-                        android:id="@+id/iv_more_discuss"
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-                        android:layout_alignParentRight="true"
-                        android:layout_centerVertical="true"
-                        android:layout_marginRight="20dp"
-                        android:src="@drawable/arrowright"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
+                        android:id="@+id/article_logo"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_toLeftOf="@+id/iv_more_discuss"
-                        android:paddingRight="8dp"
-                        android:textColor="#333631"
-                        android:text="@string/article_more_discuss"
-                        android:textSize="12sp"/>
-                </RelativeLayout>
+                        android:scaleType="centerCrop"/>
 
-                <LinearLayout
-                    android:id="@+id/article_discuss_container"
-                    android:layout_width="match_parent"
+                    <WebView
+                        android:id="@+id/article_content"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="14dp"
+                            android:gravity="center_horizontal"
+                            android:text="@string/article_share_title"
+                            android:textColor="#333631"
+                            android:textSize="14sp"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="26dp"
+                            android:gravity="center_horizontal"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_horizontal"
+                                android:orientation="vertical">
+
+                                <ImageView
+                                    android:id="@+id/share_wechat_friend"
+                                    android:layout_width="44dp"
+                                    android:layout_height="44dp"
+                                    android:layout_marginBottom="12dp"
+                                    android:src="@drawable/sharewechatfriend"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/share_wechat_friend"
+                                    android:textColor="#333631"
+                                    android:textSize="10sp"/>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="50dp"
+                                android:gravity="center_horizontal"
+                                android:orientation="vertical">
+
+                                <ImageView
+                                    android:id="@+id/share_wechat_circle"
+                                    android:layout_width="44dp"
+                                    android:layout_height="44dp"
+                                    android:layout_marginBottom="11dp"
+                                    android:src="@drawable/sharewechatcircle"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/share_wechat_circle"
+                                    android:textColor="#333631"
+                                    android:textSize="10sp"/>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="50dp"
+                                android:gravity="center_horizontal"
+                                android:orientation="vertical">
+
+                                <ImageView
+                                    android:id="@+id/share_weibo"
+                                    android:layout_width="44dp"
+                                    android:layout_height="44dp"
+                                    android:layout_marginBottom="11dp"
+                                    android:src="@drawable/shareweibo"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/share_weibo"
+                                    android:textColor="#333631"
+                                    android:textSize="10sp"/>
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="30dp"
+                            android:layout_marginTop="17dp"
+                            android:gravity="center_horizontal"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_horizontal"
+                                android:orientation="vertical">
+
+                                <ImageView
+                                    android:id="@+id/share_copylink"
+                                    android:layout_width="44dp"
+                                    android:layout_height="44dp"
+                                    android:layout_marginBottom="11dp"
+                                    android:src="@drawable/copylink"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/share_copy_link"
+                                    android:textColor="#333631"
+                                    android:textSize="10sp"/>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/share_more"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="50dp"
+                                android:gravity="center_horizontal"
+                                android:orientation="vertical">
+
+                                <ImageView
+                                    android:layout_width="44dp"
+                                    android:layout_height="44dp"
+                                    android:layout_marginBottom="11dp"
+                                    android:src="@drawable/sharemore"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/share_more"
+                                    android:textColor="#333631"
+                                    android:textSize="10sp"/>
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="44dp"
+                                android:layout_height="44dp"
+                                android:layout_marginLeft="50dp"
+                                android:orientation="vertical"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:paddingLeft="16dp"
+                            android:text="@string/article_hot_discuss"
+                            android:textColor="#333631"
+                            android:textSize="16sp"/>
+
+                        <ImageView
+                            android:id="@+id/iv_more_discuss"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginRight="20dp"
+                            android:src="@drawable/arrowright"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_toLeftOf="@+id/iv_more_discuss"
+                            android:paddingRight="8dp"
+                            android:text="@string/article_more_discuss"
+                            android:textColor="#333631"
+                            android:textSize="12sp"/>
+                    </RelativeLayout>
+
+                    <LinearLayout
+                        android:id="@+id/article_discuss_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"/>
+
+                </LinearLayout>
+
+            </android.support.v7.widget.CardView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                android:layout_marginTop="6dp"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"/>
+                    android:text="@string/article_feedback"
+                    android:textColor="#333631"
+                    android:textSize="12sp"/>
 
+                <TextView
+                    android:id="@+id/article_feedback_link"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/article_feedback_link"
+                    android:textColor="@color/menu_checked_color"
+                    android:textSize="12sp"/>
             </LinearLayout>
-
-        </android.support.v7.widget.CardView>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:layout_marginTop="6dp"
-            android:layout_marginBottom="14dp"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/article_feedback"
-                android:textColor="#333631"
-                android:textSize="12sp"/>
-
-            <TextView
-                android:id="@+id/article_feedback_link"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/article_feedback_link"
-                android:textColor="@color/menu_checked_color"
-                android:textSize="12sp"/>
         </LinearLayout>
-    </LinearLayout>
-</ScrollView>
+
+    </ScrollView>
+
+    <com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:visibility="visible"
+        app:mlpb_progress_color="@color/font_color"
+        app:mlpb_progress_stoke_width="3dp"/>
+</FrameLayout>

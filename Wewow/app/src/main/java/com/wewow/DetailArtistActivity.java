@@ -297,13 +297,12 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
 
         final List<Article> articles = artist.getArticles();
 
-
         for (int i = 0; i < articles.size(); i++) {
             HashMap<String, Object> map = new HashMap<String, Object>();
 
             //
 
-            map.put("image", articles.get(i).getImage_320_160());
+            map.put("image", articles.get(i).getImage_642_320());
 
             map.put("title", articles.get(i).getTitle());
             //todo
@@ -541,7 +540,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
     private void setUpToolBar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setNavigationIcon(R.drawable.selector_btn_back);
+        toolbar.setNavigationIcon(R.drawable.back_b);
 //        getSupportActionBar().setTitle(getResources().getString(R.string.all_artists_title));
 
     }
@@ -572,6 +571,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
             article.setId(result.getString("id"));
             article.setImage_284_160(result.getString("image_284_160"));
             article.setImage_320_160(result.getString("image_320_160"));
+            article.setImage_642_320(result.getString("image_688_316"));
             article.setTitle(result.getString("title"));
             article.setWewow_category(result.getString("wewow_category"));
 
@@ -600,6 +600,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
             article.setId(result.getString("id"));
             article.setImage_284_160(result.getString("image_284_160"));
             article.setImage_320_160(result.getString("image_320_160"));
+            article.setImage_642_320(result.getString("image_688_316"));
             article.setTitle(result.getString("title"));
             article.setWewow_category(result.getString("wewow_category"));
 

@@ -201,7 +201,6 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
     private void setUpToolBar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setNavigationIcon(R.drawable.selector_btn_menu);
         getSupportActionBar().setTitle(getResources().getString(R.string.all_artists_subscribed_title));
 
     }

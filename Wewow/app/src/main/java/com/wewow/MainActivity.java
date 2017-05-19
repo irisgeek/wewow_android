@@ -71,6 +71,7 @@ import com.bumptech.glide.Glide;
 import com.growingio.android.sdk.collection.GrowingIO;
 import com.jaeger.library.StatusBarUtil;
 import com.wewow.adapter.FragmentAdapter;
+import com.wewow.adapter.ListViewSearchHotWordsAdapter;
 import com.wewow.dto.Banner;
 import com.wewow.dto.Institute;
 import com.wewow.dto.LabCollection;
@@ -131,6 +132,7 @@ public class MainActivity extends BaseActivity {
     private boolean isSearchViewShown = false;
     private boolean isAppBarFolded = false;
     private Toolbar toolbar;
+    private List<String> hotWords;
 
 
     @Override
@@ -143,7 +145,6 @@ public class MainActivity extends BaseActivity {
         context = this;
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         float density = Utils.getSceenDensity(this);
-
         Utils.regitsterNetSateBroadcastReceiver(this);
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
@@ -237,10 +238,13 @@ public class MainActivity extends BaseActivity {
                     }
                     searchView.setVisibility(View.GONE);
                    textTitle.setVisibility(View.GONE);
-                    final String[] testStrings = getResources().getStringArray(R.array.test_array);
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.list_item_search, R.id.text, testStrings);
+
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.list_item_search, R.id.text, hotWords);
+
+
 
                     searchView.setAdapter(adapter);
+
                     searchView.setThreshold(0);
                     searchView.showDropDown();
                     searchView.setTextColor(getResources().getColor(R.color.search_text_view_color));
@@ -249,8 +253,12 @@ public class MainActivity extends BaseActivity {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                             if (position != 0) {
-                                searchView.setText(testStrings[position], true);
+                                searchView.setText(hotWords.get(position), true);
                                 imageViewSearch.performClick();
+                            }
+                            else
+                            {
+                                searchView.setText("");
                             }
 //
 
@@ -293,7 +301,7 @@ public class MainActivity extends BaseActivity {
 //                        searchView.setHint(getResources().getString(R.string.search_hint));
                         textTitle.setVisibility(View.GONE);
                         final String[] testStrings = getResources().getStringArray(R.array.test_array);
-                        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.list_item_search, R.id.text, testStrings);
+                        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.list_item_search, R.id.text, hotWords);
 
                         searchView.setAdapter(adapter);
                         searchView.showDropDown();
@@ -378,6 +386,22 @@ public class MainActivity extends BaseActivity {
 
                         long cacheUpdatedTime = (long) (Double.parseDouble(cacheUpdatedTimeStamp) * 1000);
                         boolean isCacheDataOutdated = FileCacheUtil
+                                .isCacheDataFailure(CommonUtilities.CACHE_FILE_HOT_WORDS, context, cacheUpdatedTime);
+
+
+                        if (isCacheDataOutdated) {
+                            getSearhHotWordsFromServer();
+                        } else {
+                            String fileContent = FileCacheUtil.getCache(context, CommonUtilities.CACHE_FILE_HOT_WORDS);
+
+                            try {
+                                hotWords = parseHotwordsFromString(fileContent);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        isCacheDataOutdated = FileCacheUtil
                                 .isCacheDataFailure(CommonUtilities.CACHE_FILE_BANNER, context, cacheUpdatedTime);
 
                         if (isCacheDataOutdated) {
@@ -940,6 +964,67 @@ public class MainActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(null);
 
+    }
+
+
+    private void getSearhHotWordsFromServer() {
+
+        ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
+        iTask.getHotSearchWords(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), new Callback<JSONObject>() {
+
+            @Override
+            public void success(JSONObject object, Response response) {
+
+
+                try {
+                    String realData = Utils.convertStreamToString(response.getBody().in());
+                    if (!realData.contains(CommonUtilities.SUCCESS)) {
+                        Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
+
+                    } else {
+                        hotWords = parseHotwordsFromString(realData);
+                        FileCacheUtil.setCache(realData, MainActivity.this, CommonUtilities.CACHE_FILE_HOT_WORDS, 0);
+
+
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.i("MainActivity", "request banner failed: " + error.toString());
+
+            }
+        });
+    }
+
+    private ArrayList<String> parseHotwordsFromString (String realData) throws JSONException{
+
+        ArrayList<String> words=new ArrayList<String>();
+        String s = new JSONObject(realData).getJSONObject("result")
+                .getJSONObject("data")
+                .getString("hot_words").toString();
+        s=s.substring(2,s.length()-2 );
+        String[]list=s.split("\",\"");
+        for(int i=0;i<list.length+1;i++)
+        {
+            if(i==0)
+            {
+                words.add(getResources().getString(R.string.hot_search_text));
+            }
+            else
+            {
+                words.add(list[i-1]);
+            }
+        }
+
+        return words;
     }
 
 }

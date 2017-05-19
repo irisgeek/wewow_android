@@ -57,6 +57,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -64,6 +65,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.sina.weibo.sdk.openapi.models.User;
 import com.wewow.adapter.ListViewMenuAdapter;
 import com.wewow.dto.Artist;
 import com.wewow.dto.Feedback;
@@ -105,7 +107,10 @@ public class BaseActivity extends ActionBarActivity {
     private NavigationView mainNavView;
 
     private TextView tvusername, tvuserdesc;
+    private ImageView imageViewSetting,imageViewUserCover;
     private MaterialDialog dialog;
+    private int[] bgRes = {R.drawable.cover1, R.drawable.cover2,R.drawable.cover3,
+            R.drawable.cover4,R.drawable.cover5,R.drawable.cover6};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -213,7 +218,7 @@ public class BaseActivity extends ActionBarActivity {
             HashMap<String, Object> map = new HashMap<String, Object>();
 
             //
-            if (i == 4 || i == 7) {
+            if (i == 4 || i == 6) {
                 map.put("icon", 0);
                 map.put("menuText", "");
                 map.put("new", "0");
@@ -256,6 +261,8 @@ public class BaseActivity extends ActionBarActivity {
 
         //fix crash when clicking logout
         this.tvuserdesc = (TextView) VheandrView.findViewById(R.id.textViewSignature);
+        this.imageViewSetting=(ImageView)VheandrView.findViewById(R.id.imageViewSetting);
+        this.imageViewUserCover=(ImageView)VheandrView.findViewById(R.id.userCover);
 //        usertv.setText("Anonymous");
 
         if (UserInfo.isUserLogged(this)) {
@@ -263,13 +270,17 @@ public class BaseActivity extends ActionBarActivity {
             this.tvusername.setText(UserInfo.getCurrentUser(this).getNickname());
 
             this.tvuserdesc.setText(UserInfo.getCurrentUser(this).getDesc());
+            imageViewSetting.setVisibility(View.VISIBLE);
+            imageViewUserCover.setImageResource(bgRes[Integer.parseInt(UserInfo.getCurrentUser(this).getBackground_id())-1]);
         }
+
+
         this.findViewById(R.id.userloginarea).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (UserInfo.isUserLogged(BaseActivity.this)) {
                     Intent edIntent = new Intent(BaseActivity.this, UserInfoActivity.class);
-                    BaseActivity.this.startActivity(edIntent);
+                    BaseActivity.this.startActivityForResult(edIntent, UserInfoActivity.REQUEST_CODE_MENU);
                 } else {
                     LoginUtils.startLogin(BaseActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
                 }
@@ -289,10 +300,15 @@ public class BaseActivity extends ActionBarActivity {
         UserInfo ui = UserInfo.getCurrentUser(this);
         Log.d("BaseActivity", String.format("%s %s", ui.getOpen_id(), ui.getToken()));
 
-        TextView usertv = (TextView) this.findViewById(R.id.textViewUsername);
-        usertv.setText(UserInfo.getCurrentUser(this).getNickname());
-        TextView userSignature = (TextView) findViewById(R.id.textViewSignature);
-        userSignature.setText(UserInfo.getCurrentUser(this).getDesc());
+
+
+            TextView usertv = (TextView) this.findViewById(R.id.textViewUsername);
+            usertv.setText(UserInfo.getCurrentUser(this).getNickname());
+            TextView userSignature = (TextView) findViewById(R.id.textViewSignature);
+            userSignature.setText(UserInfo.getCurrentUser(this).getDesc());
+            imageViewSetting.setVisibility(View.VISIBLE);
+        imageViewUserCover.setImageResource(bgRes[Integer.parseInt(UserInfo.getCurrentUser(this).getBackground_id()) - 1]);
+
 
         if (requestCode == LoginActivity.REQUEST_CODE_FEEDBACK) {
             Intent intentFeedback = new Intent(BaseActivity.this, FeedbackActivity.class);
@@ -304,13 +320,18 @@ public class BaseActivity extends ActionBarActivity {
             BaseActivity.this.startActivity(intentSubscribedArtists);
 
         }
+     else if (requestCode ==UserInfoActivity.REQUEST_CODE_MENU ) {
+            imageViewUserCover.setImageResource(bgRes[Integer.parseInt(UserInfo.getCurrentUser(this).getBackground_id())-1]);
+
+    }
+
 
     }
 
     private void setUpToolBar() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setNavigationIcon(R.drawable.selector_btn_menu);
+        toolbar.setNavigationIcon(R.drawable.menu_b);
         getSupportActionBar().setTitle(" ");
 
     }
@@ -370,7 +391,7 @@ public class BaseActivity extends ActionBarActivity {
                         LoginUtils.startLogin(BaseActivity.this, LoginActivity.REQUEST_CODE_SUBSCRIBED_ARTISTS);
                     }
                     break;
-                case 7:
+                case 8:
                     Intent intentAbout = new Intent(BaseActivity.this, AboutActivity.class);
                     BaseActivity.this.startActivity(intentAbout);
                     break;
@@ -420,7 +441,9 @@ public class BaseActivity extends ActionBarActivity {
                     UserInfo.logout(BaseActivity.this);
                     BaseActivity.this.tvusername.setText(R.string.login_gologin);
                     BaseActivity.this.tvuserdesc.setText(R.string.login_to_see_more);
-                    break;
+
+                    imageViewSetting.setVisibility(View.GONE);
+                    imageViewUserCover.setImageResource(bgRes[1]);
                 case 4:
                 default:
                     break;

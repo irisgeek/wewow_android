@@ -376,7 +376,7 @@ public class LifeLabActivity extends BaseActivity {
                 (SearchView) menu.findItem(R.id.search).getActionView();
 
         searchView.setQueryHint(getResources().getString(R.string.search_hint));
-        ((ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_button)).setImageResource(R.drawable.selector_btn_search);
+        ((ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_button)).setImageResource(R.drawable.search_b);
         searchView.setSearchableInfo(
                 searchManager.getSearchableInfo(getComponentName()));
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {

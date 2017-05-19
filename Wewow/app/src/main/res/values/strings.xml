@@ -205,5 +205,6 @@
     <string name="clear_cache_success">清除成功</string>
 
     <string name="search_no_key_word">搜索内容不能为空</string>
+    <string name="hot_search_text">热门搜索</string>
 
 </resources>
