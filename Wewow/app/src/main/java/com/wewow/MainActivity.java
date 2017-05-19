@@ -139,8 +139,9 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 //        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 //        Utils.setActivityToBeFullscreen(this);
-        StatusBarUtil.setTranslucent(this, 50);
+
         setContentView(R.layout.activity_main);
+        StatusBarUtil.setTranslucentForCoordinatorLayout(this, 100);
         context = this;
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         float density = Utils.getSceenDensity(this);
