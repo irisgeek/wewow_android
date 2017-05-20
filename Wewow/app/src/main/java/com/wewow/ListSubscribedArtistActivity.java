@@ -51,6 +51,8 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
     private ArrayList<HashMap<String, Object>> listItem;
     private ListViewSubscribedArtistsAdapter adapter;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private int selectedPosition=0;
+    private ArrayList<String> read;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +87,7 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
         listItem = new ArrayList<HashMap<String, Object>>();
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(this);
+        read=new ArrayList<String>();
     }
 
     @Override
@@ -303,13 +306,20 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
 
 
         ArrayList<HashMap<String, Object>> listItemCopy = new ArrayList<HashMap<String, Object>>();
+        ArrayList<String> readCopy=new ArrayList<String>();
         listItemCopy.addAll(listItem);
+        readCopy.addAll(read);
         if (refresh) {
 
             if (listItem != null && listItem.size() > 0) {
                 listItem.clear();
 
             }
+            if (read != null && read.size() > 0) {
+                read.clear();
+
+            }
+
         }
 
         for (int i = 0; i < artists.size(); i++) {
@@ -325,15 +335,19 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
             map.put("textViewFollowerCount", artists.get(i).getFollower_count());
             map.put("imageViewFollowed", artists.get(i).getFollowed());
             map.put("id",artists.get(i).getId());
-            map.put("read",artists.get(i).getRead());
+            map.put("read", artists.get(i).getRead());
 
             listItem.add(map);
+            read.add(artists.get(i).getRead());
         }
 
         listItem.addAll(listItemCopy);
+        read.addAll(readCopy);
+
+
         if (!refresh)
         {
-            adapter = new ListViewSubscribedArtistsAdapter(this, listItem);
+            adapter = new ListViewSubscribedArtistsAdapter(this, listItem,read);
 
             listView.setAdapter(adapter);
 
@@ -352,7 +366,8 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
                                                 }
                                                 Intent intent = new Intent(ListSubscribedArtistActivity.this,DetailArtistActivity.class);
                                                 intent.putExtra("id",artistId);
-                                                startActivity(intent);
+                                                startActivityForResult(intent, 10);
+                                                selectedPosition=position;
                                             }
                                         }
         );
@@ -498,6 +513,25 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
         }
 
         return result;
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(resultCode==0&&requestCode==10)
+        {
+            read.set(selectedPosition, "0");
+            adapter.notifyDataSetChanged();
+
+
+            if(!read.contains("1"))
+            {
+
+                updateMenuForSubscribedAritstNotification();
+            }
+        }
 
     }
 }
