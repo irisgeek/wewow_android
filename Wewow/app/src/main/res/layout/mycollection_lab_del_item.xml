@@ -16,6 +16,7 @@
         android:id="@+id/img_lab_del"
         android:layout_width="16dp"
         android:layout_height="16dp"
+        android:layout_marginTop="-7dp"
         android:layout_gravity="center"
         android:src="@drawable/del_lab" />
 
