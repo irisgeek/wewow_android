@@ -107,10 +107,14 @@ public class BaseActivity extends ActionBarActivity {
     private NavigationView mainNavView;
 
     private TextView tvusername, tvuserdesc;
-    private ImageView imageViewSetting,imageViewUserCover;
+    private ImageView imageViewSetting, imageViewUserCover;
     private MaterialDialog dialog;
-    private int[] bgRes = {R.drawable.cover1, R.drawable.cover2,R.drawable.cover3,
-            R.drawable.cover4,R.drawable.cover5,R.drawable.cover6};
+    private int[] bgRes = {R.drawable.cover1, R.drawable.cover2, R.drawable.cover3,
+            R.drawable.cover4, R.drawable.cover5, R.drawable.cover6};
+    private ArrayList<HashMap<String, Object>> listItem;
+    private ListViewMenuAdapter adapter;
+    private List<String> newIcons;
+    public static final int REQUEST_CODE_MENU = 11;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,13 +130,14 @@ public class BaseActivity extends ActionBarActivity {
         getLayoutInflater().inflate(layoutResID, frameLayout, true);
 
         super.setContentView(drawerLayout);
+        newIcons = new ArrayList<String>();
 
         if (UserInfo.isUserLogged(this) && Utils.isNetworkAvailable(this)) {
             String userId = UserInfo.getCurrentUser(this).getId().toString();
             getNewFeedsAndArtistInfo(userId);
 
         } else {
-            setUpNavigation("0", "0");
+        setUpNavigation("0", "0");
 //        setUpNavigationView();
         }
         setUpToolBar();
@@ -212,7 +217,11 @@ public class BaseActivity extends ActionBarActivity {
         View VheandrView = LayoutInflater.from(this).inflate(R.layout.list_header_drawer, null);
         drawerList.addHeaderView(VheandrView, null, true);
 
-        ArrayList<HashMap<String, Object>> listItem = new ArrayList<HashMap<String, Object>>();
+        listItem = new ArrayList<HashMap<String, Object>>();
+        if (newIcons.size() > 0) {
+            newIcons.clear();
+
+        }
 
         for (int i = 0; i < 10; i++) {
             HashMap<String, Object> map = new HashMap<String, Object>();
@@ -222,6 +231,7 @@ public class BaseActivity extends ActionBarActivity {
                 map.put("icon", 0);
                 map.put("menuText", "");
                 map.put("new", "0");
+                newIcons.add("0");
                 listItem.add(map);
                 map = new HashMap<String, Object>();
             }
@@ -230,10 +240,13 @@ public class BaseActivity extends ActionBarActivity {
             map.put("menuText", planetTitles[i]);
             if (i == 3) {
                 map.put("new", feedbackUpdate);
+                newIcons.add(feedbackUpdate);
             } else if (i == 5) {
                 map.put("new", artistUpdate);
+                newIcons.add(artistUpdate);
             } else {
                 map.put("new", "0");
+                newIcons.add("0");
             }
 
 
@@ -247,7 +260,7 @@ public class BaseActivity extends ActionBarActivity {
 //                //ids
 //                new int[]{R.id.imageViewIcon, R.id.textViewMenuItem}
 //        );
-        ListViewMenuAdapter adapter = new ListViewMenuAdapter(this, listItem);
+        adapter = new ListViewMenuAdapter(this, listItem, newIcons);
         drawerList.setAdapter(adapter);
 
 
@@ -261,8 +274,8 @@ public class BaseActivity extends ActionBarActivity {
 
         //fix crash when clicking logout
         this.tvuserdesc = (TextView) VheandrView.findViewById(R.id.textViewSignature);
-        this.imageViewSetting=(ImageView)VheandrView.findViewById(R.id.imageViewSetting);
-        this.imageViewUserCover=(ImageView)VheandrView.findViewById(R.id.userCover);
+        this.imageViewSetting = (ImageView) VheandrView.findViewById(R.id.imageViewSetting);
+        this.imageViewUserCover = (ImageView) VheandrView.findViewById(R.id.userCover);
 //        usertv.setText("Anonymous");
 
         if (UserInfo.isUserLogged(this)) {
@@ -271,7 +284,7 @@ public class BaseActivity extends ActionBarActivity {
 
             this.tvuserdesc.setText(UserInfo.getCurrentUser(this).getDesc());
             imageViewSetting.setVisibility(View.VISIBLE);
-            imageViewUserCover.setImageResource(bgRes[Integer.parseInt(UserInfo.getCurrentUser(this).getBackground_id())-1]);
+            imageViewUserCover.setImageResource(bgRes[Integer.parseInt(UserInfo.getCurrentUser(this).getBackground_id()) - 1]);
         }
 
 
@@ -301,12 +314,11 @@ public class BaseActivity extends ActionBarActivity {
         Log.d("BaseActivity", String.format("%s %s", ui.getOpen_id(), ui.getToken()));
 
 
-
-            TextView usertv = (TextView) this.findViewById(R.id.textViewUsername);
-            usertv.setText(UserInfo.getCurrentUser(this).getNickname());
-            TextView userSignature = (TextView) findViewById(R.id.textViewSignature);
-            userSignature.setText(UserInfo.getCurrentUser(this).getDesc());
-            imageViewSetting.setVisibility(View.VISIBLE);
+        TextView usertv = (TextView) this.findViewById(R.id.textViewUsername);
+        usertv.setText(UserInfo.getCurrentUser(this).getNickname());
+        TextView userSignature = (TextView) findViewById(R.id.textViewSignature);
+        userSignature.setText(UserInfo.getCurrentUser(this).getDesc());
+        imageViewSetting.setVisibility(View.VISIBLE);
         imageViewUserCover.setImageResource(bgRes[Integer.parseInt(UserInfo.getCurrentUser(this).getBackground_id()) - 1]);
 
 
@@ -319,11 +331,12 @@ public class BaseActivity extends ActionBarActivity {
             Intent intentSubscribedArtists = new Intent(BaseActivity.this, ListSubscribedArtistActivity.class);
             BaseActivity.this.startActivity(intentSubscribedArtists);
 
-        }
-     else if (requestCode ==UserInfoActivity.REQUEST_CODE_MENU ) {
-            imageViewUserCover.setImageResource(bgRes[Integer.parseInt(UserInfo.getCurrentUser(this).getBackground_id())-1]);
+        } else if (requestCode == UserInfoActivity.REQUEST_CODE_MENU) {
+            imageViewUserCover.setImageResource(bgRes[Integer.parseInt(UserInfo.getCurrentUser(this).getBackground_id()) - 1]);
 
-    }
+        } else if (requestCode == FeedbackActivity.REQUEST_CODE_MENU) {
+            updateMenuForFeedbackNotification();
+        }
 
 
     }
@@ -368,7 +381,7 @@ public class BaseActivity extends ActionBarActivity {
 
                     if (UserInfo.isUserLogged(BaseActivity.this)) {
                         Intent intentFeedback = new Intent(BaseActivity.this, FeedbackActivity.class);
-                        BaseActivity.this.startActivity(intentFeedback);
+                        BaseActivity.this.startActivityForResult(intentFeedback, FeedbackActivity.REQUEST_CODE_MENU);
                     } else {
                         LoginUtils.startLogin(BaseActivity.this, LoginActivity.REQUEST_CODE_FEEDBACK);
                     }
@@ -500,5 +513,22 @@ public class BaseActivity extends ActionBarActivity {
         menuItem.setVisible(false);
         return true;
     }
+
+    protected void updateMenuForSubscribedAritstNotification()
+
+    {
+        this.newIcons.set(6, "0");
+        this.adapter.notifyDataSetChanged();
+
+    }
+
+    protected void updateMenuForFeedbackNotification()
+
+    {
+        this.newIcons.set(3, "0");
+        this.adapter.notifyDataSetChanged();
+
+    }
+
 
 }

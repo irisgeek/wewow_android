@@ -99,6 +99,7 @@ public class FeedbackActivity extends BaseActivity{
         setUpToolBar();
         getToken();
 
+
     }
 
     private void initData() {
@@ -191,6 +192,7 @@ public class FeedbackActivity extends BaseActivity{
             return true;
         }
         if (id == android.R.id.home) {
+            setResult(0);
             finish();
             return true;
 

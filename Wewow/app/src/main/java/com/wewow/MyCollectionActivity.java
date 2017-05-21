@@ -5,14 +5,8 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.design.widget.TabLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.Pair;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -46,6 +40,7 @@ public class MyCollectionActivity extends BaseActivity {
     private JSONObject likedinfo;
     private ListView mycollist;
     private TextView articleCategory;
+    private View article_category_line;
     private JSONArray articles = new JSONArray();
 
     @Override
@@ -73,6 +68,7 @@ public class MyCollectionActivity extends BaseActivity {
         });
         this.articleCategory = (TextView) this.findViewById(R.id.article_category);
         this.articleCategory.setOnClickListener(this.categoryClickListener);
+        article_category_line = findViewById(R.id.article_category_line);
         ImageView iv = (ImageView) this.findViewById(R.id.collection_expand);
         iv.setImageDrawable(this.getResources().getDrawable(R.drawable.expanded));
         iv.setOnClickListener(new View.OnClickListener() {
@@ -83,7 +79,7 @@ public class MyCollectionActivity extends BaseActivity {
                 }
                 ImageView iv = (ImageView) view;
                 Drawable expdr = MyCollectionActivity.this.getResources().getDrawable(R.drawable.expanded);
-                Drawable coldr = MyCollectionActivity.this.getResources().getDrawable(R.drawable.close);
+                Drawable coldr = MyCollectionActivity.this.getResources().getDrawable(R.drawable.expanded_up);
                 if (iv.getDrawable().getConstantState().equals(expdr.getConstantState())) {
                     iv.setImageDrawable(coldr);
                     MyCollectionActivity.this.findViewById(R.id.collection_man_area).setVisibility(View.VISIBLE);
@@ -164,9 +160,11 @@ public class MyCollectionActivity extends BaseActivity {
     public View.OnClickListener categoryClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
+            updateClickStatus(view);
             String id = view.getTag().toString();
             if (id.equals("0")) {
                 MyCollectionActivity.this.articleCategory.setTextColor(Color.parseColor("#333631"));
+                article_category_line.setVisibility(View.VISIBLE);
                 try {
                     MyCollectionActivity.this.onListDataLoaded(MyCollectionActivity.this.likedinfo.getJSONArray("articles"));
                 } catch (JSONException e) {
@@ -174,6 +172,7 @@ public class MyCollectionActivity extends BaseActivity {
                 }
             } else {
                 MyCollectionActivity.this.articleCategory.setTextColor(Color.parseColor("#7f333631"));
+                article_category_line.setVisibility(View.INVISIBLE);
                 ArrayList<Pair<String, String>> fields = new ArrayList<>();
                 fields.add(new Pair<String, String>("collection_id", id));
                 if (UserInfo.isUserLogged(MyCollectionActivity.this)) {
@@ -211,6 +210,19 @@ public class MyCollectionActivity extends BaseActivity {
             }
         }
     };
+
+    private void updateClickStatus(View view) {
+        for (int i = 0; i < labs_container.getChildCount(); i++) {
+            LinearLayout child = (LinearLayout) labs_container.getChildAt(i);
+            if (child == view) {
+                ((TextView) child.getChildAt(0)).setTextColor(Color.parseColor("#333631"));
+                child.getChildAt(1).setVisibility(View.VISIBLE);
+            } else {
+                ((TextView) child.getChildAt(0)).setTextColor(Color.parseColor("#7f333631"));
+                child.getChildAt(1).setVisibility(View.INVISIBLE);
+            }
+        }
+    }
 
     private void loadData() {
         if (!UserInfo.isUserLogged(this)) {
@@ -267,17 +279,12 @@ public class MyCollectionActivity extends BaseActivity {
             } catch (JSONException e) {
                 continue;
             }
-            TextView col = (TextView) View.inflate(this, R.layout.liked_collection, null);
+            View child = View.inflate(this, R.layout.liked_collection, null);
+            TextView col = (TextView) child.findViewById(R.id.tv_collection_tab);
             col.setText(collection.optString("collection_title"));
-            col.setTag(collection.optString("collection_id"));
-            col.setOnClickListener(this.categoryClickListener);
-            this.labs_container.addView(col);
-            LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) col.getLayoutParams();
-            lp.gravity = Gravity.CENTER;
-            lp.width = Utils.dipToPixel(this, 75);
-            lp.height = LinearLayout.LayoutParams.MATCH_PARENT;
-            lp.setMargins(Utils.dipToPixel(this, 4), 0, 0, 0);
-            col.setLayoutParams(lp);
+            child.setTag(collection.optString("collection_id"));
+            child.setOnClickListener(this.categoryClickListener);
+            this.labs_container.addView(child);
 
             if (i % delrowcount == 0) {
                 tr = this.addTableRow();

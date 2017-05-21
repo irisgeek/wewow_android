@@ -14,6 +14,7 @@ import com.wewow.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by iris on 17/3/23.
@@ -22,10 +23,12 @@ public class ListViewSubscribedArtistsAdapter extends BaseAdapter
 {
     private Context context;
     private ArrayList<HashMap<String, Object>> list;
-    public ListViewSubscribedArtistsAdapter(Context context, ArrayList<HashMap<String, Object>> list)
+    private List<String> read;
+    public ListViewSubscribedArtistsAdapter(Context context, ArrayList<HashMap<String, Object>> list,List<String> read)
     {
         this.context = context;
         this.list=list;
+        this.read=read;
 
     }
     @Override
@@ -74,7 +77,7 @@ public class ListViewSubscribedArtistsAdapter extends BaseAdapter
         holder.textViewArticleCount.setText(stringObjectHashMap.get("textViewArticleCount").toString());
         holder.textViewFollowerCount.setText(stringObjectHashMap.get("textViewFollowerCount").toString());
 
-        if(stringObjectHashMap.get("read").toString().equals("1")) {
+        if(read.get(position).toString().equals("1")) {
             holder.imageNew.setVisibility(View.VISIBLE);
         }
         else

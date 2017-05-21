@@ -1,55 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#f7f7f7"
-    android:orientation="vertical"
-    tools:context="com.wewow.MyCollectionActivity">
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="#f7f7f7"
+              android:orientation="vertical"
+              tools:context="com.wewow.MyCollectionActivity">
 
-    <include layout="@layout/toolbar" />
+    <include layout="@layout/toolbar"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/collection_expand"
-            android:layout_width="52dp"
-            android:layout_height="52dp"
-            android:layout_alignParentRight="true"
-            android:padding="13dp"
-            android:src="@drawable/expanded" />
-
         <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="52dp"
-            android:layout_toLeftOf="@id/collection_expand">
+            android:layout_marginEnd="55dp"
+            android:scrollbars="none">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/article_category"
+                <LinearLayout
                     android:layout_width="75dp"
                     android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:tag="0"
-                    android:text="@string/articles_collected"
-                    android:textColor="#333631"
-                    android:textSize="17sp" />
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/article_category"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:tag="0"
+                        android:text="@string/articles_collected"
+                        android:textColor="#333631"
+                        android:textSize="12sp"/>
+
+                    <View
+                        android:id="@+id/article_category_line"
+                        android:layout_width="match_parent"
+                        android:layout_height="4dp"
+                        android:background="@color/black"/>
+                </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/collected_lablist"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal"></LinearLayout>
+                    android:orientation="horizontal"/>
             </LinearLayout>
 
         </HorizontalScrollView>
 
+        <ImageView
+            android:id="@+id/collection_expand"
+            android:layout_width="55dp"
+            android:layout_height="52dp"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/collection_expand_bg"
+            android:padding="12dp"
+            android:paddingStart="18dp"
+            android:src="@drawable/expanded"/>
     </RelativeLayout>
 
     <FrameLayout
@@ -65,7 +80,7 @@
             android:layout_marginTop="4dp"
             android:background="#ffffff"
             android:divider="#f7f7f7"
-            android:dividerHeight="12dp"></ListView>
+            android:dividerHeight="12dp"/>
 
         <FrameLayout
             android:id="@+id/collection_man_area"
@@ -88,13 +103,13 @@
 
                 <ImageView
                     android:id="@+id/collection_unfav"
-                    android:layout_width="80dp"
+                    android:layout_width="74dp"
                     android:layout_height="80dp"
                     android:layout_alignParentBottom="true"
                     android:layout_alignParentRight="true"
                     android:layout_marginBottom="4dp"
                     android:layout_marginRight="4dp"
-                    android:background="@drawable/delcollection" />
+                    android:background="@drawable/delcollection"/>
 
             </RelativeLayout>
         </FrameLayout>

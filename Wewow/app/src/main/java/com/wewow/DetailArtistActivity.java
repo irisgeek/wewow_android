@@ -74,6 +74,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
     private String followed;
     private ArtistDetail artistCurrent;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
