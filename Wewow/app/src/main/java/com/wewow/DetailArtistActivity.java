@@ -6,11 +6,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.Image;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -33,6 +36,7 @@ import com.wewow.dto.Article;
 import com.wewow.dto.Artist;
 import com.wewow.dto.ArtistDetail;
 import com.wewow.netTask.ITask;
+import com.wewow.utils.AppBarStateChangeListener;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.FileCacheUtil;
 import com.wewow.utils.LoadMoreListener;
@@ -73,6 +77,11 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
     private String totalPages;
     private String followed;
     private ArtistDetail artistCurrent;
+    private ImageView imageView;
+    private TextView textViewNickName;
+    private TextView textViewDesc;
+    private String nickName;
+    private CollapsingToolbarLayout collapsingToolbar;
 
 
     @Override
@@ -84,6 +93,8 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
         Intent getIntent = getIntent();
         id = getIntent.getStringExtra("id");
         listItem = new ArrayList<HashMap<String, Object>>();
+        initAppBar();
+
 
 //        initData();
         rv = (RecyclerViewUpRefresh) findViewById(R.id.recyclerview);
@@ -108,6 +119,49 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
         setUpToolBar();
 
 
+    }
+
+    private void initAppBar() {
+        imageView = (ImageView) findViewById(R.id.imageViewIcon);
+
+        textViewNickName = (TextView) findViewById(R.id.textViewNickName);
+        textViewDesc = (TextView) findViewById(R.id.textViewDesc);
+       collapsingToolbar =
+                (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+
+        collapsingToolbar.setExpandedTitleColor(getResources().getColor(R.color.transparent));
+        collapsingToolbar.setCollapsedTitleTextColor(getResources().getColor(R.color.font_color));
+
+        AppBarLayout mAppBarLayout = (AppBarLayout) findViewById(R.id.appbar);
+        mAppBarLayout.addOnOffsetChangedListener(new AppBarStateChangeListener() {
+            @Override
+            public void onStateChanged(AppBarLayout appBarLayout, State state) {
+                Log.d("STATE", state.name());
+                if (state == State.EXPANDED) {
+                    imageView.setVisibility(View.VISIBLE);
+                    textViewNickName.setVisibility(View.VISIBLE);
+                    textViewDesc.setVisibility(View.VISIBLE);
+//                    isAppBarFolded = false;
+                    //展开状态
+
+                } else if (state == State.COLLAPSED) {
+
+                    imageView.setVisibility(View.GONE);
+                    textViewNickName.setVisibility(View.GONE);
+                    textViewDesc.setVisibility(View.GONE);
+//                    isAppBarFolded = true;
+
+                    //折叠状态
+
+                } else {
+                    imageView.setVisibility(View.GONE);
+                    textViewNickName.setVisibility(View.GONE);
+                    textViewDesc.setVisibility(View.GONE);
+                    //中间状态
+
+                }
+            }
+        });
     }
 
 
@@ -235,18 +289,19 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
     }
 
     private void setUpArtist(final ArtistDetail artist, boolean refresh) {
+
         artistCurrent=artist;
 
         if (!refresh) {
-            ImageView imageView = (ImageView) findViewById(R.id.imageViewIcon);
+
             Glide.with(this)
 
                     .load(artist.getArtist().getImage()).crossFade().fitCenter().placeholder(R.drawable.banner_loading_spinner).placeholder(R.drawable.banner_loading_spinner).into(imageView);
 
-            TextView textViewNickName = (TextView) findViewById(R.id.textViewNickName);
-            textViewNickName.setText(artist.getArtist().getNickname());
+            nickName=artist.getArtist().getNickname();
+            textViewNickName.setText(nickName);
 
-            TextView textViewDesc = (TextView) findViewById(R.id.textViewDesc);
+            collapsingToolbar.setTitle(nickName);
             textViewDesc.setText(artist.getArtist().getDesc());
 
             imageViewSubscribe = (ImageView) findViewById(R.id.imageViewSubscribe);
