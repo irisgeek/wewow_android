@@ -3,11 +3,16 @@ package com.wewow.utils;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.CountDownTimer;
+import android.transition.Transition;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -15,8 +20,10 @@ import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.view.animation.ScaleAnimation;
 
+import com.wewow.LoginActivity;
 import com.wewow.R;
 import com.wewow.ShareActivity;
+import com.wewow.UserInfo;
 
 import java.io.ByteArrayOutputStream;
 
@@ -28,6 +35,7 @@ public class ShareUtils {
 
     private Context context;
     private static final String TAG = "ShareUtils";
+    private static final int ANIMATION_DURATION = 500;
 
     private String content;
     private Bitmap picture;
@@ -65,6 +73,12 @@ public class ShareUtils {
         Wechar_Friend
     }
 
+    private static class beforeAnimInfo {
+        public static float scaleX;
+        public static float scaleY;
+        public static float alpha;
+    }
+
     public ShareUtils(Context cxt) {
         this.context = cxt;
     }
@@ -75,7 +89,11 @@ public class ShareUtils {
     }
 
     public void share(ShareTypes type) {
-        Intent intent = new Intent(this.context, ShareActivity.class);
+        if (!UserInfo.isUserLogged(this.context)) {
+            LoginUtils.startLogin((Activity) this.context, LoginActivity.REQUEST_CODE_LOGIN);
+            return;
+        }
+        final Intent intent = new Intent(this.context, ShareActivity.class);
         intent.putExtra(ShareActivity.SHARE_TYPE, type.ordinal());
         intent.putExtra(ShareActivity.SHARE_CONTEXT, this.content);
         intent.putExtra(ShareActivity.SHARE_URL, this.url == null ? "" : this.url);
@@ -95,16 +113,55 @@ public class ShareUtils {
             byte[] buf = Utils.getBitmapBytes(bm);
             intent.putExtra(ShareActivity.BACK_GROUND, buf);
         }
-//        AnimationSet aset = new AnimationSet(false);
-//        AlphaAnimation dark = new AlphaAnimation(0.0f, 1.0f);
-//        ScaleAnimation scale = new ScaleAnimation(1.0f, 0.9f, 1.0f, 0.9f);
-//        aset.setDuration(500);
-//        aset.addAnimation(dark);
-//        aset.addAnimation(scale);
-//        v.setAnimation(aset);
-//        aset.start();
-        this.context.startActivity(intent);
+
+        AnimatorSet animSet = new AnimatorSet();
+        beforeAnimInfo.alpha = v.getAlpha();
+        beforeAnimInfo.scaleY = v.getScaleY();
+        beforeAnimInfo.scaleX = v.getScaleX();
+        ValueAnimator alphava = ObjectAnimator.ofFloat(v, "alpha", beforeAnimInfo.alpha, beforeAnimInfo.alpha / 2f);
+        ValueAnimator scaleYva = ObjectAnimator.ofFloat(v, "scaleY", beforeAnimInfo.scaleY, beforeAnimInfo.scaleY * 0.9f);
+        ValueAnimator scaleXva = ObjectAnimator.ofFloat(v, "scaleX", beforeAnimInfo.scaleX, beforeAnimInfo.scaleY * 0.9f);
+        animSet.play(alphava).with(scaleXva).with(scaleYva);
+
+        animSet.setDuration(ANIMATION_DURATION);
+        animSet.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+                //
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                ActivityOptions ao = ActivityOptions.makeCustomAnimation(ShareUtils.this.context, R.anim.share_start, 0);
+                ShareUtils.this.context.startActivity(intent, ao.toBundle());
+                ShareUtils.this.reverse();
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+                //
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+//
+            }
+        });
+        animSet.start();
     }
 
+    private void reverse() {
+        Activity act = (Activity) this.context;
+        final View v = act.findViewById(android.R.id.content);
+        v.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                v.setAlpha(beforeAnimInfo.alpha);
+                v.setScaleX(beforeAnimInfo.scaleX);
+                v.setScaleY(beforeAnimInfo.scaleY);
+                Log.d(TAG, "reversed");
+            }
+        }, ANIMATION_DURATION * 5);
+    }
 
 }
