@@ -89,8 +89,7 @@
             android:layout_height="match_parent"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
-            android:layout_marginTop="4dp"
-            android:background="#ffffff"
+            android:layout_marginTop="10dp"
             android:scrollbars="none"
             android:divider="#f7f7f7"
             android:dividerHeight="12dp"/>
