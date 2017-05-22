@@ -38,6 +38,7 @@ import android.content.Intent;
 import android.media.Image;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.GravityCompat;
@@ -46,8 +47,11 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -55,6 +59,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -62,6 +67,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -100,7 +106,7 @@ import retrofit.client.Response;
 /**
  * Created by iris on 17/3/3.
  */
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity  implements TextWatcher {
 
 
     private ViewPager viewPager;
@@ -133,6 +139,7 @@ public class MainActivity extends BaseActivity {
     private boolean isAppBarFolded = false;
     private Toolbar toolbar;
     private List<String> hotWords;
+    private boolean resetDropdownOffset = false;
 
 
     @Override
@@ -210,8 +217,9 @@ public class MainActivity extends BaseActivity {
                 if (!isSearchViewShown) {
                     drawerLayout.openDrawer(GravityCompat.START);
                 } else {
-                    searchView.setVisibility(View.GONE);
+                    searchView.setVisibility(View.INVISIBLE);
                     searchView.setText("");
+                    resetDropdownOffset = true;
                     imageViewHome.setImageResource(R.drawable.selector_btn_menu);
                     isSearchViewShown = false;
                     if (isAppBarFolded) {
@@ -230,27 +238,33 @@ public class MainActivity extends BaseActivity {
 
                 String queryText = searchView.getText().toString().trim();
                 if (!isSearchViewShown) {
-                    if(isAppBarFolded) {
+                    if (isAppBarFolded) {
                         imageViewHome.setImageResource(R.drawable.back_b);
-                    }
-                    else
-                    {
+                    } else {
                         imageViewHome.setImageResource(R.drawable.selector_btn_back);
                     }
-
-                   textTitle.setVisibility(View.GONE);
-                    ListSearchAdapter adapter =new ListSearchAdapter(hotWords,MainActivity.this);
+                    searchView.setVisibility(View.VISIBLE);
+                    textTitle.setVisibility(View.GONE);
+                    ListSearchAdapter adapter = new ListSearchAdapter(hotWords, MainActivity.this);
 //
 //                    ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.list_item_search, R.id.text, hotWords);
 
 
-
                     searchView.setAdapter(adapter);
                     searchView.setHint(getResources().getString(R.string.search_hint));
+                    searchView.requestFocus();
+                    InputMethodManager inputManager =
+                            (InputMethodManager) searchView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    inputManager.showSoftInput(searchView, 0);
                     searchView.setThreshold(0);
-                    searchView.setDropDownVerticalOffset(40);
+                    if (resetDropdownOffset) {
+//                        searchView.setDropDownVerticalOffset(40);
+//                        resetDropdownOffset = false;
+                    }
                     searchView.showDropDown();
-                    searchView.setVisibility(View.VISIBLE);
+                    showCover();
+
+                    searchView.addTextChangedListener(MainActivity.this);
                     searchView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -272,14 +286,13 @@ public class MainActivity extends BaseActivity {
 
                     if (!queryText.equals("")) {
                         searchView.setText("");
-                        searchView.setVisibility(View.GONE);
+                        searchView.setVisibility(View.INVISIBLE);
                         Intent intentSearch = new Intent(MainActivity.this, SearchResultActivity.class);
                         intentSearch.putExtra("key_word", queryText);
                         startActivity(intentSearch);
                         if (isAppBarFolded) {
                             imageViewHome.setImageResource(R.drawable.menu_b);
-                        }
-                        else {
+                        } else {
                             imageViewHome.setImageResource(R.drawable.selector_btn_menu);
                         }
 
@@ -289,22 +302,30 @@ public class MainActivity extends BaseActivity {
                         }
                     } else {
 
-                        if(isAppBarFolded) {
+                        if (isAppBarFolded) {
                             imageViewHome.setImageResource(R.drawable.back_b);
-                        }
-                        else
-                        {
+                        } else {
                             imageViewHome.setImageResource(R.drawable.selector_btn_back);
                         }
-                               searchView.setVisibility(View.VISIBLE);
+                        searchView.setVisibility(View.VISIBLE);
                         searchView.setHint(getResources().getString(R.string.search_hint));
                         textTitle.setVisibility(View.GONE);
                         final String[] testStrings = getResources().getStringArray(R.array.test_array);
 //                        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.list_item_search, R.id.text, hotWords);
-                        ListSearchAdapter adapter =new ListSearchAdapter(hotWords,MainActivity.this);
+                        ListSearchAdapter adapter = new ListSearchAdapter(hotWords, MainActivity.this);
                         searchView.setAdapter(adapter);
-                        searchView.setDropDownVerticalOffset(-40);
+                        searchView.requestFocus();
+                        InputMethodManager inputManager =
+                                (InputMethodManager) searchView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        inputManager.showSoftInput(searchView, 0);
+                        if (resetDropdownOffset) {
+//                            resetDropdownOffset = false;
+//                            searchView.setDropDownVerticalOffset(-40);
+                        }
+//                        searchView.setDropDownVerticalOffset(-40);
                         searchView.showDropDown();
+                        showCover();
+                        searchView.addTextChangedListener(MainActivity.this);
                         searchView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                             @Override
                             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -339,7 +360,8 @@ public class MainActivity extends BaseActivity {
                     imageViewHome.setImageResource(R.drawable.selector_btn_menu);
                     imageViewSearch.setImageResource(R.drawable.selector_btn_search);
                     textTitle.setVisibility(View.GONE);
-                    searchView.setVisibility(View.VISIBLE);
+                    searchView.setVisibility(View.INVISIBLE);
+
                     isAppBarFolded = false;
                     toolbar.setBackgroundColor(getResources().getColor(R.color.transparent));
                     //展开状态
@@ -349,10 +371,12 @@ public class MainActivity extends BaseActivity {
                     searchView.setHintTextColor(getResources().getColor(R.color.search_hot_search));
                     imageViewHome.setImageResource(R.drawable.menu_b);
                     imageViewSearch.setImageResource(R.drawable.search_b);
-                    textTitle.setVisibility(View.VISIBLE);
-                    searchView.setVisibility(View.GONE);
 
-                    toolbar.setBackgroundColor(getResources().getColor(R.color.white    ));
+                    textTitle.setVisibility(View.VISIBLE);
+                    resetDropdownOffset = true;
+                    searchView.setVisibility(View.INVISIBLE);
+
+                    toolbar.setBackgroundColor(getResources().getColor(R.color.white));
 
 
                     isAppBarFolded = true;
@@ -367,6 +391,35 @@ public class MainActivity extends BaseActivity {
             }
         });
     }
+
+    private void showCover() {
+
+        RelativeLayout layoutCover = (RelativeLayout) findViewById(R.id.layoutCover);
+        layoutCover.setVisibility(View.VISIBLE);
+        layoutCover.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                searchView.setVisibility(View.INVISIBLE);
+//                if(isAppBarFolded)
+//                {
+//                    textTitle.setVisibility(View.VISIBLE);
+//                }
+                removeCover();
+            }
+        });
+    }
+
+    private void removeCover() {
+        RelativeLayout layoutCover = (RelativeLayout) findViewById(R.id.layoutCover);
+        layoutCover.setVisibility(View.GONE);
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm.isActive()) {
+            imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+
+
+    }
+
 
     private void checkcacheUpdatedOrNot() {
         ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
@@ -1007,27 +1060,48 @@ public class MainActivity extends BaseActivity {
         });
     }
 
-    private ArrayList<String> parseHotwordsFromString (String realData) throws JSONException{
+    private ArrayList<String> parseHotwordsFromString(String realData) throws JSONException {
 
-        ArrayList<String> words=new ArrayList<String>();
+        ArrayList<String> words = new ArrayList<String>();
         String s = new JSONObject(realData).getJSONObject("result")
                 .getJSONObject("data")
                 .getString("hot_words").toString();
-        s=s.substring(2,s.length()-2 );
-        String[]list=s.split("\",\"");
-        for(int i=0;i<list.length+1;i++)
-        {
-            if(i==0)
-            {
+        s = s.substring(2, s.length() - 2);
+        String[] list = s.split("\",\"");
+        for (int i = 0; i < list.length + 1; i++) {
+            if (i == 0) {
                 words.add(getResources().getString(R.string.hot_search_text));
-            }
-            else
-            {
-                words.add(list[i-1]);
+            } else {
+                words.add(list[i - 1]);
             }
         }
 
         return words;
+    }
+
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count,
+                                  int after) {
+        // TODO Auto-generated method stub
+        RelativeLayout layoutCover = (RelativeLayout) findViewById(R.id.layoutCover);
+        layoutCover.setVisibility(View.GONE);
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        // TODO Auto-generated method stub
+        RelativeLayout layoutCover = (RelativeLayout) findViewById(R.id.layoutCover);
+        layoutCover.setVisibility(View.GONE);
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+        // TODO Auto-generated method stub
+        RelativeLayout layoutCover = (RelativeLayout) findViewById(R.id.layoutCover);
+        layoutCover.setVisibility(View.GONE);
     }
 
 }
