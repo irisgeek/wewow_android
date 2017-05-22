@@ -38,6 +38,7 @@ import android.content.Intent;
 import android.media.Image;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.GravityCompat;
@@ -46,8 +47,11 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -55,6 +59,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -62,6 +67,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -71,6 +77,7 @@ import com.bumptech.glide.Glide;
 import com.growingio.android.sdk.collection.GrowingIO;
 import com.jaeger.library.StatusBarUtil;
 import com.wewow.adapter.FragmentAdapter;
+import com.wewow.adapter.ListSearchAdapter;
 import com.wewow.dto.Banner;
 import com.wewow.dto.Institute;
 import com.wewow.dto.LabCollection;
@@ -99,7 +106,7 @@ import retrofit.client.Response;
 /**
  * Created by iris on 17/3/3.
  */
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity  implements TextWatcher {
 
 
     private ViewPager viewPager;
@@ -131,6 +138,8 @@ public class MainActivity extends BaseActivity {
     private boolean isSearchViewShown = false;
     private boolean isAppBarFolded = false;
     private Toolbar toolbar;
+    private List<String> hotWords;
+    private boolean resetDropdownOffset = false;
 
 
     @Override
@@ -138,12 +147,12 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 //        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 //        Utils.setActivityToBeFullscreen(this);
-        StatusBarUtil.setTranslucent(this, 127);
+
         setContentView(R.layout.activity_main);
+        StatusBarUtil.setTranslucentForCoordinatorLayout(this, 100);
         context = this;
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         float density = Utils.getSceenDensity(this);
-
         Utils.regitsterNetSateBroadcastReceiver(this);
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
@@ -208,8 +217,9 @@ public class MainActivity extends BaseActivity {
                 if (!isSearchViewShown) {
                     drawerLayout.openDrawer(GravityCompat.START);
                 } else {
-                    searchView.setVisibility(View.GONE);
+                    searchView.setVisibility(View.INVISIBLE);
                     searchView.setText("");
+                    resetDropdownOffset = true;
                     imageViewHome.setImageResource(R.drawable.selector_btn_menu);
                     isSearchViewShown = false;
                     if (isAppBarFolded) {
@@ -228,29 +238,41 @@ public class MainActivity extends BaseActivity {
 
                 String queryText = searchView.getText().toString().trim();
                 if (!isSearchViewShown) {
-                    if(isAppBarFolded) {
+                    if (isAppBarFolded) {
                         imageViewHome.setImageResource(R.drawable.back_b);
-                    }
-                    else
-                    {
+                    } else {
                         imageViewHome.setImageResource(R.drawable.selector_btn_back);
                     }
-                    searchView.setVisibility(View.GONE);
-                   textTitle.setVisibility(View.GONE);
-                    final String[] testStrings = getResources().getStringArray(R.array.test_array);
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.list_item_search, R.id.text, testStrings);
+                    searchView.setVisibility(View.VISIBLE);
+                    textTitle.setVisibility(View.GONE);
+                    ListSearchAdapter adapter = new ListSearchAdapter(hotWords, MainActivity.this);
+//
+//                    ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.list_item_search, R.id.text, hotWords);
+
 
                     searchView.setAdapter(adapter);
+                    searchView.setHint(getResources().getString(R.string.search_hint));
+                    searchView.requestFocus();
+                    InputMethodManager inputManager =
+                            (InputMethodManager) searchView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    inputManager.showSoftInput(searchView, 0);
                     searchView.setThreshold(0);
+                    if (resetDropdownOffset) {
+//                        searchView.setDropDownVerticalOffset(40);
+//                        resetDropdownOffset = false;
+                    }
                     searchView.showDropDown();
-                    searchView.setTextColor(getResources().getColor(R.color.search_text_view_color));
-                    searchView.setHintTextColor(getResources().getColor(R.color.search_text_view_hint_color));
+                    showCover();
+
+                    searchView.addTextChangedListener(MainActivity.this);
                     searchView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                             if (position != 0) {
-                                searchView.setText(testStrings[position], true);
+                                searchView.setText(hotWords.get(position), true);
                                 imageViewSearch.performClick();
+                            } else {
+                                searchView.setText("");
                             }
 //
 
@@ -259,20 +281,18 @@ public class MainActivity extends BaseActivity {
                     searchView.setThreshold(0);
 
                     isSearchViewShown = true;
-                    searchView.performClick();
                 } else {
 
 
                     if (!queryText.equals("")) {
                         searchView.setText("");
-                        searchView.setVisibility(View.GONE);
+                        searchView.setVisibility(View.INVISIBLE);
                         Intent intentSearch = new Intent(MainActivity.this, SearchResultActivity.class);
                         intentSearch.putExtra("key_word", queryText);
                         startActivity(intentSearch);
                         if (isAppBarFolded) {
                             imageViewHome.setImageResource(R.drawable.menu_b);
-                        }
-                        else {
+                        } else {
                             imageViewHome.setImageResource(R.drawable.selector_btn_menu);
                         }
 
@@ -282,28 +302,35 @@ public class MainActivity extends BaseActivity {
                         }
                     } else {
 
-                        if(isAppBarFolded) {
+                        if (isAppBarFolded) {
                             imageViewHome.setImageResource(R.drawable.back_b);
-                        }
-                        else
-                        {
+                        } else {
                             imageViewHome.setImageResource(R.drawable.selector_btn_back);
                         }
-                               searchView.setVisibility(View.VISIBLE);
-//                        searchView.setHint(getResources().getString(R.string.search_hint));
+                        searchView.setVisibility(View.VISIBLE);
+                        searchView.setHint(getResources().getString(R.string.search_hint));
                         textTitle.setVisibility(View.GONE);
                         final String[] testStrings = getResources().getStringArray(R.array.test_array);
-                        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.list_item_search, R.id.text, testStrings);
-
+//                        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.list_item_search, R.id.text, hotWords);
+                        ListSearchAdapter adapter = new ListSearchAdapter(hotWords, MainActivity.this);
                         searchView.setAdapter(adapter);
+                        searchView.requestFocus();
+                        InputMethodManager inputManager =
+                                (InputMethodManager) searchView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        inputManager.showSoftInput(searchView, 0);
+                        if (resetDropdownOffset) {
+//                            resetDropdownOffset = false;
+//                            searchView.setDropDownVerticalOffset(-40);
+                        }
+//                        searchView.setDropDownVerticalOffset(-40);
                         searchView.showDropDown();
-                        searchView.setTextColor(getResources().getColor(R.color.search_text_view_color));
-                        searchView.setHintTextColor(getResources().getColor(R.color.search_text_view_hint_color));
+                        showCover();
+                        searchView.addTextChangedListener(MainActivity.this);
                         searchView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                             @Override
                             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                                 if (position != 0) {
-                                    searchView.setText(testStrings[position], true);
+                                    searchView.setText(hotWords.get(position), true);
                                     imageViewSearch.performClick();
                                 }
 //
@@ -327,22 +354,30 @@ public class MainActivity extends BaseActivity {
             public void onStateChanged(AppBarLayout appBarLayout, State state) {
                 Log.d("STATE", state.name());
                 if (state == State.EXPANDED) {
+                    searchView.setTextColor(getResources().getColor(R.color.search_text_view_color));
+                    searchView.setHintTextColor(getResources().getColor(R.color.search_text_view_hint_color));
 
                     imageViewHome.setImageResource(R.drawable.selector_btn_menu);
                     imageViewSearch.setImageResource(R.drawable.selector_btn_search);
                     textTitle.setVisibility(View.GONE);
-                    searchView.setVisibility(View.VISIBLE);
+                    searchView.setVisibility(View.INVISIBLE);
+
                     isAppBarFolded = false;
                     toolbar.setBackgroundColor(getResources().getColor(R.color.transparent));
                     //展开状态
 
                 } else if (state == State.COLLAPSED) {
+                    searchView.setTextColor(getResources().getColor(R.color.font_color));
+                    searchView.setHintTextColor(getResources().getColor(R.color.search_hot_search));
                     imageViewHome.setImageResource(R.drawable.menu_b);
                     imageViewSearch.setImageResource(R.drawable.search_b);
-                    textTitle.setVisibility(View.VISIBLE);
-                    searchView.setVisibility(View.GONE);
 
-                    toolbar.setBackgroundColor(getResources().getColor(R.color.white    ));
+                    textTitle.setVisibility(View.VISIBLE);
+                    resetDropdownOffset = true;
+                    searchView.setVisibility(View.INVISIBLE);
+
+                    toolbar.setBackgroundColor(getResources().getColor(R.color.white));
+
 
                     isAppBarFolded = true;
 
@@ -356,6 +391,35 @@ public class MainActivity extends BaseActivity {
             }
         });
     }
+
+    private void showCover() {
+
+        RelativeLayout layoutCover = (RelativeLayout) findViewById(R.id.layoutCover);
+        layoutCover.setVisibility(View.VISIBLE);
+        layoutCover.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                searchView.setVisibility(View.INVISIBLE);
+//                if(isAppBarFolded)
+//                {
+//                    textTitle.setVisibility(View.VISIBLE);
+//                }
+                removeCover();
+            }
+        });
+    }
+
+    private void removeCover() {
+        RelativeLayout layoutCover = (RelativeLayout) findViewById(R.id.layoutCover);
+        layoutCover.setVisibility(View.GONE);
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm.isActive()) {
+            imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+
+
+    }
+
 
     private void checkcacheUpdatedOrNot() {
         ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
@@ -378,6 +442,22 @@ public class MainActivity extends BaseActivity {
 
                         long cacheUpdatedTime = (long) (Double.parseDouble(cacheUpdatedTimeStamp) * 1000);
                         boolean isCacheDataOutdated = FileCacheUtil
+                                .isCacheDataFailure(CommonUtilities.CACHE_FILE_HOT_WORDS, context, cacheUpdatedTime);
+
+
+                        if (isCacheDataOutdated) {
+                            getSearhHotWordsFromServer();
+                        } else {
+                            String fileContent = FileCacheUtil.getCache(context, CommonUtilities.CACHE_FILE_HOT_WORDS);
+
+                            try {
+                                hotWords = parseHotwordsFromString(fileContent);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        isCacheDataOutdated = FileCacheUtil
                                 .isCacheDataFailure(CommonUtilities.CACHE_FILE_BANNER, context, cacheUpdatedTime);
 
                         if (isCacheDataOutdated) {
@@ -940,6 +1020,88 @@ public class MainActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(null);
 
+    }
+
+
+    private void getSearhHotWordsFromServer() {
+
+        ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
+        iTask.getHotSearchWords(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), new Callback<JSONObject>() {
+
+            @Override
+            public void success(JSONObject object, Response response) {
+
+
+                try {
+                    String realData = Utils.convertStreamToString(response.getBody().in());
+                    if (!realData.contains(CommonUtilities.SUCCESS)) {
+                        Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
+
+                    } else {
+                        hotWords = parseHotwordsFromString(realData);
+                        FileCacheUtil.setCache(realData, MainActivity.this, CommonUtilities.CACHE_FILE_HOT_WORDS, 0);
+
+
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.i("MainActivity", "request banner failed: " + error.toString());
+
+            }
+        });
+    }
+
+    private ArrayList<String> parseHotwordsFromString(String realData) throws JSONException {
+
+        ArrayList<String> words = new ArrayList<String>();
+        String s = new JSONObject(realData).getJSONObject("result")
+                .getJSONObject("data")
+                .getString("hot_words").toString();
+        s = s.substring(2, s.length() - 2);
+        String[] list = s.split("\",\"");
+        for (int i = 0; i < list.length + 1; i++) {
+            if (i == 0) {
+                words.add(getResources().getString(R.string.hot_search_text));
+            } else {
+                words.add(list[i - 1]);
+            }
+        }
+
+        return words;
+    }
+
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count,
+                                  int after) {
+        // TODO Auto-generated method stub
+        RelativeLayout layoutCover = (RelativeLayout) findViewById(R.id.layoutCover);
+        layoutCover.setVisibility(View.GONE);
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        // TODO Auto-generated method stub
+        RelativeLayout layoutCover = (RelativeLayout) findViewById(R.id.layoutCover);
+        layoutCover.setVisibility(View.GONE);
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+        // TODO Auto-generated method stub
+        RelativeLayout layoutCover = (RelativeLayout) findViewById(R.id.layoutCover);
+        layoutCover.setVisibility(View.GONE);
     }
 
 }

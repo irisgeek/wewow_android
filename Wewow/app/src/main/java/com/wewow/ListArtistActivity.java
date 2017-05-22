@@ -163,7 +163,7 @@ public class ListArtistActivity extends BaseActivity {
         searchView.setQueryHint(getResources().getString(R.string.search_hint));
 
 
-        ((ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_button)).setImageResource(R.drawable.selector_btn_search);
+        ((ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_button)).setImageResource(R.drawable.search_b);
 
 
         final String[] testStrings = getResources().getStringArray(R.array.test_array);
@@ -282,7 +282,7 @@ public class ListArtistActivity extends BaseActivity {
     private void setUpToolBar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setNavigationIcon(R.drawable.selector_btn_menu);
+        toolbar.setNavigationIcon(R.drawable.menu_b);
         getSupportActionBar().setTitle(getResources().getString(R.string.all_artists_title));
 
     }

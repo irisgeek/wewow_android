@@ -14,6 +14,7 @@ import com.wewow.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by iris on 17/3/23.
@@ -22,10 +23,12 @@ public class ListViewMenuAdapter extends BaseAdapter
 {
     private Context context;
     private ArrayList<HashMap<String, Object>> list;
-    public ListViewMenuAdapter(Context context, ArrayList<HashMap<String, Object>> list)
+    private List<String> newIcons;
+    public ListViewMenuAdapter(Context context, ArrayList<HashMap<String, Object>> list,List<String> newIcons)
     {
         this.context = context;
         this.list=list;
+        this.newIcons=newIcons;
 
     }
     @Override
@@ -63,7 +66,7 @@ public class ListViewMenuAdapter extends BaseAdapter
         HashMap<String, Object> stringObjectHashMap = list.get(position);
         holder.imageView.setImageResource((int)stringObjectHashMap.get("icon"));
         holder.textViewTitle.setText(stringObjectHashMap.get("menuText").toString());
-        if(stringObjectHashMap.get("new").toString().equals("1")) {
+        if(newIcons.get(position).equals("1")) {
             holder.imageNew.setVisibility(View.VISIBLE);
         }
         else

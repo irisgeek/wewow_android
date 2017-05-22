@@ -17,14 +17,14 @@ import java.io.ByteArrayOutputStream;
 public class LoginUtils {
     public static void startLogin(Activity act, int req_code) {
         Intent intent = new Intent(act, LoginActivity.class);
-        final View content = act.getWindow().getDecorView();
+        /*final View content = act.getWindow().getDecorView();
         if (content.getWidth() > 0) {
             Bitmap image = BlurBuilder.blur(content);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             image.compress(Bitmap.CompressFormat.PNG, 100, baos);
             byte[] data = baos.toByteArray();
             intent.putExtra(LoginActivity.BACKGROUND, data);
-        }
+        }*/
         act.startActivityForResult(intent, req_code);
     }
 }

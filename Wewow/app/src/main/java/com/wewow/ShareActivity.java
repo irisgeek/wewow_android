@@ -136,7 +136,7 @@ public class ShareActivity extends Activity implements IWeiboHandler.Response {
                 sendIntent.setType("text/plain");
 //                }
                 String content = intent.getStringExtra(SHARE_CONTEXT);
-                if(intent.hasExtra(SHARE_URL)){
+                if (intent.hasExtra(SHARE_URL)) {
                     content = intent.getStringExtra(SHARE_CONTEXT) + " " + intent.getStringExtra(SHARE_URL);
                 }
                 sendIntent.putExtra(Intent.EXTRA_TEXT, content);

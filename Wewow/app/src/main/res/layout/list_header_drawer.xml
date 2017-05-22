@@ -3,48 +3,59 @@
 
     android:layout_width="304dp"
     android:layout_height="172dp">
+
     <ImageView
+        android:id="@+id/userCover"
         android:layout_width="304dp"
         android:layout_height="172dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/cover2"/>
+        android:src="@drawable/cover2" />
 
 
-<LinearLayout
-    android:id="@+id/userloginarea"
-    android:layout_width="304dp"
-    android:layout_height="172dp"
+    <LinearLayout
+        android:id="@+id/userloginarea"
+        android:layout_width="304dp"
+        android:layout_height="172dp"
 
-    android:orientation="vertical">
+        android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/imageViewSetting"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:layout_marginRight="70dp"
-        android:layout_marginTop="37dp"
-        android:src="@drawable/setting" />
+        <ImageView
+            android:id="@+id/imageViewSetting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|top"
+            android:layout_marginRight="14dp"
+            android:layout_marginTop="37dp"
+            android:visibility="gone"
+            android:src="@drawable/setting" />
 
-    <TextView
-        android:id="@+id/textViewUsername"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="17dp"
-        android:layout_marginTop="58dp"
-        android:text="@string/login_gologin"
-        android:textColor="#FFFFFF"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+    </LinearLayout>
 
-    <TextView
-        android:id="@+id/textViewSignature"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="17dp"
-        android:layout_marginTop="5dp"
-        android:text="@string/login_to_see_more"
-        android:textColor="#FFFFFF"
-        android:textSize="14sp" />
-</LinearLayout>
-    </FrameLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+
+        <TextView
+            android:id="@+id/textViewUsername"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="17dp"
+            android:layout_marginTop="116dp"
+            android:text="@string/login_gologin"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textViewSignature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="17dp"
+            android:layout_marginTop="7dp"
+            android:text="@string/login_to_see_more"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp" />
+    </LinearLayout>
+</FrameLayout>
