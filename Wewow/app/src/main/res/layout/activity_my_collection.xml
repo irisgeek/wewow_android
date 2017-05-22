@@ -9,6 +9,11 @@
 
     <include layout="@layout/toolbar"/>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#efefef"/>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -58,14 +63,21 @@
 
         <ImageView
             android:id="@+id/collection_expand"
-            android:layout_width="55dp"
+            android:layout_width="58dp"
             android:layout_height="52dp"
             android:layout_alignParentRight="true"
             android:background="@drawable/collection_expand_bg"
-            android:padding="12dp"
-            android:paddingStart="18dp"
+            android:paddingStart="20dp"
+            android:paddingTop="14dp"
+            android:paddingBottom="14dp"
+            android:paddingEnd="14dp"
             android:src="@drawable/expanded"/>
     </RelativeLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@drawable/divider"/>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -79,6 +91,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginTop="4dp"
             android:background="#ffffff"
+            android:scrollbars="none"
             android:divider="#f7f7f7"
             android:dividerHeight="12dp"/>
 

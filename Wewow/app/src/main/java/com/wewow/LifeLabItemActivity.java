@@ -18,10 +18,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jaeger.library.StatusBarUtil;
 import com.wewow.dto.LabCollection;
+import com.wewow.utils.BlurBuilder;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
-import com.wewow.utils.LoginUtils;
 import com.wewow.utils.PhotoUtils;
 import com.wewow.utils.ProgressDialogUtil;
 import com.wewow.utils.RemoteImageLoader;
@@ -60,7 +61,7 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
         Intent intent = this.getIntent();
         Parcelable p = intent.getParcelableExtra(LIFELAB_COLLECTION);
         this.lc = (LabCollection) p;
-        Utils.setActivityToBeFullscreen(this);
+        StatusBarUtil.setTranslucent(this, 127);
         setContentView(R.layout.activity_lifelab_item);
         this.setupUI();
     }
@@ -107,10 +108,14 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
 //                            LifeLabItemActivity.this.adapter.notifyDataSetChanged();
 //                            LifeLabItemActivity.this.expandAll();
                             LifeLabItemActivity.this.display();
+//                            Glide.with(LifeLabItemActivity.this).load(x.collection_image).bitmapTransform(new BlurT(this, 15)).into()
                             new RemoteImageLoader(LifeLabItemActivity.this, x.collection_image, new RemoteImageLoader.RemoteImageListener() {
                                 @Override
                                 public void onRemoteImageAcquired(Drawable dr) {
-                                    LifeLabItemActivity.this.findViewById(R.id.lifelab_item_root).setBackground(dr);
+                                    Bitmap bitmap = ((BitmapDrawable) dr).getBitmap();
+                                    Bitmap blurBitMap = BlurBuilder.blur(LifeLabItemActivity.this, bitmap);
+                                    bitmap.recycle();
+                                    LifeLabItemActivity.this.findViewById(R.id.lifelab_item_root).setBackground(new BitmapDrawable(getResources(), blurBitMap));
                                 }
                             });
                         }

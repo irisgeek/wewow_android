@@ -1,32 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
 
-    <include layout="@layout/toolbar" />
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scaleType="fitXY"
-        android:src="@drawable/divider" />
-
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/lifelab_swipe"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="12dp">
+        android:orientation="vertical">
+
+        <include layout="@layout/toolbar"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="fitXY"
+            android:src="@drawable/divider"/>
 
         <ListView
             android:id="@+id/list_lifelab"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="12dp"
             android:background="#ffffff"
-            android:dividerHeight="16dp">
+            android:dividerHeight="16dp"/>
 
-        </ListView>
-    </android.support.v4.widget.SwipeRefreshLayout>
-</LinearLayout>
+    </LinearLayout>
+
+    <com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="50dp"
+        android:visibility="visible"
+        app:mlpb_progress_color="@color/font_color"
+        app:mlpb_progress_stoke_width="3dp"/>
+</FrameLayout>
