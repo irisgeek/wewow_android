@@ -20,21 +20,21 @@
 
             <ImageView
                 android:id="@+id/lifelab_item_back"
-                android:layout_width="33dp"
-                android:layout_height="33dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="18dp"
+                android:layout_marginLeft="17dp"
                 android:foregroundGravity="center"
-                android:src="@drawable/back"/>
+                android:background="@drawable/back"/>
 
 
             <ImageView
                 android:id="@+id/lifelab_share"
-                android:layout_width="33dp"
-                android:layout_height="33dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="18dp"
+                android:layout_marginRight="17dp"
                 android:src="@drawable/share"/>
 
             <FrameLayout
@@ -45,8 +45,8 @@
 
                 <ImageView
                     android:id="@+id/lifelab_fav"
-                    android:layout_width="33dp"
-                    android:layout_height="33dp"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
                     android:layout_gravity="center_vertical"
                     android:layout_marginEnd="12dp"
                     android:src="@drawable/mark"/>

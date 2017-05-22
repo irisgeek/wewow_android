@@ -46,7 +46,6 @@ public class MyCollectionActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Utils.setActivityToBeFullscreen(this);
         setContentView(R.layout.activity_my_collection);
         this.getSupportActionBar().setTitle(R.string.my_collection);
         this.setupUI();

@@ -27,7 +27,7 @@
             android:layout_marginRight="12dp"
             android:layout_marginTop="26dp"
             android:textColor="@color/text_gray_drak"
-            android:textSize="14sp" />
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/lifelab_item_article_category"

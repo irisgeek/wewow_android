@@ -26,11 +26,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 import com.wewow.dto.LabCollection;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
 import com.wewow.utils.RemoteImageLoader;
-import com.wewow.utils.Utils;
 import com.wewow.utils.WebAPIHelper;
 
 import org.json.JSONArray;
@@ -54,21 +54,20 @@ public class LifeLabActivity extends BaseActivity {
     private static final String TAG = "LifeLabActivity";
     private LabData labData = new LabData();
     private LabData filteredLabData = new LabData();
-    private SwipeRefreshLayout swipe;
+    CircleProgressBar progressBar;
     private View foot;
     private boolean isLoading = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Utils.setActivityToBeFullscreen(this);
         setContentView(R.layout.activity_lifelab_list);
         this.getSupportActionBar().setTitle(R.string.lifelab_title);
         this.setupUI();
     }
 
     private void setupUI() {
-        this.swipe = (SwipeRefreshLayout) this.findViewById(R.id.lifelab_swipe);
+        progressBar = (CircleProgressBar) this.findViewById(R.id.progressBar);
         this.foot = View.inflate(this, R.layout.lifelab_foot, null);
         this.foot.findViewById(R.id.tv_lab_more).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,12 +106,12 @@ public class LifeLabActivity extends BaseActivity {
                 if (i + i1 == i2) {
                     Log.d(TAG, "onScroll: Show refresh");
                     LifeLabActivity.this.foot.setVisibility(View.VISIBLE);
-                    LifeLabActivity.this.swipe.setRefreshing(true);
+                    progressBar.setVisibility(View.VISIBLE);
                     LifeLabActivity.this.startDataLoading();
                 }
             }
         });
-        this.swipe.setRefreshing(true);
+        progressBar.setVisibility(View.VISIBLE);
         this.startDataLoading();
     }
 
@@ -185,7 +184,7 @@ public class LifeLabActivity extends BaseActivity {
                     @Override
                     public void taskCompletionResult(byte[] result) {
                         //LifeLabActivity.this.toggleProgressDialog(false);
-                        LifeLabActivity.this.swipe.setRefreshing(false);
+                        progressBar.setVisibility(View.GONE);
                         JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
                         if (jobj == null) {
                             Toast.makeText(LifeLabActivity.this, R.string.networkError, Toast.LENGTH_LONG).show();
