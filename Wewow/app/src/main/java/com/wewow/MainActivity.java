@@ -71,6 +71,7 @@ import com.bumptech.glide.Glide;
 import com.growingio.android.sdk.collection.GrowingIO;
 import com.jaeger.library.StatusBarUtil;
 import com.wewow.adapter.FragmentAdapter;
+import com.wewow.adapter.ListSearchAdapter;
 import com.wewow.dto.Banner;
 import com.wewow.dto.Institute;
 import com.wewow.dto.LabCollection;
@@ -236,28 +237,27 @@ public class MainActivity extends BaseActivity {
                     {
                         imageViewHome.setImageResource(R.drawable.selector_btn_back);
                     }
-                    searchView.setVisibility(View.GONE);
-                   textTitle.setVisibility(View.GONE);
 
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.list_item_search, R.id.text, hotWords);
+                   textTitle.setVisibility(View.GONE);
+                    ListSearchAdapter adapter =new ListSearchAdapter(hotWords,MainActivity.this);
+//
+//                    ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.list_item_search, R.id.text, hotWords);
 
 
 
                     searchView.setAdapter(adapter);
-
+                    searchView.setHint(getResources().getString(R.string.search_hint));
                     searchView.setThreshold(0);
+                    searchView.setDropDownVerticalOffset(40);
                     searchView.showDropDown();
-                    searchView.setTextColor(getResources().getColor(R.color.search_text_view_color));
-                    searchView.setHintTextColor(getResources().getColor(R.color.search_text_view_hint_color));
+                    searchView.setVisibility(View.VISIBLE);
                     searchView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                             if (position != 0) {
                                 searchView.setText(hotWords.get(position), true);
                                 imageViewSearch.performClick();
-                            }
-                            else
-                            {
+                            } else {
                                 searchView.setText("");
                             }
 //
@@ -267,7 +267,6 @@ public class MainActivity extends BaseActivity {
                     searchView.setThreshold(0);
 
                     isSearchViewShown = true;
-                    searchView.performClick();
                 } else {
 
 
@@ -298,20 +297,19 @@ public class MainActivity extends BaseActivity {
                             imageViewHome.setImageResource(R.drawable.selector_btn_back);
                         }
                                searchView.setVisibility(View.VISIBLE);
-//                        searchView.setHint(getResources().getString(R.string.search_hint));
+                        searchView.setHint(getResources().getString(R.string.search_hint));
                         textTitle.setVisibility(View.GONE);
                         final String[] testStrings = getResources().getStringArray(R.array.test_array);
-                        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.list_item_search, R.id.text, hotWords);
-
+//                        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.list_item_search, R.id.text, hotWords);
+                        ListSearchAdapter adapter =new ListSearchAdapter(hotWords,MainActivity.this);
                         searchView.setAdapter(adapter);
+                        searchView.setDropDownVerticalOffset(-40);
                         searchView.showDropDown();
-                        searchView.setTextColor(getResources().getColor(R.color.search_text_view_color));
-                        searchView.setHintTextColor(getResources().getColor(R.color.search_text_view_hint_color));
                         searchView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                             @Override
                             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                                 if (position != 0) {
-                                    searchView.setText(testStrings[position], true);
+                                    searchView.setText(hotWords.get(position), true);
                                     imageViewSearch.performClick();
                                 }
 //
@@ -335,6 +333,8 @@ public class MainActivity extends BaseActivity {
             public void onStateChanged(AppBarLayout appBarLayout, State state) {
                 Log.d("STATE", state.name());
                 if (state == State.EXPANDED) {
+                    searchView.setTextColor(getResources().getColor(R.color.search_text_view_color));
+                    searchView.setHintTextColor(getResources().getColor(R.color.search_text_view_hint_color));
 
                     imageViewHome.setImageResource(R.drawable.selector_btn_menu);
                     imageViewSearch.setImageResource(R.drawable.selector_btn_search);
@@ -345,12 +345,15 @@ public class MainActivity extends BaseActivity {
                     //展开状态
 
                 } else if (state == State.COLLAPSED) {
+                    searchView.setTextColor(getResources().getColor(R.color.font_color));
+                    searchView.setHintTextColor(getResources().getColor(R.color.search_hot_search));
                     imageViewHome.setImageResource(R.drawable.menu_b);
                     imageViewSearch.setImageResource(R.drawable.search_b);
                     textTitle.setVisibility(View.VISIBLE);
                     searchView.setVisibility(View.GONE);
 
                     toolbar.setBackgroundColor(getResources().getColor(R.color.white    ));
+
 
                     isAppBarFolded = true;
 
