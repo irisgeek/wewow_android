@@ -3,7 +3,7 @@
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:background="#f7f7f7"
+              android:background="@color/white"
               android:orientation="vertical"
               tools:context="com.wewow.MyCollectionActivity">
 
@@ -67,10 +67,10 @@
             android:layout_height="52dp"
             android:layout_alignParentRight="true"
             android:background="@drawable/collection_expand_bg"
-            android:paddingStart="20dp"
-            android:paddingTop="14dp"
             android:paddingBottom="14dp"
             android:paddingEnd="14dp"
+            android:paddingStart="20dp"
+            android:paddingTop="14dp"
             android:src="@drawable/expanded"/>
     </RelativeLayout>
 
@@ -81,7 +81,8 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="#f7f7f7">
 
         <ListView
             android:id="@+id/mycollection_list"
@@ -90,9 +91,9 @@
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginTop="10dp"
-            android:scrollbars="none"
             android:divider="#f7f7f7"
-            android:dividerHeight="12dp"/>
+            android:dividerHeight="12dp"
+            android:scrollbars="none"/>
 
         <FrameLayout
             android:id="@+id/collection_man_area"
