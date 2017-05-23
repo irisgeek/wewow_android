@@ -2,6 +2,10 @@ package com.wewow;
 
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.jaeger.library.StatusBarUtil;
 import com.wewow.adapter.ListViewArtistsAdapter;
 import com.wewow.adapter.RecycleViewArticlesOfArtistDetail;
 import com.wewow.adapter.RecycleViewInstitutesOfSubjectAdapter;
@@ -24,9 +29,12 @@ import com.wewow.dto.ArtistDetail;
 import com.wewow.dto.Institute;
 import com.wewow.dto.Subject;
 import com.wewow.netTask.ITask;
+import com.wewow.utils.BlurBuilder;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.FileCacheUtil;
+import com.wewow.utils.RemoteImageLoader;
 import com.wewow.utils.SettingUtils;
+import com.wewow.utils.ShareUtils;
 import com.wewow.utils.Utils;
 
 import org.json.JSONArray;
@@ -50,6 +58,8 @@ public class SubjectActivity extends BaseActivity {
 
     private String id;
     private ImageView imageViewSubscribe;
+    private Subject subject;
+    private Drawable shareBitmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +67,7 @@ public class SubjectActivity extends BaseActivity {
 
 
         setContentView(R.layout.activity_subject);
+        StatusBarUtil.setTranslucent(this,100);
         Intent getIntent = getIntent();
         id = getIntent.getStringExtra("id");
 
@@ -74,8 +85,6 @@ public class SubjectActivity extends BaseActivity {
 
         }
 
-
-        setUpToolBar();
 
 
     }
@@ -189,10 +198,20 @@ public class SubjectActivity extends BaseActivity {
     private void setUpSuject(final Subject subject) {
 
         ImageView imageView = (ImageView) findViewById(R.id.imageViewTop);
-        Glide.with(this)
+//        Glide.with(this)
+//                .load(subject.getImage()).crossFade().fitCenter().placeholder(R.drawable.banner_loading_spinner).placeholder(R.drawable.banner_loading_spinner).into(imageView);
 
-                .load(subject.getImage()).crossFade().fitCenter().placeholder(R.drawable.banner_loading_spinner).placeholder(R.drawable.banner_loading_spinner).into(imageView);
 
+        new RemoteImageLoader(SubjectActivity.this,subject.getImage(), new RemoteImageLoader.RemoteImageListener() {
+            @Override
+            public void onRemoteImageAcquired(Drawable dr) {
+                Bitmap bitmap = ((BitmapDrawable) dr).getBitmap();
+                shareBitmap=dr;
+                Bitmap blurBitMap = BlurBuilder.blur(SubjectActivity.this, bitmap);
+                bitmap.recycle();
+                SubjectActivity.this.findViewById(R.id.imageViewTop).setBackground(new BitmapDrawable(getResources(), blurBitMap));
+            }
+        });
         TextView textViewTitle = (TextView) findViewById(R.id.textViewTitle);
         textViewTitle.setText(subject.getTitle());
 
@@ -202,12 +221,35 @@ public class SubjectActivity extends BaseActivity {
         TextView textViewContent = (TextView) findViewById(R.id.textViewContent);
         textViewContent.setText(subject.getContent());
 
+        ImageView imageViewBack= (ImageView)findViewById(R.id.btnBack);
+        imageViewBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        ImageView imageViewShare=(ImageView)findViewById(R.id.btnShare);
+        imageViewShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                ShareUtils su = new ShareUtils(SubjectActivity.this);
+                su.setContent(subject.getTitle());
+                su.setUrl(subject.getShare_link());
+//                if (shareBitmap != null) {
+//                    su.setPicture(((BitmapDrawable) shareBitmap).getBitmap());
+//                }
+                su.share();
+
+
+            }
+        });
 
 
         ArrayList<HashMap<String, Object>> listItem = new ArrayList<HashMap<String, Object>>();
         List<List<Institute>> institutes = subject.getInstitutes();
-        List<String> institutesDescs=subject.getInstituteDescs();
-
+        List<String> institutesDescs = subject.getInstituteDescs();
 
 
         for (int i = 0; i < institutes.size(); i++) {
@@ -231,7 +273,6 @@ public class SubjectActivity extends BaseActivity {
     }
 
 
-
     private void setUpSubjectFromCache() {
 
         if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_SUBJECT + id, this)) {
@@ -246,7 +287,6 @@ public class SubjectActivity extends BaseActivity {
             setUpSuject(subject);
         }
     }
-
 
 
     @Override
@@ -351,13 +391,14 @@ public class SubjectActivity extends BaseActivity {
 
     private Subject parseSubjectFromString(String realData) throws JSONException {
 
-        Subject subject = new Subject();
+        subject = new Subject();
         JSONObject object = new JSONObject(realData);
         JSONObject result = object.getJSONObject("result").getJSONObject("data");
         subject.setTitle(result.getString("title"));
         subject.setContent(result.getString("content"));
         subject.setDate(result.getString("date"));
         subject.setImage(result.getString("image"));
+        subject.setShare_link(result.getString("share_link"));
 
         List<List<Institute>> institues = new ArrayList<List<Institute>>();
         List<String> instituteDescs = new ArrayList<String>();

@@ -14,6 +14,7 @@ public class Subject implements Parcelable {
     private String date;
     private String content;
     private String image;
+    private String share_link;
 
 
     private List<List<Institute>> institutes;
@@ -91,5 +92,13 @@ public class Subject implements Parcelable {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public String getShare_link() {
+        return share_link;
+    }
+
+    public void setShare_link(String share_link) {
+        this.share_link = share_link;
     }
 }
