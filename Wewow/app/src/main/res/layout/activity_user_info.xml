@@ -1,25 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.wewow.UserInfoActivity">
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="#f7f7f7"
+              android:orientation="vertical"
+              tools:context="com.wewow.UserInfoActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="59dp">
+        android:layout_height="59dp"
+        android:background="@color/white">
 
         <ImageView
             android:id="@+id/userinfo_item_back"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
+            android:layout_marginLeft="17dp"
+            android:layout_marginRight="17dp"
             android:foregroundGravity="center"
-            android:src="@drawable/back_b" />
+            android:src="@drawable/back_b"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -28,20 +29,24 @@
             android:layout_toRightOf="@id/userinfo_item_back"
             android:text="@string/personal_info"
             android:textColor="#333631"
-            android:textSize="20sp" />
+            android:textSize="20sp"/>
 
 
         <ImageView
             android:id="@+id/luserinfo_done"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="6dp"
-            android:src="@drawable/complete" />
-        />
+            android:layout_marginRight="17dp"
+            android:src="@drawable/complete"/>
 
     </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="@drawable/divider"/>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -56,10 +61,12 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="11dp"
                 android:layout_marginLeft="20dp"
+                android:layout_marginTop="12dp"
                 android:text="@string/user_covers"
-                android:textColor="#333631"
-                android:textSize="12sp" />
+                android:textColor="#626461"
+                android:textSize="12sp"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -76,60 +83,65 @@
 
                     <ImageView
                         android:id="@+id/cover_1"
-                        android:layout_width="100dp"
+                        android:layout_width="match_parent"
                         android:layout_height="100dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/cover1" />
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/cover1"/>
 
                     <ImageView
                         android:id="@+id/cover_sel1"
-                        android:layout_width="111dp"
-                        android:layout_height="111dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="100dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/selected"
-                        android:visibility="invisible" />
+                        android:background="@drawable/selected"
+                        android:visibility="invisible"/>
                 </FrameLayout>
 
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="11dp"
                     android:layout_weight="1">
 
                     <ImageView
                         android:id="@+id/cover_2"
-                        android:layout_width="100dp"
+                        android:layout_width="match_parent"
                         android:layout_height="100dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/cover2" />
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/cover2"/>
 
                     <ImageView
                         android:id="@+id/cover_sel2"
-                        android:layout_width="111dp"
-                        android:layout_height="111dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="100dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/selected"
-                        android:visibility="invisible" />
+                        android:background="@drawable/selected"
+                        android:visibility="invisible"/>
                 </FrameLayout>
 
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="11dp"
                     android:layout_weight="1">
 
                     <ImageView
                         android:id="@+id/cover_3"
-                        android:layout_width="100dp"
+                        android:layout_width="match_parent"
                         android:layout_height="100dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/cover3" />
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/cover3"/>
 
                     <ImageView
                         android:id="@+id/cover_sel3"
-                        android:layout_width="111dp"
-                        android:layout_height="111dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="100dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/selected"
-                        android:visibility="invisible" />
+                        android:background="@drawable/selected"
+                        android:visibility="invisible"/>
                 </FrameLayout>
 
             </LinearLayout>
@@ -139,6 +151,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
+                android:layout_marginTop="11dp"
                 android:baselineAligned="false"
                 android:orientation="horizontal">
 
@@ -149,60 +162,65 @@
 
                     <ImageView
                         android:id="@+id/cover_4"
-                        android:layout_width="100dp"
+                        android:layout_width="match_parent"
                         android:layout_height="100dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/cover4" />
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/cover4"/>
 
                     <ImageView
                         android:id="@+id/cover_sel4"
-                        android:layout_width="111dp"
-                        android:layout_height="111dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="100dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/selected"
-                        android:visibility="invisible" />
+                        android:background="@drawable/selected"
+                        android:visibility="invisible"/>
                 </FrameLayout>
 
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="11dp"
                     android:layout_weight="1">
 
                     <ImageView
                         android:id="@+id/cover_5"
-                        android:layout_width="100dp"
+                        android:layout_width="match_parent"
                         android:layout_height="100dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/cover5" />
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/cover5"/>
 
                     <ImageView
                         android:id="@+id/cover_sel5"
-                        android:layout_width="111dp"
-                        android:layout_height="111dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="100dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/selected"
-                        android:visibility="invisible" />
+                        android:background="@drawable/selected"
+                        android:visibility="invisible"/>
                 </FrameLayout>
 
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="11dp"
                     android:layout_weight="1">
 
                     <ImageView
                         android:id="@+id/cover_6"
-                        android:layout_width="100dp"
+                        android:layout_width="match_parent"
                         android:layout_height="100dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/cover6" />
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/cover6"/>
 
                     <ImageView
                         android:id="@+id/cover_sel6"
-                        android:layout_width="111dp"
-                        android:layout_height="111dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="100dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/selected"
-                        android:visibility="invisible" />
+                        android:background="@drawable/selected"
+                        android:visibility="invisible"/>
                 </FrameLayout>
 
             </LinearLayout>
@@ -212,10 +230,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="11dp"
                 android:layout_marginLeft="20dp"
-                android:layout_marginTop="33dp"
+                android:layout_marginTop="44dp"
                 android:text="@string/user_nickname"
-                android:textColor="#333631"
-                android:textSize="12sp" />
+                android:textColor="#4f524e"
+                android:textSize="12sp"/>
 
             <EditText
                 android:id="@+id/userinfo_nickname"
@@ -225,30 +243,32 @@
                 android:layout_marginRight="20dp"
                 android:background="#ffffff"
                 android:paddingLeft="14dp"
-                android:textSize="14sp" />
+                android:textColor="#333631"
+                android:textSize="14sp"/>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="11dp"
                 android:layout_marginLeft="20dp"
-                android:layout_marginTop="40dp"
-                android:text="@string/user_nickname"
-                android:textColor="#333631"
-                android:textSize="12sp" />
+                android:layout_marginTop="11dp"
+                android:text="@string/user_description"
+                android:textColor="#4f524e"
+                android:textSize="12sp"/>
 
             <EditText
                 android:id="@+id/userinfo_desp"
                 android:layout_width="match_parent"
-                android:layout_height="80dp"
+                android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:background="#ffffff"
                 android:gravity="start"
                 android:inputType="textMultiLine"
-                android:paddingLeft="14dp"
-                android:paddingTop="14dp"
-                android:textSize="14sp" />
+                android:minHeight="80dp"
+                android:padding="14dp"
+                android:textColor="#333631"
+                android:textSize="14sp"/>
 
         </LinearLayout>
     </ScrollView>

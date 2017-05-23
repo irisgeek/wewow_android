@@ -148,6 +148,7 @@
         <activity
             android:name=".UserInfoActivity"
             android:label="@string/title_activity_user_info"
+            android:windowSoftInputMode="stateHidden"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
             android:name=".ShowImageActivity"
