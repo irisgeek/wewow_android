@@ -13,6 +13,7 @@
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:orientation="horizontal"
+        card_view:cardElevation="1dp"
         card_view:cardCornerRadius="2dp">
 
         <FrameLayout

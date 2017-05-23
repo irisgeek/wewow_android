@@ -37,6 +37,7 @@
             android:layout_marginTop="12dp"
             android:orientation="vertical"
             android:visibility="gone"
+            card_view:cardElevation="1dp"
             card_view:cardCornerRadius="2dp">
 
 
@@ -104,6 +105,7 @@
             android:layout_marginTop="12dp"
             android:orientation="vertical"
             android:visibility="gone"
+            card_view:cardElevation="1dp"
             card_view:cardCornerRadius="2dp">
 
             <RelativeLayout
@@ -233,7 +235,7 @@
             android:layout_marginTop="12dp"
             android:orientation="horizontal"
             android:id="@+id/cardViewLatest"
-
+            card_view:cardElevation="1dp"
             card_view:cardCornerRadius="2dp">
 
             <FrameLayout

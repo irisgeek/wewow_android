@@ -17,7 +17,7 @@
         android:layout_marginLeft="2dp"
         android:layout_marginRight="2dp"
         android:orientation="horizontal"
-
+        card_view:cardElevation="1dp"
         card_view:cardCornerRadius="2dp">
     <ImageView
         xmlns:app="http://schemas.android.com/apk/res-auto"

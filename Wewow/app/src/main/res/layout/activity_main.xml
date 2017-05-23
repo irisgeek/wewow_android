@@ -52,7 +52,7 @@
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
-                        android:layout_marginBottom="10dp"
+                        android:layout_marginBottom="8dp"
                         android:gravity="center_horizontal"
                         android:orientation="horizontal"></LinearLayout>
 
@@ -65,13 +65,13 @@
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="40dp"
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="56dp"
+                    android:layout_height="40dp"
                     android:layout_marginRight="17dp"
                     android:orientation="horizontal">
 
@@ -79,7 +79,7 @@
                         android:id="@+id/btnBack"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
+                        android:layout_gravity="bottom"
                         android:layout_weight="1"
 
                         android:src="@drawable/selector_btn_menu" />
@@ -93,16 +93,18 @@
                         <AutoCompleteTextView
                             android:id="@+id/editTextSearch"
                             android:layout_width="244dp"
-                            android:layout_height="56dp"
+                            android:layout_height="40dp"
                             android:layout_gravity="bottom"
                             android:layout_marginLeft="17dp"
                             android:layout_marginRight="17dp"
                             android:layout_weight="3"
                             android:gravity="bottom"
                             android:imeOptions="actionDone"
+                            android:layout_marginBottom="-7dp"
                             android:singleLine="true"
                             android:textColor="#ffffff"
                             android:textSize="13sp"
+                            android:text=""
                             android:theme="@style/MyEditText"
                             android:visibility="gone" />
 
@@ -110,7 +112,7 @@
                             android:id="@+id/textTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical|left"
+                            android:layout_gravity="bottom|left"
                             android:layout_marginLeft="12dp"
                             android:text="@string/home"
                             android:textColor="@color/font_color"
@@ -124,7 +126,7 @@
                         android:id="@+id/btnSearch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
+                        android:layout_gravity="bottom"
                         android:layout_marginLeft="17dp"
                         android:layout_weight="1"
                         android:src="@drawable/selector_btn_search" />
@@ -144,6 +146,7 @@
             app:tabIndicatorColor="#333631"
             app:tabMinWidth="@dimen/tab_width"
             app:tabMode="fixed"
+            app:tabIndicatorHeight="4dp"
             app:tabSelectedTextColor="@color/tab_text_selected_color"
             app:tabTextAppearance="@style/MyTabLayoutTextAppearance" />
 
