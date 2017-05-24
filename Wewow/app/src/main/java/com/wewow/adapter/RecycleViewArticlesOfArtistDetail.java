@@ -97,7 +97,7 @@ public  class RecycleViewArticlesOfArtistDetail
                 .fitCenter()
                 .into(holder.mImageView);
         holder.mTextView.setText(list.get(position).get("title").toString());
-//        holder.textViewCount.setText(list.get(position).get("count").toString());
+        holder.textViewCount.setText(list.get(position).get("read_count").toString());
         if(mOnItemClickListener != null){
             //为ItemView设置监听器
             holder.itemView.setOnClickListener(new View.OnClickListener() {

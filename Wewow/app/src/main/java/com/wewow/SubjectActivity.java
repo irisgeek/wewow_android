@@ -224,6 +224,9 @@ public class SubjectActivity extends BaseActivity {
         TextView textViewContent = (TextView) findViewById(R.id.textViewContent);
         textViewContent.setText(subject.getContent());
 
+        ImageView imageVerticalLine=(ImageView)findViewById(R.id.imageVerticalLine);
+        imageVerticalLine.setVisibility(View.VISIBLE);
+
         ImageView imageViewBack= (ImageView)findViewById(R.id.btnBack);
         imageViewBack.setOnClickListener(new View.OnClickListener() {
             @Override

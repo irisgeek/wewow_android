@@ -134,7 +134,7 @@ public class SearchResultActivity extends BaseActivity {
             //
             map.put("id",articles.get(i).getId());
             map.put("image", articles.get(i).getImage_642_320());
-
+            map.put("read_count",articles.get(i).getRead_count());
             map.put("title", articles.get(i).getTitle());
             //todo
             listItemArticle.add(map);
@@ -315,7 +315,7 @@ public class SearchResultActivity extends BaseActivity {
             article.setId(result.getString("id"));
             article.setImage_642_320(result.getString("image_642_320"));
             article.setTitle(result.getString("title"));
-
+            article.setRead_count(result.getString("read_count"));
             articles.add(article);
         }
         return  articles;

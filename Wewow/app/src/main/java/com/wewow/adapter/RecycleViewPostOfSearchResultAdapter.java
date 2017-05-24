@@ -66,7 +66,7 @@ public  class RecycleViewPostOfSearchResultAdapter
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.list_item_post, parent, false);
+                .inflate(R.layout.list_item_post_of_search_result, parent, false);
         view.setBackgroundResource(mBackground);
         return new ViewHolder(view);
     }
