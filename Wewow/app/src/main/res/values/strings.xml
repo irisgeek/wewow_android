@@ -41,6 +41,8 @@
     <string name="article_more_discuss">查看更多</string>
     <string name="article_feedback">文章排版出错了？或者有任何建议请</string>
     <string name="article_feedback_link">反馈给我们</string>
+    <string name="article_all_comment">全部评论</string>
+    <string name="article_psot_comment">发表你的看法</string>
     <string name="lifepost_nodata">还没有人发表看法</string>
     <string name="lifepost_mycomment">我的评论</string>
     <string name="lifepost_title">⽣活帖</string>
