@@ -41,7 +41,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class ArticleActivity extends AppCompatActivity {
+public class ArticleActivity extends AppCompatActivity implements View.OnClickListener {
 
     public static final String ARTICLE_ID = "ARTICLE_ID";
     private static final String TAG = "ArticleActivity";
@@ -91,6 +91,18 @@ public class ArticleActivity extends AppCompatActivity {
         };
         ProgressDialogUtil.getInstance(this).showProgressDialog();
         new HttpAsyncTask().execute(params);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.tv_more_discuss:
+            case R.id.iv_more_discuss:
+                Intent intent = new Intent(ArticleActivity.this, AllCommentActivity.class);
+                intent.putExtra("articleId", id + "");
+                startActivity(intent);
+                break;
+        }
     }
 
     private class ArticleJS {
@@ -307,6 +319,8 @@ public class ArticleActivity extends AppCompatActivity {
                 startActivity(Intent.createChooser(sendIntent, "选择分享方式"));
             }
         });
+        findViewById(R.id.iv_more_discuss).setOnClickListener(this);
+        findViewById(R.id.tv_more_discuss).setOnClickListener(this);
     }
 
     private void fillContent(JSONObject article) {
