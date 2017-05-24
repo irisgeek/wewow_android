@@ -36,6 +36,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.media.Image;
+import android.os.Build;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
@@ -149,7 +150,16 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
 //        Utils.setActivityToBeFullscreen(this);
 
         setContentView(R.layout.activity_main);
+
         StatusBarUtil.setTranslucentForCoordinatorLayout(this, 100);
+        getWindow().getDecorView().setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+            @Override
+            public void onSystemUiVisibilityChange(int visibility) {
+                hideBottomUIMenu();
+            }
+        });
+        this.hideBottomUIMenu();
+
         context = this;
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         float density = Utils.getSceenDensity(this);
@@ -203,6 +213,22 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
 
 
     }
+
+    protected void hideBottomUIMenu() {
+        //隐藏虚拟按键，并且全屏
+        if (Build.VERSION.SDK_INT > 11 && Build.VERSION.SDK_INT < 19) { // lower api
+            View v = this.getWindow().getDecorView();
+            v.setSystemUiVisibility(View.GONE);
+        } else if (Build.VERSION.SDK_INT >= 19) {
+            //for new api versions.
+            View decorView = getWindow().getDecorView();
+            int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_FULLSCREEN;
+            decorView.setSystemUiVisibility(uiOptions);
+
+        }
+    }
+
 
     private void initAppBar() {
         imageViewHome = (ImageView) findViewById(R.id.btnBack);
@@ -441,23 +467,8 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
                                 .getString("update_at");
 
                         long cacheUpdatedTime = (long) (Double.parseDouble(cacheUpdatedTimeStamp) * 1000);
-                        boolean isCacheDataOutdated = FileCacheUtil
-                                .isCacheDataFailure(CommonUtilities.CACHE_FILE_HOT_WORDS, context, cacheUpdatedTime);
 
-
-                        if (isCacheDataOutdated) {
-                            getSearhHotWordsFromServer();
-                        } else {
-                            String fileContent = FileCacheUtil.getCache(context, CommonUtilities.CACHE_FILE_HOT_WORDS);
-
-                            try {
-                                hotWords = parseHotwordsFromString(fileContent);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        isCacheDataOutdated = FileCacheUtil
+                        boolean   isCacheDataOutdated = FileCacheUtil
                                 .isCacheDataFailure(CommonUtilities.CACHE_FILE_BANNER, context, cacheUpdatedTime);
 
                         if (isCacheDataOutdated) {
@@ -487,6 +498,20 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
                                 e.printStackTrace();
                             }
                             setUpNavigationTab(categories);
+                        }
+
+                        isCacheDataOutdated = FileCacheUtil
+                                .isCacheDataFailure(CommonUtilities.CACHE_FILE_HOT_WORDS, context, cacheUpdatedTime);
+                        if (isCacheDataOutdated) {
+                            getSearhHotWordsFromServer();
+                        } else {
+                            String fileContent = FileCacheUtil.getCache(context, CommonUtilities.CACHE_FILE_HOT_WORDS);
+
+                            try {
+                                hotWords = parseHotwordsFromString(fileContent);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
 
 
