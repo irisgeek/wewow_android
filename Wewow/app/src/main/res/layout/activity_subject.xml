@@ -1,6 +1,13 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    android:scrollbars="none">
+
+<FrameLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -11,7 +18,7 @@
         android:orientation="vertical">
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="206dp">
+            android:layout_height="230dp">
 
 <ImageView
     android:layout_width="match_parent"
@@ -28,7 +35,7 @@
                     android:layout_height="wrap_content"
                     android:text=""
                     android:layout_marginLeft="19dp"
-                    android:layout_marginTop="79dp"
+                    android:layout_marginTop="103dp"
                     android:textColor="#ffffff"
                     android:textSize="18sp"
                     android:id="@+id/textViewTitle"/>
@@ -65,7 +72,7 @@
                 android:layout_width="8dp"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="27dp"
-                android:src="#1d7c7d7a"/>
+                android:src="#4A7c7d7a"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -73,7 +80,8 @@
                 android:id="@+id/textViewContent"
                 android:text=""
                 android:layout_marginLeft="22dp"
-                android:textSize="12sp"
+                android:textSize="11sp"
+                android:lineSpacingMultiplier="1.5"
                 android:textColor="#606060"
                 android:layout_marginRight="56dp"
                 />
@@ -87,8 +95,6 @@
 
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
             android:layout_marginTop="40dp"
             android:choiceMode="singleChoice"
             android:divider="@android:color/transparent"
@@ -97,6 +103,7 @@
 
     </LinearLayout>
     <RelativeLayout
+        android:layout_marginTop="24dp"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:gravity="center_vertical">
@@ -125,3 +132,4 @@
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
 </FrameLayout>
+</ScrollView>

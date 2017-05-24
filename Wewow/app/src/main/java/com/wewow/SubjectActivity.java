@@ -15,6 +15,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ScrollView;
+import android.widget.Scroller;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -67,7 +69,8 @@ public class SubjectActivity extends BaseActivity {
 
 
         setContentView(R.layout.activity_subject);
-        StatusBarUtil.setTranslucent(this,100);
+        ImageView view=(ImageView)findViewById(R.id.imageViewTop);
+        StatusBarUtil.setTranslucentForImageView(this, 100, null);
         Intent getIntent = getIntent();
         id = getIntent.getStringExtra("id");
 

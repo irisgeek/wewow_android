@@ -220,7 +220,7 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
                     searchView.setVisibility(View.INVISIBLE);
                     searchView.setText("");
                     resetDropdownOffset = true;
-                    imageViewHome.setImageResource(R.drawable.selector_btn_menu);
+                    imageViewHome.setImageResource(R.drawable.menu);
                     isSearchViewShown = false;
                     if (isAppBarFolded) {
                         textTitle.setVisibility(View.VISIBLE);
@@ -241,7 +241,7 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
                     if (isAppBarFolded) {
                         imageViewHome.setImageResource(R.drawable.back_b);
                     } else {
-                        imageViewHome.setImageResource(R.drawable.selector_btn_back);
+                        imageViewHome.setImageResource(R.drawable.back);
                     }
                     searchView.setVisibility(View.VISIBLE);
                     textTitle.setVisibility(View.GONE);
@@ -293,7 +293,7 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
                         if (isAppBarFolded) {
                             imageViewHome.setImageResource(R.drawable.menu_b);
                         } else {
-                            imageViewHome.setImageResource(R.drawable.selector_btn_menu);
+                            imageViewHome.setImageResource(R.drawable.menu);
                         }
 
                         isSearchViewShown = false;
@@ -305,7 +305,7 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
                         if (isAppBarFolded) {
                             imageViewHome.setImageResource(R.drawable.back_b);
                         } else {
-                            imageViewHome.setImageResource(R.drawable.selector_btn_back);
+                            imageViewHome.setImageResource(R.drawable.back);
                         }
                         searchView.setVisibility(View.VISIBLE);
                         searchView.setHint(getResources().getString(R.string.search_hint));
@@ -357,8 +357,8 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
                     searchView.setTextColor(getResources().getColor(R.color.search_text_view_color));
                     searchView.setHintTextColor(getResources().getColor(R.color.search_text_view_hint_color));
 
-                    imageViewHome.setImageResource(R.drawable.selector_btn_menu);
-                    imageViewSearch.setImageResource(R.drawable.selector_btn_search);
+                    imageViewHome.setImageResource(R.drawable.menu);
+                    imageViewSearch.setImageResource(R.drawable.search);
                     textTitle.setVisibility(View.GONE);
                     searchView.setVisibility(View.INVISIBLE);
 

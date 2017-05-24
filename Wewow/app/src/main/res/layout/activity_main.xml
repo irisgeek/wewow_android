@@ -82,7 +82,7 @@
                         android:layout_gravity="bottom"
                         android:layout_weight="1"
 
-                        android:src="@drawable/selector_btn_menu" />
+                        android:src="@drawable/menu" />
 
 
                     <FrameLayout
@@ -129,7 +129,7 @@
                         android:layout_gravity="bottom"
                         android:layout_marginLeft="17dp"
                         android:layout_weight="1"
-                        android:src="@drawable/selector_btn_search" />
+                        android:src="@drawable/search" />
                 </LinearLayout>
 
 
