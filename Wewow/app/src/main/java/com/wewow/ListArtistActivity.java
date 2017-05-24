@@ -435,6 +435,7 @@ public class ListArtistActivity extends BaseActivity {
             adapter = new ListViewArtistsAdapter(this, listItem, followStatus);
 
             listView.setAdapter(adapter);
+
 //            if(!isHeaderAdded) {
 //
 //                isHeaderAdded=true;
@@ -456,11 +457,12 @@ public class ListArtistActivity extends BaseActivity {
                                         }
         );
         adapter.notifyDataSetChanged();
+        listView.setVisibility(View.VISIBLE);
         currentPage++;
         refreshLayout.finishRefresh();
         refreshLayout.finishRefreshLoadMore();
-        CardView view=(CardView)findViewById(R.id.refreshCardView);
-        view.setVisibility(View.VISIBLE);
+//        CardView view=(CardView)findViewById(R.id.refreshCardView);
+//        view.setVisibility(View.VISIBLE);
 
 
     }

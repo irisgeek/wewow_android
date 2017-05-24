@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -18,6 +19,9 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.cjj.MaterialRefreshLayout;
+import com.cjj.MaterialRefreshListener;
+import com.jaeger.library.StatusBarUtil;
 import com.wewow.adapter.ListViewArtistsAdapter;
 import com.wewow.adapter.ListViewSubscribedArtistsAdapter;
 import com.wewow.dto.Artist;
@@ -50,9 +54,10 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
     private ListView listView;
     private ArrayList<HashMap<String, Object>> listItem;
     private ListViewSubscribedArtistsAdapter adapter;
-    private SwipeRefreshLayout swipeRefreshLayout;
     private int selectedPosition=0;
     private ArrayList<String> read;
+    private MaterialRefreshLayout refreshLayout;
+    private int totalPages = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,21 +66,11 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
 
 
         setContentView(R.layout.activity_list_artist_subscribed);
+
+        StatusBarUtil.setColor(this, getResources().getColor(R.color.white), 50);
         initData();
 
-        if (Utils.isNetworkAvailable(this)) {
 
-//            checkcacheUpdatedOrNot();
-            getArtistListFromServer();
-
-        } else {
-            Toast.makeText(this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
-            swipeRefreshLayout.setRefreshing(false);
-
-            SettingUtils.set(this, CommonUtilities.NETWORK_STATE, false);
-            setUpArtistsFromCache();
-
-        }
         setUpToolBar();
 
     }
@@ -85,9 +80,66 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
         listView = (ListView) findViewById(R.id.listViewArtists);
 
         listItem = new ArrayList<HashMap<String, Object>>();
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
-        swipeRefreshLayout.setOnRefreshListener(this);
         read=new ArrayList<String>();
+
+        refreshLayout = (MaterialRefreshLayout) findViewById(R.id.refresh);
+
+        refreshLayout.setShowArrow(false);
+        int[] colors = {getResources().getColor(R.color.font_color)};
+        refreshLayout.setProgressColors(colors);
+        refreshLayout.setLoadMore(true);
+        refreshLayout.finishRefreshLoadMore();
+
+        refreshLayout.setMaterialRefreshListener(new MaterialRefreshListener() {
+            @Override
+            public void onRefresh(final MaterialRefreshLayout materialRefreshLayout) {
+                currentPage = 1;
+                if (Utils.isNetworkAvailable(ListSubscribedArtistActivity.this)) {
+
+//                    checkcacheUpdatedOrNot();
+                    getArtistListFromServer();
+
+                } else {
+                    Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
+                    refreshLayout.finishRefresh();
+
+                    SettingUtils.set(ListSubscribedArtistActivity.this, CommonUtilities.NETWORK_STATE, false);
+                    setUpArtistsFromCache();
+
+                }
+
+            }
+
+            @Override
+            public void onfinish() {
+
+                refreshLayout.finishRefreshLoadMore();
+            }
+
+            @Override
+            public void onRefreshLoadMore(MaterialRefreshLayout materialRefreshLayout) {
+
+                boolean isLastPageLoaded = false;
+                try {
+                    isLastPageLoaded = isLastPageLoaded();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                if (!isLastPageLoaded) {
+
+                    getArtistListFromServer();
+                } else {
+                    adapter.notifyDataSetChanged();
+                    onfinish();
+                }
+
+
+            }
+        });
+
+
+        refreshLayout.autoRefresh();
+
     }
 
     @Override
@@ -103,58 +155,7 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.toolbar, menu);
-        MenuItem menuItem = menu.findItem(R.id.search);
-        menuItem.setVisible(true);
 
-        SearchManager searchManager =
-                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        final SearchView searchView =
-                (SearchView) menu.findItem(R.id.search).getActionView();
-
-        searchView.setQueryHint(getResources().getString(R.string.search_hint));
-
-
-        ((ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_button)).setImageResource(R.drawable.selector_btn_search);
-
-
-        final String[] testStrings = getResources().getStringArray(R.array.test_array);
-//        int completeTextId = searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
-//        AutoCompleteTextView completeText = (AutoCompleteTextView) searchView
-//                .findViewById(completeTextId) ;
-
-
-        AutoCompleteTextView completeText = (SearchView.SearchAutoComplete) searchView.findViewById(R.id.search_src_text);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.list_item_search, R.id.text, testStrings);
-
-        completeText.setAdapter(adapter);
-        completeText.setTextColor(getResources().getColor(R.color.search_text_view_color));
-        completeText.setHintTextColor(getResources().getColor(R.color.search_text_view_hint_color));
-        completeText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                searchView.setQuery(testStrings[position], true);
-            }
-        });
-
-        completeText.setThreshold(0);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                Toast.makeText(ListSubscribedArtistActivity.this, query, Toast.LENGTH_SHORT).show();
-//                LinearLayout layout = (LinearLayout) findViewById(R.id.layoutCover);
-//                layout.setVisibility(View.GONE);
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-        });
-
-        searchView.setSearchableInfo(
-                searchManager.getSearchableInfo(getComponentName()));
         return true;
     }
 
@@ -232,60 +233,60 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
     }
 
     private void checkcacheUpdatedOrNot() {
-        swipeRefreshLayout.setRefreshing(true);
-        ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
-        iTask.updateAt(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), new Callback<JSONObject>() {
-            @Override
-            public void success(JSONObject object, Response response) {
-
-
-                try {
-                    String realData = Utils.convertStreamToString(response.getBody().in());
-                    if (!realData.contains(CommonUtilities.SUCCESS)) {
-                        Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-
-                        swipeRefreshLayout.setRefreshing(false);
-
-                    } else {
-                        JSONObject jsonObject = new JSONObject(realData);
-                        String cacheUpdatedTimeStamp = jsonObject
-                                .getJSONObject("result")
-                                .getJSONObject("data")
-                                .getString("update_at");
-
-                        long cacheUpdatedTime = (long) (Double.parseDouble(cacheUpdatedTimeStamp) * 1000);
-                        boolean isCacheDataOutdated = FileCacheUtil
-                                .isCacheDataFailure(CommonUtilities.CACHE_FILE_SUBSCRIBED_ARTISTS_LIST, ListSubscribedArtistActivity.this, cacheUpdatedTime);
-
-                        if (isCacheDataOutdated) {
-                            getArtistListFromServer();
-                        } else {
-                            setUpArtistsFromCache();
-//                            setUpListViewDummy();
-
-                        }
-
-
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                    swipeRefreshLayout.setRefreshing(false);
-                } catch (JSONException e) {
-                    Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
-                    swipeRefreshLayout.setRefreshing(false);
-                }
-
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                swipeRefreshLayout.setRefreshing(false);
-            }
-
-        });
+//        swipeRefreshLayout.setRefreshing(true);
+//        ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
+//        iTask.updateAt(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), new Callback<JSONObject>() {
+//            @Override
+//            public void success(JSONObject object, Response response) {
+//
+//
+//                try {
+//                    String realData = Utils.convertStreamToString(response.getBody().in());
+//                    if (!realData.contains(CommonUtilities.SUCCESS)) {
+//                        Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+//
+//                        swipeRefreshLayout.setRefreshing(false);
+//
+//                    } else {
+//                        JSONObject jsonObject = new JSONObject(realData);
+//                        String cacheUpdatedTimeStamp = jsonObject
+//                                .getJSONObject("result")
+//                                .getJSONObject("data")
+//                                .getString("update_at");
+//
+//                        long cacheUpdatedTime = (long) (Double.parseDouble(cacheUpdatedTimeStamp) * 1000);
+//                        boolean isCacheDataOutdated = FileCacheUtil
+//                                .isCacheDataFailure(CommonUtilities.CACHE_FILE_SUBSCRIBED_ARTISTS_LIST, ListSubscribedArtistActivity.this, cacheUpdatedTime);
+//
+//                        if (isCacheDataOutdated) {
+//                            getArtistListFromServer();
+//                        } else {
+//                            setUpArtistsFromCache();
+////                            setUpListViewDummy();
+//
+//                        }
+//
+//
+//                    }
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                    Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+//                    swipeRefreshLayout.setRefreshing(false);
+//                } catch (JSONException e) {
+//                    Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+//                    e.printStackTrace();
+//                    swipeRefreshLayout.setRefreshing(false);
+//                }
+//
+//            }
+//
+//            @Override
+//            public void failure(RetrofitError error) {
+//                Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+//                swipeRefreshLayout.setRefreshing(false);
+//            }
+//
+//        });
     }
 
     private void setUpArtistsFromCache() {
@@ -309,7 +310,7 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
         ArrayList<String> readCopy=new ArrayList<String>();
         listItemCopy.addAll(listItem);
         readCopy.addAll(read);
-        if (refresh) {
+//        if (refresh) {
 
             if (listItem != null && listItem.size() > 0) {
                 listItem.clear();
@@ -318,8 +319,14 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
             if (read != null && read.size() > 0) {
                 read.clear();
 
-            }
+//            }
 
+        }
+
+        if (currentPage != 1) {
+
+            listItem.addAll(listItemCopy);
+            read.addAll(readCopy);
         }
 
         for (int i = 0; i < artists.size(); i++) {
@@ -341,8 +348,6 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
             read.add(artists.get(i).getRead());
         }
 
-        listItem.addAll(listItemCopy);
-        read.addAll(readCopy);
 
 
         if (!refresh)
@@ -372,9 +377,12 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
                                         }
         );
         adapter.notifyDataSetChanged();
+        listView.setVisibility(View.VISIBLE);
         currentPage++;
-        swipeRefreshLayout.setRefreshing(false);
-
+        refreshLayout.finishRefresh();
+        refreshLayout.finishRefreshLoadMore();
+//        CardView view=(CardView)findViewById(R.id.refreshCardView);
+//        view.setVisibility(View.VISIBLE);
 
     }
 
@@ -387,7 +395,7 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
         final String read="1";
 
 
-        iTask.artist_read(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), userId, token,artistId,read, new Callback<JSONObject>() {
+        iTask.artist_read(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), userId, token, artistId, read, new Callback<JSONObject>() {
 
             @Override
             public void success(JSONObject object, Response response) {
@@ -395,14 +403,12 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
 
                 try {
                     String realData = Utils.convertStreamToString(response.getBody().in());
-                    String code=new JSONObject(realData).getJSONObject("result").get("code").toString();
+                    String code = new JSONObject(realData).getJSONObject("result").get("code").toString();
                     if (!code.equals("0")) {
                         Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                    }
-                    else
-                    {
+                    } else {
                         FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_LIST, ListSubscribedArtistActivity.this);
-                        FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_DETAIL+artistId, ListSubscribedArtistActivity.this);
+                        FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_DETAIL + artistId, ListSubscribedArtistActivity.this);
                         FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_SUBSCRIBED_ARTISTS_LIST, ListSubscribedArtistActivity.this);
                     }
 
@@ -427,7 +433,7 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
     }
 
     private void getArtistListFromServer() {
-        swipeRefreshLayout.setRefreshing(true);
+        refreshLayout.finishRefresh();
         ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
         String userId = "0";
         //check user login or not
@@ -445,10 +451,13 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
                     String realData = Utils.convertStreamToString(response.getBody().in());
                     if (!realData.contains(CommonUtilities.SUCCESS)) {
                         Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                        swipeRefreshLayout.setRefreshing(false);
+                        refreshLayout.finishRefresh();
+                        refreshLayout.finishRefreshLoadMore();
 
                     } else {
                         artists = parseArtistsListFromString(realData);
+                        JSONObject objectData = new JSONObject(realData);
+                        totalPages = Integer.parseInt(objectData.getJSONObject("result").getJSONObject("data").getString("follow_total_page"));
 
                         if (currentPage > 1) {
                             setUpArtists(artists, true);
@@ -462,11 +471,13 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
                 } catch (IOException e) {
                     e.printStackTrace();
                     Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                    swipeRefreshLayout.setRefreshing(false);
+                    refreshLayout.finishRefresh();
+                    refreshLayout.finishRefreshLoadMore();
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                    swipeRefreshLayout.setRefreshing(false);
+                    refreshLayout.finishRefresh();
+                    refreshLayout.finishRefreshLoadMore();
                 }
 
             }
@@ -474,7 +485,8 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
             @Override
             public void failure(RetrofitError error) {
                 Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                swipeRefreshLayout.setRefreshing(false);
+                refreshLayout.finishRefresh();
+                refreshLayout.finishRefreshLoadMore();
 
             }
         });
@@ -494,7 +506,7 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
             getArtistListFromServer();
         }
         else {
-            swipeRefreshLayout.setRefreshing(false);
+            refreshLayout.finishRefresh();
         }
     }
 
@@ -502,19 +514,18 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
 
         boolean result = false;
 
-        if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_SUBSCRIBED_ARTISTS_LIST, this)) {
-            String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_SUBSCRIBED_ARTISTS_LIST);
-            JSONObject object = new JSONObject(fileContent);
-            String totalPages = object.getJSONObject("result").getJSONObject("data").getString("follow_total_page");
-            if (currentPage>Integer.parseInt(totalPages)) {
 
-                result = true;
-            }
+        if (currentPage > totalPages) {
+
+            result = true;
         }
+
 
         return result;
 
     }
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
