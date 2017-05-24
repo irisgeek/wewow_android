@@ -41,7 +41,7 @@ import retrofit.client.OkClient;
 /**
  * Created by iris on 17/3/2.
  */
-public class    Utils {
+public class Utils {
 
     /**
      * Converts pixel to dip.
@@ -62,11 +62,23 @@ public class    Utils {
         return pixelToDip(activity, screenWidth);
     }
 
-    public static float getSceenDensity(Context mContext)
-    {
+    public static int getScreenHeightDp(Activity activity) {
+        Point size = new Point();
+        activity.getWindowManager().getDefaultDisplay().getSize(size);
+        int screenHeight = size.y;
+        return pixelToDip(activity, screenHeight);
+    }
+
+    public static int getScreenHeightPx(Activity activity) {
+        Point size = new Point();
+        activity.getWindowManager().getDefaultDisplay().getSize(size);
+        return size.y;
+    }
+
+    public static float getSceenDensity(Context mContext) {
         DisplayMetrics displayMetrics = mContext.getResources()
                 .getDisplayMetrics();
-        return  displayMetrics.density;
+        return displayMetrics.density;
 
     }
 
