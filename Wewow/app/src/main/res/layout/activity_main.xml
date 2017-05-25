@@ -52,7 +52,7 @@
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
-                        android:layout_marginBottom="8dp"
+                        android:layout_marginBottom="6dp"
                         android:gravity="center_horizontal"
                         android:orientation="horizontal"></LinearLayout>
 
@@ -168,6 +168,23 @@
         android:visibility="gone">
 
     </RelativeLayout>
+    <LinearLayout
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginTop="230dp"
+        android:orientation="vertical">
+
+        <com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar
+            android:id="@+id/progress1"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="2dp"
+            android:layout_gravity="center_horizontal"
+            android:visibility="visible"
+            app:mlpb_progress_color="@color/font_color"
+            app:mlpb_progress_stoke_width="3dp" />
+    </LinearLayout>
 
 
 </android.support.design.widget.CoordinatorLayout>

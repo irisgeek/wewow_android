@@ -75,6 +75,13 @@ public class SubjectActivity extends BaseActivity {
         id = getIntent.getStringExtra("id");
 
 
+        ImageView imageViewBack= (ImageView)findViewById(R.id.btnBack);
+        imageViewBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         if (Utils.isNetworkAvailable(this)) {
 
             checkcacheUpdatedOrNot();
@@ -227,13 +234,6 @@ public class SubjectActivity extends BaseActivity {
         ImageView imageVerticalLine=(ImageView)findViewById(R.id.imageVerticalLine);
         imageVerticalLine.setVisibility(View.VISIBLE);
 
-        ImageView imageViewBack= (ImageView)findViewById(R.id.btnBack);
-        imageViewBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
 
         ImageView imageViewShare=(ImageView)findViewById(R.id.btnShare);
         imageViewShare.setOnClickListener(new View.OnClickListener() {

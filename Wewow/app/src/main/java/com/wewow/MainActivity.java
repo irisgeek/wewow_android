@@ -141,6 +141,7 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
     private Toolbar toolbar;
     private List<String> hotWords;
     private boolean resetDropdownOffset = false;
+    public LinearLayout progressBar;
 
 
     @Override
@@ -159,6 +160,8 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
             }
         });
         this.hideBottomUIMenu();
+        progressBar=(LinearLayout)findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
 
         context = this;
         viewPager = (ViewPager) findViewById(R.id.viewPager);
@@ -174,39 +177,51 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
 //        setUpNavigationTabDummy(null);
 
 //        setUpNavigationTab();
-        if (Utils.isNetworkAvailable(this)) {
-            //if banner data never cached or outdated
 
-            checkcacheUpdatedOrNot();
-        } else {
-            Toast.makeText(this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
-
-            SettingUtils.set(this, CommonUtilities.NETWORK_STATE, false);
-            //if banner data cached
-            if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_BANNER, this)) {
-                String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_BANNER);
-                List<Banner> banners = new ArrayList<Banner>();
-                try {
-                    banners = parseBannersFromString(fileContent);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                setUpViewPagerBanner(banners);
+        SettingUtils.set(this, CommonUtilities.NETWORK_STATE, false);
+        //if banner data cached
+        if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_BANNER, this)) {
+            String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_BANNER);
+            List<Banner> banners = new ArrayList<Banner>();
+            try {
+                banners = parseBannersFromString(fileContent);
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
+            setUpViewPagerBanner(banners);
+        }
 
-            //if tab title cached
-            if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_TAB_TITLE, this)) {
-                String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_TAB_TITLE);
-                List<collectionCategory> categories = new ArrayList<collectionCategory>();
-                try {
-                    categories = parseCategoriesFromString(fileContent);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+        //if tab title cached
+        if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_TAB_TITLE, this)) {
+            String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_TAB_TITLE);
+            List<collectionCategory> categories = new ArrayList<collectionCategory>();
+            try {
+                categories = parseCategoriesFromString(fileContent);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            if(Utils.isNetworkAvailable(this))
+            {
+                setUpNavigationTabTitle(categories);
+            }
+            else
+            {
                 setUpNavigationTab(categories);
             }
 
         }
+        if (Utils.isNetworkAvailable(this)) {
+            //if banner data never cached or outdated
+
+            checkcacheUpdatedOrNot();
+        }
+        else {
+            Toast.makeText(this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
+        }
+
+
+
+//        }
 
         setUpToolBar();
 //        setUpScrollView();
@@ -223,11 +238,13 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
             //for new api versions.
             View decorView = getWindow().getDecorView();
             int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_FULLSCREEN;
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
             decorView.setSystemUiVisibility(uiOptions);
 
         }
     }
+
+
 
 
     private void initAppBar() {
@@ -474,14 +491,14 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
                         if (isCacheDataOutdated) {
                             getBannerInfoFromServer();
                         } else {
-                            String fileContent = FileCacheUtil.getCache(MainActivity.this, CommonUtilities.CACHE_FILE_BANNER);
-                            List<Banner> banners = new ArrayList<Banner>();
-                            try {
-                                banners = parseBannersFromString(fileContent);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            setUpViewPagerBanner(banners);
+//                            String fileContent = FileCacheUtil.getCache(MainActivity.this, CommonUtilities.CACHE_FILE_BANNER);
+//                            List<Banner> banners = new ArrayList<Banner>();
+//                            try {
+//                                banners = parseBannersFromString(fileContent);
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
+//                            setUpViewPagerBanner(banners);
 
                         }
 
@@ -583,12 +600,7 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
 
 
     private void setUpNavigationTab(List<collectionCategory> titles) {
-        mTabLayout = (TabLayout) findViewById(R.id.tabs);
-        mTabLayout.setTabMode(TabLayout.MODE_FIXED);
-        mTabLayout.addTab(mTabLayout.newTab().setText(" " + getResources().getString(R.string.home_page) + " "));
-        for (int i = 0; i < titles.size(); i++) {
-            mTabLayout.addTab(mTabLayout.newTab().setText(titles.get(i).getTitle()));
-        }
+        setUpNavigationTabTitle(titles);
 
 
 //        mTabLayout.addTab(mTabLayout.newTab().setText(" " + getResources().getString(R.string.home)));
@@ -616,6 +628,15 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
 
         setUpTabs(list, ids);
 
+    }
+
+    private void setUpNavigationTabTitle(List<collectionCategory> titles) {
+        mTabLayout = (TabLayout) findViewById(R.id.tabs);
+        mTabLayout.setTabMode(TabLayout.MODE_FIXED);
+        mTabLayout.addTab(mTabLayout.newTab().setText(" " + getResources().getString(R.string.home_page) + " "));
+        for (int i = 0; i < titles.size(); i++) {
+            mTabLayout.addTab(mTabLayout.newTab().setText(titles.get(i).getTitle()));
+        }
     }
 
     private void setUpNavigationTabDummy(List<collectionCategory> titles) {
@@ -663,7 +684,7 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
         viewPagerTabs.setAdapter(adapter);
         viewPagerTabs.setOffscreenPageLimit(5);
         mTabLayout.setupWithViewPager(viewPagerTabs);
-
+        progressBar.setVisibility(View.GONE);
         viewPager.setFocusable(true);
         viewPager.setFocusableInTouchMode(true);
         viewPager.requestFocus();
@@ -751,12 +772,13 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
             });
         }
 
+        group.removeAllViews();
         //
         imageViews = new ImageView[pageview.size()];
         for (int i = 0; i < pageview.size(); i++) {
             imageView = new ImageView(MainActivity.this);
-            imageView.setLayoutParams(new ViewGroup.LayoutParams(50, 50));
-            imageView.setPadding(20, 0, 20, 0);
+            imageView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            imageView.setPadding(12, 0, 12, 0);
             imageViews[i] = imageView;
 
             //
