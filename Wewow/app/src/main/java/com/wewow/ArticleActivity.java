@@ -61,7 +61,7 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Utils.setActivityToBeFullscreen(this);
+//        Utils.setActivityToBeFullscreen(this);
         setContentView(R.layout.activity_article);
         this.setupUI();
         Intent i = this.getIntent();
