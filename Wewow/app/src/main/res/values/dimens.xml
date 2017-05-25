@@ -5,4 +5,5 @@
     <dimen name="life_lover_recommended_page_margin">12dp</dimen>
     <dimen name="tab_width">60dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="text_title_height">24dp</dimen>
 </resources>

@@ -37,6 +37,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.Image;
 import android.os.Build;
+import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
@@ -60,6 +61,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -142,6 +145,7 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
     private List<String> hotWords;
     private boolean resetDropdownOffset = false;
     public LinearLayout progressBar;
+    private ImageView imageViewUnderLine;
 
 
     @Override
@@ -251,7 +255,7 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
         imageViewHome = (ImageView) findViewById(R.id.btnBack);
         imageViewSearch = (ImageView) findViewById(R.id.btnSearch);
         textTitle = (TextView) findViewById(R.id.textTitle);
-
+        imageViewUnderLine = (ImageView) findViewById(R.id.imageViewUnderlineOfSearchView);
 
         searchView = (AutoCompleteTextView) findViewById(R.id.editTextSearch);
         imageViewHome.setOnClickListener(new View.OnClickListener() {
@@ -259,8 +263,10 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
             public void onClick(View v) {
                 if (!isSearchViewShown) {
                     drawerLayout.openDrawer(GravityCompat.START);
+
                 } else {
                     searchView.setVisibility(View.INVISIBLE);
+                    imageViewUnderLine.setVisibility(View.INVISIBLE);
                     searchView.setText("");
                     resetDropdownOffset = true;
                     imageViewHome.setImageResource(R.drawable.menu);
@@ -286,8 +292,7 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
                     } else {
                         imageViewHome.setImageResource(R.drawable.back);
                     }
-                    searchView.setVisibility(View.VISIBLE);
-                    textTitle.setVisibility(View.GONE);
+
                     ListSearchAdapter adapter = new ListSearchAdapter(hotWords, MainActivity.this);
 //
 //                    ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.list_item_search, R.id.text, hotWords);
@@ -295,17 +300,35 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
 
                     searchView.setAdapter(adapter);
                     searchView.setHint(getResources().getString(R.string.search_hint));
-                    searchView.requestFocus();
-                    InputMethodManager inputManager =
-                            (InputMethodManager) searchView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    inputManager.showSoftInput(searchView, 0);
+
                     searchView.setThreshold(0);
                     if (resetDropdownOffset) {
 //                        searchView.setDropDownVerticalOffset(40);
 //                        resetDropdownOffset = false;
                     }
-                    searchView.showDropDown();
+                    showUnderLine();
+
                     showCover();
+                    new Handler().postDelayed(new Runnable() {
+
+                        public void run() {
+                            //execute the task
+                            searchView.setVisibility(View.VISIBLE);
+                            textTitle.setVisibility(View.GONE);
+                            searchView.requestFocus();
+                            InputMethodManager inputManager =
+                                    (InputMethodManager) searchView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                            inputManager.showSoftInput(searchView, 0);
+                        }
+                    }, 100);
+
+                    new Handler().postDelayed(new Runnable() {
+
+                        public void run() {
+                            //execute the task
+                            searchView.showDropDown();
+                        }
+                    }, 200);
 
                     searchView.addTextChangedListener(MainActivity.this);
                     searchView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -330,6 +353,7 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
                     if (!queryText.equals("")) {
                         searchView.setText("");
                         searchView.setVisibility(View.INVISIBLE);
+                        imageViewUnderLine.setVisibility(View.INVISIBLE);
                         Intent intentSearch = new Intent(MainActivity.this, SearchResultActivity.class);
                         intentSearch.putExtra("key_word", queryText);
                         startActivity(intentSearch);
@@ -350,24 +374,42 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
                         } else {
                             imageViewHome.setImageResource(R.drawable.back);
                         }
-                        searchView.setVisibility(View.VISIBLE);
                         searchView.setHint(getResources().getString(R.string.search_hint));
-                        textTitle.setVisibility(View.GONE);
+
                         final String[] testStrings = getResources().getStringArray(R.array.test_array);
 //                        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.list_item_search, R.id.text, hotWords);
                         ListSearchAdapter adapter = new ListSearchAdapter(hotWords, MainActivity.this);
                         searchView.setAdapter(adapter);
                         searchView.requestFocus();
-                        InputMethodManager inputManager =
-                                (InputMethodManager) searchView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                        inputManager.showSoftInput(searchView, 0);
+
                         if (resetDropdownOffset) {
 //                            resetDropdownOffset = false;
 //                            searchView.setDropDownVerticalOffset(-40);
                         }
 //                        searchView.setDropDownVerticalOffset(-40);
-                        searchView.showDropDown();
+                        showUnderLine();
+
                         showCover();
+                        new Handler().postDelayed(new Runnable() {
+
+                            public void run() {
+                                //execute the task
+                                searchView.setVisibility(View.VISIBLE);
+                                textTitle.setVisibility(View.GONE);
+                                searchView.requestFocus();
+                                InputMethodManager inputManager =
+                                        (InputMethodManager) searchView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                                inputManager.showSoftInput(searchView, 0);
+                            }
+                        }, 100);
+
+                        new Handler().postDelayed(new Runnable() {
+
+                            public void run() {
+                                //execute the task
+                                searchView.showDropDown();
+                            }
+                        }, 200);
                         searchView.addTextChangedListener(MainActivity.this);
                         searchView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                             @Override
@@ -404,6 +446,7 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
                     imageViewSearch.setImageResource(R.drawable.search);
                     textTitle.setVisibility(View.GONE);
                     searchView.setVisibility(View.INVISIBLE);
+                    imageViewUnderLine.setVisibility(View.INVISIBLE);
 
                     isAppBarFolded = false;
                     toolbar.setBackgroundColor(getResources().getColor(R.color.transparent));
@@ -418,6 +461,7 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
                     textTitle.setVisibility(View.VISIBLE);
                     resetDropdownOffset = true;
                     searchView.setVisibility(View.INVISIBLE);
+                    imageViewUnderLine.setVisibility(View.INVISIBLE);
 
                     toolbar.setBackgroundColor(getResources().getColor(R.color.white));
 
@@ -433,6 +477,15 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
                 }
             }
         });
+    }
+
+    private void showUnderLine() {
+
+        final Animation animation = AnimationUtils.loadAnimation(this, R.anim.search_view_underline_anim);
+
+        imageViewUnderLine.setVisibility(View.VISIBLE);
+        imageViewUnderLine.startAnimation(animation);
+
     }
 
     private void showCover() {
