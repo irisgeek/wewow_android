@@ -24,6 +24,7 @@ import com.wewow.utils.BlurBuilder;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
 import com.wewow.utils.LoginUtils;
+import com.wewow.utils.MessageBoxUtils;
 import com.wewow.utils.ProgressDialogUtil;
 import com.wewow.utils.RemoteImageLoader;
 import com.wewow.utils.Utils;
@@ -95,7 +96,7 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.tv_more_discuss:
             case R.id.iv_more_discuss:
                 Intent intent = new Intent(ArticleActivity.this, AllCommentActivity.class);
@@ -171,7 +172,7 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
                 view.loadUrl("javascript:articlejs.onGetPage(document.documentElement.innerHTML);");
                 layout_content.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.GONE);
-                findViewById(R.id.scrollview).scrollTo(0,0);
+                findViewById(R.id.scrollview).scrollTo(0, 0);
             }
         });
         this.logo = (ImageView) this.findViewById(R.id.article_logo);
@@ -235,15 +236,21 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
                                         throw new Exception(String.valueOf(i));
                                     }
                                     ArticleActivity.this.like.setImageDrawable(ArticleActivity.this.getResources().getDrawable(like == 1 ? R.drawable.marked_b : R.drawable.mark_b));
-                                    if(like == 1){
+                                    String s;
+                                    if (like == 1) {
                                         likedCount += 1;
-                                    }else{
+                                        s = ArticleActivity.this.getString(R.string.fav_succeed);
+                                    } else {
                                         likedCount -= 1;
+                                        s = ArticleActivity.this.getString(R.string.unfav_succeed);
                                     }
                                     article_fav_count.setText(likedCount + "");
+                                    MessageBoxUtils.messageBoxWithNoButton(ArticleActivity.this, true, s, 2500);
                                 } catch (Exception e) {
                                     Log.e(TAG, String.format("favourite fail: %s", e.getMessage()));
-                                    Toast.makeText(ArticleActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                                    //Toast.makeText(ArticleActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                                    String s = ArticleActivity.this.getString(like == 1 ? R.string.fav_fail : R.string.unfav_fail);
+                                    MessageBoxUtils.messageBoxWithNoButton(ArticleActivity.this, true, s, 2500);
                                 }
                             }
                         },
@@ -367,7 +374,7 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
 
     private void setupFeedback() {
         TextView tv = (TextView) this.findViewById(R.id.article_feedback_link);
-        tv.getPaint().setFlags(Paint. UNDERLINE_TEXT_FLAG );
+        tv.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
         tv.getPaint().setAntiAlias(true);
 
         tv.setOnClickListener(new View.OnClickListener() {
