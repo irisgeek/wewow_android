@@ -38,7 +38,11 @@ public class HttpAsyncTask extends AsyncTask<Object, Integer, byte[]> {
 
     @Override
     protected void onPostExecute(byte[] result) {
-        this.delegate.taskCompletionResult(result);
+        try {
+            this.delegate.taskCompletionResult(result);
+        } catch (Exception ex) {
+            Log.e(TAG, String.format("onPostExecute error: %s", ex.getMessage()));
+        }
     }
 
     public static JSONObject bytearray2JSON(byte[] in) {
