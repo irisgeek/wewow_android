@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
@@ -63,6 +64,8 @@ public class AllCommentActivity extends Activity implements View.OnClickListener
         view_empty = findViewById(R.id.view_empty);
         editTextContent = (EditText) findViewById(R.id.editTextContent);
         footer = View.inflate(this, R.layout.lifelab_foot, null);
+        ImageView iv_loading = (ImageView) footer.findViewById(R.id.iv_loading);
+        Glide.with(this).load(R.drawable.bottom_loading).into(iv_loading);
         list_comment.addFooterView(footer, null, false);
         adapter = new CommentAdapter();
         list_comment.setAdapter(adapter);
