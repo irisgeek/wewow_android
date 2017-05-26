@@ -149,11 +149,11 @@ public class ShareActivity extends Activity implements IWeiboHandler.Response {
                 startActivity(Intent.createChooser(sendIntent, "选择分享方式"));
             }
         });
-        if (this.getIntent().hasExtra(BACK_GROUND)) {
+        /*if (this.getIntent().hasExtra(BACK_GROUND)) {
             byte[] buf = this.getIntent().getByteArrayExtra(BACK_GROUND);
             Bitmap bm = BitmapFactory.decodeByteArray(buf, 0, buf.length);
             this.findViewById(android.R.id.content).setBackground(new BitmapDrawable(bm));
-        }
+        }*/
         View sv = this.findViewById(R.id.share_area);
         sv.setY(Utils.getScreenHeightPx(this));
         this.findViewById(R.id.share_area).post(new Runnable() {
@@ -166,12 +166,15 @@ public class ShareActivity extends Activity implements IWeiboHandler.Response {
 
     private void animShareArea() {
         View sv = this.findViewById(R.id.share_area);
+        View nv = this.findViewById(R.id.non_share_area);
         int sh = Utils.getScreenHeightPx(this);
         float h = sv.getHeight();
         ValueAnimator va = ObjectAnimator.ofFloat(sv, "y", sh, sh - h);
+        va.setDuration(300);
+        ValueAnimator va1 = ObjectAnimator.ofFloat(nv, "alpha", 0, 0.7f);
+        va1.setDuration(200);
         AnimatorSet animSet = new AnimatorSet();
-        animSet.play(va);
-        animSet.setDuration(300);
+        animSet.play(va).before(va1);
         animSet.start();
     }
 

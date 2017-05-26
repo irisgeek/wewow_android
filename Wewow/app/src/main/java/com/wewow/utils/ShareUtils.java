@@ -114,7 +114,8 @@ public class ShareUtils {
             intent.putExtra(ShareActivity.BACK_GROUND, buf);
         }
 
-        AnimatorSet animSet = new AnimatorSet();
+        this.context.startActivity(intent);
+        /*AnimatorSet animSet = new AnimatorSet();
         beforeAnimInfo.alpha = v.getAlpha();
         beforeAnimInfo.scaleY = v.getScaleY();
         beforeAnimInfo.scaleX = v.getScaleX();
@@ -148,7 +149,7 @@ public class ShareUtils {
 //
             }
         });
-        animSet.start();
+        animSet.start();*/
     }
 
     private void reverse() {
