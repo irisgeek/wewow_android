@@ -293,8 +293,8 @@
                         <TextView
                             android:id="@+id/tv_more_discuss"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
                             android:layout_toLeftOf="@+id/iv_more_discuss"
                             android:paddingRight="8dp"
                             android:text="@string/article_more_discuss"
