@@ -9,15 +9,12 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.Pair;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -39,22 +36,25 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 
-public class LifePostActivity extends AppCompatActivity {
+public class LifePostActivity extends AppCompatActivity implements AbsListView.OnScrollListener {
 
     private static final String TAG = "LifePostActivity";
     public static final String POST_ID = "POST_ID";
 
     private TextView title;
     private TextView desc;
-    private View contentView;
+    private View contentView, header;
     private ImageView addpost;
+    private View layout_title, lifepost_title_shadow;
+    private ImageView lifepost_back, lifepost_share;
+    private TextView lifepost_title;
     private JSONArray comments = new JSONArray();
     private UserInfo user;
     private int postId;
     private JSONObject daily_topic;
     private ListView listComments;
+    private float topHeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,9 +90,19 @@ public class LifePostActivity extends AppCompatActivity {
                 LifePostActivity.this.finish();
             }
         });
-        this.title = (TextView) this.findViewById(R.id.lifepost_title);
-        this.desc = (TextView) this.findViewById(R.id.lifepost_desc);
         this.contentView = this.findViewById(R.id.lifepost_root);
+        this.layout_title = this.findViewById(R.id.layout_title);
+        this.lifepost_title_shadow = this.findViewById(R.id.lifepost_title_shadow);
+        this.lifepost_back = (ImageView) this.findViewById(R.id.lifepost_back);
+        this.lifepost_share = (ImageView) this.findViewById(R.id.lifepost_share);
+        this.lifepost_title = (TextView) this.findViewById(R.id.lifepost_title);
+        listComments = (ListView) this.findViewById(R.id.lifepost_comments);
+        header = View.inflate(this, R.layout.header_life_post, null);
+        this.title = (TextView) header.findViewById(R.id.lifepost_title);
+        this.desc = (TextView) header.findViewById(R.id.lifepost_desc);
+        listComments.addHeaderView(header);
+        listComments.setAdapter(this.adapter);
+        listComments.setOnScrollListener(this);
         this.addpost = (ImageView) this.findViewById(R.id.lifepost_newpost);
         this.addpost.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,20 +153,21 @@ public class LifePostActivity extends AppCompatActivity {
             this.comments = jobj.getJSONArray("comments");
             if (this.comments.length() > 0) {
                 this.findViewById(R.id.lifepost_nodata_area).setVisibility(View.GONE);
-                this.listComments = (ListView) this.findViewById(R.id.lifepost_comments);
                 this.listComments.setVisibility(View.VISIBLE);
-                this.listComments.setAdapter(this.adapter);
             }
         } catch (JSONException e) {
             Log.e(TAG, "onDataLoad: fail");
         }
+
+        header.measure(0, 0);
+        topHeight = header.getMeasuredHeight() - Utils.dipToPixel(this, 64);
     }
 
     private BaseAdapter adapter = new BaseAdapter() {
 
         @Override
         public int getCount() {
-            return LifePostActivity.this.comments.length();
+            return comments == null ? 0 : comments.length();
         }
 
         @Override
@@ -391,4 +402,33 @@ public class LifePostActivity extends AppCompatActivity {
             new HttpAsyncTask().execute(params);
         }
     };
+
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+    }
+
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+        if(view.getChildCount() < 2)
+            return;
+        View child = view.getChildAt(1);
+        if (firstVisibleItem == 0) {
+            int top = child.getTop();
+            Log.d("---------", -top + "");
+            if(-top >= Utils.dipToPixel(LifePostActivity.this, 64)){
+                layout_title.setBackgroundColor(getResources().getColor(R.color.white));
+                lifepost_back.setImageResource(R.drawable.back_b);
+                lifepost_share.setImageResource(R.drawable.share_b);
+                lifepost_title.setTextColor(getResources().getColor(R.color.text_gray_drak));
+                lifepost_title_shadow.setVisibility(View.VISIBLE);
+            }else{
+                layout_title.setBackgroundColor(getResources().getColor(R.color.transparent));
+                lifepost_back.setImageResource(R.drawable.back);
+                lifepost_share.setImageResource(R.drawable.share_w);
+                lifepost_title.setTextColor(getResources().getColor(R.color.white));
+                lifepost_title_shadow.setVisibility(View.INVISIBLE);
+            }
+        }
+    }
 }
