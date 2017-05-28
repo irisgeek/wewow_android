@@ -2,18 +2,18 @@ package com.wewow.dto;
 
 
 public class Comment {
-    private String liked;
+    private int liked;
     private int liked_count;
     private String content;
     private String user;
     private String time;
     private String id;
 
-    public String getLiked() {
+    public int getLiked() {
         return liked;
     }
 
-    public void setLiked(String liked) {
+    public void setLiked(int liked) {
         this.liked = liked;
     }
 

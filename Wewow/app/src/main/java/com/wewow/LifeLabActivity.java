@@ -26,6 +26,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 import com.wewow.dto.LabCollection;
 import com.wewow.utils.CommonUtilities;
@@ -69,7 +70,9 @@ public class LifeLabActivity extends BaseActivity {
     private void setupUI() {
         progressBar = (CircleProgressBar) this.findViewById(R.id.progressBar);
         this.foot = View.inflate(this, R.layout.lifelab_foot, null);
-        this.foot.findViewById(R.id.tv_lab_more).setOnClickListener(new View.OnClickListener() {
+        ImageView iv_loading = (ImageView) foot.findViewById(R.id.iv_loading);
+        Glide.with(this).load(R.drawable.bottom_loading).into(iv_loading);
+        iv_loading.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 LifeLabActivity.this.startDataLoading();
@@ -106,7 +109,6 @@ public class LifeLabActivity extends BaseActivity {
                 if (i + i1 == i2) {
                     Log.d(TAG, "onScroll: Show refresh");
                     LifeLabActivity.this.foot.setVisibility(View.VISIBLE);
-                    progressBar.setVisibility(View.VISIBLE);
                     LifeLabActivity.this.startDataLoading();
                 }
             }

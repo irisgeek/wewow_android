@@ -12,10 +12,12 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
@@ -62,6 +64,8 @@ public class AllCommentActivity extends Activity implements View.OnClickListener
         view_empty = findViewById(R.id.view_empty);
         editTextContent = (EditText) findViewById(R.id.editTextContent);
         footer = View.inflate(this, R.layout.lifelab_foot, null);
+        ImageView iv_loading = (ImageView) footer.findViewById(R.id.iv_loading);
+        Glide.with(this).load(R.drawable.bottom_loading).into(iv_loading);
         list_comment.addFooterView(footer, null, false);
         adapter = new CommentAdapter();
         list_comment.setAdapter(adapter);
@@ -174,6 +178,56 @@ public class AllCommentActivity extends Activity implements View.OnClickListener
         new HttpAsyncTask().execute(params);
     }
 
+    private void postLike(final CommentAdapter.ViewHolder holder, final Comment comment){
+        if (!UserInfo.isUserLogged(context)) {
+            LoginUtils.startLogin(AllCommentActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
+            return;
+        }
+        UserInfo ui = UserInfo.getCurrentUser(context);
+        List<Pair<String, String>> fields = new ArrayList<>();
+        fields.add(new Pair<>("user_id", ui.getId() + ""));
+        fields.add(new Pair<>("token", ui.getToken()));
+        fields.add(new Pair<>("item_type", "comment"));
+        fields.add(new Pair<>("item_id", comment.getId()));
+        fields.add(new Pair<>("like", comment.getLiked() == 1 ? "0" : "1"));
+        List<Pair<String, String>> headers = new ArrayList<>();
+        headers.add(new Pair<>("Content-Type", "application/x-www-form-urlencoded"));
+        Object[] params = new Object[]{
+                String.format("%s/like", CommonUtilities.WS_HOST),
+                new HttpAsyncTask.TaskDelegate() {
+                    @Override
+                    public void taskCompletionResult(byte[] result) {
+                        JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
+                        if (jobj == null) {
+                            Toast.makeText(context, R.string.networkError, Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        try {
+                            JSONObject r = jobj.getJSONObject("result");
+                            if (r.getInt("code") != 0) {
+                                Toast.makeText(context, R.string.serverError, Toast.LENGTH_LONG).show();
+                            } else {
+                                comment.setLiked(comment.getLiked() == 1 ? 0 : 1);
+                                if(comment.getLiked() == 1){
+                                    comment.setLiked_count(comment.getLiked_count() - 1);
+                                } else{
+                                    comment.setLiked_count(comment.getLiked_count() + 1);
+                                }
+                                holder.iv_comment_liked.setImageResource(comment.getLiked() == 1 ? R.drawable.liked : R.drawable.like);
+                                holder.liked_count.setText(comment.getLiked_count() + "");
+                            }
+                        } catch (JSONException e) {
+                            Toast.makeText(context, R.string.serverError, Toast.LENGTH_LONG).show();
+                        }
+                    }
+                },
+                WebAPIHelper.HttpMethod.POST,
+                WebAPIHelper.buildHttpQuery(fields).getBytes(),
+                headers
+        };
+        new HttpAsyncTask().execute(params);
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()){
@@ -258,7 +312,7 @@ public class AllCommentActivity extends Activity implements View.OnClickListener
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder holder;
+            final ViewHolder holder;
             if(convertView == null){
                 convertView = View.inflate(context, R.layout.article_comment, null);
                 holder = new ViewHolder();
@@ -266,15 +320,24 @@ public class AllCommentActivity extends Activity implements View.OnClickListener
                 holder.date = (TextView) convertView.findViewById(R.id.article_comment_date);
                 holder.content = (TextView) convertView.findViewById(R.id.article_comment_content);
                 holder.liked_count = (TextView) convertView.findViewById(R.id.article_comment_liked_count);
+                holder.iv_comment_liked = (ImageView) convertView.findViewById(R.id.iv_comment_liked);
+                holder.comment_like_area = convertView.findViewById(R.id.comment_like_area);
                 convertView.setTag(holder);
             } else{
                 holder = (ViewHolder) convertView.getTag();
             }
-            Comment comment = commentList.get(position);
+            final Comment comment = commentList.get(position);
             holder.author.setText(comment.getUser());
             holder.date.setText(comment.getTime());
             holder.content.setText(comment.getContent());
             holder.liked_count.setText(comment.getLiked_count() + "");
+            holder.iv_comment_liked.setImageResource(comment.getLiked() == 1 ? R.drawable.liked : R.drawable.like);
+            holder.comment_like_area.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    postLike(holder, comment);
+                }
+            });
             return convertView;
         }
 
@@ -290,6 +353,8 @@ public class AllCommentActivity extends Activity implements View.OnClickListener
 
         class ViewHolder{
             TextView author, date, content, liked_count;
+            ImageView iv_comment_liked;
+            View comment_like_area;
         }
     }
 }
