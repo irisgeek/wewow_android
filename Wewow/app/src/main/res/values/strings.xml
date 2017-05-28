@@ -82,9 +82,11 @@
     <string name="user_nickname">用户昵称</string>
     <string name="user_description">个性签名</string>
     <string name="user_covers">封面图</string>
-    <string name="userinfo_save_prompt">用户信息已修改，要保存吗？</string>
+    <string name="userinfo_save_prompt">您有尚未保存的修改，确认离开吗？</string>
     <string name="userinfo_update_success">用户信息已成功修改</string>
     <string name="userinfo_update_fail">用户信息修改已失败</string>
+    <string name="userinfo_leave">离开</string>
+    <string name="userinfo_stay">留下</string>
 
     <string name="prompt_comfirmd">好</string>
     <string name="prompt_denied">不</string>
