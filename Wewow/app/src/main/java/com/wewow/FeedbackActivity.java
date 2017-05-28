@@ -3,6 +3,8 @@ package com.wewow;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -43,6 +45,7 @@ import com.wewow.adapter.ListViewFeedbackAdapter;
 import com.wewow.dto.Feedback;
 import com.wewow.dto.Token;
 import com.wewow.netTask.ITask;
+import com.wewow.utils.BitmapUtils;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.FileCacheUtil;
 import com.wewow.utils.SettingUtils;
@@ -53,7 +56,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -64,7 +69,7 @@ import retrofit.client.Response;
 /**
  * Created by iris on 17/4/13.
  */
-public class FeedbackActivity extends BaseActivity{
+public class FeedbackActivity extends AppCompatActivity implements IPickResult{
 
 
     private int currentPage = 1;
@@ -74,6 +79,7 @@ public class FeedbackActivity extends BaseActivity{
     private ListViewFeedbackAdapter adapter;
     private Token token;
     private PickImageDialog dialog;
+    private OSSClient oss;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,7 +103,7 @@ public class FeedbackActivity extends BaseActivity{
 //
 //        }
         setUpToolBar();
-        getToken();
+        getTokenFromServer();
 
 
     }
@@ -454,18 +460,12 @@ public class FeedbackActivity extends BaseActivity{
             @Override
             public void onClick(View v) {
 //                choosePic();
-                dialog=PickImageDialog.build(new PickSetup()
-                        .setTitle(getResources().getString(R.string.choose))
-                        .setCameraButtonText(getResources().getString(R.string.camera))
-                        .setGalleryButtonText(getResources().getString(R.string.gallery))
-                        .setCancelText(getResources().getString(R.string.cancel))
-                ).setOnPickResult(new IPickResult() {
-                    @Override
-                    public void onPickResult(PickResult pickResult) {
-                        dialog.dismiss();
-
-                    }
-                }).show(FeedbackActivity.this);
+                dialog = PickImageDialog.build(new PickSetup()
+                                .setTitle(getResources().getString(R.string.choose))
+                                .setCameraButtonText(getResources().getString(R.string.camera))
+                                .setGalleryButtonText(getResources().getString(R.string.gallery))
+                                .setCancelText(getResources().getString(R.string.cancel))
+                ).setOnPickResult(FeedbackActivity.this).show(FeedbackActivity.this);
             }
         });
 
@@ -549,27 +549,72 @@ public class FeedbackActivity extends BaseActivity{
 
     }
 
-    private void choosePic() {
+    private void SendImage(String url) {
 
+        ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
+
+        UserInfo currentUser = UserInfo.getCurrentUser(FeedbackActivity.this);
+        String userId = currentUser.getId().toString();
+        String token = currentUser.getToken().toString();
+        final EditText textContent = (EditText) findViewById(R.id.editTextContent);
+
+            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(textContent.getWindowToken(), 0);
+
+            iTask.feedbackImage(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), userId, token, url, "1","720","1280", "", new Callback<JSONObject>() {
+
+                @Override
+                public void success(JSONObject object, Response response) {
+                    List<Feedback> feedbacks = new ArrayList<Feedback>();
+
+                    try {
+                        String realData = Utils.convertStreamToString(response.getBody().in());
+
+                        JSONObject result = new JSONObject(realData).getJSONObject("result");
+                        String code = result.get("code").toString();
+                        String message = result.get("message").toString();
+                        if (!code.equals("0")) {
+                            Toast.makeText(FeedbackActivity.this, message, Toast.LENGTH_SHORT).show();
+
+
+                        } else {
+
+                            Feedback feedback = parseFeedbackSent(realData);
+                            feedbacks.add(feedback);
+                            setUpFeedbacks(feedbacks, true, true);
+                        }
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+
+                    }
+
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
+                    Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+
+
+                }
+            });
 
     }
 
-    private void updloadImage()
-    {
-        String endpoint = "http://oss-cn-beijing.aliyuncs.com";
 
-
-
-    }
-
-    public void asyncPutObjectFromLocalFile(String filePath) {
+    public void asyncPutObjectFromLocalFile(final String filePath) {
 
 
         OSSCredentialProvider credentialProvider = new OSSPlainTextAKSKCredentialProvider(token.getAccessKeyId(),token.getAccessKeySecret());
 
-        OSS oss = new OSSClient(getApplicationContext(), CommonUtilities.OOS_ENDPOINT, credentialProvider);
+        oss = new OSSClient(getApplicationContext(), CommonUtilities.OOS_ENDPOINT, credentialProvider);
         // 构造上传请求
-        PutObjectRequest put = new PutObjectRequest(CommonUtilities.BUCKETNAME, "textImage", filePath);
+        PutObjectRequest put = new PutObjectRequest(CommonUtilities.BUCKETNAME, filePath, filePath);
 
         // 异步上传时可以设置进度回调
         put.setProgressCallback(new OSSProgressCallback<PutObjectRequest>() {
@@ -586,6 +631,10 @@ public class FeedbackActivity extends BaseActivity{
 
                 Log.d("ETag", result.getETag());
                 Log.d("RequestId", result.getRequestId());
+
+                String url=oss.presignPublicObjectURL(CommonUtilities.BUCKETNAME,filePath);
+                SendImage(url);
+                Toast.makeText(FeedbackActivity.this,result.getRequestId(),Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -594,8 +643,11 @@ public class FeedbackActivity extends BaseActivity{
                 if (clientExcepion != null) {
                     // 本地异常如网络异常等
                     clientExcepion.printStackTrace();
+                    Toast.makeText(FeedbackActivity.this,clientExcepion.toString(),Toast.LENGTH_SHORT).show();
                 }
                 if (serviceException != null) {
+
+                    Toast.makeText(FeedbackActivity.this, serviceException.getRawMessage(),Toast.LENGTH_SHORT).show();
                     // 服务异常
                     Log.e("ErrorCode", serviceException.getErrorCode());
                     Log.e("RequestId", serviceException.getRequestId());
@@ -604,6 +656,9 @@ public class FeedbackActivity extends BaseActivity{
                 }
             }
         });
+
+
+
     }
 
 
@@ -619,7 +674,7 @@ public class FeedbackActivity extends BaseActivity{
 
                 try {
                     String realData = Utils.convertStreamToString(response.getBody().in());
-                   String status= new JSONObject(realData).get("status").toString();
+                    String status = new JSONObject(realData).get("status").toString();
                     if (!status.equals("200")) {
                         Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
 
@@ -627,7 +682,7 @@ public class FeedbackActivity extends BaseActivity{
                     } else {
                         token = parseTokenFromString(realData);
 
-                            FileCacheUtil.setCache(realData, FeedbackActivity.this, CommonUtilities.CACHE_FILE_TOKEN, 0);
+                        FileCacheUtil.setCache(realData, FeedbackActivity.this, CommonUtilities.CACHE_FILE_TOKEN, 0);
 
                     }
 
@@ -688,10 +743,10 @@ public class FeedbackActivity extends BaseActivity{
                         feedbacks = parseFeedbackFromString(realData);
 
                         if (currentPage > 1) {
-                            setUpFeedbacks(feedbacks, true,false);
+                            setUpFeedbacks(feedbacks, true, false);
                         } else {
                             FileCacheUtil.setCache(realData, FeedbackActivity.this, CommonUtilities.CACHE_FILE_FEEDBACKS, 0);
-                            setUpFeedbacks(feedbacks, false,false);
+                            setUpFeedbacks(feedbacks, false, false);
                         }
 
                     }
@@ -735,5 +790,57 @@ public class FeedbackActivity extends BaseActivity{
 
     }
 
+
+    @Override
+    public void onPickResult(PickResult pickResult) {
+        if (pickResult.getError() == null) {
+            //If you want the Uri.
+            //Mandatory to refresh image from Uri.
+            //getImageView().setImageURI(null);
+
+            //Setting the real returned image.
+            //getImageView().setImageURI(r.getUri());
+//            Toast.makeText(this, pickResult.getPath(), Toast.LENGTH_LONG).show();
+//            String path= BitmapUtils.saveBitmap(FeedbackActivity.this,compressBySize(pickResult.getPath(), 720, 1280));
+//            asyncPutObjectFromLocalFile(path);
+
+            //Image path
+            //r.getPath();
+        } else {
+            //Handle possible errors
+            //TODO: do what you have to do with r.getError();
+            Toast.makeText(this, pickResult.getError().getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public static Bitmap compressBySize(String pathName, int targetWidth,
+                                        int targetHeight) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;// 不去真的解析图片，只是获取图片的头部信息，包含宽高等；
+        Bitmap bitmap = BitmapFactory.decodeFile(pathName, options);
+
+        // 得到图片的宽度、高度；
+        float imgWidth = options.outWidth;
+        float imgHeight = options.outHeight;
+
+        // 分别计算图片宽度、高度与目标宽度、高度的比例；取大于等于该比例的最小整数；
+        int widthRatio = (int) Math.ceil(imgWidth / (float) targetWidth);
+        int heightRatio = (int) Math.ceil(imgHeight / (float) targetHeight);
+        options.inSampleSize = 1;
+
+        // 如果尺寸接近则不压缩，否则进行比例压缩
+        if (widthRatio > 1 || widthRatio > 1) {
+            if (widthRatio > heightRatio) {
+                options.inSampleSize = widthRatio;
+            } else {
+                options.inSampleSize = heightRatio;
+            }
+        }
+
+        //设置好缩放比例后，加载图片进内容；
+        options.inJustDecodeBounds = false; // 这里一定要设置false
+        bitmap = BitmapFactory.decodeFile(pathName, options);
+        return bitmap;
+    }
 
 }

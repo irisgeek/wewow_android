@@ -261,10 +261,12 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
         imageViewHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 if (!isSearchViewShown) {
                     drawerLayout.openDrawer(GravityCompat.START);
 
                 } else {
+                    removeCover();
                     searchView.setVisibility(View.INVISIBLE);
                     imageViewUnderLine.setVisibility(View.INVISIBLE);
                     searchView.setText("");
