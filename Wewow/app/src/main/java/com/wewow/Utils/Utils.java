@@ -62,6 +62,12 @@ public class Utils {
         return pixelToDip(activity, screenWidth);
     }
 
+    public static int getScreenWidthPx(Activity activity) {
+        Point size = new Point();
+        activity.getWindowManager().getDefaultDisplay().getSize(size);
+        return size.x;
+    }
+
     public static int getScreenHeightDp(Activity activity) {
         Point size = new Point();
         activity.getWindowManager().getDefaultDisplay().getSize(size);
