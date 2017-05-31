@@ -21,10 +21,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 import com.wewow.utils.BlurBuilder;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
-import com.wewow.utils.ProgressDialogUtil;
 import com.wewow.utils.RemoteImageLoader;
 import com.wewow.utils.ShareUtils;
 import com.wewow.utils.Utils;
@@ -54,6 +54,7 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
     private int postId;
     private JSONObject daily_topic;
     private ListView listComments;
+    private CircleProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +69,7 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
                 new HttpAsyncTask.TaskDelegate() {
                     @Override
                     public void taskCompletionResult(byte[] result) {
-                        ProgressDialogUtil.getInstance(LifePostActivity.this).finishProgressDialog();
+                        progressBar.setVisibility(View.GONE);
                         JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
                         if (jobj != null) {
                             LifePostActivity.this.onDataLoad(jobj.optJSONObject("result").optJSONObject("data"));
@@ -77,7 +78,6 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
                 },
                 WebAPIHelper.HttpMethod.GET
         };
-        ProgressDialogUtil.getInstance(this).showProgressDialog();
         new HttpAsyncTask().execute(params);
     }
 
@@ -90,6 +90,7 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
         });
         this.contentView = this.findViewById(R.id.lifepost_root);
         this.statusbar = this.findViewById(R.id.statusbar);
+        progressBar = (CircleProgressBar) findViewById(R.id.progressBar);
         this.layout_title = this.findViewById(R.id.layout_title);
         this.lifepost_title_shadow = this.findViewById(R.id.lifepost_title_shadow);
         this.lifepost_back = (ImageView) this.findViewById(R.id.lifepost_back);
@@ -338,7 +339,7 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
                         new HttpAsyncTask.TaskDelegate() {
                             @Override
                             public void taskCompletionResult(byte[] result) {
-                                ProgressDialogUtil.getInstance(LifePostActivity.this).finishProgressDialog();
+                                progressBar.setVisibility(View.GONE);
                                 JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
                                 try {
                                     int code = jobj.getJSONObject("result").getInt("code");
@@ -375,7 +376,7 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
                         new HttpAsyncTask.TaskDelegate() {
                             @Override
                             public void taskCompletionResult(byte[] result) {
-                                ProgressDialogUtil.getInstance(LifePostActivity.this).finishProgressDialog();
+                                progressBar.setVisibility(View.GONE);
                                 JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
                                 try {
                                     int code = jobj.getJSONObject("result").getInt("code");
@@ -394,7 +395,7 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
                         headers
                 };
             }
-            ProgressDialogUtil.getInstance(LifePostActivity.this).showProgressDialog();
+            progressBar.setVisibility(View.VISIBLE);
             new HttpAsyncTask().execute(params);
         }
     };

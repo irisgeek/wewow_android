@@ -19,12 +19,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jaeger.library.StatusBarUtil;
+import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 import com.wewow.dto.LabCollection;
 import com.wewow.utils.BlurBuilder;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
 import com.wewow.utils.PhotoUtils;
-import com.wewow.utils.ProgressDialogUtil;
 import com.wewow.utils.RemoteImageLoader;
 import com.wewow.utils.ShareUtils;
 import com.wewow.utils.Utils;
@@ -54,6 +54,7 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
     private BitmapDrawable picture;
     private ImageView like, lifelab_foot_collect;
     private TextView lifelab_fav_count, lifelab_foot_collect_count;
+    private CircleProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,10 +87,10 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
         });
         findViewById(R.id.lifelab_share).setOnClickListener(this);
         this.like = (ImageView) this.findViewById(R.id.lifelab_fav);
+        progressBar = (CircleProgressBar) findViewById(R.id.progressBar);
 
         findViewById(R.id.layout_lifelab_fav).setOnClickListener(this);
 
-        ProgressDialogUtil.getInstance(this).showProgressDialog();
         ArrayList<Pair<String, String>> fields = new ArrayList<>();
         fields.add(new Pair<String, String>("collection_id", String.valueOf(this.lc.id)));
         if (UserInfo.isUserLogged(this)) {
@@ -100,7 +101,7 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
                 new HttpAsyncTask.TaskDelegate() {
                     @Override
                     public void taskCompletionResult(byte[] result) {
-                        ProgressDialogUtil.getInstance(LifeLabItemActivity.this).finishProgressDialog();
+                        progressBar.setVisibility(View.GONE);
                         JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
                         LabCollectionDetail x = LabCollectionDetail.parse(jobj);
                         if (x != null) {
