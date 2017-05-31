@@ -1,5 +1,7 @@
 package com.wewow;
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -118,6 +120,14 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
                                     Bitmap blurBitMap = BlurBuilder.blur(LifeLabItemActivity.this, bitmap);
                                     bitmap.recycle();
                                     LifeLabItemActivity.this.findViewById(R.id.lifelab_item_root).setBackground(new BitmapDrawable(getResources(), blurBitMap));
+                                    LifeLabItemActivity.this.findViewById(R.id.lifelab_item_root).post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            ValueAnimator va = ObjectAnimator.ofFloat(LifeLabItemActivity.this.container, "alpha", 0f, 1f);
+                                            va.setDuration(300);
+                                            va.start();
+                                        }
+                                    });
                                 }
                             });
                         }

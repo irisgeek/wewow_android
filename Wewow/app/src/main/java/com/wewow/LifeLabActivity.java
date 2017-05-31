@@ -20,6 +20,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
@@ -140,9 +142,15 @@ public class LifeLabActivity extends BaseActivity {
         this.anim_view.setVisibility(View.GONE);
         statusHolder.itemView.setAlpha(statusHolder.viewAlpha);
         statusHolder.adapterView.setAlpha(statusHolder.listAlpha);
+        WindowManager.LayoutParams lp = this.getWindow().getAttributes();
+        lp.alpha = 1.0f;
+        this.getWindow().setAttributes(lp);
     }
 
     private void openLifeLab(AdapterView<?> adapterView, final View view, final LabCollection lc) {
+        WindowManager.LayoutParams lp = this.getWindow().getAttributes();
+        lp.alpha = 0.5f;
+        this.getWindow().setAttributes(lp);
         statusHolder.listAlpha = adapterView.getAlpha();
         statusHolder.viewAlpha = view.getAlpha();
         statusHolder.viewScaleX = view.getScaleX();
@@ -152,7 +160,8 @@ public class LifeLabActivity extends BaseActivity {
         AnimatorSet as = new AnimatorSet();
         ValueAnimator av = ObjectAnimator.ofFloat(view, "alpha", statusHolder.viewAlpha, 0f);
         ValueAnimator bv = ObjectAnimator.ofFloat(adapterView, "alpha", statusHolder.listAlpha, 0.5f);
-        as.play(av).with(bv);
+        //as.play(av).with(bv);
+        as.play(av);
         as.setDuration(500);
         as.addListener(new Animator.AnimatorListener() {
             @Override

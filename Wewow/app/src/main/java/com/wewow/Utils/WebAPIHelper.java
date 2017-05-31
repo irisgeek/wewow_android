@@ -66,7 +66,7 @@ public class WebAPIHelper {
     public static WebAPIHelper getWewowWebAPIHelper(boolean sslcheck) {
         if ((WebAPIHelper.instance == null) || (WebAPIHelper.instance.ignoreSslCheck != sslcheck)) {
             WebAPIHelper.instance = new WebAPIHelper(sslcheck);
-            WebAPIHelper.instance.addDefaultHeader("User-Agent", "Wewow/1.6");
+            WebAPIHelper.instance.addDefaultHeader("User-Agent", "Wewow/Android1.0");
         }
         return WebAPIHelper.instance;
     }
