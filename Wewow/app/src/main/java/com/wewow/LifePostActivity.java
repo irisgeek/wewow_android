@@ -21,6 +21,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jaeger.library.StatusBarUtil;
 import com.wewow.utils.BlurBuilder;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
@@ -54,13 +55,12 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
     private int postId;
     private JSONObject daily_topic;
     private ListView listComments;
-    private float topHeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_life_post);
-        Utils.setActivityToBeFullscreen(this);
+        StatusBarUtil.setTranslucent(this, 100);
         this.setupUI();
         Intent i = this.getIntent();
         postId = i.getIntExtra(POST_ID, -1);
@@ -158,9 +158,6 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
         } catch (JSONException e) {
             Log.e(TAG, "onDataLoad: fail");
         }
-
-        header.measure(0, 0);
-        topHeight = header.getMeasuredHeight() - Utils.dipToPixel(this, 64);
     }
 
     private BaseAdapter adapter = new BaseAdapter() {
@@ -410,25 +407,37 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
 
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-        if(view.getChildCount() < 2)
+        if(view.getChildCount() < 1)
             return;
-        View child = view.getChildAt(1);
+        View child = view.getChildAt(0);
         if (firstVisibleItem == 0) {
             int top = child.getTop();
-            Log.d("---------", -top + "");
-            if(-top >= Utils.dipToPixel(LifePostActivity.this, 64)){
-                layout_title.setBackgroundColor(getResources().getColor(R.color.white));
-                lifepost_back.setImageResource(R.drawable.back_b);
-                lifepost_share.setImageResource(R.drawable.share_b);
-                lifepost_title.setTextColor(getResources().getColor(R.color.text_gray_drak));
-                lifepost_title_shadow.setVisibility(View.VISIBLE);
+            int height = child.getHeight() - Utils.dipToPixel(this, 59 - 12);
+            if(-top >= height){
+                showTitle();
             }else{
-                layout_title.setBackgroundColor(getResources().getColor(R.color.transparent));
-                lifepost_back.setImageResource(R.drawable.back);
-                lifepost_share.setImageResource(R.drawable.share_w);
-                lifepost_title.setTextColor(getResources().getColor(R.color.white));
-                lifepost_title_shadow.setVisibility(View.INVISIBLE);
+                hideTitle();
             }
+        }else{
+            showTitle();
         }
+    }
+
+    private void hideTitle() {
+        layout_title.setBackgroundColor(getResources().getColor(R.color.transparent));
+        lifepost_back.setImageResource(R.drawable.back);
+        lifepost_share.setImageResource(R.drawable.share_w);
+        lifepost_title.setTextColor(getResources().getColor(R.color.white));
+        lifepost_title_shadow.setVisibility(View.INVISIBLE);
+        StatusBarUtil.setTranslucent(this, 100);
+    }
+
+    private void showTitle() {
+        layout_title.setBackgroundColor(getResources().getColor(R.color.white));
+        lifepost_back.setImageResource(R.drawable.back_b);
+        lifepost_share.setImageResource(R.drawable.share_b);
+        lifepost_title.setTextColor(getResources().getColor(R.color.text_gray_drak));
+        lifepost_title_shadow.setVisibility(View.VISIBLE);
+        StatusBarUtil.setColor(this, Color.parseColor("#d0d0d0"), 0);
     }
 }
