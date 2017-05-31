@@ -53,6 +53,7 @@ public class CommonUtilities {
     public static final String BANNER_TYPE_COLLECTION="collection";
     public static final String BANNER_TYPE_POST="daily_topic";
     public static final String BANNER_TYPE_HTML="html";
+    public static final String FEEDBACK_PIC_UPLOAD_FOLDER="feedback/";
 
 
 
