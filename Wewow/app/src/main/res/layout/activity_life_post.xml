@@ -6,6 +6,10 @@
                 android:layout_height="match_parent"
                 android:background="#553311"
                 tools:context="com.wewow.LifePostActivity">
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#33000000"/>
 
 
     <LinearLayout
@@ -39,11 +43,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:dividerHeight="12dp"
+        android:divider="@color/transparent"
         android:visibility="gone"/>
+
+    <View
+        android:id="@+id/statusbar"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"/>
 
     <RelativeLayout
         android:id="@+id/layout_title"
         android:layout_width="match_parent"
+        android:layout_below="@+id/statusbar"
         android:layout_height="59dp">
 
         <ImageView

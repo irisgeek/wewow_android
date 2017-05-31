@@ -21,7 +21,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.jaeger.library.StatusBarUtil;
 import com.wewow.utils.BlurBuilder;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
@@ -45,7 +44,7 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
 
     private TextView title;
     private TextView desc;
-    private View contentView, header;
+    private View contentView, header, statusbar;
     private ImageView addpost;
     private View layout_title, lifepost_title_shadow;
     private ImageView lifepost_back, lifepost_share;
@@ -60,7 +59,6 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_life_post);
-        StatusBarUtil.setTranslucent(this, 100);
         this.setupUI();
         Intent i = this.getIntent();
         postId = i.getIntExtra(POST_ID, -1);
@@ -91,6 +89,7 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
             }
         });
         this.contentView = this.findViewById(R.id.lifepost_root);
+        this.statusbar = this.findViewById(R.id.statusbar);
         this.layout_title = this.findViewById(R.id.layout_title);
         this.lifepost_title_shadow = this.findViewById(R.id.lifepost_title_shadow);
         this.lifepost_back = (ImageView) this.findViewById(R.id.lifepost_back);
@@ -429,7 +428,7 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
         lifepost_share.setImageResource(R.drawable.share_w);
         lifepost_title.setTextColor(getResources().getColor(R.color.white));
         lifepost_title_shadow.setVisibility(View.INVISIBLE);
-        StatusBarUtil.setTranslucent(this, 100);
+        statusbar.setBackgroundColor(Color.parseColor("#33000000"));
     }
 
     private void showTitle() {
@@ -438,6 +437,6 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
         lifepost_share.setImageResource(R.drawable.share_b);
         lifepost_title.setTextColor(getResources().getColor(R.color.text_gray_drak));
         lifepost_title_shadow.setVisibility(View.VISIBLE);
-        StatusBarUtil.setColor(this, Color.parseColor("#d0d0d0"), 0);
+        statusbar.setBackgroundColor(Color.parseColor("#d0d0d0"));
     }
 }

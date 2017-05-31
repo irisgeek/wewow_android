@@ -5,6 +5,14 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="TranslucentStatusTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:fitsSystemWindows">false</item>
+    </style>
+
     <style name="ButtonStyle">
         <item name="android:background">@drawable/selector_btn_menu</item>
         <item name="android:textColor">#ffffff</item>
