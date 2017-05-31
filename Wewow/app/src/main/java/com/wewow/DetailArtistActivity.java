@@ -361,6 +361,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
             map.put("image", articles.get(i).getImage_642_320());
 
             map.put("title", articles.get(i).getTitle());
+            map.put("read_count",articles.get(i).getRead_count());
             //todo
             listItem.add(map);
         }
@@ -629,6 +630,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
             article.setImage_320_160(result.getString("image_320_160"));
             article.setImage_642_320(result.getString("image_688_316"));
             article.setTitle(result.getString("title"));
+            article.setRead_count(result.getString("read_count"));
             article.setWewow_category(result.getString("wewow_category"));
 
             articles.add(article);

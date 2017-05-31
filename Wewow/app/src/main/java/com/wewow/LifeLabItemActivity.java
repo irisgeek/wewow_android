@@ -24,6 +24,7 @@ import com.wewow.dto.LabCollection;
 import com.wewow.utils.BlurBuilder;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
+import com.wewow.utils.MessageBoxUtils;
 import com.wewow.utils.PhotoUtils;
 import com.wewow.utils.RemoteImageLoader;
 import com.wewow.utils.ShareUtils;
@@ -307,7 +308,7 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.layout_footer_feedback:
                 startActivity(new Intent(LifeLabItemActivity.this, FeedbackActivity.class));
                 break;
@@ -326,54 +327,60 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
                 break;
             case R.id.layout_lifelab_fav:
             case R.id.layout_lifelab_foot_collect:
-                    if (!UserInfo.isUserLogged(LifeLabItemActivity.this)) {
-                        Intent logini = new Intent(LifeLabItemActivity.this, LoginActivity.class);
-                        LifeLabItemActivity.this.startActivity(logini);
-                        return;
-                    }
-                    Drawable.ConstantState notliked = LifeLabItemActivity.this.getResources().getDrawable(R.drawable.mark).getConstantState();
-                    Drawable.ConstantState currentlike = LifeLabItemActivity.this.like.getDrawable().getConstantState();
-                    final Integer like = notliked.equals(currentlike) ? 1 : 0;
-                    ArrayList<Pair<String, String>> fields = new ArrayList<>();
-                    UserInfo ui = UserInfo.getCurrentUser(LifeLabItemActivity.this);
-                    fields.add(new Pair<>("user_id", ui.getId().toString()));
-                    fields.add(new Pair<>("token", ui.getToken()));
-                    fields.add(new Pair<>("item_type", "collection"));
-                    fields.add(new Pair<>("item_id", String.valueOf(LifeLabItemActivity.this.lc.id)));
-                    fields.add(new Pair<>("like", like.toString()));
-                    ArrayList<Pair<String, String>> headers = new ArrayList<Pair<String, String>>();
-                    headers.add(WebAPIHelper.getHttpFormUrlHeader());
-                    Object[] params = new Object[]{
-                            String.format("%s/like", CommonUtilities.WS_HOST),
-                            new HttpAsyncTask.TaskDelegate() {
-                                @Override
-                                public void taskCompletionResult(byte[] result) {
-                                    JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
-                                    try {
-                                        int i = jobj.getJSONObject("result").getInt("code");
-                                        if (i != 0) {
-                                            throw new Exception(String.valueOf(i));
-                                        }
-                                        LifeLabItemActivity.this.like.setImageDrawable(LifeLabItemActivity.this.getResources().getDrawable(like == 1 ? R.drawable.marked : R.drawable.mark));
-                                        lifelab_foot_collect.setImageDrawable(LifeLabItemActivity.this.getResources().getDrawable(like == 1 ? R.drawable.marked : R.drawable.mark));
-                                        if(like == 1){
-                                            lcd.liked_count += 1;
-                                        }else{
-                                            lcd.liked_count -= 1;
-                                        }
-                                        lifelab_fav_count.setText(lcd.liked_count + "");
-                                        lifelab_foot_collect_count.setText(lcd.liked_count + "");
-                                    } catch (Exception e) {
-                                        Log.e(TAG, String.format("favourite fail: %s", e.getMessage()));
-                                        Toast.makeText(LifeLabItemActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                if (!UserInfo.isUserLogged(LifeLabItemActivity.this)) {
+                    Intent logini = new Intent(LifeLabItemActivity.this, LoginActivity.class);
+                    LifeLabItemActivity.this.startActivity(logini);
+                    return;
+                }
+                Drawable.ConstantState notliked = LifeLabItemActivity.this.getResources().getDrawable(R.drawable.mark).getConstantState();
+                Drawable.ConstantState currentlike = LifeLabItemActivity.this.like.getDrawable().getConstantState();
+                final Integer like = notliked.equals(currentlike) ? 1 : 0;
+                ArrayList<Pair<String, String>> fields = new ArrayList<>();
+                UserInfo ui = UserInfo.getCurrentUser(LifeLabItemActivity.this);
+                fields.add(new Pair<>("user_id", ui.getId().toString()));
+                fields.add(new Pair<>("token", ui.getToken()));
+                fields.add(new Pair<>("item_type", "collection"));
+                fields.add(new Pair<>("item_id", String.valueOf(LifeLabItemActivity.this.lc.id)));
+                fields.add(new Pair<>("like", like.toString()));
+                ArrayList<Pair<String, String>> headers = new ArrayList<Pair<String, String>>();
+                headers.add(WebAPIHelper.getHttpFormUrlHeader());
+                Object[] params = new Object[]{
+                        String.format("%s/like", CommonUtilities.WS_HOST),
+                        new HttpAsyncTask.TaskDelegate() {
+                            @Override
+                            public void taskCompletionResult(byte[] result) {
+                                JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
+                                try {
+                                    int i = jobj.getJSONObject("result").getInt("code");
+                                    if (i != 0) {
+                                        throw new Exception(String.valueOf(i));
                                     }
+                                    String s;
+                                    LifeLabItemActivity.this.like.setImageDrawable(LifeLabItemActivity.this.getResources().getDrawable(like == 1 ? R.drawable.marked : R.drawable.mark));
+                                    lifelab_foot_collect.setImageDrawable(LifeLabItemActivity.this.getResources().getDrawable(like == 1 ? R.drawable.marked : R.drawable.mark));
+                                    if (like == 1) {
+                                        lcd.liked_count += 1;
+                                        s = LifeLabItemActivity.this.getString(R.string.fav_succeed);
+                                    } else {
+                                        lcd.liked_count -= 1;
+                                        s = LifeLabItemActivity.this.getString(R.string.unfav_succeed);
+                                    }
+                                    lifelab_fav_count.setText(lcd.liked_count + "");
+                                    lifelab_foot_collect_count.setText(lcd.liked_count + "");
+                                    MessageBoxUtils.messageBoxWithNoButton(LifeLabItemActivity.this, true, s, 2500);
+                                } catch (Exception e) {
+                                    Log.e(TAG, String.format("favourite fail: %s", e.getMessage()));
+                                    Toast.makeText(LifeLabItemActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                                    String s = LifeLabItemActivity.this.getString(like == 1 ? R.string.fav_fail : R.string.unfav_fail);
+                                    MessageBoxUtils.messageBoxWithNoButton(LifeLabItemActivity.this, false, s, 2500);
                                 }
-                            },
-                            WebAPIHelper.HttpMethod.POST,
-                            WebAPIHelper.buildHttpQuery(fields).getBytes(),
-                            headers
-                    };
-                    new HttpAsyncTask().execute(params);
+                            }
+                        },
+                        WebAPIHelper.HttpMethod.POST,
+                        WebAPIHelper.buildHttpQuery(fields).getBytes(),
+                        headers
+                };
+                new HttpAsyncTask().execute(params);
                 break;
         }
     }

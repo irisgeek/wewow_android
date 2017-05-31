@@ -114,14 +114,15 @@ public class ShareUtils {
             intent.putExtra(ShareActivity.BACK_GROUND, buf);
         }
 
-        AnimatorSet animSet = new AnimatorSet();
+        this.context.startActivity(intent);
+        /*AnimatorSet animSet = new AnimatorSet();
         beforeAnimInfo.alpha = v.getAlpha();
         beforeAnimInfo.scaleY = v.getScaleY();
         beforeAnimInfo.scaleX = v.getScaleX();
         ValueAnimator alphava = ObjectAnimator.ofFloat(v, "alpha", beforeAnimInfo.alpha, beforeAnimInfo.alpha / 2f);
         ValueAnimator scaleYva = ObjectAnimator.ofFloat(v, "scaleY", beforeAnimInfo.scaleY, beforeAnimInfo.scaleY * 0.9f);
         ValueAnimator scaleXva = ObjectAnimator.ofFloat(v, "scaleX", beforeAnimInfo.scaleX, beforeAnimInfo.scaleY * 0.9f);
-        animSet.play(alphava).with(scaleXva).with(scaleYva);
+        animSet.play(scaleXva).with(scaleYva);
 
         animSet.setDuration(ANIMATION_DURATION);
         animSet.addListener(new Animator.AnimatorListener() {
@@ -132,8 +133,9 @@ public class ShareUtils {
 
             @Override
             public void onAnimationEnd(Animator animator) {
-                ActivityOptions ao = ActivityOptions.makeCustomAnimation(ShareUtils.this.context, R.anim.share_start, 0);
-                ShareUtils.this.context.startActivity(intent, ao.toBundle());
+                ShareUtils.this.context.startActivity(intent);
+//                ActivityOptions ao = ActivityOptions.makeCustomAnimation(ShareUtils.this.context, R.anim.share_start, 0);
+//                ShareUtils.this.context.startActivity(intent, ao.toBundle());
                 ShareUtils.this.reverse();
             }
 
@@ -147,7 +149,7 @@ public class ShareUtils {
 //
             }
         });
-        animSet.start();
+        animSet.start();*/
     }
 
     private void reverse() {

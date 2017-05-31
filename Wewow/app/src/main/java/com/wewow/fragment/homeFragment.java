@@ -114,6 +114,7 @@ public class homeFragment extends Fragment {
         progressBar.setVisibility(View.VISIBLE);
 
 
+
         if (Utils.isNetworkAvailable(getActivity())) {
 
             checkCacheUpdatedOrNot();

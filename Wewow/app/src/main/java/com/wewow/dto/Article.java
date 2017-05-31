@@ -14,6 +14,7 @@ public class Article implements Parcelable {
     private String image_642_320;
     private String id;
     private String title;
+    private String read_count;
 
 
     public static final Creator<Article> CREATOR = new Creator<Article>() {
@@ -87,5 +88,13 @@ public class Article implements Parcelable {
 
     public void setImage_642_320(String image_642_320) {
         this.image_642_320 = image_642_320;
+    }
+
+    public String getRead_count() {
+        return read_count;
+    }
+
+    public void setRead_count(String read_count) {
+        this.read_count = read_count;
     }
 }

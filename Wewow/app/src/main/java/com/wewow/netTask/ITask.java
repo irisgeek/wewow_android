@@ -79,17 +79,6 @@ public interface ITask {
                        @Query("image_height") String image_height, @Query("status") String status,
                        Callback<JSONObject> callback);
 
-
-    @Multipart
-    @POST("/feedback")
-    void uploadImage(@Header("User-Agent") String headerContentType, @Query("user_id") String id,
-                     @Query("token") String token, @Query("content") String content,
-                     @Query("content_type") String content_type, @Query("image_width") String image_width,
-                     @Query("image_height") String image_height, @Query("status") String status,
-                     @Part("fileName") String description,
-                     @Part("file\"; filename=\"image.png\"") RequestBody imgs, Callback<JSONObject> callback);
-
-
     //search
     @GET("/hotwords")
     void getHotSearchWords(@Header("User-Agent") String headerContentType, Callback<JSONObject> callback);

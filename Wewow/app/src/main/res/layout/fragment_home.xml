@@ -37,6 +37,7 @@
             android:layout_marginTop="12dp"
             android:orientation="vertical"
             android:visibility="gone"
+            card_view:cardElevation="1dp"
             card_view:cardCornerRadius="2dp">
 
 
@@ -104,6 +105,7 @@
             android:layout_marginTop="12dp"
             android:orientation="vertical"
             android:visibility="gone"
+            card_view:cardElevation="1dp"
             card_view:cardCornerRadius="2dp">
 
             <RelativeLayout
@@ -233,7 +235,7 @@
             android:layout_marginTop="12dp"
             android:orientation="horizontal"
             android:id="@+id/cardViewLatest"
-
+            card_view:cardElevation="1dp"
             card_view:cardCornerRadius="2dp">
 
             <FrameLayout
@@ -373,6 +375,7 @@
         <com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar
             android:id="@+id/progress1"
             android:layout_width="50dp"
+            android:layout_marginTop="2dp"
             android:layout_height="50dp"
             android:layout_gravity="center_horizontal"
             android:visibility="visible"

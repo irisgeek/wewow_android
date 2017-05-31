@@ -36,6 +36,8 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.media.Image;
+import android.os.Build;
+import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
@@ -59,6 +61,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -140,6 +144,8 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
     private Toolbar toolbar;
     private List<String> hotWords;
     private boolean resetDropdownOffset = false;
+    public LinearLayout progressBar;
+    private ImageView imageViewUnderLine;
 
 
     @Override
@@ -149,7 +155,18 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
 //        Utils.setActivityToBeFullscreen(this);
 
         setContentView(R.layout.activity_main);
+
         StatusBarUtil.setTranslucentForCoordinatorLayout(this, 100);
+        getWindow().getDecorView().setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+            @Override
+            public void onSystemUiVisibilityChange(int visibility) {
+                hideBottomUIMenu();
+            }
+        });
+        this.hideBottomUIMenu();
+        progressBar=(LinearLayout)findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
+
         context = this;
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         float density = Utils.getSceenDensity(this);
@@ -164,39 +181,51 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
 //        setUpNavigationTabDummy(null);
 
 //        setUpNavigationTab();
-        if (Utils.isNetworkAvailable(this)) {
-            //if banner data never cached or outdated
 
-            checkcacheUpdatedOrNot();
-        } else {
-            Toast.makeText(this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
-
-            SettingUtils.set(this, CommonUtilities.NETWORK_STATE, false);
-            //if banner data cached
-            if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_BANNER, this)) {
-                String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_BANNER);
-                List<Banner> banners = new ArrayList<Banner>();
-                try {
-                    banners = parseBannersFromString(fileContent);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                setUpViewPagerBanner(banners);
+        SettingUtils.set(this, CommonUtilities.NETWORK_STATE, false);
+        //if banner data cached
+        if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_BANNER, this)) {
+            String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_BANNER);
+            List<Banner> banners = new ArrayList<Banner>();
+            try {
+                banners = parseBannersFromString(fileContent);
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
+            setUpViewPagerBanner(banners);
+        }
 
-            //if tab title cached
-            if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_TAB_TITLE, this)) {
-                String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_TAB_TITLE);
-                List<collectionCategory> categories = new ArrayList<collectionCategory>();
-                try {
-                    categories = parseCategoriesFromString(fileContent);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+        //if tab title cached
+        if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_TAB_TITLE, this)) {
+            String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_TAB_TITLE);
+            List<collectionCategory> categories = new ArrayList<collectionCategory>();
+            try {
+                categories = parseCategoriesFromString(fileContent);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            if(Utils.isNetworkAvailable(this))
+            {
+                setUpNavigationTabTitle(categories);
+            }
+            else
+            {
                 setUpNavigationTab(categories);
             }
 
         }
+        if (Utils.isNetworkAvailable(this)) {
+            //if banner data never cached or outdated
+
+            checkcacheUpdatedOrNot();
+        }
+        else {
+            Toast.makeText(this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
+        }
+
+
+
+//        }
 
         setUpToolBar();
 //        setUpScrollView();
@@ -204,23 +233,45 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
 
     }
 
+    protected void hideBottomUIMenu() {
+        //隐藏虚拟按键，并且全屏
+        if (Build.VERSION.SDK_INT > 11 && Build.VERSION.SDK_INT < 19) { // lower api
+            View v = this.getWindow().getDecorView();
+            v.setSystemUiVisibility(View.GONE);
+        } else if (Build.VERSION.SDK_INT >= 19) {
+            //for new api versions.
+            View decorView = getWindow().getDecorView();
+            int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+            decorView.setSystemUiVisibility(uiOptions);
+
+        }
+    }
+
+
+
+
     private void initAppBar() {
         imageViewHome = (ImageView) findViewById(R.id.btnBack);
         imageViewSearch = (ImageView) findViewById(R.id.btnSearch);
         textTitle = (TextView) findViewById(R.id.textTitle);
-
+        imageViewUnderLine = (ImageView) findViewById(R.id.imageViewUnderlineOfSearchView);
 
         searchView = (AutoCompleteTextView) findViewById(R.id.editTextSearch);
         imageViewHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 if (!isSearchViewShown) {
                     drawerLayout.openDrawer(GravityCompat.START);
+
                 } else {
+                    removeCover();
                     searchView.setVisibility(View.INVISIBLE);
+                    imageViewUnderLine.setVisibility(View.INVISIBLE);
                     searchView.setText("");
                     resetDropdownOffset = true;
-                    imageViewHome.setImageResource(R.drawable.selector_btn_menu);
+                    imageViewHome.setImageResource(R.drawable.menu);
                     isSearchViewShown = false;
                     if (isAppBarFolded) {
                         textTitle.setVisibility(View.VISIBLE);
@@ -241,10 +292,9 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
                     if (isAppBarFolded) {
                         imageViewHome.setImageResource(R.drawable.back_b);
                     } else {
-                        imageViewHome.setImageResource(R.drawable.selector_btn_back);
+                        imageViewHome.setImageResource(R.drawable.back);
                     }
-                    searchView.setVisibility(View.VISIBLE);
-                    textTitle.setVisibility(View.GONE);
+
                     ListSearchAdapter adapter = new ListSearchAdapter(hotWords, MainActivity.this);
 //
 //                    ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.list_item_search, R.id.text, hotWords);
@@ -252,17 +302,35 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
 
                     searchView.setAdapter(adapter);
                     searchView.setHint(getResources().getString(R.string.search_hint));
-                    searchView.requestFocus();
-                    InputMethodManager inputManager =
-                            (InputMethodManager) searchView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    inputManager.showSoftInput(searchView, 0);
+
                     searchView.setThreshold(0);
                     if (resetDropdownOffset) {
 //                        searchView.setDropDownVerticalOffset(40);
 //                        resetDropdownOffset = false;
                     }
-                    searchView.showDropDown();
+                    showUnderLine();
+
                     showCover();
+                    new Handler().postDelayed(new Runnable() {
+
+                        public void run() {
+                            //execute the task
+                            searchView.setVisibility(View.VISIBLE);
+                            textTitle.setVisibility(View.GONE);
+                            searchView.requestFocus();
+                            InputMethodManager inputManager =
+                                    (InputMethodManager) searchView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                            inputManager.showSoftInput(searchView, 0);
+                        }
+                    }, 100);
+
+                    new Handler().postDelayed(new Runnable() {
+
+                        public void run() {
+                            //execute the task
+                            searchView.showDropDown();
+                        }
+                    }, 200);
 
                     searchView.addTextChangedListener(MainActivity.this);
                     searchView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -287,13 +355,14 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
                     if (!queryText.equals("")) {
                         searchView.setText("");
                         searchView.setVisibility(View.INVISIBLE);
+                        imageViewUnderLine.setVisibility(View.INVISIBLE);
                         Intent intentSearch = new Intent(MainActivity.this, SearchResultActivity.class);
                         intentSearch.putExtra("key_word", queryText);
                         startActivity(intentSearch);
                         if (isAppBarFolded) {
                             imageViewHome.setImageResource(R.drawable.menu_b);
                         } else {
-                            imageViewHome.setImageResource(R.drawable.selector_btn_menu);
+                            imageViewHome.setImageResource(R.drawable.menu);
                         }
 
                         isSearchViewShown = false;
@@ -305,26 +374,44 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
                         if (isAppBarFolded) {
                             imageViewHome.setImageResource(R.drawable.back_b);
                         } else {
-                            imageViewHome.setImageResource(R.drawable.selector_btn_back);
+                            imageViewHome.setImageResource(R.drawable.back);
                         }
-                        searchView.setVisibility(View.VISIBLE);
                         searchView.setHint(getResources().getString(R.string.search_hint));
-                        textTitle.setVisibility(View.GONE);
+
                         final String[] testStrings = getResources().getStringArray(R.array.test_array);
 //                        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.list_item_search, R.id.text, hotWords);
                         ListSearchAdapter adapter = new ListSearchAdapter(hotWords, MainActivity.this);
                         searchView.setAdapter(adapter);
                         searchView.requestFocus();
-                        InputMethodManager inputManager =
-                                (InputMethodManager) searchView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                        inputManager.showSoftInput(searchView, 0);
+
                         if (resetDropdownOffset) {
 //                            resetDropdownOffset = false;
 //                            searchView.setDropDownVerticalOffset(-40);
                         }
 //                        searchView.setDropDownVerticalOffset(-40);
-                        searchView.showDropDown();
+                        showUnderLine();
+
                         showCover();
+                        new Handler().postDelayed(new Runnable() {
+
+                            public void run() {
+                                //execute the task
+                                searchView.setVisibility(View.VISIBLE);
+                                textTitle.setVisibility(View.GONE);
+                                searchView.requestFocus();
+                                InputMethodManager inputManager =
+                                        (InputMethodManager) searchView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                                inputManager.showSoftInput(searchView, 0);
+                            }
+                        }, 100);
+
+                        new Handler().postDelayed(new Runnable() {
+
+                            public void run() {
+                                //execute the task
+                                searchView.showDropDown();
+                            }
+                        }, 200);
                         searchView.addTextChangedListener(MainActivity.this);
                         searchView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                             @Override
@@ -357,10 +444,11 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
                     searchView.setTextColor(getResources().getColor(R.color.search_text_view_color));
                     searchView.setHintTextColor(getResources().getColor(R.color.search_text_view_hint_color));
 
-                    imageViewHome.setImageResource(R.drawable.selector_btn_menu);
-                    imageViewSearch.setImageResource(R.drawable.selector_btn_search);
+                    imageViewHome.setImageResource(R.drawable.menu);
+                    imageViewSearch.setImageResource(R.drawable.search);
                     textTitle.setVisibility(View.GONE);
                     searchView.setVisibility(View.INVISIBLE);
+                    imageViewUnderLine.setVisibility(View.INVISIBLE);
 
                     isAppBarFolded = false;
                     toolbar.setBackgroundColor(getResources().getColor(R.color.transparent));
@@ -375,6 +463,7 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
                     textTitle.setVisibility(View.VISIBLE);
                     resetDropdownOffset = true;
                     searchView.setVisibility(View.INVISIBLE);
+                    imageViewUnderLine.setVisibility(View.INVISIBLE);
 
                     toolbar.setBackgroundColor(getResources().getColor(R.color.white));
 
@@ -390,6 +479,15 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
                 }
             }
         });
+    }
+
+    private void showUnderLine() {
+
+        final Animation animation = AnimationUtils.loadAnimation(this, R.anim.search_view_underline_anim);
+
+        imageViewUnderLine.setVisibility(View.VISIBLE);
+        imageViewUnderLine.startAnimation(animation);
+
     }
 
     private void showCover() {
@@ -441,36 +539,21 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
                                 .getString("update_at");
 
                         long cacheUpdatedTime = (long) (Double.parseDouble(cacheUpdatedTimeStamp) * 1000);
-                        boolean isCacheDataOutdated = FileCacheUtil
-                                .isCacheDataFailure(CommonUtilities.CACHE_FILE_HOT_WORDS, context, cacheUpdatedTime);
 
-
-                        if (isCacheDataOutdated) {
-                            getSearhHotWordsFromServer();
-                        } else {
-                            String fileContent = FileCacheUtil.getCache(context, CommonUtilities.CACHE_FILE_HOT_WORDS);
-
-                            try {
-                                hotWords = parseHotwordsFromString(fileContent);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        isCacheDataOutdated = FileCacheUtil
+                        boolean   isCacheDataOutdated = FileCacheUtil
                                 .isCacheDataFailure(CommonUtilities.CACHE_FILE_BANNER, context, cacheUpdatedTime);
 
                         if (isCacheDataOutdated) {
                             getBannerInfoFromServer();
                         } else {
-                            String fileContent = FileCacheUtil.getCache(MainActivity.this, CommonUtilities.CACHE_FILE_BANNER);
-                            List<Banner> banners = new ArrayList<Banner>();
-                            try {
-                                banners = parseBannersFromString(fileContent);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            setUpViewPagerBanner(banners);
+//                            String fileContent = FileCacheUtil.getCache(MainActivity.this, CommonUtilities.CACHE_FILE_BANNER);
+//                            List<Banner> banners = new ArrayList<Banner>();
+//                            try {
+//                                banners = parseBannersFromString(fileContent);
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
+//                            setUpViewPagerBanner(banners);
 
                         }
 
@@ -487,6 +570,20 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
                                 e.printStackTrace();
                             }
                             setUpNavigationTab(categories);
+                        }
+
+                        isCacheDataOutdated = FileCacheUtil
+                                .isCacheDataFailure(CommonUtilities.CACHE_FILE_HOT_WORDS, context, cacheUpdatedTime);
+                        if (isCacheDataOutdated) {
+                            getSearhHotWordsFromServer();
+                        } else {
+                            String fileContent = FileCacheUtil.getCache(context, CommonUtilities.CACHE_FILE_HOT_WORDS);
+
+                            try {
+                                hotWords = parseHotwordsFromString(fileContent);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
 
 
@@ -558,12 +655,7 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
 
 
     private void setUpNavigationTab(List<collectionCategory> titles) {
-        mTabLayout = (TabLayout) findViewById(R.id.tabs);
-        mTabLayout.setTabMode(TabLayout.MODE_FIXED);
-        mTabLayout.addTab(mTabLayout.newTab().setText(" " + getResources().getString(R.string.home_page) + " "));
-        for (int i = 0; i < titles.size(); i++) {
-            mTabLayout.addTab(mTabLayout.newTab().setText(titles.get(i).getTitle()));
-        }
+        setUpNavigationTabTitle(titles);
 
 
 //        mTabLayout.addTab(mTabLayout.newTab().setText(" " + getResources().getString(R.string.home)));
@@ -591,6 +683,15 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
 
         setUpTabs(list, ids);
 
+    }
+
+    private void setUpNavigationTabTitle(List<collectionCategory> titles) {
+        mTabLayout = (TabLayout) findViewById(R.id.tabs);
+        mTabLayout.setTabMode(TabLayout.MODE_FIXED);
+        mTabLayout.addTab(mTabLayout.newTab().setText(" " + getResources().getString(R.string.home_page) + " "));
+        for (int i = 0; i < titles.size(); i++) {
+            mTabLayout.addTab(mTabLayout.newTab().setText(titles.get(i).getTitle()));
+        }
     }
 
     private void setUpNavigationTabDummy(List<collectionCategory> titles) {
@@ -638,7 +739,7 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
         viewPagerTabs.setAdapter(adapter);
         viewPagerTabs.setOffscreenPageLimit(5);
         mTabLayout.setupWithViewPager(viewPagerTabs);
-
+        progressBar.setVisibility(View.GONE);
         viewPager.setFocusable(true);
         viewPager.setFocusableInTouchMode(true);
         viewPager.requestFocus();
@@ -726,12 +827,13 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
             });
         }
 
+        group.removeAllViews();
         //
         imageViews = new ImageView[pageview.size()];
         for (int i = 0; i < pageview.size(); i++) {
             imageView = new ImageView(MainActivity.this);
-            imageView.setLayoutParams(new ViewGroup.LayoutParams(50, 50));
-            imageView.setPadding(20, 0, 20, 0);
+            imageView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            imageView.setPadding(12, 0, 12, 0);
             imageViews[i] = imageView;
 
             //

@@ -334,7 +334,7 @@ public class BaseActivity extends ActionBarActivity {
         } else if (requestCode == UserInfoActivity.REQUEST_CODE_MENU) {
             imageViewUserCover.setImageResource(bgRes[Integer.parseInt(UserInfo.getCurrentUser(this).getBackground_id()) - 1]);
 
-        } else if (requestCode == FeedbackActivity.REQUEST_CODE_MENU) {
+        } else if (requestCode == BaseActivity.REQUEST_CODE_MENU) {
             updateMenuForFeedbackNotification();
         }
 
@@ -381,7 +381,7 @@ public class BaseActivity extends ActionBarActivity {
 
                     if (UserInfo.isUserLogged(BaseActivity.this)) {
                         Intent intentFeedback = new Intent(BaseActivity.this, FeedbackActivity.class);
-                        BaseActivity.this.startActivityForResult(intentFeedback, FeedbackActivity.REQUEST_CODE_MENU);
+                        BaseActivity.this.startActivityForResult(intentFeedback, BaseActivity.REQUEST_CODE_MENU);
                     } else {
                         LoginUtils.startLogin(BaseActivity.this, LoginActivity.REQUEST_CODE_FEEDBACK);
                     }

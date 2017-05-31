@@ -1,5 +1,8 @@
 package com.wewow;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -7,11 +10,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.sina.weibo.sdk.api.ImageObject;
@@ -143,11 +149,33 @@ public class ShareActivity extends Activity implements IWeiboHandler.Response {
                 startActivity(Intent.createChooser(sendIntent, "选择分享方式"));
             }
         });
-        if (this.getIntent().hasExtra(BACK_GROUND)) {
+        /*if (this.getIntent().hasExtra(BACK_GROUND)) {
             byte[] buf = this.getIntent().getByteArrayExtra(BACK_GROUND);
             Bitmap bm = BitmapFactory.decodeByteArray(buf, 0, buf.length);
             this.findViewById(android.R.id.content).setBackground(new BitmapDrawable(bm));
-        }
+        }*/
+        View sv = this.findViewById(R.id.share_area);
+        sv.setY(Utils.getScreenHeightPx(this));
+        this.findViewById(R.id.share_area).post(new Runnable() {
+            @Override
+            public void run() {
+                ShareActivity.this.animShareArea();
+            }
+        });
+    }
+
+    private void animShareArea() {
+        View sv = this.findViewById(R.id.share_area);
+        View nv = this.findViewById(R.id.non_share_area);
+        int sh = Utils.getScreenHeightPx(this);
+        float h = sv.getHeight();
+        ValueAnimator va = ObjectAnimator.ofFloat(sv, "y", sh, sh - h);
+        va.setDuration(300);
+        ValueAnimator va1 = ObjectAnimator.ofFloat(nv, "alpha", 0, 0.7f);
+        va1.setDuration(200);
+        AnimatorSet animSet = new AnimatorSet();
+        animSet.play(va).before(va1);
+        animSet.start();
     }
 
     private void shareWeibo() {

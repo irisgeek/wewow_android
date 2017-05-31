@@ -1,124 +1,161 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
-    android:layout_width="257dp"
-    android:layout_height="90dp"
-    android:background="#f7f7f7"
-    android:gravity="center_vertical"
-    android:layout_marginLeft="12dp">
+<?xml version="1.0" encoding="utf-8"?><!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"--><!--android:orientation="horizontal"--><!--android:layout_width="match_parent"--><!--android:layout_height="90dp"--><!--android:background="#ffffff"--><!--android:gravity="center_vertical"--><!--android:layout_marginLeft="12dp">-->
 
-    <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:card_view="http://schemas.android.com/apk/res-auto"
-        card_view:cardBackgroundColor="#ffffff"
-        android:layout_width="match_parent"
+<!--<LinearLayout--><!--android:layout_width="match_parent"--><!--android:layout_height="86dp"--><!--android:layout_gravity="center"--><!--android:layout_marginLeft="2dp"--><!--android:layout_marginRight="2dp"--><!--android:orientation="horizontal">--><!--<com.wewow.view.CircleImageView--><!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
+
+<!--android:layout_width="60dp"--><!--android:layout_height="60dp"--><!--android:layout_gravity="left|center_vertical"--><!--android:layout_marginLeft="10dp"--><!--android:scaleType="fitXY"--><!--android:id="@+id/imageViewIcon"--><!--/>--><!--<LinearLayout--><!--android:layout_width="200dp"--><!--android:layout_height="wrap_content"--><!--android:orientation="vertical"--><!--android:layout_marginTop="16dp"--><!--android:layout_gravity="top"--><!--android:layout_marginLeft="15dp">--><!--<TextView--><!--android:layout_width="wrap_content"--><!--android:layout_height="wrap_content"--><!--android:textSize="14sp"--><!--android:text="Smooth"--><!--android:textColor="#333631"--><!--android:layout_gravity="left"--><!--android:gravity="left"--><!--android:textStyle="bold"--><!--android:id="@+id/textViewNickName"/>-->
+
+<!--<TextView--><!--android:layout_width="wrap_content"--><!--android:layout_height="wrap_content"--><!--android:textSize="10sp"--><!--android:text="寻找有趣的活法"--><!--android:textColor="#333631"--><!--android:gravity="left"--><!--android:layout_gravity="left"--><!--android:id="@+id/textViewDesc"/>-->
+
+
+<!--<LinearLayout--><!--android:layout_width="wrap_content"-->
+
+<!--android:layout_height="wrap_content"--><!--android:layout_marginTop="12dp"--><!--android:layout_marginRight="12dp"--><!--android:orientation="horizontal">-->
+
+<!--<TextView--><!--android:layout_width="wrap_content"--><!--android:layout_height="wrap_content"--><!--android:text="@string/articles"--><!--android:textColor="#333631"--><!--android:textSize="10sp" />-->
+
+<!--<TextView--><!--android:id="@+id/textViewArticle"--><!--android:layout_width="wrap_content"--><!--android:layout_height="wrap_content"--><!--android:layout_marginLeft="4dp"--><!--android:text="23"--><!--android:textStyle="italic"--><!--android:textColor="#333631"--><!--android:textSize="10sp" />-->
+
+<!--<TextView--><!--android:layout_width="wrap_content"--><!--android:layout_height="wrap_content"--><!--android:layout_marginLeft="12dp"--><!--android:text="@string/followers"--><!--android:textColor="#333631"--><!--android:textSize="10sp" />-->
+
+<!--<TextView--><!--android:id="@+id/textViewFollow"--><!--android:layout_width="wrap_content"--><!--android:layout_height="wrap_content"--><!--android:layout_marginLeft="4dp"--><!--android:text="1300"--><!--android:textStyle="italic"--><!--android:textColor="#333631"--><!--android:textSize="10sp" />-->
+
+<!--</LinearLayout>--><!--</LinearLayout>-->
+
+<!--<ImageView--><!--android:layout_width="30dp"--><!--android:layout_height="30dp"--><!--android:layout_gravity="right|center_vertical"--><!--android:layout_marginRight="16dp"--><!--android:layout_marginLeft="20dp"--><!--android:id="@+id/imageViewFollowed"--><!--android:src="@drawable/selector_btn_follow"/>--><!--</LinearLayout>-->
+
+<!--</LinearLayout>-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="86dp"
+    android:background="#ffffff">
+
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="257dp"
         android:layout_height="86dp"
-        android:layout_gravity="center"
-        android:layout_marginLeft="2dp"
-        android:layout_marginRight="2dp"
-        android:orientation="horizontal"
+        android:layout_marginLeft="12dp"
+        android:background="#ffffff"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-        card_view:cardCornerRadius="2dp">
 
         <FrameLayout
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="left|center_vertical"
-            android:layout_marginLeft="10dp"
-            android:layout_height="wrap_content">
-    <com.wewow.view.CircleImageView
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_marginLeft="10dp">
 
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:scaleType="fitXY"
-        android:id="@+id/imageViewIcon"
-        />
+            <com.wewow.view.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+
+                android:id="@+id/imageViewIcon"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:scaleType="fitXY" />
+
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/dot_new"
                 android:id="@+id/imageNew"
-                android:visibility="gone"
-                android:layout_gravity="top|right"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|right"
+                android:src="@drawable/dot_new"
+                android:visibility="gone" />
         </FrameLayout>
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="16dp"
-        android:layout_gravity="top"
-        android:layout_marginLeft="48dp">
-        <TextView
+
+        <FrameLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:text="Smooth"
-            android:textColor="#333631"
-            android:layout_gravity="left"
-            android:layout_marginLeft="32dp"
-            android:textStyle="bold"
-            android:id="@+id/textViewNickName"/>
+            android:layout_height="match_parent"
+            android:layout_marginLeft="15dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="10sp"
-            android:text="寻找有趣的活法"
-            android:textColor="#333631"
-            android:layout_gravity="left"
-            android:layout_marginLeft="32dp"
-            android:id="@+id/textViewDesc"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_alignParentRight="true"
-            android:layout_marginBottom="5dp"
-            android:layout_marginRight="12dp"
-            android:layout_marginLeft="80dp"
-            android:orientation="horizontal">
-
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/articles"
-                android:textColor="#333631"
-                android:textSize="10sp" />
+                android:layout_gravity="top"
+                android:layout_marginTop="16dp"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/textViewArticle"
+                <TextView
+                    android:id="@+id/textViewNickName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:text=""
+                    android:textColor="#333631"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textViewDesc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:maxEms="18"
+                    android:maxLines="2"
+                    android:text=""
+                    android:textColor="#333631"
+                    android:textSize="10sp" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="wrap_content"
+
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="4dp"
-                android:text="23"
-                android:textStyle="italic"
-                android:textColor="#333631"
-                android:textSize="10sp" />
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="12dp"
+                android:layout_marginRight="12dp"
+                android:orientation="horizontal">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="12dp"
-                android:text="@string/followers"
-                android:textColor="#333631"
-                android:textSize="10sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/articles"
+                    android:textColor="#333631"
 
-            <TextView
-                android:id="@+id/textViewFollow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="4dp"
-                android:text="1300"
-                android:textStyle="italic"
-                android:textColor="#333631"
-                android:textSize="10sp" />
+                    android:textSize="10sp" />
 
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/textViewArticle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="4dp"
+                    android:text=""
+                    android:textColor="#333631"
+                    android:textSize="10sp"
+                    android:textStyle="italic" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:text="@string/followers"
+                    android:textColor="#333631"
+                    android:textSize="10sp" />
+
+                <TextView
+                    android:id="@+id/textViewFollow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="4dp"
+                    android:text=""
+                    android:textColor="#333631"
+                    android:textSize="10sp"
+                    android:textStyle="italic" />
+
+            </LinearLayout>
+
+
+        </FrameLayout>
 
 
 
-</android.support.v7.widget.CardView>
 
-</LinearLayout>
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_gravity="bottom"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:src="#e9e9e9"/>
+
+</FrameLayout>

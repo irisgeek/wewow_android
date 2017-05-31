@@ -1,14 +1,18 @@
 package com.wewow;
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.util.Pair;
@@ -29,9 +33,11 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 import com.wewow.dto.LabCollection;
+import com.wewow.utils.BlurBuilder;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
 import com.wewow.utils.RemoteImageLoader;
+import com.wewow.utils.Utils;
 import com.wewow.utils.WebAPIHelper;
 
 import org.json.JSONArray;
@@ -58,6 +64,7 @@ public class LifeLabActivity extends BaseActivity {
     CircleProgressBar progressBar;
     private View foot;
     private boolean isLoading = false;
+    private ImageView anim_view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,10 +92,7 @@ public class LifeLabActivity extends BaseActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 LabCollection lc = (LabCollection) adapterView.getAdapter().getItem(i);
-                Intent intent = new Intent(LifeLabActivity.this, LifeLabItemActivity.class);
-                intent.putExtra(LifeLabItemActivity.LIFELAB_COLLECTION, lc);
-                Bundle b = new Bundle();
-                LifeLabActivity.this.startActivity(intent);
+                LifeLabActivity.this.openLifeLab(adapterView, view, lc);
             }
         });
         this.lvlifelab.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -115,6 +119,119 @@ public class LifeLabActivity extends BaseActivity {
         });
         progressBar.setVisibility(View.VISIBLE);
         this.startDataLoading();
+        this.anim_view = (ImageView) this.findViewById(R.id.anim_view);
+    }
+
+    private static class statusHolder {
+        public static float listAlpha;
+        public static float viewAlpha;
+        public static float viewScaleX;
+        public static float viewScaleY;
+        public static View adapterView;
+        public static View itemView;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        this.revert();
+    }
+
+    private void revert() {
+        this.anim_view.setVisibility(View.GONE);
+        statusHolder.itemView.setAlpha(statusHolder.viewAlpha);
+        statusHolder.adapterView.setAlpha(statusHolder.listAlpha);
+    }
+
+    private void openLifeLab(AdapterView<?> adapterView, final View view, final LabCollection lc) {
+        statusHolder.listAlpha = adapterView.getAlpha();
+        statusHolder.viewAlpha = view.getAlpha();
+        statusHolder.viewScaleX = view.getScaleX();
+        statusHolder.viewScaleY = view.getScaleY();
+        statusHolder.adapterView = adapterView;
+        statusHolder.itemView = view;
+        AnimatorSet as = new AnimatorSet();
+        ValueAnimator av = ObjectAnimator.ofFloat(view, "alpha", statusHolder.viewAlpha, 0f);
+        ValueAnimator bv = ObjectAnimator.ofFloat(adapterView, "alpha", statusHolder.listAlpha, 0.5f);
+        as.play(av).with(bv);
+        as.setDuration(500);
+        as.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                //
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                //Bitmap bm = BlurBuilder.getScreenshot(view);
+                //LifeLabActivity.this.anim_view.setBackground(new BitmapDrawable(LifeLabActivity.this.getResources(), bm));
+                ViewGroup.LayoutParams lp = LifeLabActivity.this.anim_view.getLayoutParams();
+                lp.width = view.getWidth();
+                lp.height = view.getHeight();
+                LifeLabActivity.this.anim_view.setLayoutParams(lp);
+                LifeLabActivity.this.anim_view.setX(view.getX());
+                LifeLabActivity.this.anim_view.setY(view.getY());
+                LifeLabActivity.this.anim_view.setVisibility(View.VISIBLE);
+                LifeLabActivity.this.anim_view.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        AnimatorSet as = new AnimatorSet();
+                        ValueAnimator x = ObjectAnimator.ofFloat(LifeLabActivity.this.anim_view, "x", LifeLabActivity.this.anim_view.getX(), 0);
+                        ValueAnimator y = ObjectAnimator.ofFloat(LifeLabActivity.this.anim_view, "y", LifeLabActivity.this.anim_view.getY(), 0);
+                        float x0 = LifeLabActivity.this.anim_view.getScaleX();
+                        float y0 = LifeLabActivity.this.anim_view.getScaleY();
+                        float sx = (float) Utils.getScreenWidthPx(LifeLabActivity.this) / (float) LifeLabActivity.this.anim_view.getWidth();
+                        ValueAnimator scalex = ObjectAnimator.ofFloat(LifeLabActivity.this.anim_view, "scaleX", x0, x0 * sx * 2);
+                        //Log.d(TAG, String.format("run X: %f, %f", x0, x0 * sx));
+                        float sy = (float) Utils.getScreenHeightPx(LifeLabActivity.this) / (float) LifeLabActivity.this.anim_view.getHeight();
+                        //Log.d(TAG, String.format("screenH: %d, viewH:%d", Utils.getScreenHeightPx(LifeLabActivity.this), LifeLabActivity.this.anim_view.getHeight()));
+                        //Log.d(TAG, String.format("y0: %f, sy: %f, y1: %f", y0, sy, y0 * sy));
+                        ValueAnimator scaley = ObjectAnimator.ofFloat(LifeLabActivity.this.anim_view, "scaleY", y0, y0 * sy * 6);
+                        //Log.d(TAG, String.format("run Y: %f, %f", x0, y0 * sy));
+                        as.play(x).with(scalex).with(y).with(scaley);
+                        //as.play(x).with(y);
+                        as.setDuration(300);
+                        as.addListener(new Animator.AnimatorListener() {
+                            @Override
+                            public void onAnimationStart(Animator animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                View x = LifeLabActivity.this.anim_view;
+                                //Log.d(TAG, String.format("onAnimationEnd: %f %f %d %d", x.getX(), x.getY(), x.getWidth(), x.getHeight()));
+                                Intent intent = new Intent(LifeLabActivity.this, LifeLabItemActivity.class);
+                                intent.putExtra(LifeLabItemActivity.LIFELAB_COLLECTION, lc);
+                                LifeLabActivity.this.startActivityForResult(intent, 0);
+                            }
+
+                            @Override
+                            public void onAnimationCancel(Animator animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animator animation) {
+
+                            }
+                        });
+                        as.start();
+
+                    }
+                });
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+                //
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+                //
+            }
+        });
+        as.start();
     }
 
     private class LifeLabAdapter extends BaseAdapter {

@@ -13,28 +13,37 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="60dp"
+            android:layout_marginTop="56dp"
             android:scaleType="fitXY"
-            android:src="@drawable/divider" />
-        <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/swipe_refresh_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
-        <ListView
-            android:id="@+id/listViewArtists"
+            android:src="@drawable/divider_topbar" />
 
+
+        <com.cjj.MaterialRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/refresh"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="10dp"
-            android:choiceMode="singleChoice"
-            android:divider="#e2e2e2"
-            android:dividerHeight="1dp"
-            android:scrollbars="none"/>
+            android:background="@color/white"
+            app:isLoadMore="true"
+            app:overlay="false"
+            app:progress_size_type="normal"
+            app:wave_height_type="normal"
+            app:wave_show="false">
 
-        </android.support.v4.widget.SwipeRefreshLayout>
+            <ListView
+                android:id="@+id/listViewArtists"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="1dp"
+                android:background="@drawable/bg_listview_artist"
+                android:choiceMode="singleChoice"
+                android:divider="#00ffffff"
+                android:scrollbars="none"
+                android:visibility="gone" />
+
+        </com.cjj.MaterialRefreshLayout>
 
     </LinearLayout>
 

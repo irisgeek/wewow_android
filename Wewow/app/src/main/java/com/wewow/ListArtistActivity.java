@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -434,6 +435,7 @@ public class ListArtistActivity extends BaseActivity {
             adapter = new ListViewArtistsAdapter(this, listItem, followStatus);
 
             listView.setAdapter(adapter);
+
 //            if(!isHeaderAdded) {
 //
 //                isHeaderAdded=true;
@@ -455,9 +457,12 @@ public class ListArtistActivity extends BaseActivity {
                                         }
         );
         adapter.notifyDataSetChanged();
+        listView.setVisibility(View.VISIBLE);
         currentPage++;
         refreshLayout.finishRefresh();
         refreshLayout.finishRefreshLoadMore();
+//        CardView view=(CardView)findViewById(R.id.refreshCardView);
+//        view.setVisibility(View.VISIBLE);
 
 
     }

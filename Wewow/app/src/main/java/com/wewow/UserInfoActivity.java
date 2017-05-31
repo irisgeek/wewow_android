@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
+import com.wewow.utils.MessageBoxUtils;
 import com.wewow.utils.ProgressDialogUtil;
 import com.wewow.utils.WebAPIHelper;
 
@@ -60,9 +61,8 @@ public class UserInfoActivity extends Activity {
             iv.setTag(i);
         }
         int key = Integer.valueOf(this.user.getBackground_id());
-        if(key<1)
-        {
-            key=1;
+        if (key < 1) {
+            key = 1;
         }
         this.selectedCover = this.covers.get(key);
         this.selectedCover.setVisibility(View.VISIBLE);
@@ -116,7 +116,7 @@ public class UserInfoActivity extends Activity {
     private void goBack() {
         boolean changed = this.isEdited();
         if (changed) {
-            new AlertDialog.Builder(this)
+            /*new AlertDialog.Builder(this)
                     .setTitle(R.string.userinfo_save_prompt)
                     .setNegativeButton(R.string.prompt_denied, new DialogInterface.OnClickListener() {
                         @Override
@@ -132,7 +132,40 @@ public class UserInfoActivity extends Activity {
                             dialogInterface.dismiss();
                             UserInfoActivity.this.updateUserInfo();
                         }
-                    }).show();
+                    }).show();*/
+            MessageBoxUtils.messageBoxWithButtons(this
+                    , this.getString(R.string.userinfo_save_prompt)
+                    , new String[]{
+                            this.getString(R.string.userinfo_stay),
+                            this.getString(R.string.userinfo_leave)
+                    }
+                    , new Object[]{0, 1}
+                    , new MessageBoxUtils.MsgboxButtonListener[]{
+                            new MessageBoxUtils.MsgboxButtonListener() {
+                                @Override
+                                public boolean shouldCloseMessageBox(Object tag) {
+                                    return true;
+                                }
+
+                                @Override
+                                public void onClick(Object tag) {
+                                    //UserInfoActivity.this.updateUserInfo();
+                                }
+                            },
+                            new MessageBoxUtils.MsgboxButtonListener() {
+                                @Override
+                                public boolean shouldCloseMessageBox(Object tag) {
+                                    return true;
+                                }
+
+                                @Override
+                                public void onClick(Object tag) {
+                                    UserInfoActivity.this.setResult(RESULT_CANCELED);
+                                    UserInfoActivity.this.finish();
+                                }
+                            },
+                    }
+            );
         } else {
             this.setResult(RESULT_CANCELED);
             this.finish();
