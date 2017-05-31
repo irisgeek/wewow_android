@@ -17,21 +17,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="170dp"
+        android:layout_marginTop="210dp"
+        android:gravity="center_horizontal"
         android:orientation="vertical">
 
         <ImageView
-            android:layout_width="280dp"
-            android:layout_height="280dp"
-            android:layout_gravity="center"
-            android:layout_marginBottom="17dp"
-            android:scaleType="fitCenter"
+            android:layout_width="231dp"
+            android:layout_height="241dp"
             android:src="@drawable/lifepostempty"/>
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:text="@string/lifepost_nodata"
             android:textColor="#ffffff"
             android:textSize="13sp"/>
@@ -43,6 +40,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:dividerHeight="12dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
         android:divider="@color/transparent"
         android:visibility="gone"/>
 
@@ -62,17 +61,17 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="6dp"
+            android:layout_marginStart="17dp"
+            android:layout_marginEnd="17dp"
             android:foregroundGravity="center"
             android:src="@drawable/back"/>
 
         <TextView
-            android:id="@+id/lifepost_title"
+            android:id="@+id/tv_lifepost_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="16dp"
-            android:layout_toRightOf="@+id/lifepost_back"
+            android:layout_toEndOf="@+id/lifepost_back"
             android:text="@string/lifepost_title"
             android:textColor="#ffffff"
             android:textSize="20sp"/>
@@ -84,7 +83,7 @@
             android:padding="3dp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="6dp"
+            android:layout_marginRight="13dp"
             android:src="@drawable/share_w"/>
 
     </RelativeLayout>

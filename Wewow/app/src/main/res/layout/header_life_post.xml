@@ -3,7 +3,9 @@
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:orientation="vertical"
-              android:paddingRight="12dp"
+              android:paddingEnd="12dp"
+              android:paddingStart="12dp"
+              android:paddingBottom="3dp"
               android:paddingTop="70dp">
 
     <TextView
@@ -13,7 +15,8 @@
         android:layout_marginTop="15dp"
         android:gravity="right"
         android:textColor="#ffffff"
-        android:textSize="20sp"/>
+        android:textSize="20sp"
+        android:textStyle="bold"/>
 
     <TextView
         android:id="@+id/lifepost_desc"

@@ -94,7 +94,7 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
         this.lifepost_title_shadow = this.findViewById(R.id.lifepost_title_shadow);
         this.lifepost_back = (ImageView) this.findViewById(R.id.lifepost_back);
         this.lifepost_share = (ImageView) this.findViewById(R.id.lifepost_share);
-        this.lifepost_title = (TextView) this.findViewById(R.id.lifepost_title);
+        this.lifepost_title = (TextView) this.findViewById(R.id.tv_lifepost_title);
         listComments = (ListView) this.findViewById(R.id.lifepost_comments);
         header = View.inflate(this, R.layout.header_life_post, null);
         this.title = (TextView) header.findViewById(R.id.lifepost_title);
@@ -201,10 +201,10 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
             iv.setImageDrawable(LifePostActivity.this.getResources().getDrawable(jobj.optInt("liked", 0) == 0 ? R.drawable.like : R.drawable.liked));
             if (!author.equals(LifePostActivity.this.user.getNickname())) {
                 view.findViewById(R.id.lifepost_mycomment).setVisibility(View.GONE);
-                v.setBackgroundColor(Color.WHITE);
+//                v.setBackgroundColor(Color.WHITE);
             } else {
                 view.findViewById(R.id.lifepost_mycomment).setVisibility(View.VISIBLE);
-                v.setBackgroundColor(Color.argb(255, 252, 211, 145));
+//                v.setBackgroundColor(Color.argb(255, 252, 211, 145));
             }
             View normalPanel = view.findViewById(R.id.normal_area);
             View menuPanel = view.findViewById(R.id.comment_menu);
@@ -411,7 +411,7 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
         View child = view.getChildAt(0);
         if (firstVisibleItem == 0) {
             int top = child.getTop();
-            int height = child.getHeight() - Utils.dipToPixel(this, 59 - 12);
+            int height = child.getHeight() - Utils.dipToPixel(this, 59 + 25 - 15);
             if(-top >= height){
                 showTitle();
             }else{

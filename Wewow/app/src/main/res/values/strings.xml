@@ -45,7 +45,7 @@
     <string name="article_psot_comment">发表你的看法</string>
     <string name="lifepost_nodata">还没有人发表看法</string>
     <string name="lifepost_mycomment">我的评论</string>
-    <string name="lifepost_title">⽣活帖</string>
+    <string name="lifepost_title">生活帖</string>
     <string name="addpost_title">说说我的想法</string>
     <string name="addpost_quit_prompt">现在退出的话，输入的文字就都白费了，确定吗？</string>
     <string name="addpost_counter_max">140</string>
