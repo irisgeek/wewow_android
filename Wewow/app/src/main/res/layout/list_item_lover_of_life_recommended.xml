@@ -50,6 +50,7 @@
             android:layout_height="wrap_content"
             android:textSize="10sp"
             android:text="寻找有趣的活法"
+            android:maxLines="1"
             android:textColor="#333631"
             android:layout_gravity="left"
             android:id="@+id/textViewDesc"/>

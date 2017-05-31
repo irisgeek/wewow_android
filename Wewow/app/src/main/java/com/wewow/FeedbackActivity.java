@@ -614,7 +614,7 @@ public class FeedbackActivity extends AppCompatActivity implements IPickResult{
 
         oss = new OSSClient(getApplicationContext(), CommonUtilities.OOS_ENDPOINT, credentialProvider);
         // 构造上传请求
-        PutObjectRequest put = new PutObjectRequest(CommonUtilities.BUCKETNAME, filePath, filePath);
+        PutObjectRequest put = new PutObjectRequest(CommonUtilities.BUCKETNAME, "test", filePath);
 
         // 异步上传时可以设置进度回调
         put.setProgressCallback(new OSSProgressCallback<PutObjectRequest>() {
@@ -632,7 +632,7 @@ public class FeedbackActivity extends AppCompatActivity implements IPickResult{
                 Log.d("ETag", result.getETag());
                 Log.d("RequestId", result.getRequestId());
 
-                String url=oss.presignPublicObjectURL(CommonUtilities.BUCKETNAME,filePath);
+                String url=oss.presignPublicObjectURL(CommonUtilities.BUCKETNAME,"test");
                 SendImage(url);
                 Toast.makeText(FeedbackActivity.this,result.getRequestId(),Toast.LENGTH_SHORT).show();
             }
@@ -800,9 +800,9 @@ public class FeedbackActivity extends AppCompatActivity implements IPickResult{
 
             //Setting the real returned image.
             //getImageView().setImageURI(r.getUri());
-//            Toast.makeText(this, pickResult.getPath(), Toast.LENGTH_LONG).show();
-//            String path= BitmapUtils.saveBitmap(FeedbackActivity.this,compressBySize(pickResult.getPath(), 720, 1280));
-//            asyncPutObjectFromLocalFile(path);
+            Toast.makeText(this, pickResult.getPath(), Toast.LENGTH_LONG).show();
+            String path= BitmapUtils.saveBitmap(FeedbackActivity.this,compressBySize(pickResult.getPath(), 720, 1280));
+            asyncPutObjectFromLocalFile(path);
 
             //Image path
             //r.getPath();
