@@ -9,25 +9,22 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.Pair;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 import com.wewow.utils.BlurBuilder;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
-import com.wewow.utils.ProgressDialogUtil;
 import com.wewow.utils.RemoteImageLoader;
 import com.wewow.utils.ShareUtils;
 import com.wewow.utils.Utils;
@@ -39,28 +36,30 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 
-public class LifePostActivity extends AppCompatActivity {
+public class LifePostActivity extends AppCompatActivity implements AbsListView.OnScrollListener {
 
     private static final String TAG = "LifePostActivity";
     public static final String POST_ID = "POST_ID";
 
     private TextView title;
     private TextView desc;
-    private View contentView;
+    private View contentView, header, statusbar;
     private ImageView addpost;
+    private View layout_title, lifepost_title_shadow;
+    private ImageView lifepost_back, lifepost_share;
+    private TextView lifepost_title;
     private JSONArray comments = new JSONArray();
     private UserInfo user;
     private int postId;
     private JSONObject daily_topic;
     private ListView listComments;
+    private CircleProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_life_post);
-        Utils.setActivityToBeFullscreen(this);
         this.setupUI();
         Intent i = this.getIntent();
         postId = i.getIntExtra(POST_ID, -1);
@@ -70,7 +69,7 @@ public class LifePostActivity extends AppCompatActivity {
                 new HttpAsyncTask.TaskDelegate() {
                     @Override
                     public void taskCompletionResult(byte[] result) {
-                        ProgressDialogUtil.getInstance(LifePostActivity.this).finishProgressDialog();
+                        progressBar.setVisibility(View.GONE);
                         JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
                         if (jobj != null) {
                             LifePostActivity.this.onDataLoad(jobj.optJSONObject("result").optJSONObject("data"));
@@ -79,7 +78,6 @@ public class LifePostActivity extends AppCompatActivity {
                 },
                 WebAPIHelper.HttpMethod.GET
         };
-        ProgressDialogUtil.getInstance(this).showProgressDialog();
         new HttpAsyncTask().execute(params);
     }
 
@@ -90,9 +88,21 @@ public class LifePostActivity extends AppCompatActivity {
                 LifePostActivity.this.finish();
             }
         });
-        this.title = (TextView) this.findViewById(R.id.lifepost_title);
-        this.desc = (TextView) this.findViewById(R.id.lifepost_desc);
         this.contentView = this.findViewById(R.id.lifepost_root);
+        this.statusbar = this.findViewById(R.id.statusbar);
+        progressBar = (CircleProgressBar) findViewById(R.id.progressBar);
+        this.layout_title = this.findViewById(R.id.layout_title);
+        this.lifepost_title_shadow = this.findViewById(R.id.lifepost_title_shadow);
+        this.lifepost_back = (ImageView) this.findViewById(R.id.lifepost_back);
+        this.lifepost_share = (ImageView) this.findViewById(R.id.lifepost_share);
+        this.lifepost_title = (TextView) this.findViewById(R.id.tv_lifepost_title);
+        listComments = (ListView) this.findViewById(R.id.lifepost_comments);
+        header = View.inflate(this, R.layout.header_life_post, null);
+        this.title = (TextView) header.findViewById(R.id.lifepost_title);
+        this.desc = (TextView) header.findViewById(R.id.lifepost_desc);
+        listComments.addHeaderView(header);
+        listComments.setAdapter(this.adapter);
+        listComments.setOnScrollListener(this);
         this.addpost = (ImageView) this.findViewById(R.id.lifepost_newpost);
         this.addpost.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,9 +153,7 @@ public class LifePostActivity extends AppCompatActivity {
             this.comments = jobj.getJSONArray("comments");
             if (this.comments.length() > 0) {
                 this.findViewById(R.id.lifepost_nodata_area).setVisibility(View.GONE);
-                this.listComments = (ListView) this.findViewById(R.id.lifepost_comments);
                 this.listComments.setVisibility(View.VISIBLE);
-                this.listComments.setAdapter(this.adapter);
             }
         } catch (JSONException e) {
             Log.e(TAG, "onDataLoad: fail");
@@ -156,7 +164,7 @@ public class LifePostActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return LifePostActivity.this.comments.length();
+            return comments == null ? 0 : comments.length();
         }
 
         @Override
@@ -194,10 +202,10 @@ public class LifePostActivity extends AppCompatActivity {
             iv.setImageDrawable(LifePostActivity.this.getResources().getDrawable(jobj.optInt("liked", 0) == 0 ? R.drawable.like : R.drawable.liked));
             if (!author.equals(LifePostActivity.this.user.getNickname())) {
                 view.findViewById(R.id.lifepost_mycomment).setVisibility(View.GONE);
-                v.setBackgroundColor(Color.WHITE);
+//                v.setBackgroundColor(Color.WHITE);
             } else {
                 view.findViewById(R.id.lifepost_mycomment).setVisibility(View.VISIBLE);
-                v.setBackgroundColor(Color.argb(255, 252, 211, 145));
+//                v.setBackgroundColor(Color.argb(255, 252, 211, 145));
             }
             View normalPanel = view.findViewById(R.id.normal_area);
             View menuPanel = view.findViewById(R.id.comment_menu);
@@ -331,7 +339,7 @@ public class LifePostActivity extends AppCompatActivity {
                         new HttpAsyncTask.TaskDelegate() {
                             @Override
                             public void taskCompletionResult(byte[] result) {
-                                ProgressDialogUtil.getInstance(LifePostActivity.this).finishProgressDialog();
+                                progressBar.setVisibility(View.GONE);
                                 JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
                                 try {
                                     int code = jobj.getJSONObject("result").getInt("code");
@@ -368,7 +376,7 @@ public class LifePostActivity extends AppCompatActivity {
                         new HttpAsyncTask.TaskDelegate() {
                             @Override
                             public void taskCompletionResult(byte[] result) {
-                                ProgressDialogUtil.getInstance(LifePostActivity.this).finishProgressDialog();
+                                progressBar.setVisibility(View.GONE);
                                 JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
                                 try {
                                     int code = jobj.getJSONObject("result").getInt("code");
@@ -387,8 +395,49 @@ public class LifePostActivity extends AppCompatActivity {
                         headers
                 };
             }
-            ProgressDialogUtil.getInstance(LifePostActivity.this).showProgressDialog();
+            progressBar.setVisibility(View.VISIBLE);
             new HttpAsyncTask().execute(params);
         }
     };
+
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+    }
+
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+        if(view.getChildCount() < 1)
+            return;
+        View child = view.getChildAt(0);
+        if (firstVisibleItem == 0) {
+            int top = child.getTop();
+            int height = child.getHeight() - Utils.dipToPixel(this, 59 + 25 - 15);
+            if(-top >= height){
+                showTitle();
+            }else{
+                hideTitle();
+            }
+        }else{
+            showTitle();
+        }
+    }
+
+    private void hideTitle() {
+        layout_title.setBackgroundColor(getResources().getColor(R.color.transparent));
+        lifepost_back.setImageResource(R.drawable.back);
+        lifepost_share.setImageResource(R.drawable.share_w);
+        lifepost_title.setTextColor(getResources().getColor(R.color.white));
+        lifepost_title_shadow.setVisibility(View.INVISIBLE);
+        statusbar.setBackgroundColor(Color.parseColor("#33000000"));
+    }
+
+    private void showTitle() {
+        layout_title.setBackgroundColor(getResources().getColor(R.color.white));
+        lifepost_back.setImageResource(R.drawable.back_b);
+        lifepost_share.setImageResource(R.drawable.share_b);
+        lifepost_title.setTextColor(getResources().getColor(R.color.text_gray_drak));
+        lifepost_title_shadow.setVisibility(View.VISIBLE);
+        statusbar.setBackgroundColor(Color.parseColor("#d0d0d0"));
+    }
 }

@@ -31,7 +31,9 @@ import com.alibaba.sdk.android.oss.callback.OSSCompletedCallback;
 import com.alibaba.sdk.android.oss.callback.OSSProgressCallback;
 import com.alibaba.sdk.android.oss.common.auth.OSSCredentialProvider;
 import com.alibaba.sdk.android.oss.common.auth.OSSPlainTextAKSKCredentialProvider;
+import com.alibaba.sdk.android.oss.common.auth.OSSStsTokenCredentialProvider;
 import com.alibaba.sdk.android.oss.internal.OSSAsyncTask;
+import com.alibaba.sdk.android.oss.model.ObjectMetadata;
 import com.alibaba.sdk.android.oss.model.PutObjectRequest;
 import com.alibaba.sdk.android.oss.model.PutObjectResult;
 import com.cjj.MaterialRefreshLayout;
@@ -57,10 +59,13 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -69,7 +74,7 @@ import retrofit.client.Response;
 /**
  * Created by iris on 17/4/13.
  */
-public class FeedbackActivity extends AppCompatActivity implements IPickResult{
+public class FeedbackActivity extends AppCompatActivity implements IPickResult {
 
 
     private int currentPage = 1;
@@ -355,8 +360,7 @@ public class FeedbackActivity extends AppCompatActivity implements IPickResult{
         }
     }
 
-    private void getToken()
-    {
+    private void getToken() {
 
         if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_TOKEN, this)) {
             String fileContent = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_TOKEN);
@@ -366,9 +370,7 @@ public class FeedbackActivity extends AppCompatActivity implements IPickResult{
                 e.printStackTrace();
             }
 
-        }
-        else
-        {
+        } else {
             getTokenFromServer();
         }
 
@@ -442,12 +444,10 @@ public class FeedbackActivity extends AppCompatActivity implements IPickResult{
         currentPage++;
         setUpButtons();
         refreshLayout.finishRefresh();
-        if ((!refresh)||feedbackSent) {
+        if ((!refresh) || feedbackSent) {
             listView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
             listView.setStackFromBottom(true);
-        }
-        else
-        {
+        } else {
             listView.setTranscriptMode(ListView.TRANSCRIPT_MODE_DISABLED);
             listView.setStackFromBottom(true);
         }
@@ -495,7 +495,7 @@ public class FeedbackActivity extends AppCompatActivity implements IPickResult{
             }
         });
         String content = textContent.getText().toString();
-        if(!content.trim().equals("")) {
+        if (!content.trim().equals("")) {
             textContent.setText("");
             InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(textContent.getWindowToken(), 0);
@@ -542,8 +542,7 @@ public class FeedbackActivity extends AppCompatActivity implements IPickResult{
 
                 }
             });
-        }
-        else {
+        } else {
             Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.no_content), Toast.LENGTH_SHORT).show();
         }
 
@@ -558,63 +557,94 @@ public class FeedbackActivity extends AppCompatActivity implements IPickResult{
         String token = currentUser.getToken().toString();
         final EditText textContent = (EditText) findViewById(R.id.editTextContent);
 
-            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(textContent.getWindowToken(), 0);
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(textContent.getWindowToken(), 0);
 
-            iTask.feedbackImage(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), userId, token, url, "1","720","1280", "", new Callback<JSONObject>() {
+        iTask.feedbackImage(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), userId, token, url, "1", "720", "1280", "", new Callback<JSONObject>() {
 
-                @Override
-                public void success(JSONObject object, Response response) {
-                    List<Feedback> feedbacks = new ArrayList<Feedback>();
+            @Override
+            public void success(JSONObject object, Response response) {
+                List<Feedback> feedbacks = new ArrayList<Feedback>();
 
-                    try {
-                        String realData = Utils.convertStreamToString(response.getBody().in());
+                try {
+                    String realData = Utils.convertStreamToString(response.getBody().in());
 
-                        JSONObject result = new JSONObject(realData).getJSONObject("result");
-                        String code = result.get("code").toString();
-                        String message = result.get("message").toString();
-                        if (!code.equals("0")) {
-                            Toast.makeText(FeedbackActivity.this, message, Toast.LENGTH_SHORT).show();
+                    JSONObject result = new JSONObject(realData).getJSONObject("result");
+                    String code = result.get("code").toString();
+                    String message = result.get("message").toString();
+                    if (!code.equals("0")) {
+                        Toast.makeText(FeedbackActivity.this, message, Toast.LENGTH_SHORT).show();
 
 
-                        } else {
+                    } else {
 
-                            Feedback feedback = parseFeedbackSent(realData);
-                            feedbacks.add(feedback);
-                            setUpFeedbacks(feedbacks, true, true);
-                        }
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-
+                        Feedback feedback = parseFeedbackSent(realData);
+                        feedbacks.add(feedback);
+                        setUpFeedbacks(feedbacks, true, true);
                     }
 
-                }
-
-                @Override
-                public void failure(RetrofitError error) {
+                } catch (IOException e) {
+                    e.printStackTrace();
                     Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
 
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
 
                 }
-            });
 
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Toast.makeText(FeedbackActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+
+
+            }
+        });
+
+    }
+
+    // 从本地文件上传，采用阻塞的同步接口
+    public void putObjectFromLocalFile(String uploadFilePath) {
+        // 构造上传请求
+
+        OSSCredentialProvider credentialProvider = new OSSStsTokenCredentialProvider(token.getAccessKeyId(), token.getAccessKeySecret(), token.getSecurityToken());
+
+        oss = new OSSClient(getApplicationContext(), CommonUtilities.OOS_ENDPOINT, credentialProvider);
+        PutObjectRequest put = new PutObjectRequest(CommonUtilities.BUCKETNAME, "comment/test.jpg", uploadFilePath);
+
+        try {
+            PutObjectResult putResult = oss.putObject(put);
+
+            Log.d("PutObject", "UploadSuccess");
+
+            Log.d("ETag", putResult.getETag());
+            Log.d("RequestId", putResult.getRequestId());
+        } catch (ClientException e) {
+            // 本地异常如网络异常等
+            e.printStackTrace();
+        } catch (ServiceException e) {
+            // 服务异常
+            Log.e("RequestId", e.getRequestId());
+            Log.e("ErrorCode", e.getErrorCode());
+            Log.e("HostId", e.getHostId());
+            Log.e("RawMessage", e.getRawMessage());
+        }
     }
 
 
     public void asyncPutObjectFromLocalFile(final String filePath) {
 
 
-        OSSCredentialProvider credentialProvider = new OSSPlainTextAKSKCredentialProvider(token.getAccessKeyId(),token.getAccessKeySecret());
+        OSSCredentialProvider credentialProvider = new OSSStsTokenCredentialProvider(token.getAccessKeyId(), token.getAccessKeySecret(), token.getSecurityToken());
 
         oss = new OSSClient(getApplicationContext(), CommonUtilities.OOS_ENDPOINT, credentialProvider);
+
+       final   String objectKey = CommonUtilities.FEEDBACK_PIC_UPLOAD_FOLDER + generateFileName();
         // 构造上传请求
-        PutObjectRequest put = new PutObjectRequest(CommonUtilities.BUCKETNAME, "test", filePath);
+        PutObjectRequest put = new PutObjectRequest(CommonUtilities.BUCKETNAME, objectKey, filePath);
+
 
         // 异步上传时可以设置进度回调
         put.setProgressCallback(new OSSProgressCallback<PutObjectRequest>() {
@@ -632,22 +662,23 @@ public class FeedbackActivity extends AppCompatActivity implements IPickResult{
                 Log.d("ETag", result.getETag());
                 Log.d("RequestId", result.getRequestId());
 
-                String url=oss.presignPublicObjectURL(CommonUtilities.BUCKETNAME,"test");
+                String url = oss.presignPublicObjectURL(CommonUtilities.BUCKETNAME, objectKey);
                 SendImage(url);
-                Toast.makeText(FeedbackActivity.this,result.getRequestId(),Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(PutObjectRequest request, ClientException clientExcepion, ServiceException serviceException) {
                 // 请求异常
+
                 if (clientExcepion != null) {
                     // 本地异常如网络异常等
                     clientExcepion.printStackTrace();
-                    Toast.makeText(FeedbackActivity.this,clientExcepion.toString(),Toast.LENGTH_SHORT).show();
+
+                    Log.e("ErrorCode", clientExcepion.getMessage());
                 }
                 if (serviceException != null) {
 
-                    Toast.makeText(FeedbackActivity.this, serviceException.getRawMessage(),Toast.LENGTH_SHORT).show();
+                    Toast.makeText(FeedbackActivity.this, serviceException.getRawMessage(), Toast.LENGTH_SHORT).show();
                     // 服务异常
                     Log.e("ErrorCode", serviceException.getErrorCode());
                     Log.e("RequestId", serviceException.getRequestId());
@@ -658,12 +689,10 @@ public class FeedbackActivity extends AppCompatActivity implements IPickResult{
         });
 
 
-
     }
 
 
-    private void getTokenFromServer()
-    {
+    private void getTokenFromServer() {
         ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
 
         iTask.getTokenToUploadFiles(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), new Callback<JSONObject>() {
@@ -709,8 +738,8 @@ public class FeedbackActivity extends AppCompatActivity implements IPickResult{
     }
 
     private Token parseTokenFromString(String realData) throws JSONException {
-        Token token=new Token();
-        JSONObject data=new JSONObject(realData).getJSONObject("data");
+        Token token = new Token();
+        JSONObject data = new JSONObject(realData).getJSONObject("data");
         token.setAccessKeyId(data.get("AccessKeyId").toString());
         token.setAccessKeySecret(data.get("AccessKeySecret").toString());
         token.setExpiration(data.get("Expiration").toString());
@@ -800,9 +829,9 @@ public class FeedbackActivity extends AppCompatActivity implements IPickResult{
 
             //Setting the real returned image.
             //getImageView().setImageURI(r.getUri());
-            Toast.makeText(this, pickResult.getPath(), Toast.LENGTH_LONG).show();
-            String path= BitmapUtils.saveBitmap(FeedbackActivity.this,compressBySize(pickResult.getPath(), 720, 1280));
+            String path = BitmapUtils.saveBitmap(FeedbackActivity.this, compressBySize(pickResult.getPath(), 720, 1280));
             asyncPutObjectFromLocalFile(path);
+//            putObjectFromLocalFile(path);
 
             //Image path
             //r.getPath();
@@ -838,9 +867,20 @@ public class FeedbackActivity extends AppCompatActivity implements IPickResult{
         }
 
         //设置好缩放比例后，加载图片进内容；
-        options.inJustDecodeBounds = false; // 这里一定要设置false
+        options.inJustDecodeBounds = false; //
         bitmap = BitmapFactory.decodeFile(pathName, options);
         return bitmap;
+    }
+
+    private String generateFileName() {
+
+        DateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
+
+        String formatDate = format.format(new Date());
+
+        int random = new Random().nextInt(10000);
+        return new StringBuffer().append(formatDate).append(
+                random).toString()+".jpg";
     }
 
 }

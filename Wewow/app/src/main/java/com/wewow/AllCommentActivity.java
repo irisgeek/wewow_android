@@ -209,9 +209,9 @@ public class AllCommentActivity extends Activity implements View.OnClickListener
                             } else {
                                 comment.setLiked(comment.getLiked() == 1 ? 0 : 1);
                                 if(comment.getLiked() == 1){
-                                    comment.setLiked_count(comment.getLiked_count() - 1);
-                                } else{
                                     comment.setLiked_count(comment.getLiked_count() + 1);
+                                } else{
+                                    comment.setLiked_count(comment.getLiked_count() - 1);
                                 }
                                 holder.iv_comment_liked.setImageResource(comment.getLiked() == 1 ? R.drawable.liked : R.drawable.like);
                                 holder.liked_count.setText(comment.getLiked_count() + "");

@@ -90,7 +90,6 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
                 },
                 WebAPIHelper.HttpMethod.GET,
         };
-        ProgressDialogUtil.getInstance(this).showProgressDialog();
         new HttpAsyncTask().execute(params);
     }
 
