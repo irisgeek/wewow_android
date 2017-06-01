@@ -32,9 +32,11 @@
 //
 package com.wewow;
 
+import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.media.Image;
 import android.os.Build;
 import android.os.Handler;
@@ -51,7 +53,10 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Display;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -60,6 +65,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -100,6 +106,8 @@ import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -110,7 +118,7 @@ import retrofit.client.Response;
 /**
  * Created by iris on 17/3/3.
  */
-public class MainActivity extends BaseActivity  implements TextWatcher {
+public class MainActivity extends BaseActivity implements TextWatcher {
 
 
     private ViewPager viewPager;
@@ -146,6 +154,7 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
     private boolean resetDropdownOffset = false;
     public LinearLayout progressBar;
     private ImageView imageViewUnderLine;
+    private Field field;
 
 
     @Override
@@ -155,19 +164,37 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
 //        Utils.setActivityToBeFullscreen(this);
 
         setContentView(R.layout.activity_main);
+        context = this;
+//        StatusBarUtil.setTranslucentForCoordinatorLayout(this, 100);
 
-        StatusBarUtil.setTranslucentForCoordinatorLayout(this, 100);
-        getWindow().getDecorView().setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
-            @Override
-            public void onSystemUiVisibilityChange(int visibility) {
-                hideBottomUIMenu();
-            }
-        });
-        this.hideBottomUIMenu();
-        progressBar=(LinearLayout)findViewById(R.id.progressBar);
+         if (android.os.Build.VERSION.SDK_INT > 18) {
+                         Window window = getWindow();
+                         window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+//                         window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION, WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+                         //设置根布局的内边距
+//                         CoordinatorLayout layout = (CoordinatorLayout) findViewById(R.id.main_content);
+//             if(checkDeviceHasNavigationBar(this))
+//             {
+//                 layout.setPadding(0,0, 0,getVirtualBarHeigh() );
+//             }
+//             else
+//             {
+//                 layout.setPadding(0, 0, 0, 0);
+//
+//             }
+        }
+
+//        getWindow().getDecorView().setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+//            @Override
+//            public void onSystemUiVisibilityChange(int visibility) {
+//                hideBottomUIMenu();
+//            }
+//        });
+//        this.hideBottomUIMenu();
+        progressBar = (LinearLayout) findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
 
-        context = this;
+
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         float density = Utils.getSceenDensity(this);
         Utils.regitsterNetSateBroadcastReceiver(this);
@@ -204,12 +231,9 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            if(Utils.isNetworkAvailable(this))
-            {
+            if (Utils.isNetworkAvailable(this)) {
                 setUpNavigationTabTitle(categories);
-            }
-            else
-            {
+            } else {
                 setUpNavigationTab(categories);
             }
 
@@ -218,11 +242,9 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
             //if banner data never cached or outdated
 
             checkcacheUpdatedOrNot();
-        }
-        else {
+        } else {
             Toast.makeText(this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
         }
-
 
 
 //        }
@@ -247,8 +269,6 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
 
         }
     }
-
-
 
 
     private void initAppBar() {
@@ -540,7 +560,7 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
 
                         long cacheUpdatedTime = (long) (Double.parseDouble(cacheUpdatedTimeStamp) * 1000);
 
-                        boolean   isCacheDataOutdated = FileCacheUtil
+                        boolean isCacheDataOutdated = FileCacheUtil
                                 .isCacheDataFailure(CommonUtilities.CACHE_FILE_BANNER, context, cacheUpdatedTime);
 
                         if (isCacheDataOutdated) {
@@ -1204,6 +1224,77 @@ public class MainActivity extends BaseActivity  implements TextWatcher {
         // TODO Auto-generated method stub
         RelativeLayout layoutCover = (RelativeLayout) findViewById(R.id.layoutCover);
         layoutCover.setVisibility(View.GONE);
+    }
+
+
+    public int getStatusBarHeight() {
+        Class<?> c = null;
+        Object obj = null;
+        Field field = null;
+        int x = 0, statusBarHeight = 0;
+        try {
+            c = Class.forName("com.android.internal.R$dimen");
+            obj = c.newInstance();
+            field = c.getField("status_bar_height");
+            x = Integer.parseInt(field.get(obj).toString());
+            statusBarHeight = getResources().getDimensionPixelSize(x);
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
+        return statusBarHeight;
+    }
+
+    // 获取ActionBar的高度
+    public int getActionBarHeight() {
+        TypedValue tv = new TypedValue();
+        int actionBarHeight = 0;
+        if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))// 如果资源是存在的、有效的
+        {
+            actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
+        }
+        return actionBarHeight;
+    }
+
+    /**获取虚拟功能键高度 */
+    public int getVirtualBarHeigh() {
+        int vh = 0;
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = windowManager.getDefaultDisplay();
+        DisplayMetrics dm = new DisplayMetrics();
+        try {
+            @SuppressWarnings("rawtypes")
+            Class c = Class.forName("android.view.Display");
+            @SuppressWarnings("unchecked")
+            Method method = c.getMethod("getRealMetrics", DisplayMetrics.class);
+            method.invoke(display, dm);
+            vh = dm.heightPixels - windowManager.getDefaultDisplay().getHeight();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return vh;
+    }
+
+    public static boolean checkDeviceHasNavigationBar(Context context) {
+        boolean hasNavigationBar = false;
+        Resources rs = context.getResources();
+        int id = rs.getIdentifier("config_showNavigationBar", "bool", "android");
+        if (id > 0) {
+            hasNavigationBar = rs.getBoolean(id);
+        }
+        try {
+            Class systemPropertiesClass = Class.forName("android.os.SystemProperties");
+            Method m = systemPropertiesClass.getMethod("get", String.class);
+            String navBarOverride = (String) m.invoke(systemPropertiesClass, "qemu.hw.mainkeys");
+            if ("1".equals(navBarOverride)) {
+                hasNavigationBar = false;
+            } else if ("0".equals(navBarOverride)) {
+                hasNavigationBar = true;
+            }
+        } catch (Exception e) {
+
+        }
+        return hasNavigationBar;
+
     }
 
 }
