@@ -20,6 +20,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
+import com.tencent.mm.opensdk.openapi.IWXAPI;
+import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.wewow.utils.BlurBuilder;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
@@ -100,7 +102,7 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
             case R.id.iv_more_discuss:
                 if (!UserInfo.isUserLogged(ArticleActivity.this)) {
                     LoginUtils.startLogin(ArticleActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
-                }else{
+                } else {
                     Intent intent = new Intent(ArticleActivity.this, AllCommentActivity.class);
                     intent.putExtra("articleId", id + "");
                     startActivity(intent);
@@ -288,9 +290,20 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
                 ArticleActivity.this.startActivity(i);
             }
         });
+        final IWXAPI api = WXAPIFactory.createWXAPI(ArticleActivity.this, CommonUtilities.WX_AppID, true);
+        ImageView wf = (ImageView) this.findViewById(R.id.share_wechat_friend);
+        ImageView wc = (ImageView) this.findViewById(R.id.share_wechat_circle);
+        if (!api.isWXAppInstalled()) {
+            wf.setImageDrawable(this.getResources().getDrawable(R.drawable.sharewechatfriend_grey));
+            wc.setImageDrawable(this.getResources().getDrawable(R.drawable.sharewechatcircle_grey));
+        }
         this.findViewById(R.id.share_wechat_circle).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (!api.isWXAppInstalled()) {
+                    Toast.makeText(ArticleActivity.this, R.string.login_wechat_not_install, Toast.LENGTH_LONG).show();
+                    return;
+                }
                 Intent i = new Intent(ArticleActivity.this, ShareActivity.class);
                 i.putExtra(ShareActivity.SHARE_TYPE, ShareActivity.SHARE_TYPE_WECHAT_CIRCLE);
                 i.putExtra(ShareActivity.SHARE_CONTEXT, ArticleActivity.this.data.optString("title", "no title"));
@@ -306,6 +319,10 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
         this.findViewById(R.id.share_wechat_friend).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (!api.isWXAppInstalled()) {
+                    Toast.makeText(ArticleActivity.this, R.string.login_wechat_not_install, Toast.LENGTH_LONG).show();
+                    return;
+                }
                 Intent i = new Intent(ArticleActivity.this, ShareActivity.class);
                 i.putExtra(ShareActivity.SHARE_TYPE, ShareActivity.SHARE_TYPE_WECHAT_FRIEND);
                 i.putExtra(ShareActivity.SHARE_CONTEXT, ArticleActivity.this.data.optString("title", "no title"));
@@ -385,7 +402,7 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
             public void onClick(View v) {
                 if (!UserInfo.isUserLogged(ArticleActivity.this)) {
                     LoginUtils.startLogin(ArticleActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
-                }else{
+                } else {
                     startActivity(new Intent(ArticleActivity.this, FeedbackActivity.class));
                 }
             }
