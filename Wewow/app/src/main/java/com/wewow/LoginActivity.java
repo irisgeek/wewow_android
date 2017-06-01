@@ -2,30 +2,23 @@ package com.wewow;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
-import android.util.Pair;
-
-import android.app.ProgressDialog;
 import android.graphics.drawable.Drawable;
-import android.os.CountDownTimer;
-import android.support.v7.app.ActionBarActivity;
-
-import android.os.AsyncTask;
-
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.support.annotation.NonNull;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -40,7 +33,6 @@ import com.huawei.hms.api.HuaweiApiClient.ConnectionCallbacks;
 import com.huawei.hms.api.HuaweiApiClient.OnConnectionFailedListener;
 import com.huawei.hms.support.api.client.PendingResult;
 import com.huawei.hms.support.api.client.ResultCallback;
-import com.huawei.hms.support.api.client.Status;
 import com.huawei.hms.support.api.hwid.HuaweiId;
 import com.huawei.hms.support.api.hwid.HuaweiIdSignInOptions;
 import com.huawei.hms.support.api.hwid.HuaweiIdStatusCodes;
@@ -51,24 +43,16 @@ import com.sina.weibo.sdk.auth.Oauth2AccessToken;
 import com.sina.weibo.sdk.auth.WeiboAuthListener;
 import com.sina.weibo.sdk.auth.sso.SsoHandler;
 import com.sina.weibo.sdk.exception.WeiboException;
-import com.sina.weibo.sdk.net.HttpManager;
 import com.sina.weibo.sdk.net.RequestListener;
 import com.sina.weibo.sdk.openapi.UsersAPI;
 import com.sina.weibo.sdk.openapi.models.User;
-import com.tencent.mm.opensdk.modelbase.BaseReq;
-import com.tencent.mm.opensdk.modelbase.BaseResp;
-import com.tencent.mm.opensdk.openapi.IWXAPI;
-import com.tencent.mm.opensdk.openapi.IWXAPIEventHandler;
-import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.tencent.mm.opensdk.modelmsg.SendAuth;
-
-import com.wewow.utils.BlurBuilder;
+import com.tencent.mm.opensdk.openapi.IWXAPI;
+import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
-import com.wewow.utils.PhotoUtils;
 import com.wewow.utils.ProgressDialogUtil;
 import com.wewow.utils.WebAPIHelper;
-import com.wewow.wxapi.WXEntryActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -465,10 +449,14 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
 
     private void setupWechat() {
         this.imWechat = (ImageButton) this.findViewById(R.id.login_btn_wechat);
+        final IWXAPI api = WXAPIFactory.createWXAPI(LoginActivity.this, CommonUtilities.WX_AppID, true);
+        if(!api.isWXAppInstalled()){
+            imWechat.setBackgroundResource(R.drawable.wechat_grey);
+            ((TextView)findViewById(R.id.login_tv_wechat)).setTextColor(Color.parseColor("#9b9b9b"));
+        }
         this.imWechat.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                IWXAPI api = WXAPIFactory.createWXAPI(LoginActivity.this, CommonUtilities.WX_AppID, true);
                 if (!api.isWXAppInstalled()) {
                     Toast.makeText(LoginActivity.this, R.string.login_wechat_not_install, Toast.LENGTH_LONG).show();
                     return;

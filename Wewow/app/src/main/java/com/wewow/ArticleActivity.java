@@ -98,9 +98,13 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
         switch (v.getId()) {
             case R.id.tv_more_discuss:
             case R.id.iv_more_discuss:
-                Intent intent = new Intent(ArticleActivity.this, AllCommentActivity.class);
-                intent.putExtra("articleId", id + "");
-                startActivity(intent);
+                if (!UserInfo.isUserLogged(ArticleActivity.this)) {
+                    LoginUtils.startLogin(ArticleActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
+                }else{
+                    Intent intent = new Intent(ArticleActivity.this, AllCommentActivity.class);
+                    intent.putExtra("articleId", id + "");
+                    startActivity(intent);
+                }
                 break;
         }
     }
@@ -379,7 +383,11 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
         tv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(ArticleActivity.this, FeedbackActivity.class));
+                if (!UserInfo.isUserLogged(ArticleActivity.this)) {
+                    LoginUtils.startLogin(ArticleActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
+                }else{
+                    startActivity(new Intent(ArticleActivity.this, FeedbackActivity.class));
+                }
             }
         });
     }

@@ -26,6 +26,7 @@ import com.wewow.dto.LabCollection;
 import com.wewow.utils.BlurBuilder;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
+import com.wewow.utils.LoginUtils;
 import com.wewow.utils.MessageBoxUtils;
 import com.wewow.utils.PhotoUtils;
 import com.wewow.utils.RemoteImageLoader;
@@ -320,7 +321,11 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.layout_footer_feedback:
-                startActivity(new Intent(LifeLabItemActivity.this, FeedbackActivity.class));
+                if (!UserInfo.isUserLogged(LifeLabItemActivity.this)) {
+                    LoginUtils.startLogin(LifeLabItemActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
+                }else{
+                    startActivity(new Intent(LifeLabItemActivity.this, FeedbackActivity.class));
+                }
                 break;
             case R.id.lifelab_share:
             case R.id.layout_footer_share:
