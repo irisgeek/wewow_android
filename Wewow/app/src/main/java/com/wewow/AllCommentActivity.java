@@ -24,7 +24,6 @@ import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 import com.wewow.dto.Comment;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
-import com.wewow.utils.LoginUtils;
 import com.wewow.utils.WebAPIHelper;
 
 import org.json.JSONException;
@@ -129,10 +128,6 @@ public class AllCommentActivity extends Activity implements View.OnClickListener
     private void addComment(String content) {
         if(content.isEmpty())
             return;
-        if (!UserInfo.isUserLogged(context)) {
-            LoginUtils.startLogin(AllCommentActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
-            return;
-        }
         UserInfo ui = UserInfo.getCurrentUser(context);
         List<Pair<String, String>> ps = new ArrayList<>();
         ps.add(new Pair<>("token", ui.getToken()));
@@ -179,10 +174,6 @@ public class AllCommentActivity extends Activity implements View.OnClickListener
     }
 
     private void postLike(final CommentAdapter.ViewHolder holder, final Comment comment){
-        if (!UserInfo.isUserLogged(context)) {
-            LoginUtils.startLogin(AllCommentActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
-            return;
-        }
         UserInfo ui = UserInfo.getCurrentUser(context);
         List<Pair<String, String>> fields = new ArrayList<>();
         fields.add(new Pair<>("user_id", ui.getId() + ""));

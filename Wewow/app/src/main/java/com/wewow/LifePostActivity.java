@@ -25,6 +25,7 @@ import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 import com.wewow.utils.BlurBuilder;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
+import com.wewow.utils.LoginUtils;
 import com.wewow.utils.RemoteImageLoader;
 import com.wewow.utils.ShareUtils;
 import com.wewow.utils.Utils;
@@ -107,13 +108,17 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
         this.addpost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(LifePostActivity.this, AddPostActivity.class);
-                BitmapDrawable bdr = (BitmapDrawable) LifePostActivity.this.contentView.getBackground();
-                if (bdr != null) {
-                    i.putExtra(AddPostActivity.BACK_GROUND, Utils.getBitmapBytes(bdr.getBitmap()));
+                if (!UserInfo.isUserLogged(LifePostActivity.this)) {
+                    LoginUtils.startLogin(LifePostActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
+                }else{
+                    Intent i = new Intent(LifePostActivity.this, AddPostActivity.class);
+                    BitmapDrawable bdr = (BitmapDrawable) LifePostActivity.this.contentView.getBackground();
+                    if (bdr != null) {
+                        i.putExtra(AddPostActivity.BACK_GROUND, Utils.getBitmapBytes(bdr.getBitmap()));
+                    }
+                    i.putExtra(AddPostActivity.TOPIC_ID, LifePostActivity.this.postId);
+                    LifePostActivity.this.startActivity(i);
                 }
-                i.putExtra(AddPostActivity.TOPIC_ID, LifePostActivity.this.postId);
-                LifePostActivity.this.startActivity(i);
             }
         });
         this.findViewById(R.id.lifepost_share).setOnClickListener(new View.OnClickListener() {
