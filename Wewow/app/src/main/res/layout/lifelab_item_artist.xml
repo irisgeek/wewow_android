@@ -13,7 +13,7 @@
         android:paddingStart="10dp"
         android:paddingTop="13dp">
 
-        <ImageView
+        <com.wewow.view.CircleImageView
             android:id="@+id/lifelab_item_artist_logo"
             android:layout_width="60dp"
             android:layout_height="60dp"

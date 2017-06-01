@@ -2,7 +2,6 @@ package com.wewow;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,10 +18,10 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
 import com.wewow.utils.LoginUtils;
-import com.wewow.utils.RemoteImageLoader;
 import com.wewow.utils.Utils;
 import com.wewow.utils.WebAPIHelper;
 
@@ -139,16 +138,11 @@ public class MyCollectionActivity extends BaseActivity {
             }
             JSONObject jobj = (JSONObject) this.getItem(i);
             final ImageView iv = (ImageView) view.findViewById(R.id.mycollection_pic);
-            new RemoteImageLoader(MyCollectionActivity.this, jobj.optString("image_642_320"), new RemoteImageLoader.RemoteImageListener() {
-                @Override
-                public void onRemoteImageAcquired(Drawable dr) {
-                    BitmapDrawable bdr = (BitmapDrawable) iv.getBackground();
-                    if (bdr != null) {
-                        bdr.getBitmap().recycle();
-                    }
-                    iv.setBackground(dr);
-                }
-            });
+            Glide.with(MyCollectionActivity.this)
+                    .load(jobj.optString("image_642_320"))
+                    .placeholder(R.drawable.banner_loading_spinner)
+                    .crossFade()
+                    .into(iv);
             TextView tv = (TextView) view.findViewById(R.id.mycollection_title);
             tv.setText(jobj.optString("title"));
             view.setTag(jobj.optInt("id"));

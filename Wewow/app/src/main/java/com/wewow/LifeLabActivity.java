@@ -8,9 +8,6 @@ import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
@@ -20,7 +17,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -35,10 +31,8 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 import com.wewow.dto.LabCollection;
-import com.wewow.utils.BlurBuilder;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
-import com.wewow.utils.RemoteImageLoader;
 import com.wewow.utils.Utils;
 import com.wewow.utils.WebAPIHelper;
 
@@ -270,7 +264,11 @@ public class LifeLabActivity extends BaseActivity {
             TextView tv = (TextView) view.findViewById(R.id.tv_lab_title);
             tv.setText(labcol.title);
             ImageView iv = (ImageView) view.findViewById(R.id.iv_lab_image);
-            LifeLabActivity.this.loadItemImage(iv, labcol);
+            Glide.with(LifeLabActivity.this)
+                    .load(labcol.image_688_316)
+                    .placeholder(R.drawable.banner_loading_spinner)
+                    .crossFade()
+                    .into(iv);
             TextView tvvol = (TextView) view.findViewById(R.id.tv_lab_num);
             tvvol.setText(String.format("vol. %d", labcol.order));
             TextView tvread = (TextView) view.findViewById(R.id.tv_lab_read);
@@ -463,19 +461,6 @@ public class LifeLabActivity extends BaseActivity {
             return ld;
         }
 
-    }
-
-    private void loadItemImage(final ImageView target, final LabCollection data) {
-        new RemoteImageLoader(this, data.image_688_316, new RemoteImageLoader.RemoteImageListener() {
-            @Override
-            public void onRemoteImageAcquired(Drawable dr) {
-                BitmapDrawable oldbd = (BitmapDrawable) target.getDrawable();
-                target.setImageDrawable(dr);
-                if (oldbd != null) {
-                    oldbd.getBitmap().recycle();
-                }
-            }
-        });
     }
 
     @Override
