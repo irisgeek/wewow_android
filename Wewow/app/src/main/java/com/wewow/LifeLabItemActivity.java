@@ -9,7 +9,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.util.Log;
 import android.util.Pair;
 import android.view.View;
@@ -20,6 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.jaeger.library.StatusBarUtil;
 import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 import com.wewow.dto.LabCollection;
@@ -28,7 +28,6 @@ import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
 import com.wewow.utils.LoginUtils;
 import com.wewow.utils.MessageBoxUtils;
-import com.wewow.utils.PhotoUtils;
 import com.wewow.utils.RemoteImageLoader;
 import com.wewow.utils.ShareUtils;
 import com.wewow.utils.Utils;
@@ -188,16 +187,11 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
             tv = (TextView) itemView.findViewById(R.id.lifelab_item_article_title);
             tv.setText(a.title);
             final ImageView iv = (ImageView) itemView.findViewById(R.id.lifelab_item_article_img);
-            new RemoteImageLoader(this, a.image_320_160, new RemoteImageLoader.RemoteImageListener() {
-                @Override
-                public void onRemoteImageAcquired(Drawable dr) {
-                    BitmapDrawable bd = (BitmapDrawable) iv.getDrawable();
-                    iv.setImageDrawable(dr);
-                    if (bd != null) {
-                        bd.getBitmap().recycle();
-                    }
-                }
-            });
+            Glide.with(this)
+                    .load(a.image_320_160)
+                    .placeholder(R.drawable.banner_loading_spinner)
+                    .crossFade()
+                    .into(iv);
             itemView.setOnClickListener(this.articleClickListener);
             item_container.addView(itemView);
         }
@@ -229,16 +223,11 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
         tv = (TextView) view.findViewById(R.id.tv_lifelab_item_discuz_count);
         tv.setText(p.comment_count + getString(R.string.discuss_people_number));
         final ImageView iv = (ImageView) view.findViewById(R.id.iv_lifelab_item_discuz);
-        new RemoteImageLoader(this, p.image_664_250, new RemoteImageLoader.RemoteImageListener() {
-            @Override
-            public void onRemoteImageAcquired(Drawable dr) {
-                BitmapDrawable bd = (BitmapDrawable) iv.getDrawable();
-                iv.setImageDrawable(dr);
-                if (bd != null) {
-                    bd.getBitmap().recycle();
-                }
-            }
-        });
+        Glide.with(this)
+                .load(p.image_664_250)
+                .placeholder(R.drawable.banner_loading_spinner)
+                .crossFade()
+                .into(iv);
         view.setTag(p.id);
         view.setOnClickListener(this.postClickListener);
         container.addView(view, groupParams);
@@ -276,18 +265,11 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
             tv = (TextView) itemView.findViewById(R.id.lifelab_item_artist_follower);
             tv.setText(a.follow_count + "");
             final ImageView iv = (ImageView) itemView.findViewById(R.id.lifelab_item_artist_logo);
-            new RemoteImageLoader(this, a.image, new RemoteImageLoader.RemoteImageListener() {
-                @Override
-                public void onRemoteImageAcquired(Drawable dr) {
-                    BitmapDrawable bd = (BitmapDrawable) iv.getDrawable();
-                    Bitmap bm = PhotoUtils.drawableToBitmap(dr);
-                    RoundedBitmapDrawable rdr = PhotoUtils.createRoundedDrawable(LifeLabItemActivity.this, bm, bm.getWidth());
-                    iv.setImageDrawable(rdr);
-                    if (bd != null) {
-                        bd.getBitmap().recycle();
-                    }
-                }
-            });
+            Glide.with(this)
+                    .load(a.image)
+                    .placeholder(R.drawable.banner_loading_spinner)
+                    .crossFade()
+                    .into(iv);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
