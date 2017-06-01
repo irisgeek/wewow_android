@@ -9,12 +9,13 @@
         android:id="@+id/lifelab_item_root"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#553311"
+        android:background="#ffffff"
         android:scrollbars="none">
 
         <LinearLayout
             android:id="@+id/lifelab_item_container"
             android:layout_width="match_parent"
+            android:alpha="0"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
