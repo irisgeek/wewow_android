@@ -94,6 +94,7 @@ public  class RecycleViewArticlesOfArtistDetail
 
         Glide.with(holder.mImageView.getContext())
                 .load(list.get(position).get("image").toString())
+                .placeholder(R.drawable.article_loading_spinner)
                 .fitCenter()
                 .into(holder.mImageView);
         holder.mTextView.setText(list.get(position).get("title").toString());

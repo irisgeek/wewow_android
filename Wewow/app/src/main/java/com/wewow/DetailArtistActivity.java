@@ -662,6 +662,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
             article.setImage_320_160(result.getString("image_320_160"));
             article.setImage_642_320(result.getString("image_688_316"));
             article.setTitle(result.getString("title"));
+            article.setRead_count(result.getString("read_count"));
             article.setWewow_category(result.getString("wewow_category"));
 
             articles.add(article);
