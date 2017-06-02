@@ -38,6 +38,7 @@ import com.huawei.hms.support.api.hwid.HuaweiIdSignInOptions;
 import com.huawei.hms.support.api.hwid.HuaweiIdStatusCodes;
 import com.huawei.hms.support.api.hwid.SignInHuaweiId;
 import com.huawei.hms.support.api.hwid.SignInResult;
+import com.jaeger.library.StatusBarUtil;
 import com.sina.weibo.sdk.auth.AuthInfo;
 import com.sina.weibo.sdk.auth.Oauth2AccessToken;
 import com.sina.weibo.sdk.auth.WeiboAuthListener;
@@ -119,6 +120,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        StatusBarUtil.setColor(this, getResources().getColor(R.color.white), 50);
         this.initView();
         Intent i = this.getIntent();
         if (i.hasExtra(BACKGROUND)) {

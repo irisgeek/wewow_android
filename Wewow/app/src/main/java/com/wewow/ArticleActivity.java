@@ -19,6 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jaeger.library.StatusBarUtil;
 import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
@@ -66,6 +67,7 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
 //        Utils.setActivityToBeFullscreen(this);
         setContentView(R.layout.activity_article);
+        StatusBarUtil.setColor(this, getResources().getColor(R.color.white), 50);
         this.setupUI();
         Intent i = this.getIntent();
         this.id = i.getIntExtra(ARTICLE_ID, -1);

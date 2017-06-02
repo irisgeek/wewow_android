@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.jaeger.library.StatusBarUtil;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
 import com.wewow.utils.LoginUtils;
@@ -46,6 +47,7 @@ public class MyCollectionActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_collection);
+        StatusBarUtil.setColor(this, getResources().getColor(R.color.white), 50);
         this.getSupportActionBar().setTitle(R.string.my_collection);
         this.setupUI();
         this.loadData();

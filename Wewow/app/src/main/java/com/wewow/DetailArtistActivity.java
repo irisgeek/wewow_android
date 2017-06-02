@@ -29,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.jaeger.library.StatusBarUtil;
 import com.wewow.adapter.ListViewArtistsAdapter;
 import com.wewow.adapter.RecycleViewArticlesOfArtistDetail;
 import com.wewow.adapter.RecycleViewArtistsOfHomePageAdapter;
@@ -90,6 +91,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
 
 
         setContentView(R.layout.activity_detail_artist);
+        StatusBarUtil.setColor(this, getResources().getColor(R.color.white), 50);
         Intent getIntent = getIntent();
         id = getIntent.getStringExtra("id");
         listItem = new ArrayList<HashMap<String, Object>>();
@@ -296,7 +298,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
 
             Glide.with(this)
 
-                    .load(artist.getArtist().getImage()).crossFade().fitCenter().placeholder(R.drawable.banner_loading_spinner).placeholder(R.drawable.banner_loading_spinner).into(imageView);
+                    .load(artist.getArtist().getImage()).crossFade().fitCenter().placeholder(R.drawable.artist_loading_spinner).into(imageView);
 
             nickName=artist.getArtist().getNickname();
             textViewNickName.setText(nickName);
