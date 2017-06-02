@@ -17,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -118,16 +119,31 @@ public class ShareActivity extends Activity implements IWeiboHandler.Response {
                 ShareActivity.this.shareLink();
             }
         });
-        this.findViewById(R.id.share_wechat_friend).setOnClickListener(new View.OnClickListener() {
+        final IWXAPI api = WXAPIFactory.createWXAPI(ShareActivity.this, CommonUtilities.WX_AppID, true);
+        ImageView wf = (ImageView) this.findViewById(R.id.share_wechat_friend);
+        ImageView wc = (ImageView) this.findViewById(R.id.share_wechat_circle);
+        if (!api.isWXAppInstalled()) {
+            wf.setImageDrawable(this.getResources().getDrawable(R.drawable.sharewechatfriend_grey));
+            wc.setImageDrawable(this.getResources().getDrawable(R.drawable.sharewechatcircle_grey));
+        }
+        wf.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ShareActivity.this.shareWechatFriend();
+                if (api.isWXAppInstalled()) {
+                    ShareActivity.this.shareWechatFriend();
+                } else {
+                    Toast.makeText(ShareActivity.this, R.string.login_wechat_not_install, Toast.LENGTH_LONG).show();
+                }
             }
         });
-        this.findViewById(R.id.share_wechat_circle).setOnClickListener(new View.OnClickListener() {
+        wc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ShareActivity.this.shareWechatCircle();
+                if (api.isWXAppInstalled()) {
+                    ShareActivity.this.shareWechatCircle();
+                } else {
+                    Toast.makeText(ShareActivity.this, R.string.login_wechat_not_install, Toast.LENGTH_LONG).show();
+                }
             }
         });
         findViewById(R.id.share_more).setOnClickListener(new View.OnClickListener() {
