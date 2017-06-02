@@ -13,6 +13,8 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -65,7 +67,11 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
         Intent intent = this.getIntent();
         Parcelable p = intent.getParcelableExtra(LIFELAB_COLLECTION);
         this.lc = (LabCollection) p;
-        StatusBarUtil.setTranslucent(this, 127);
+//        StatusBarUtil.setTranslucent(this, 127);
+        if (android.os.Build.VERSION.SDK_INT > 18) {
+            Window window = getWindow();
+            window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        }
         setContentView(R.layout.activity_lifelab_item);
         this.setupUI();
     }
