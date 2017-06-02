@@ -8,6 +8,8 @@ import android.view.MenuItem;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.jaeger.library.StatusBarUtil;
+
 /**
  * Created by iris on 17/4/16.
  */
@@ -17,6 +19,7 @@ public class WebPageActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web_page);
+        StatusBarUtil.setColor(this, getResources().getColor(R.color.white), 50);
         Intent intent=getIntent();
 
         String url=intent.getStringExtra("url");

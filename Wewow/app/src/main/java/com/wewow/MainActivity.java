@@ -34,10 +34,14 @@ package com.wewow;
 
 import android.app.Activity;
 import android.app.SearchManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.media.Image;
+import android.net.ConnectivityManager;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
@@ -96,6 +100,7 @@ import com.wewow.netTask.ITask;
 import com.wewow.utils.AppBarStateChangeListener;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.FileCacheUtil;
+import com.wewow.utils.NetStateUtils;
 import com.wewow.utils.SettingUtils;
 import com.wewow.utils.Utils;
 import com.wewow.view.CustomViewPager;
@@ -155,8 +160,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
     public LinearLayout progressBar;
     private ImageView imageViewUnderLine;
     private Field field;
-
-
+    private final BroadcastReceiver mybroadcast = new NetStateUtils();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -197,7 +201,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
 
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         float density = Utils.getSceenDensity(this);
-        Utils.regitsterNetSateBroadcastReceiver(this);
+//        Utils.regitsterNetSateBroadcastReceiver(this);
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(getResources().getString(R.string.home));
@@ -528,12 +532,13 @@ public class MainActivity extends BaseActivity implements TextWatcher {
     }
 
     private void removeCover() {
+
         RelativeLayout layoutCover = (RelativeLayout) findViewById(R.id.layoutCover);
         layoutCover.setVisibility(View.GONE);
+
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (imm.isActive()) {
-            imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS);
-        }
+
+        imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
 
 
     }
@@ -646,6 +651,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
     protected void onResume() {
 
         super.onResume();
+        regitsterNetSateBroadcastReceiver(this);
 
         if (!Utils.isNetworkAvailable(this) && onPauseCalled) {
             Toast.makeText(this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
@@ -671,6 +677,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
     protected void onPause() {
         super.onPause();
         onPauseCalled = true;
+        unregisterReceiver(mybroadcast);
     }
 
 
@@ -1296,5 +1303,14 @@ public class MainActivity extends BaseActivity implements TextWatcher {
         return hasNavigationBar;
 
     }
+
+    public  void regitsterNetSateBroadcastReceiver(Context context) {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        context.registerReceiver(mybroadcast, filter);
+    }
+
 
 }

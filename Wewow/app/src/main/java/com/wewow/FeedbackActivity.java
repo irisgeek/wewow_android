@@ -5,6 +5,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -38,6 +39,8 @@ import com.alibaba.sdk.android.oss.model.PutObjectRequest;
 import com.alibaba.sdk.android.oss.model.PutObjectResult;
 import com.cjj.MaterialRefreshLayout;
 import com.cjj.MaterialRefreshListener;
+import com.cjj.Util;
+import com.jaeger.library.StatusBarUtil;
 import com.vansuita.pickimage.bean.PickResult;
 import com.vansuita.pickimage.bundle.PickSetup;
 import com.vansuita.pickimage.dialog.PickImageDialog;
@@ -65,6 +68,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 import retrofit.Callback;
@@ -93,6 +97,7 @@ public class FeedbackActivity extends AppCompatActivity implements IPickResult {
 
 
         setContentView(R.layout.activity_feed_back);
+        StatusBarUtil.setColor(this, getResources().getColor(R.color.white), 50);
         initData();
 
 //        if (Utils.isNetworkAvailable(this)) {
@@ -500,7 +505,7 @@ public class FeedbackActivity extends AppCompatActivity implements IPickResult {
             InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(textContent.getWindowToken(), 0);
 
-            iTask.feedbackText(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), userId, token, content, "0", "", new Callback<JSONObject>() {
+            iTask.feedbackText(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), userId, token, content, "0", generateStatusString(), new Callback<JSONObject>() {
 
                 @Override
                 public void success(JSONObject object, Response response) {
@@ -560,7 +565,7 @@ public class FeedbackActivity extends AppCompatActivity implements IPickResult {
         InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(textContent.getWindowToken(), 0);
 
-        iTask.feedbackImage(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), userId, token, url, "1", "720", "1280", "", new Callback<JSONObject>() {
+        iTask.feedbackImage(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), userId, token, url, "1", "720", "1280", generateStatusString(), new Callback<JSONObject>() {
 
             @Override
             public void success(JSONObject object, Response response) {
@@ -881,6 +886,19 @@ public class FeedbackActivity extends AppCompatActivity implements IPickResult {
         int random = new Random().nextInt(10000);
         return new StringBuffer().append(formatDate).append(
                 random).toString()+".jpg";
+    }
+
+    private String generateStatusString(){
+
+        String brand= Build.BRAND;
+        String model=Build.MODEL;
+        String sdk=Build.VERSION.RELEASE;
+        Locale locale = getResources().getConfiguration().locale;
+        String language = locale.getLanguage();
+        String location=locale.getCountry();
+
+        return "from: version:Android"+ Utils.getAppVersionName(this)+" brand:"+brand+" model:"+model
+                +" location:"+location+" language:"+language+" android sdk version:"+sdk;
     }
 
 }

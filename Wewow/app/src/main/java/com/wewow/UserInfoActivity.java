@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jaeger.library.StatusBarUtil;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
 import com.wewow.utils.MessageBoxUtils;
@@ -43,6 +44,7 @@ public class UserInfoActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_info);
+        StatusBarUtil.setColor(this, getResources().getColor(R.color.white), 50);
         this.user = UserInfo.getCurrentUser(this);
         this.nickname = (TextView) this.findViewById(R.id.userinfo_nickname);
         this.signature = (TextView) this.findViewById(R.id.userinfo_desp);

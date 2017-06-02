@@ -38,6 +38,7 @@ import com.huawei.hms.support.api.hwid.HuaweiIdSignInOptions;
 import com.huawei.hms.support.api.hwid.HuaweiIdStatusCodes;
 import com.huawei.hms.support.api.hwid.SignInHuaweiId;
 import com.huawei.hms.support.api.hwid.SignInResult;
+import com.jaeger.library.StatusBarUtil;
 import com.sina.weibo.sdk.auth.AuthInfo;
 import com.sina.weibo.sdk.auth.Oauth2AccessToken;
 import com.sina.weibo.sdk.auth.WeiboAuthListener;
@@ -119,6 +120,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        StatusBarUtil.setColor(this, getResources().getColor(R.color.white), 50);
         this.initView();
         Intent i = this.getIntent();
         if (i.hasExtra(BACKGROUND)) {
@@ -262,6 +264,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
 
             @Override
             public void afterTextChanged(Editable editable) {
+                Log.d(TAG, "afterTextChanged: ");
                 if (editable.toString().equals("")) {
                     this.toggleButtonLogin(false);
                     return;
@@ -289,8 +292,35 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
                 LoginActivity.this.btnlogin.setBackground(dr);
             }
         };
+        View.OnKeyListener keyListener = new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                EditText x = (EditText) v;
+                int index = (Integer) x.getTag();
+                switch (keyCode) {
+                    case KeyEvent.KEYCODE_DEL: {
+                        if (event.getAction() == KeyEvent.ACTION_UP) {
+                            return true;
+                        }
+                        if (!x.getText().toString().trim().equals("")) {
+                            return false;
+                        } else {
+                            if (index > 0) {
+                                LoginActivity.this.edtvcodes.get(index - 1).requestFocus();
+                            }
+                            return true;
+                        }
+                    }
+                    default: {
+                        Log.d(TAG, String.format("Verify codes %d onKey: %d", index, keyCode));
+                        return false;
+                    }
+                }
+            }
+        };
         for (EditText edt : this.edtvcodes) {
             edt.addTextChangedListener(codewatcher);
+            edt.setOnKeyListener(keyListener);
         }
     }
 
@@ -450,9 +480,9 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
     private void setupWechat() {
         this.imWechat = (ImageButton) this.findViewById(R.id.login_btn_wechat);
         final IWXAPI api = WXAPIFactory.createWXAPI(LoginActivity.this, CommonUtilities.WX_AppID, true);
-        if(!api.isWXAppInstalled()){
+        if (!api.isWXAppInstalled()) {
             imWechat.setBackgroundResource(R.drawable.wechat_grey);
-            ((TextView)findViewById(R.id.login_tv_wechat)).setTextColor(Color.parseColor("#9b9b9b"));
+            ((TextView) findViewById(R.id.login_tv_wechat)).setTextColor(Color.parseColor("#9b9b9b"));
         }
         this.imWechat.setOnClickListener(new OnClickListener() {
             @Override
