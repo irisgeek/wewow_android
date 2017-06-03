@@ -149,13 +149,30 @@
         <!--app:wave_height_type="normal"-->
         <!--app:wave_show="false"-->
         <!--app:isLoadMore="true">-->
+
     <com.wewow.view.RecyclerViewUpRefresh xmlns:android="http://schemas.android.com/apk/res/android"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:id="@+id/recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         />
+    <LinearLayout
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginTop="256dp"
+        android:orientation="vertical">
 
+        <com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar
+            android:id="@+id/progress1"
+            android:layout_width="50dp"
+            android:layout_marginTop="2dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center_horizontal"
+            android:visibility="visible"
+            app:mlpb_progress_color="@color/font_color"
+            app:mlpb_progress_stoke_width="3dp" />
+    </LinearLayout>
 
     <!--</com.cjj.MaterialRefreshLayout>-->
 </android.support.design.widget.CoordinatorLayout>
