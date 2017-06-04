@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -147,12 +148,12 @@ public class categaryFragment  extends Fragment implements LoadMoreListener {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         rv.setLayoutManager(linearLayoutManager);
-
+        rv.setNestedScrollingEnabled(false);
         rvInstitue = (RecyclerViewUpRefresh)view.findViewById(R.id.recyclerview);
         LinearLayoutManager layoutManager = new LinearLayoutManager(rv.getContext());
 
-//        layoutManager.setSmoothScrollbarEnabled(true);
-//        layoutManager.setAutoMeasureEnabled(true);
+        layoutManager.setSmoothScrollbarEnabled(true);
+        layoutManager.setAutoMeasureEnabled(true);
         rvInstitue.setLayoutManager(layoutManager);
         rvInstitue.setNestedScrollingEnabled(false);
         rvInstitue.setCanloadMore(true);
@@ -160,6 +161,29 @@ public class categaryFragment  extends Fragment implements LoadMoreListener {
 
         textViewArtist=(TextView)view.findViewById(R.id.textViewArtist);
         textViewInstitute=(TextView)view.findViewById(R.id.textViewLifeLab);
+
+        NestedScrollView scroller = (NestedScrollView) view.findViewById(R.id.scrollview);
+
+        if (scroller != null) {
+
+            scroller.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+                @Override
+                public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+
+                    if (scrollY > oldScrollY) {
+                    }
+                    if (scrollY < oldScrollY) {
+                    }
+
+                    if (scrollY == 0) {
+                    }
+
+                    if (scrollY == (v.getChildAt(0).getMeasuredHeight() - v.getMeasuredHeight())) {
+                       rvInstitue.setNestedScrollingEnabled(true);
+                    }
+                }
+            });
+        }
 
     }
 
@@ -334,8 +358,10 @@ public class categaryFragment  extends Fragment implements LoadMoreListener {
         setUpListViewInstituteRecommend(institutes, view);
         LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.layoutMain);
         linearLayout.setVisibility(View.VISIBLE);
-
-        startAnimation();
+        rvInstitue.setNestedScrollingEnabled(false);
+        if(currentPage-1==1) {
+            startAnimation();
+        }
 
 
     }
@@ -714,7 +740,7 @@ public class categaryFragment  extends Fragment implements LoadMoreListener {
 
     @Override
     public void onLoadMore() {
-
+        rvInstitue.setNestedScrollingEnabled(false);
         boolean isLastPageLoaded = false;
         try {
             isLastPageLoaded = isLastPageLoaded();
