@@ -137,7 +137,7 @@
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_below="@id/textViewAdsContent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="122dp"
                     android:layout_gravity="bottom"
                     android:gravity="bottom"
                     android:layout_marginTop="12dp"
@@ -146,7 +146,7 @@
 
                     <ImageView
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:scaleType="fitXY"
                         android:id="@+id/imageViewAdsBg"/>
 
