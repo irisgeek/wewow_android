@@ -20,6 +20,8 @@ import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -199,7 +201,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
             private static final String TAG = "LoginTaskDeletegate";
 
             @Override
-            public void onClick(View view) {
+            public void onClick(final View view) {
                 StringBuilder sb = new StringBuilder();
                 for (EditText edt : LoginActivity.this.edtvcodes) {
                     sb.append(edt.getText().toString());
@@ -207,6 +209,8 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
                 if (sb.length() < LoginActivity.this.edtvcodes.size()) {
                     return;
                 }
+                InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
                 ArrayList<Pair<String, String>> ups = new ArrayList<Pair<String, String>>();
                 ups.add(new Pair<String, String>("code", sb.toString()));
                 Object[] params = new Object[]{
@@ -219,14 +223,31 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
                                     String x = new String(result, "utf-8");
                                     Log.d(TAG, String.format("login returns: %s", x));
                                     JSONObject jobj = new JSONObject(x).getJSONObject("result");
-                                    Toast.makeText(LoginActivity.this, jobj.getString("message"), Toast.LENGTH_LONG).show();
+                                    //Toast.makeText(LoginActivity.this, jobj.getString("message"), Toast.LENGTH_LONG).show();
                                     if (jobj.getInt("code") == 0) {
                                         UserInfo user = UserInfo.getUserInfo(jobj.getJSONObject("user_info"));
                                         user.saveUserInfo(LoginActivity.this);
                                         LoginActivity.this.setResult(RESPONSE_CODE_MOILE);
                                         LoginActivity.this.finish();
                                     } else {
-                                        Toast.makeText(LoginActivity.this, jobj.getString("message"), Toast.LENGTH_LONG).show();
+                                        //Toast.makeText(LoginActivity.this, jobj.getString("message"), Toast.LENGTH_LONG).show();
+                                        MessageBoxUtils.messageBoxWithButtons(LoginActivity.this,
+                                                LoginActivity.this.getString(R.string.login_verifycode_error),
+                                                new String[]{LoginActivity.this.getString(R.string.login_verifycode_error_acknowlege)},
+                                                null,
+                                                new MessageBoxUtils.MsgboxButtonListener[]{
+                                                        new MessageBoxUtils.MsgboxButtonListener() {
+                                                            @Override
+                                                            public boolean shouldCloseMessageBox(Object tag) {
+                                                                return true;
+                                                            }
+
+                                                            @Override
+                                                            public void onClick(Object tag) {
+                                                                // do nothing
+                                                            }
+                                                        }
+                                                });
                                     }
                                 } catch (UnsupportedEncodingException e) {
                                     Log.e(TAG, "web response encoding error");
@@ -371,6 +392,8 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
     private OnClickListener sendVerifyCodeListener2 = new OnClickListener() {
         @Override
         public void onClick(View v) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
             Resources res = LoginActivity.this.getResources();
             String[] texts = new String[]{
                     res.getString(R.string.login_resend_confirm0),

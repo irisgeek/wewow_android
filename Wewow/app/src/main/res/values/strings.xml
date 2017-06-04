@@ -32,6 +32,8 @@
     <string name="login_resend_confirm1">要不等等？</string>
     <string name="login_resend_cancel">不发送</string>
     <string name="login_resend_ok">发送</string>
+    <string name="login_verifycode_error">您的验证码错了</string>
+    <string name="login_verifycode_error_acknowlege">好的</string>
 
     <!-- 生活研究所 -->
     <string name="lifelab_title">生活研究所</string>
