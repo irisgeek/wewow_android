@@ -168,7 +168,7 @@
         android:id="@+id/pagerTabs"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="12dp"
+
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <RelativeLayout
@@ -196,6 +196,21 @@
             app:mlpb_progress_color="@color/font_color"
             app:mlpb_progress_stoke_width="3dp" />
     </LinearLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp">
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:id="@+id/layoutMenu"
+            android:background="@color/transparent"/>
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:id="@+id/layoutSearch"
+            android:background="@color/transparent"/>
+    </RelativeLayout>
 
 
 </android.support.design.widget.CoordinatorLayout>

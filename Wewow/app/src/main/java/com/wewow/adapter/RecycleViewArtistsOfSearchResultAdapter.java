@@ -82,7 +82,7 @@ public  class RecycleViewArtistsOfSearchResultAdapter
         HashMap<String, Object> stringObjectHashMap = list.get(position);
         Glide.with(holder.imageView.getContext())
                 .load(stringObjectHashMap.get("imageView").toString())
-                .placeholder(R.drawable.banner_loading_spinner)
+                .placeholder(R.drawable.artist_loading_spinner)
                 .crossFade()
                 .into(holder.imageView);
         holder.textViewName.setText(stringObjectHashMap.get("textViewName").toString());

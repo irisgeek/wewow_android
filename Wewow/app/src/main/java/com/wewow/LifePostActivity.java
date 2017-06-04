@@ -418,6 +418,8 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
         if (firstVisibleItem == 0) {
             int top = child.getTop();
             int height = child.getHeight() - Utils.dipToPixel(this, 59 + 25 - 15);
+            title.setAlpha(1f - (float) -top * 1.2f / (float) height);
+            desc.setAlpha(1f - (float) -top * 1.2f / (float) height);
             if(-top >= height){
                 showTitle();
             }else{
