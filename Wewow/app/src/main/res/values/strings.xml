@@ -214,7 +214,7 @@
     <string name="cancel">取消</string>
 
     <string name="clear_cache_alert_tile">提示</string>
-    <string name="clear_cache_alert_content">确定要清除所有缓存数据吗?</string>
+    <string name="clear_cache_alert_content">确定要清除所有缓存数据吗?\n(不会影响您的收藏和订阅）</string>
     <string name="confirm">确定</string>
     <string name="clear_cache_success">清除成功</string>
     <string name="logout_content">确定要退出登录吗</string>

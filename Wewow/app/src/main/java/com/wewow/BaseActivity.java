@@ -411,7 +411,7 @@ public class BaseActivity extends ActionBarActivity {
                     dialog = new MaterialDialog.Builder(BaseActivity.this)
 
                             .content(R.string.clear_cache_alert_content)
-                            .positiveColor(getResources().getColor(R.color.font_color))
+                            .positiveColor(getResources().getColor(R.color.menu_checked_color))
                             .negativeColor(getResources().getColor(R.color.font_color))
                             .positiveText(R.string.confirm)
                             .negativeText(R.string.cancel)

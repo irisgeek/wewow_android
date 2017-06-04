@@ -20,6 +20,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -404,9 +409,20 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
             }
 
         });
+        if(currentPage==1)
+        {
+            collapsingToolbar.setVisibility(View.VISIBLE);
+            collapsingToolbar.startAnimation(moveToViewLocation(0));
+//            imageView.startAnimation(moveToViewLocation(0));
+
+            rv.setVisibility(View.VISIBLE);
+            rv.startAnimation(contentsMoveToViewLocation(200));
+
+        }
         currentPage++;
         rv.loadMoreComplete();
         progressBar.setVisibility(View.GONE);
+
 
     }
 
@@ -749,6 +765,41 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
             }
 
         }
+    }
+
+    public static AnimationSet moveToViewLocation(long startOff) {
+        TranslateAnimation mHiddenAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,
+                Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
+                0.2f, Animation.RELATIVE_TO_SELF, 0.0f);
+
+        AlphaAnimation alpha = new AlphaAnimation(0.0f, 1.0f);
+
+        AnimationSet set = new AnimationSet(true);
+        set.addAnimation(mHiddenAction);
+        set.addAnimation(alpha);
+        set.setDuration(400);
+        set.setStartOffset(startOff);
+        set.setFillAfter(true);
+        set.setInterpolator(new AccelerateInterpolator());
+
+
+        return set;
+    }
+
+    public static AnimationSet contentsMoveToViewLocation(long startOff) {
+        TranslateAnimation mHiddenAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,
+                Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
+                0.2f, Animation.RELATIVE_TO_SELF, 0.0f);
+        AlphaAnimation alpha = new AlphaAnimation(0.0f, 1.0f);
+        AnimationSet set = new AnimationSet(true);
+
+        set.addAnimation(mHiddenAction);
+        set.addAnimation(alpha);
+        set.setStartOffset(startOff);
+        set.setDuration(300);
+        set.setFillAfter(true);
+        set.setInterpolator(new AccelerateInterpolator());
+        return set;
     }
 
 }
