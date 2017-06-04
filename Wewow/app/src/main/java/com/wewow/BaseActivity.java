@@ -32,11 +32,9 @@
 //
 package com.wewow;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -51,34 +49,25 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.BaseExpandableListAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.sina.weibo.sdk.openapi.models.User;
 import com.wewow.adapter.ListViewMenuAdapter;
-import com.wewow.dto.Artist;
-import com.wewow.dto.Feedback;
-import com.wewow.dto.collectionCategory;
 import com.wewow.netTask.ITask;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.DataCleanUtils;
 import com.wewow.utils.FileCacheUtil;
 import com.wewow.utils.LoginUtils;
+import com.wewow.utils.MessageBoxUtils;
 import com.wewow.utils.ShareUtils;
 import com.wewow.utils.Utils;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -86,7 +75,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -451,12 +439,46 @@ public class BaseActivity extends ActionBarActivity {
                     break;
                 case 11:
                     Log.d("BaseActivity", "Logout");
-                    UserInfo.logout(BaseActivity.this);
-                    BaseActivity.this.tvusername.setText(R.string.login_gologin);
-                    BaseActivity.this.tvuserdesc.setText(R.string.login_to_see_more);
+                    if(UserInfo.isUserLogged(BaseActivity.this)){
+                        MessageBoxUtils.messageBoxWithButtons(BaseActivity.this, getString(R.string.logout_content),
+                                new String[]{getString(R.string.cancel), getString(R.string.confirm)},
+                                new Object[]{0, 1},
+                                new MessageBoxUtils.MsgboxButtonListener[]{
+                                        new MessageBoxUtils.MsgboxButtonListener() {
+                                            @Override
+                                            public boolean shouldCloseMessageBox(Object tag) {
+                                                return true;
+                                            }
 
-                    imageViewSetting.setVisibility(View.GONE);
-                    imageViewUserCover.setImageResource(bgRes[1]);
+                                            @Override
+                                            public void onClick(Object tag) {
+
+                                            }
+                                        },
+                                        new MessageBoxUtils.MsgboxButtonListener() {
+                                            @Override
+                                            public boolean shouldCloseMessageBox(Object tag) {
+                                                return true;
+                                            }
+
+                                            @Override
+                                            public void onClick(Object tag) {
+                                                UserInfo.logout(BaseActivity.this);
+                                                BaseActivity.this.tvusername.setText(R.string.login_gologin);
+                                                BaseActivity.this.tvuserdesc.setText(R.string.login_to_see_more);
+                                                imageViewSetting.setVisibility(View.GONE);
+                                                imageViewUserCover.setImageResource(bgRes[1]);
+                                            }
+                                        }
+                                });
+                    }else{
+                        UserInfo.logout(BaseActivity.this);
+                        BaseActivity.this.tvusername.setText(R.string.login_gologin);
+                        BaseActivity.this.tvuserdesc.setText(R.string.login_to_see_more);
+
+                        imageViewSetting.setVisibility(View.GONE);
+                        imageViewUserCover.setImageResource(bgRes[1]);
+                    }
                 case 4:
                 default:
                     break;
