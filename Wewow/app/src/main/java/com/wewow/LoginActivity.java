@@ -2,6 +2,7 @@ package com.wewow;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -52,6 +53,7 @@ import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
+import com.wewow.utils.MessageBoxUtils;
 import com.wewow.utils.ProgressDialogUtil;
 import com.wewow.utils.WebAPIHelper;
 
@@ -179,7 +181,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
 
         this.setupReqVerifyCode();
         this.btnSendVerifyCode2 = (TextView) this.findViewById(R.id.login_btn_send_verify_code_2);
-        this.btnSendVerifyCode2.setOnClickListener(this.sendVerifyCodeListener);
+        this.btnSendVerifyCode2.setOnClickListener(this.sendVerifyCodeListener2);
 
         this.setupInputVerifyCode();
         this.setupLogin();
@@ -363,6 +365,45 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
             };
             ProgressDialogUtil.getInstance(LoginActivity.this).showProgressDialog();
             new HttpAsyncTask().execute(params);
+        }
+    };
+
+    private OnClickListener sendVerifyCodeListener2 = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Resources res = LoginActivity.this.getResources();
+            String[] texts = new String[]{
+                    res.getString(R.string.login_resend_confirm0),
+                    res.getString(R.string.login_resend_confirm1)
+            };
+            String[] cmds = new String[]{
+                    res.getString(R.string.login_resend_ok),
+                    res.getString(R.string.login_resend_cancel),
+            };
+            MessageBoxUtils.messageBoxWithButtons(LoginActivity.this, texts, cmds, null, new MessageBoxUtils.MsgboxButtonListener[]{
+                    new MessageBoxUtils.MsgboxButtonListener() {
+                        @Override
+                        public boolean shouldCloseMessageBox(Object tag) {
+                            return true;
+                        }
+
+                        @Override
+                        public void onClick(Object tag) {
+                            LoginActivity.this.sendVerifyCodeListener.onClick(null);
+                        }
+                    },
+                    new MessageBoxUtils.MsgboxButtonListener() {
+                        @Override
+                        public boolean shouldCloseMessageBox(Object tag) {
+                            return true;
+                        }
+
+                        @Override
+                        public void onClick(Object tag) {
+                            //
+                        }
+                    },
+            });
         }
     };
 
