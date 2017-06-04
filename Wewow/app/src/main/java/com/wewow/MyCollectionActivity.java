@@ -1,7 +1,9 @@
 package com.wewow;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,6 +22,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.jaeger.library.StatusBarUtil;
+import com.wewow.utils.BlurBuilder;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
 import com.wewow.utils.LoginUtils;
@@ -40,7 +43,8 @@ public class MyCollectionActivity extends BaseActivity {
     private JSONObject likedinfo;
     private ListView mycollist;
     private TextView articleCategory;
-    private View article_category_line;
+    private View article_category_line, collection_man_area;
+    private ImageView iv_man_area;
     private JSONArray articles = new JSONArray();
 
     @Override
@@ -55,6 +59,8 @@ public class MyCollectionActivity extends BaseActivity {
 
     private void setupUI() {
         this.labs_container = (LinearLayout) this.findViewById(R.id.collected_lablist);
+        collection_man_area = findViewById(R.id.collection_man_area);
+        iv_man_area = (ImageView) findViewById(R.id.iv_collection_man_area);
         this.mycollist = (ListView) this.findViewById(R.id.mycollection_list);
         this.mycollist.setAdapter(this.listAdpater);
         this.mycollist.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -82,18 +88,22 @@ public class MyCollectionActivity extends BaseActivity {
                 Drawable coldr = MyCollectionActivity.this.getResources().getDrawable(R.drawable.expanded_up);
                 if (iv.getDrawable().getConstantState().equals(expdr.getConstantState())) {
                     iv.setImageDrawable(coldr);
-                    MyCollectionActivity.this.findViewById(R.id.collection_man_area).setVisibility(View.VISIBLE);
+                    Bitmap bm = BlurBuilder.blur(MyCollectionActivity.this, takeScreenShot(), 0.4f, 10f);
+                    iv_man_area.setImageBitmap(bm);
+                    iv_man_area.setVisibility(View.VISIBLE);
+                    collection_man_area.setVisibility(View.VISIBLE);
                     Log.d(TAG, "expand: ");
                 } else {
                     iv.setImageDrawable(expdr);
-                    MyCollectionActivity.this.findViewById(R.id.collection_man_area).setVisibility(View.INVISIBLE);
+                    iv_man_area.setVisibility(View.GONE);
+                    collection_man_area.setVisibility(View.INVISIBLE);
                     Log.d(TAG, "collapse: ");
                 }
 
             }
         });
         this.labman_container = (TableLayout) this.findViewById(R.id.coldellist);
-        this.findViewById(R.id.collection_man_area).setOnClickListener(new View.OnClickListener() {
+        collection_man_area.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //
@@ -388,5 +398,23 @@ public class MyCollectionActivity extends BaseActivity {
         } catch (JSONException e) {
             Log.e(TAG, "onCollectionDeleted: " + e.getMessage());
         }
+    }
+
+    private Bitmap takeScreenShot(){
+        View view = getWindow().getDecorView();
+        view.setDrawingCacheEnabled(true);
+        view.buildDrawingCache();
+        Bitmap bm = view.getDrawingCache();
+
+        Rect frame = new Rect();
+        view.getWindowVisibleDisplayFrame(frame);
+        int topHeight = frame.top + Utils.dipToPixel(this, 110);
+
+        int width = getWindowManager().getDefaultDisplay().getWidth();
+        int height = getWindowManager().getDefaultDisplay().getHeight();
+
+        Bitmap b = Bitmap.createBitmap(bm, 0, topHeight, width, height - topHeight);
+        view.destroyDrawingCache();
+        return b;
     }
 }

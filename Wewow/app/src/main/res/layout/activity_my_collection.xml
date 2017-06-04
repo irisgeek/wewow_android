@@ -95,6 +95,12 @@
             android:dividerHeight="12dp"
             android:scrollbars="none"/>
 
+        <ImageView
+            android:id="@+id/iv_collection_man_area"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"/>
+
         <FrameLayout
             android:id="@+id/collection_man_area"
             android:layout_width="match_parent"
