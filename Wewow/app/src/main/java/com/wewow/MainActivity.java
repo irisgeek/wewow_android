@@ -148,8 +148,8 @@ public class MainActivity extends BaseActivity implements TextWatcher {
     private Context context;
 
     private boolean onPauseCalled = false;
-    private ImageView imageViewHome,layoutMenu;
-    private ImageView imageViewSearch,layoutSearch;
+    private ImageView imageViewHome, layoutMenu;
+    private ImageView imageViewSearch, layoutSearch;
     private TextView textTitle;
     private AutoCompleteTextView searchView;
     private boolean isSearchViewShown = false;
@@ -161,6 +161,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
     private ImageView imageViewUnderLine;
     private Field field;
     private final BroadcastReceiver mybroadcast = new NetStateUtils();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -171,11 +172,11 @@ public class MainActivity extends BaseActivity implements TextWatcher {
         context = this;
 //        StatusBarUtil.setTranslucentForCoordinatorLayout(this, 100);
 
-         if (android.os.Build.VERSION.SDK_INT > 18) {
-                         Window window = getWindow();
-                         window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        if (android.os.Build.VERSION.SDK_INT > 18) {
+            Window window = getWindow();
+            window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 //                         window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION, WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-                         //设置根布局的内边距
+            //设置根布局的内边距
 //                         CoordinatorLayout layout = (CoordinatorLayout) findViewById(R.id.main_content);
 //             if(checkDeviceHasNavigationBar(this))
 //             {
@@ -207,6 +208,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
         collapsingToolbar.setTitle(getResources().getString(R.string.home));
         collapsingToolbar.setExpandedTitleColor(getResources().getColor(R.color.transparent));
         collapsingToolbar.setCollapsedTitleTextColor(getResources().getColor(R.color.font_color));
+
 
         initAppBar();
 //        setUpNavigationTabDummy(null);
@@ -364,7 +366,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                             if (position != 0) {
                                 searchView.setText(hotWords.get(position), true);
-                                imageViewSearch.performClick();
+                                layoutSearch.performClick();
                             } else {
                                 searchView.setText("");
                             }
@@ -475,7 +477,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
                     textTitle.setVisibility(View.GONE);
                     searchView.setVisibility(View.INVISIBLE);
                     imageViewUnderLine.setVisibility(View.INVISIBLE);
-
+                    imageViewUnderLine.setImageResource(R.color.search_text_view_hint_color);
                     isAppBarFolded = false;
                     toolbar.setBackgroundColor(getResources().getColor(R.color.transparent));
                     //展开状态
@@ -490,7 +492,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
                     resetDropdownOffset = true;
                     searchView.setVisibility(View.INVISIBLE);
                     imageViewUnderLine.setVisibility(View.INVISIBLE);
-
+                    imageViewUnderLine.setImageResource(R.color.search_hot_search);
                     toolbar.setBackgroundColor(getResources().getColor(R.color.white));
 
 
@@ -505,6 +507,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
                 }
             }
         });
+
     }
 
     private void showUnderLine() {
@@ -908,6 +911,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
         //set adapter
         viewPager.setAdapter(mPagerAdapter);
 
+
         //set page change listener
         viewPager.setOnPageChangeListener(new GuidePageChangeListener());
 
@@ -1264,7 +1268,9 @@ public class MainActivity extends BaseActivity implements TextWatcher {
         return actionBarHeight;
     }
 
-    /**获取虚拟功能键高度 */
+    /**
+     * 获取虚拟功能键高度
+     */
     public int getVirtualBarHeigh() {
         int vh = 0;
         WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
@@ -1306,7 +1312,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
 
     }
 
-    public  void regitsterNetSateBroadcastReceiver(Context context) {
+    public void regitsterNetSateBroadcastReceiver(Context context) {
         IntentFilter filter = new IntentFilter();
         filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
         filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);

@@ -34,6 +34,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.sina.weibo.sdk.constant.WBConstants;
 import com.wewow.DetailArtistActivity;
 import com.wewow.LifeLabItemActivity;
 import com.wewow.R;
@@ -228,7 +229,11 @@ public class homeFragment extends Fragment {
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         rv.setLayoutManager(linearLayoutManager);
 
+
         listViewInstituteRecommended = (ListView) view.findViewById(R.id.listViewSelectedInstitute);
+        if (android.os.Build.VERSION.SDK_INT >=21) {
+            listViewInstituteRecommended.setNestedScrollingEnabled(false);
+        }
 
         textViewAds=(TextView) view.findViewById(R.id.textviewAds);
         textViewAdsIgnore=(TextView) view.findViewById(R.id.textviewAdsIgnore);
@@ -1030,7 +1035,7 @@ public class homeFragment extends Fragment {
 
         RecycleViewArtistsOfHomePageAdapter adapterArtists= new RecycleViewArtistsOfHomePageAdapter(getActivity(), listItemArtist);
         OverScrollDecoratorHelper.setUpOverScroll(rv, OverScrollDecoratorHelper.ORIENTATION_HORIZONTAL);
-
+        rv.setNestedScrollingEnabled(false);
         adapterArtists.setOnItemClickListener(new RecycleViewArtistsOfHomePageAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
