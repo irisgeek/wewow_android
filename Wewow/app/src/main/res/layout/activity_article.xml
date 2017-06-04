@@ -94,7 +94,7 @@
                     android:layout_height="match_parent"
                     android:background="#ffffff"
                     android:orientation="vertical"
-                    android:visibility="visible">
+                    android:visibility="invisible">
 
                     <TextView
                         android:id="@+id/article_title"
