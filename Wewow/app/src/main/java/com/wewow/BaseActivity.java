@@ -441,20 +441,9 @@ public class BaseActivity extends ActionBarActivity {
                     Log.d("BaseActivity", "Logout");
                     if(UserInfo.isUserLogged(BaseActivity.this)){
                         MessageBoxUtils.messageBoxWithButtons(BaseActivity.this, getString(R.string.logout_content),
-                                new String[]{getString(R.string.cancel), getString(R.string.confirm)},
+                                new String[]{getString(R.string.confirm), getString(R.string.cancel)},
                                 new Object[]{0, 1},
                                 new MessageBoxUtils.MsgboxButtonListener[]{
-                                        new MessageBoxUtils.MsgboxButtonListener() {
-                                            @Override
-                                            public boolean shouldCloseMessageBox(Object tag) {
-                                                return true;
-                                            }
-
-                                            @Override
-                                            public void onClick(Object tag) {
-
-                                            }
-                                        },
                                         new MessageBoxUtils.MsgboxButtonListener() {
                                             @Override
                                             public boolean shouldCloseMessageBox(Object tag) {
@@ -468,6 +457,16 @@ public class BaseActivity extends ActionBarActivity {
                                                 BaseActivity.this.tvuserdesc.setText(R.string.login_to_see_more);
                                                 imageViewSetting.setVisibility(View.GONE);
                                                 imageViewUserCover.setImageResource(bgRes[1]);
+                                            }
+                                        },
+                                        new MessageBoxUtils.MsgboxButtonListener() {
+                                            @Override
+                                            public boolean shouldCloseMessageBox(Object tag) {
+                                                return true;
+                                            }
+
+                                            @Override
+                                            public void onClick(Object tag) {
                                             }
                                         }
                                 });
