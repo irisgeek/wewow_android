@@ -150,21 +150,38 @@
                         android:scaleType="fitXY"
                         android:id="@+id/imageViewAdsBg"/>
 
+                    <LinearLayout
+                        android:layout_width="60dp"
+                        android:layout_height="20dp"
+                        android:orientation="horizontal"
+                        android:layout_gravity="bottom|right"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginBottom="40dp"
+                        android:layout_marginRight="5dp"
+                        android:gravity="center"
+                        android:text="@string/ads"
+                        android:background="@drawable/bg_edit_text_feedback"
+                        android:textColor="#333631"
+                        android:textSize="10sp"
+                        android:visibility="visible"
+                        android:id="@+id/textviewAds" >
 
                         <TextView
-                            android:layout_width="60dp"
-                            android:layout_height="20dp"
-                            android:layout_gravity="bottom|right"
-                            android:layout_marginLeft="8dp"
-                            android:layout_marginBottom="40dp"
-                            android:layout_marginRight="5dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:gravity="center"
                             android:text="@string/ads"
-                            android:background="@drawable/bg_edit_text_feedback"
                             android:textColor="#333631"
                             android:textSize="10sp"
-                            android:visibility="gone"
-                            android:id="@+id/textviewAds" />
+                            android:visibility="visible"
+                            android:id="@+id/textAds" />
+                        <ImageView
+                            android:id="@+id/imageViewAdsTriangle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:src="@drawable/ads_triange_reverse"/>
+                    </LinearLayout>
                         <TextView
                             android:layout_width="60dp"
                             android:layout_height="40dp"

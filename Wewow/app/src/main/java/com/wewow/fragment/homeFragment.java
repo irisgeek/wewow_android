@@ -87,9 +87,11 @@ public class homeFragment extends Fragment {
     private TextView textViewLatest;
     private TextView textViewRecommendedInstitute;
 
-    private TextView textViewAds;
+    private LinearLayout textViewAds;
     private TextView textViewAdsIgnore;
     private CardView viewLatest;
+
+    private ImageView imageViewAdsTriangle;
 
     private int requestSentCount = 0;
     private View view;
@@ -223,6 +225,7 @@ public class homeFragment extends Fragment {
 
         cardViewNewVersionAvailable = (CardView) view.findViewById(R.id.cardViewNewVersionAvailable);
         cardViewAds = (CardView) view.findViewById(R.id.ads);
+        imageViewAdsTriangle=(ImageView)view.findViewById(R.id.imageViewAdsTriangle);
 
         rv = (RecyclerView) view.findViewById(R.id.recyclerview_artists);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
@@ -235,13 +238,14 @@ public class homeFragment extends Fragment {
             listViewInstituteRecommended.setNestedScrollingEnabled(false);
         }
 
-        textViewAds=(TextView) view.findViewById(R.id.textviewAds);
+        textViewAds=(LinearLayout) view.findViewById(R.id.textviewAds);
         textViewAdsIgnore=(TextView) view.findViewById(R.id.textviewAdsIgnore);
 
         textViewAds.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 textViewAdsIgnore.setVisibility(View.VISIBLE);
+                imageViewAdsTriangle.setImageResource(R.drawable.ads_triangle);
 
 //                showPopupMenu(textViewAds);
 

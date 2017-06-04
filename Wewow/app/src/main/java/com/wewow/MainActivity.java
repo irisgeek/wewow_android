@@ -161,6 +161,8 @@ public class MainActivity extends BaseActivity implements TextWatcher {
     private ImageView imageViewUnderLine;
     private Field field;
     private final BroadcastReceiver mybroadcast = new NetStateUtils();
+    private CollapsingToolbarLayout collapsingToolbar;
+    private AppBarLayout mAppBarLayout ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -203,7 +205,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         float density = Utils.getSceenDensity(this);
 //        Utils.regitsterNetSateBroadcastReceiver(this);
-        CollapsingToolbarLayout collapsingToolbar =
+        collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(getResources().getString(R.string.home));
         collapsingToolbar.setExpandedTitleColor(getResources().getColor(R.color.transparent));
@@ -463,7 +465,10 @@ public class MainActivity extends BaseActivity implements TextWatcher {
         });
 
 
-        AppBarLayout mAppBarLayout = (AppBarLayout) findViewById(R.id.appbar);
+        mAppBarLayout = (AppBarLayout) findViewById(R.id.appbar);
+        if(Build.VERSION.SDK_INT>=21) {
+            mAppBarLayout.setNestedScrollingEnabled(false);
+        }
         mAppBarLayout.addOnOffsetChangedListener(new AppBarStateChangeListener() {
             @Override
             public void onStateChanged(AppBarLayout appBarLayout, State state) {
@@ -825,6 +830,26 @@ public class MainActivity extends BaseActivity implements TextWatcher {
                     .placeholder(R.drawable.banner_loading_spinner)
                     .crossFade(300)
                     .into(imageBanner);
+            view.setClickable(true);
+            view.setFocusable(true);
+            view.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if (hasFocus) {
+                        AppBarLayout.LayoutParams mParams = (AppBarLayout.LayoutParams) mAppBarLayout.getChildAt(0).getLayoutParams();
+                        mParams.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED |
+                                AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP);
+                    }
+                    else
+                    {
+
+                        AppBarLayout.LayoutParams mParams = (AppBarLayout.LayoutParams) mAppBarLayout.getChildAt(0).getLayoutParams();
+                        mParams.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL |AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED |
+                                AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP);
+                    }
+                }
+            });
+
             pageview.add(view);
             final int j = i;
             view.setOnClickListener(new View.OnClickListener() {
@@ -910,7 +935,9 @@ public class MainActivity extends BaseActivity implements TextWatcher {
 
         //set adapter
         viewPager.setAdapter(mPagerAdapter);
-
+        if(Build.VERSION.SDK_INT>=21) {
+            viewPager.setNestedScrollingEnabled(false);
+        }
 
         //set page change listener
         viewPager.setOnPageChangeListener(new GuidePageChangeListener());

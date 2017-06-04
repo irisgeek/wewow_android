@@ -280,7 +280,7 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(LifeLabItemActivity.this, DetailArtistActivity.class);
-                    intent.putExtra("id", a.id);
+                    intent.putExtra("id", a.id+"");
                     startActivity(intent);
                 }
             });

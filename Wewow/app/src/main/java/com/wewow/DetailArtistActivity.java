@@ -43,6 +43,7 @@ import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.FileCacheUtil;
 import com.wewow.utils.LoadMoreListener;
 import com.wewow.utils.LoginUtils;
+import com.wewow.utils.MessageBoxUtils;
 import com.wewow.utils.SettingUtils;
 import com.wewow.utils.Utils;
 import com.wewow.view.RecyclerViewUpRefresh;
@@ -439,6 +440,9 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
                         } else {
                             followed = "1";
                         }
+                        MessageBoxUtils.messageBoxWithNoButton(DetailArtistActivity.this, true, read == 0 ? getResources()
+                                .getString(R.string.cancel_follow_artist_success) : getResources()
+                                .getString(R.string.follow_artist_success), 2500);
                         FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_DETAIL + id, DetailArtistActivity.this);
                         FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_SUBSCRIBED_ARTISTS_LIST, DetailArtistActivity.this);
                         FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_LIST, DetailArtistActivity.this);

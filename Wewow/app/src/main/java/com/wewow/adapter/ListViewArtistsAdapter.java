@@ -19,6 +19,7 @@ import com.wewow.netTask.ITask;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.FileCacheUtil;
 import com.wewow.utils.LoginUtils;
+import com.wewow.utils.MessageBoxUtils;
 import com.wewow.utils.Utils;
 
 import org.json.JSONException;
@@ -149,6 +150,9 @@ public class ListViewArtistsAdapter extends BaseAdapter {
                     } else {
                         followStatus.set(position, read == 0 ? "0" : "1");
                         holder.imageViewFollowed.setImageResource(read == 0 ? R.drawable.follow : R.drawable.followed);
+                        MessageBoxUtils.messageBoxWithNoButton(context, true, read==0?context.getResources()
+                                .getString(R.string.cancel_follow_artist_success):context.getResources()
+                                .getString(R.string.follow_artist_success), 2500);
                         notifyDataSetChanged();
                         FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_LIST, context);
                         FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_DETAIL + artistId, context);

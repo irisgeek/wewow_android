@@ -221,5 +221,8 @@
 
     <string name="search_no_key_word">搜索内容不能为空</string>
     <string name="hot_search_text">热门搜索</string>
+    <string name="follow_artist_success">已成功订阅生活家</string>
+    <string name="cancel_follow_artist_success">已成功取消订阅生活家</string>
+
 
 </resources>
