@@ -361,7 +361,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="12dp"
             android:choiceMode="singleChoice"
-
+            android:layout_marginBottom="12dp"
             android:divider="@android:color/transparent"
             android:dividerHeight="12dp" />
     </LinearLayout>
