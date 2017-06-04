@@ -24,6 +24,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -83,6 +84,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
     private TextView textViewDesc;
     private String nickName;
     private CollapsingToolbarLayout collapsingToolbar;
+    public LinearLayout progressBar;
 
 
     @Override
@@ -91,6 +93,8 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
 
 
         setContentView(R.layout.activity_detail_artist);
+        progressBar=(LinearLayout)findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
         StatusBarUtil.setColor(this, getResources().getColor(R.color.white), 50);
         Intent getIntent = getIntent();
         id = getIntent.getStringExtra("id");
@@ -111,7 +115,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
         } else {
             Toast.makeText(this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
 
-
+            progressBar.setVisibility(View.GONE);
             SettingUtils.set(this, CommonUtilities.NETWORK_STATE, false);
             setUpArtistFromCache();
 
@@ -179,6 +183,8 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
                     String realData = Utils.convertStreamToString(response.getBody().in());
                     if (!realData.contains(com.wewow.utils.CommonUtilities.SUCCESS)) {
                         Toast.makeText(DetailArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
+
+                        progressBar.setVisibility(View.GONE);
                         rv.loadMoreComplete();
 
                     } else {
@@ -205,9 +211,11 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
                 } catch (IOException e) {
                     e.printStackTrace();
                     rv.loadMoreComplete();
+                    progressBar.setVisibility(View.GONE);
                     Toast.makeText(DetailArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
 //                    swipeRefreshLayout.setRefreshing(false);
                 } catch (JSONException e) {
+                    progressBar.setVisibility(View.GONE);
                     Toast.makeText(DetailArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                     rv.loadMoreComplete();
@@ -219,6 +227,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
             @Override
             public void failure(RetrofitError error) {
                 rv.loadMoreComplete();
+                progressBar.setVisibility(View.GONE);
                 Toast.makeText(DetailArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
 //                swipeRefreshLayout.setRefreshing(false);
             }
@@ -250,6 +259,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
                     if (!realData.contains(CommonUtilities.SUCCESS)) {
                         Toast.makeText(DetailArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
 //                        swipeRefreshLayout.setRefreshing(false);
+                        progressBar.setVisibility(View.GONE);
                         rv.loadMoreComplete();
 
                     } else {
@@ -270,11 +280,13 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
                     e.printStackTrace();
                     Toast.makeText(DetailArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
 //                    swipeRefreshLayout.setRefreshing(false);
+                    progressBar.setVisibility(View.GONE);
                     rv.loadMoreComplete();
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Toast.makeText(DetailArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
 //                    swipeRefreshLayout.setRefreshing(false);
+                    progressBar.setVisibility(View.GONE);
                     rv.loadMoreComplete();
                 }
 
@@ -284,6 +296,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
             public void failure(RetrofitError error) {
                 Toast.makeText(DetailArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
 //                swipeRefreshLayout.setRefreshing(false);
+                progressBar.setVisibility(View.GONE);
                 rv.loadMoreComplete();
 
             }
@@ -392,7 +405,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
         });
         currentPage++;
         rv.loadMoreComplete();
-
+        progressBar.setVisibility(View.GONE);
 
     }
 

@@ -13,6 +13,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
@@ -81,6 +86,9 @@ public class categaryFragment  extends Fragment implements LoadMoreListener {
     private RecycleViewInstitutesOfSearchResultAdapter adapter;
     private boolean refresh=false;
 
+    private TextView textViewArtist;
+    private TextView textViewInstitute;
+
     public categaryFragment() {
 
     }
@@ -145,6 +153,44 @@ public class categaryFragment  extends Fragment implements LoadMoreListener {
         rvInstitue.setCanloadMore(true);
         rvInstitue.setLoadMoreListener(this);
 
+        textViewArtist=(TextView)view.findViewById(R.id.textViewArtist);
+        textViewInstitute=(TextView)view.findViewById(R.id.textViewLifeLab);
+
+    }
+
+    public static AnimationSet moveToViewLocation(long startOff) {
+        TranslateAnimation mHiddenAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,
+                Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
+                0.2f, Animation.RELATIVE_TO_SELF, 0.0f);
+
+        AlphaAnimation alpha = new AlphaAnimation(0.0f, 1.0f);
+
+        AnimationSet set = new AnimationSet(true);
+        set.addAnimation(mHiddenAction);
+        set.addAnimation(alpha);
+        set.setDuration(300);
+        set.setStartOffset(startOff);
+        set.setFillAfter(true);
+        set.setInterpolator(new AccelerateInterpolator());
+
+
+        return set;
+    }
+
+    public static AnimationSet contentsMoveToViewLocation(long startOff) {
+        TranslateAnimation mHiddenAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,
+                Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
+                0.2f, Animation.RELATIVE_TO_SELF, 0.0f);
+        AlphaAnimation alpha = new AlphaAnimation(0.0f, 1.0f);
+        AnimationSet set = new AnimationSet(true);
+
+        set.addAnimation(mHiddenAction);
+        set.addAnimation(alpha);
+        set.setStartOffset(startOff);
+        set.setDuration(200);
+        set.setFillAfter(true);
+        set.setInterpolator(new AccelerateInterpolator());
+        return set;
     }
 
     private void setUpArtistsAndInstituesFromCache(View view) {
@@ -281,8 +327,21 @@ public class categaryFragment  extends Fragment implements LoadMoreListener {
     private void setUpArtistsAndInstitute(List<Institute> institutes, List<Artist> artists,boolean isFromCache,View view) {
         setUpViewPagerLoverOfLife(artists,view);
         setUpListViewInstituteRecommend(institutes, view);
+        LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.layoutMain);
+        linearLayout.setVisibility(View.VISIBLE);
+
+        startAnimation();
 
 
+    }
+
+    private void startAnimation() {
+
+        textViewArtist.startAnimation(moveToViewLocation(0));
+        textViewInstitute.startAnimation(moveToViewLocation(0));
+
+        rvInstitue.startAnimation(contentsMoveToViewLocation(100));
+        rv.startAnimation(contentsMoveToViewLocation(100));
     }
 
     public void setUpListViewInstituteRecommend(List<Institute> institutes,View rootView) {

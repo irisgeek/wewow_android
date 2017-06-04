@@ -11,6 +11,12 @@
         android:scaleType="centerCrop"
         android:src="@drawable/cover2" />
 
+    <ImageView
+        android:id="@+id/userCoverCover"
+        android:layout_width="304dp"
+        android:layout_height="172dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/user_info_cover" />
 
     <LinearLayout
         android:id="@+id/userloginarea"
@@ -44,6 +50,7 @@
             android:layout_marginLeft="17dp"
             android:layout_marginTop="116dp"
             android:text="@string/login_gologin"
+            android:maxLines="1"
             android:textColor="#FFFFFF"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -54,6 +61,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="17dp"
             android:layout_marginTop="7dp"
+            android:maxLines="1"
             android:text="@string/login_to_see_more"
             android:textColor="#FFFFFF"
             android:textSize="14sp" />

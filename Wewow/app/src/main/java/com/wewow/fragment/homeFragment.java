@@ -11,9 +11,12 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
@@ -235,6 +238,8 @@ public class homeFragment extends Fragment {
             public void onClick(View v) {
                 textViewAdsIgnore.setVisibility(View.VISIBLE);
 
+//                showPopupMenu(textViewAds);
+
             }
         });
         textViewAdsIgnore.setOnClickListener(new View.OnClickListener() {
@@ -253,6 +258,39 @@ public class homeFragment extends Fragment {
         });
 
 
+
+    }
+
+    private void showPopupMenu(View view) {
+
+        PopupMenu popupMenu = new PopupMenu(getContext(), view);
+        // menu布局
+        popupMenu.getMenuInflater().inflate(R.menu.menu_ads, popupMenu.getMenu());
+        // menu的item点击事件
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+
+                cardViewAds.clearAnimation();
+                textViewAdsIgnore.clearAnimation();
+                textViewAds.clearAnimation();
+                cardViewAds.setVisibility(View.GONE);
+                textViewAdsIgnore.setVisibility(View.GONE);
+                textViewAds.setVisibility(View.GONE);
+
+                SettingUtils.set(getActivity(), CommonUtilities.ADS_READ, true);
+
+                return false;
+            }
+        });
+        // PopupMenu关闭事件
+        popupMenu.setOnDismissListener(new PopupMenu.OnDismissListener() {
+            @Override
+            public void onDismiss(PopupMenu menu) {
+            }
+        });
+        popupMenu.setGravity(Gravity.BOTTOM);
+        popupMenu.show();
 
     }
 

@@ -131,7 +131,9 @@ public class LifeLabActivity extends BaseActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        this.revert();
+        if(requestCode==0) {
+            this.revert();
+        }
     }
 
     private void revert() {
