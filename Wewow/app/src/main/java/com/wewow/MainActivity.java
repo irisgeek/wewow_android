@@ -148,8 +148,8 @@ public class MainActivity extends BaseActivity implements TextWatcher {
     private Context context;
 
     private boolean onPauseCalled = false;
-    private ImageView imageViewHome;
-    private ImageView imageViewSearch;
+    private ImageView imageViewHome,layoutMenu;
+    private ImageView imageViewSearch,layoutSearch;
     private TextView textTitle;
     private AutoCompleteTextView searchView;
     private boolean isSearchViewShown = false;
@@ -282,7 +282,9 @@ public class MainActivity extends BaseActivity implements TextWatcher {
         imageViewUnderLine = (ImageView) findViewById(R.id.imageViewUnderlineOfSearchView);
 
         searchView = (AutoCompleteTextView) findViewById(R.id.editTextSearch);
-        imageViewHome.setOnClickListener(new View.OnClickListener() {
+        layoutMenu = (ImageView) findViewById(R.id.layoutMenu);
+        layoutSearch = (ImageView) findViewById(R.id.layoutSearch);
+        layoutMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -307,7 +309,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
         });
 
 
-        imageViewSearch.setOnClickListener(new View.OnClickListener() {
+        layoutSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 

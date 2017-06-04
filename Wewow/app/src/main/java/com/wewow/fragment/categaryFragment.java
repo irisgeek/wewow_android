@@ -149,7 +149,12 @@ public class categaryFragment  extends Fragment implements LoadMoreListener {
         rv.setLayoutManager(linearLayoutManager);
 
         rvInstitue = (RecyclerViewUpRefresh)view.findViewById(R.id.recyclerview);
-        rvInstitue.setLayoutManager(new LinearLayoutManager(rv.getContext()));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(rv.getContext());
+
+//        layoutManager.setSmoothScrollbarEnabled(true);
+//        layoutManager.setAutoMeasureEnabled(true);
+        rvInstitue.setLayoutManager(layoutManager);
+        rvInstitue.setNestedScrollingEnabled(false);
         rvInstitue.setCanloadMore(true);
         rvInstitue.setLoadMoreListener(this);
 
