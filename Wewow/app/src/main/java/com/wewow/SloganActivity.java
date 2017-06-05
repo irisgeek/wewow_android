@@ -8,27 +8,24 @@ import android.os.Handler;
 import com.jaeger.library.StatusBarUtil;
 
 /**
- * Created by iris on 17/4/16.
+ * Date: 2017/6/5
+ * Description:
  */
-public class SplashActivity extends Activity {
+public class SloganActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash);
+        setContentView(R.layout.activity_slogan);
         StatusBarUtil.setColor(this, getResources().getColor(R.color.white), 50);
         new Handler().postDelayed(new Runnable() {
 
             public void run() {
-                //execute the task
-                Intent intent=new Intent(SplashActivity.this, SloganActivity.class);
+                Intent intent = new Intent(SloganActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
             }
-        }, 600);
+        }, 2000);
 
     }
-
-
-
 }

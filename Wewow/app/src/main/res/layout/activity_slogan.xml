@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/white"
+              android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="11dp"
+        android:layout_marginTop="11dp"
+        android:layout_weight="1">
+
+        <ImageView
+            android:id="@+id/slogan_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/banner_dummy"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#33000000"/>
+
+        <ImageView
+            android:id="@+id/slogan_iv1"
+            android:layout_width="70dp"
+            android:layout_height="33dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="21dp"
+            android:layout_marginTop="27dp"
+            android:src="@drawable/slogan_title"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/slogan_iv1"
+            android:layout_marginEnd="21dp"
+            android:layout_marginTop="57dp"
+            android:gravity="end"
+            android:lineSpacingExtra="8dp"
+            android:text="在家不能随心所欲\n理想的工作台\n会让你更得心应手"
+            android:textColor="#f3f1ef"
+            android:textSize="15.4sp"/>
+
+    </RelativeLayout>
+
+    <ImageView
+        android:layout_width="54dp"
+        android:layout_height="54dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="57dp"
+        android:layout_marginTop="57dp"
+        android:src="@drawable/slogan_logo"/>
+
+</LinearLayout>
