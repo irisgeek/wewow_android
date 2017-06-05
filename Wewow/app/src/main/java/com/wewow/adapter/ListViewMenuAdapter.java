@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.wewow.R;
+import com.wewow.UserInfo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,6 +25,7 @@ public class ListViewMenuAdapter extends BaseAdapter
     private Context context;
     private ArrayList<HashMap<String, Object>> list;
     private List<String> newIcons;
+
     public ListViewMenuAdapter(Context context, ArrayList<HashMap<String, Object>> list,List<String> newIcons)
     {
         this.context = context;
@@ -64,8 +66,20 @@ public class ListViewMenuAdapter extends BaseAdapter
             holder = (ViewHolder)convertView.getTag();
         }
         HashMap<String, Object> stringObjectHashMap = list.get(position);
-        holder.imageView.setImageResource((int)stringObjectHashMap.get("icon"));
+        holder.imageView.setImageResource((int) stringObjectHashMap.get("icon"));
         holder.textViewTitle.setText(stringObjectHashMap.get("menuText").toString());
+        if(position==list.size()-1) {
+            if (!UserInfo.isUserLogged(context)) {
+                holder.textViewTitle.setTextColor(context.getResources().getColor(R.color.button_disabled_background));
+            } else {
+                holder.textViewTitle.setTextColor(context.getResources().getColor(R.color.font_color));
+
+            }
+        }
+        else
+        {
+            holder.textViewTitle.setTextColor(context.getResources().getColor(R.color.font_color));
+        }
         if(newIcons.get(position).equals("1")) {
             holder.imageNew.setVisibility(View.VISIBLE);
         }
