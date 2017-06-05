@@ -11,8 +11,6 @@
         android:layout_gravity="center"
         android:layout_marginBottom="16dp"
         android:layout_marginTop="30dp"
-        android:shadowColor="@color/text_gray"
-        android:shadowRadius="15"
         android:textColor="@color/white"/>
 
     <LinearLayout
@@ -38,8 +36,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:shadowColor="@color/text_gray"
-                android:shadowRadius="15"
                 android:text="@string/lifelab_item_feedback"
                 android:textColor="@color/white"
                 android:textSize="12sp"/>
@@ -57,7 +53,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginEnd="30dp"
-                android:src="@drawable/mark"/>
+                android:src="@drawable/mark_white"/>
 
             <TextView
                 android:id="@+id/lifelab_foot_collect_count"
@@ -77,8 +73,6 @@
                 android:layout_below="@+id/lifelab_foot_collect"
                 android:layout_marginStart="2dp"
                 android:layout_marginTop="2dp"
-                android:shadowColor="@color/text_gray"
-                android:shadowRadius="15"
                 android:text="@string/collection"
                 android:textColor="@color/white"
                 android:textSize="12sp"/>
@@ -95,14 +89,12 @@
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/share"/>
+                android:src="@drawable/share_white"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:shadowColor="@color/text_gray"
-                android:shadowRadius="15"
                 android:text="@string/lifelab_item_share"
                 android:textColor="@color/white"
                 android:textSize="12sp"/>

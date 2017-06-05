@@ -297,7 +297,7 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
         lifelab_foot_collect_count.setVisibility(lcd.liked_count == 0 ? View.GONE : View.VISIBLE);
         lifelab_foot_collect_count.setText(lcd.liked_count + "");
         lifelab_foot_collect = (ImageView) view.findViewById(R.id.lifelab_foot_collect);
-        lifelab_foot_collect.setImageResource(lcd.liked ? R.drawable.favourite : R.drawable.mark);
+        lifelab_foot_collect.setImageResource(lcd.liked ? R.drawable.favourite : R.drawable.mark_white);
         this.container.addView(view);
 
         findViewById(R.id.layout_footer_feedback).setOnClickListener(this);
@@ -360,7 +360,7 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
                                     }
                                     String s;
                                     LifeLabItemActivity.this.like.setImageDrawable(LifeLabItemActivity.this.getResources().getDrawable(like == 1 ? R.drawable.marked : R.drawable.mark));
-                                    lifelab_foot_collect.setImageDrawable(LifeLabItemActivity.this.getResources().getDrawable(like == 1 ? R.drawable.marked : R.drawable.mark));
+                                    lifelab_foot_collect.setImageDrawable(LifeLabItemActivity.this.getResources().getDrawable(like == 1 ? R.drawable.marked : R.drawable.mark_white));
                                     if (like == 1) {
                                         lcd.liked_count += 1;
                                         s = LifeLabItemActivity.this.getString(R.string.fav_succeed);
