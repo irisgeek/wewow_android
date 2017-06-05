@@ -17,14 +17,14 @@
             android:id="@+id/article_comment_author"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#5a5f5f"
+            android:textColor="#cc333631"
             android:textSize="10sp"/>
 
         <TextView
             android:id="@+id/article_comment_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#5a5f5f"
+            android:textColor="#cc333631"
             android:textSize="10sp"/>
     </LinearLayout>
 

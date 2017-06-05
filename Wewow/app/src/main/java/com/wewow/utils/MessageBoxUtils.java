@@ -50,9 +50,19 @@ public class MessageBoxUtils {
     }
 
     public static void messageBoxWithButtons(Context cxt, String text, String[] cmds, Object[] tags, MsgboxButtonListener[] btnHandlers) {
+        messageBoxWithButtons(cxt, new String[]{text, null}, cmds, tags, btnHandlers);
+    }
+
+    public static void messageBoxWithButtons(Context cxt, String texts[], String[] cmds, Object[] tags, MsgboxButtonListener[] btnHandlers) {
         View v = View.inflate(cxt, R.layout.dialog_msgbox_btns, null);
         TextView tv = (TextView) v.findViewById(R.id.hint_text);
-        tv.setText(text);
+        tv.setText(texts[0]);
+        tv = (TextView) v.findViewById(R.id.hint_text2);
+        if (texts[1] == null) {
+            tv.setVisibility(View.GONE);
+        } else {
+            tv.setText(texts[1]);
+        }
         final PopupWindow pw = new PopupWindow(v, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         int max = cmds.length > 2 ? 2 : cmds.length;
         Resources rcs = cxt.getResources();
@@ -61,7 +71,7 @@ public class MessageBoxUtils {
             int resid = rcs.getIdentifier(btnid, "id", cxt.getPackageName());
             Button b = (Button) v.findViewById(resid);
             b.setText(cmds[i]);
-            Object obj = tags.length > i ? tags[i] : null;
+            Object obj = tags != null && tags.length > i ? tags[i] : null;
             MsgboxButtonListener l = btnHandlers.length > i ? btnHandlers[i] : null;
             b.setTag(new Object[]{pw, obj, l});
             b.setOnClickListener(btnClick);

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:app="http://schemas.android.com/apk/res-auto"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <ScrollView
         android:id="@+id/scrollview"
@@ -19,8 +19,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <android.support.v7.widget.CardView
-                xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="4dp">
@@ -38,7 +37,7 @@
                         android:layout_marginLeft="15dp"
                         android:foregroundGravity="center"
                         android:padding="5dp"
-                        android:src="@drawable/back_b"/>
+                        android:src="@drawable/back_b" />
 
 
                     <ImageView
@@ -49,7 +48,7 @@
                         android:layout_centerVertical="true"
                         android:layout_marginRight="13dp"
                         android:padding="5dp"
-                        android:src="@drawable/share_b"/>
+                        android:src="@drawable/share_b" />
 
                     <FrameLayout
                         android:id="@+id/layout_article_fav"
@@ -64,7 +63,7 @@
                             android:layout_gravity="center_vertical"
                             android:layout_marginEnd="12dp"
                             android:padding="5dp"
-                            android:src="@drawable/mark_b"/>
+                            android:src="@drawable/mark_b" />
 
                         <TextView
                             android:id="@+id/article_fav_count"
@@ -77,16 +76,16 @@
                             android:paddingStart="4dp"
                             android:textColor="@color/white"
                             android:textSize="9sp"
-                            android:visibility="gone"/>
+                            android:visibility="gone" />
                     </FrameLayout>
                 </RelativeLayout>
             </android.support.v7.widget.CardView>
 
-            <android.support.v7.widget.CardView
-                xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_margin="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
                 card_view:cardCornerRadius="2dp">
 
                 <LinearLayout
@@ -103,18 +102,18 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="15dp"
                         android:textColor="@color/black"
-                        android:textSize="16sp"/>
+                        android:textSize="16sp" />
 
                     <ImageView
                         android:id="@+id/article_logo"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:scaleType="centerCrop"/>
+                        android:scaleType="centerCrop" />
 
                     <WebView
                         android:id="@+id/article_content"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content" />
 
 
                     <LinearLayout
@@ -129,7 +128,7 @@
                             android:gravity="center_horizontal"
                             android:text="@string/article_share_title"
                             android:textColor="#333631"
-                            android:textSize="14sp"/>
+                            android:textSize="14sp" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -149,14 +148,14 @@
                                     android:layout_width="44dp"
                                     android:layout_height="44dp"
                                     android:layout_marginBottom="12dp"
-                                    android:src="@drawable/sharewechatfriend"/>
+                                    android:src="@drawable/sharewechatfriend" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="@string/share_wechat_friend"
                                     android:textColor="#333631"
-                                    android:textSize="10sp"/>
+                                    android:textSize="10sp" />
                             </LinearLayout>
 
                             <LinearLayout
@@ -171,14 +170,14 @@
                                     android:layout_width="44dp"
                                     android:layout_height="44dp"
                                     android:layout_marginBottom="11dp"
-                                    android:src="@drawable/sharewechatcircle"/>
+                                    android:src="@drawable/sharewechatcircle" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="@string/share_wechat_circle"
                                     android:textColor="#333631"
-                                    android:textSize="10sp"/>
+                                    android:textSize="10sp" />
                             </LinearLayout>
 
                             <LinearLayout
@@ -193,14 +192,14 @@
                                     android:layout_width="44dp"
                                     android:layout_height="44dp"
                                     android:layout_marginBottom="11dp"
-                                    android:src="@drawable/shareweibo"/>
+                                    android:src="@drawable/shareweibo" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="@string/share_weibo"
                                     android:textColor="#333631"
-                                    android:textSize="10sp"/>
+                                    android:textSize="10sp" />
                             </LinearLayout>
 
                         </LinearLayout>
@@ -224,14 +223,14 @@
                                     android:layout_width="44dp"
                                     android:layout_height="44dp"
                                     android:layout_marginBottom="11dp"
-                                    android:src="@drawable/copylink"/>
+                                    android:src="@drawable/copylink" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="@string/share_copy_link"
                                     android:textColor="#333631"
-                                    android:textSize="10sp"/>
+                                    android:textSize="10sp" />
                             </LinearLayout>
 
                             <LinearLayout
@@ -246,30 +245,48 @@
                                     android:layout_width="44dp"
                                     android:layout_height="44dp"
                                     android:layout_marginBottom="11dp"
-                                    android:src="@drawable/sharemore"/>
+                                    android:src="@drawable/sharemore" />
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="@string/share_more"
                                     android:textColor="#333631"
-                                    android:textSize="10sp"/>
+                                    android:textSize="10sp" />
                             </LinearLayout>
 
                             <View
                                 android:layout_width="44dp"
                                 android:layout_height="44dp"
                                 android:layout_marginLeft="50dp"
-                                android:orientation="vertical"/>
+                                android:orientation="vertical" />
 
                         </LinearLayout>
 
                     </LinearLayout>
 
+                </LinearLayout>
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="12dp"
+                android:background="#ffffff"
+                card_view:cardCornerRadius="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
-                        android:layout_marginTop="12dp"
+
                         android:orientation="horizontal">
 
                         <TextView
@@ -279,7 +296,7 @@
                             android:paddingLeft="16dp"
                             android:text="@string/article_hot_discuss"
                             android:textColor="#333631"
-                            android:textSize="16sp"/>
+                            android:textSize="16sp" />
 
                         <ImageView
                             android:id="@+id/iv_more_discuss"
@@ -288,26 +305,25 @@
                             android:layout_alignParentRight="true"
                             android:layout_centerVertical="true"
                             android:layout_marginRight="20dp"
-                            android:src="@drawable/arrowright"/>
+                            android:src="@drawable/arrowright" />
 
                         <TextView
                             android:id="@+id/tv_more_discuss"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
-                            android:gravity="center_vertical"
                             android:layout_toLeftOf="@+id/iv_more_discuss"
+                            android:gravity="center_vertical"
                             android:paddingRight="8dp"
                             android:text="@string/article_more_discuss"
                             android:textColor="#333631"
-                            android:textSize="12sp"/>
+                            android:textSize="12sp" />
                     </RelativeLayout>
 
                     <LinearLayout
                         android:id="@+id/article_discuss_container"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"/>
-
+                        android:orientation="vertical" />
                 </LinearLayout>
 
             </android.support.v7.widget.CardView>
@@ -316,7 +332,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="14dp"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="14dp"
                 android:gravity="center_horizontal"
                 android:orientation="horizontal">
 
@@ -325,7 +341,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/article_feedback"
                     android:textColor="#333631"
-                    android:textSize="12sp"/>
+                    android:textSize="12sp" />
 
                 <TextView
                     android:id="@+id/article_feedback_link"
@@ -333,7 +349,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/article_feedback_link"
                     android:textColor="@color/menu_checked_color"
-                    android:textSize="12sp"/>
+                    android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>
 
@@ -346,5 +362,5 @@
         android:layout_gravity="center"
         android:visibility="visible"
         app:mlpb_progress_color="@color/font_color"
-        app:mlpb_progress_stoke_width="3dp"/>
+        app:mlpb_progress_stoke_width="3dp" />
 </FrameLayout>

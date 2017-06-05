@@ -20,6 +20,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -43,6 +48,7 @@ import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.FileCacheUtil;
 import com.wewow.utils.LoadMoreListener;
 import com.wewow.utils.LoginUtils;
+import com.wewow.utils.MessageBoxUtils;
 import com.wewow.utils.SettingUtils;
 import com.wewow.utils.Utils;
 import com.wewow.view.RecyclerViewUpRefresh;
@@ -403,9 +409,20 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
             }
 
         });
+        if(currentPage==1)
+        {
+            collapsingToolbar.setVisibility(View.VISIBLE);
+            collapsingToolbar.startAnimation(moveToViewLocation(0));
+//            imageView.startAnimation(moveToViewLocation(0));
+
+            rv.setVisibility(View.VISIBLE);
+            rv.startAnimation(contentsMoveToViewLocation(200));
+
+        }
         currentPage++;
         rv.loadMoreComplete();
         progressBar.setVisibility(View.GONE);
+
 
     }
 
@@ -439,6 +456,9 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
                         } else {
                             followed = "1";
                         }
+                        MessageBoxUtils.messageBoxWithNoButton(DetailArtistActivity.this, true, read == 0 ? getResources()
+                                .getString(R.string.cancel_follow_artist_success) : getResources()
+                                .getString(R.string.follow_artist_success), 2500);
                         FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_DETAIL + id, DetailArtistActivity.this);
                         FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_SUBSCRIBED_ARTISTS_LIST, DetailArtistActivity.this);
                         FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_LIST, DetailArtistActivity.this);
@@ -745,6 +765,41 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
             }
 
         }
+    }
+
+    public static AnimationSet moveToViewLocation(long startOff) {
+        TranslateAnimation mHiddenAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,
+                Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
+                0.2f, Animation.RELATIVE_TO_SELF, 0.0f);
+
+        AlphaAnimation alpha = new AlphaAnimation(0.0f, 1.0f);
+
+        AnimationSet set = new AnimationSet(true);
+        set.addAnimation(mHiddenAction);
+        set.addAnimation(alpha);
+        set.setDuration(400);
+        set.setStartOffset(startOff);
+        set.setFillAfter(true);
+        set.setInterpolator(new AccelerateInterpolator());
+
+
+        return set;
+    }
+
+    public static AnimationSet contentsMoveToViewLocation(long startOff) {
+        TranslateAnimation mHiddenAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,
+                Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
+                0.2f, Animation.RELATIVE_TO_SELF, 0.0f);
+        AlphaAnimation alpha = new AlphaAnimation(0.0f, 1.0f);
+        AnimationSet set = new AnimationSet(true);
+
+        set.addAnimation(mHiddenAction);
+        set.addAnimation(alpha);
+        set.setStartOffset(startOff);
+        set.setDuration(300);
+        set.setFillAfter(true);
+        set.setInterpolator(new AccelerateInterpolator());
+        return set;
     }
 
 }

@@ -28,6 +28,12 @@
     <string name="login_huawei_connecting">连接华为移动服务</string>
     <string name="login_huawei_cancel">华为登录已取消</string>
     <string name="login_3rd_party">其他方式登录</string>
+    <string name="login_resend_confirm0">再次发送会使上一个验证码失效</string>
+    <string name="login_resend_confirm1">要不等等？</string>
+    <string name="login_resend_cancel">不发送</string>
+    <string name="login_resend_ok">发送</string>
+    <string name="login_verifycode_error">您的验证码错了</string>
+    <string name="login_verifycode_error_acknowlege">好的</string>
 
     <!-- 生活研究所 -->
     <string name="lifelab_title">生活研究所</string>
@@ -208,12 +214,15 @@
     <string name="cancel">取消</string>
 
     <string name="clear_cache_alert_tile">提示</string>
-    <string name="clear_cache_alert_content">确定要清除所有缓存数据吗?</string>
+    <string name="clear_cache_alert_content">确定要清除所有缓存数据吗?\n(不会影响您的收藏和订阅）</string>
     <string name="confirm">确定</string>
     <string name="clear_cache_success">清除成功</string>
     <string name="logout_content">确定要退出登录吗</string>
 
     <string name="search_no_key_word">搜索内容不能为空</string>
     <string name="hot_search_text">热门搜索</string>
+    <string name="follow_artist_success">已成功订阅生活家</string>
+    <string name="cancel_follow_artist_success">已成功取消订阅生活家</string>
+
 
 </resources>
