@@ -380,7 +380,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
             //
 
             map.put("image", articles.get(i).getImage_642_320());
-
+            map.put("id",articles.get(i).getId());
             map.put("title", articles.get(i).getTitle());
             map.put("read_count",articles.get(i).getRead_count());
             //todo
@@ -402,7 +402,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
             @Override
             public void onItemClick(View view, int position) {
                 Intent intent = new Intent(DetailArtistActivity.this, ArticleActivity.class);
-                String articleId = articles.get(position).getId();
+                String articleId = listItem.get(position).get("id").toString();
                 intent.putExtra(ArticleActivity.ARTICLE_ID, Integer.parseInt(articleId));
                 DetailArtistActivity.this.startActivity(intent);
 
