@@ -605,11 +605,11 @@ public class homeFragment extends Fragment {
                                     .get("id").toString();
                             if(savedId.equals(newId))
                             {
-                                boolean result=SettingUtils.get(getActivity(), CommonUtilities.NOTIFICATION_READ, false);
-                                if(!result)
-                                {
-                                   isNotificationShow=true;
-                                }
+//                                boolean result=SettingUtils.get(getActivity(), CommonUtilities.NOTIFICATION_READ, false);
+//                                if(!result)
+//                                {
+//                                   isNotificationShow=true;
+//                                }
 
                             }
                             else

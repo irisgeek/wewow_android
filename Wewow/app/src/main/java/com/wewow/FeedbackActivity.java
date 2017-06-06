@@ -97,6 +97,7 @@ public class FeedbackActivity extends AppCompatActivity implements IPickResult {
 
 
         setContentView(R.layout.activity_feed_back);
+
         StatusBarUtil.setColor(this, getResources().getColor(R.color.white), 50);
         initData();
 

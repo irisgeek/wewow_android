@@ -66,6 +66,7 @@ public class ListArtistActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_artist);
+        setMenuselectedPosition(1);
         StatusBarUtil.setColor(this, getResources().getColor(R.color.white), 50);
         initData();
 

@@ -100,6 +100,7 @@
             android:layout_marginTop="40dp"
             android:choiceMode="singleChoice"
             android:divider="@android:color/transparent"
+
             android:scrollbars="none"/>
 
 

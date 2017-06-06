@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
@@ -67,6 +68,7 @@ public class LifeLabActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lifelab_list);
+        setMenuselectedPosition(2);
         StatusBarUtil.setColor(this, getResources().getColor(R.color.white), 50);
         this.getSupportActionBar().setTitle(R.string.lifelab_title);
         this.setupUI();
@@ -74,10 +76,12 @@ public class LifeLabActivity extends BaseActivity {
 
     private void setupUI() {
         progressBar = (CircleProgressBar) this.findViewById(R.id.progressBar);
-        this.foot = View.inflate(this, R.layout.lifelab_foot, null);
-        ImageView iv_loading = (ImageView) foot.findViewById(R.id.iv_loading);
-        Glide.with(this).load(R.drawable.bottom_loading).into(iv_loading);
-        iv_loading.setOnClickListener(new View.OnClickListener() {
+//        this.foot = View.inflate(this, R.layout.lifelab_foot, null);
+//        ImageView iv_loading = (ImageView) foot.findViewById(R.id.iv_loading);
+//        Glide.with(this).load(R.drawable.bottom_loading).into(iv_loading);
+        this.foot = View.inflate(this, R.layout.circle_load_more, null);
+
+        foot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 LifeLabActivity.this.startDataLoading();
@@ -108,9 +112,18 @@ public class LifeLabActivity extends BaseActivity {
                     return;
                 }
                 LifeLabActivity.this.foot.setVisibility(View.VISIBLE);
+                ImageView imageViewCircle1 = (ImageView) foot.findViewById(R.id.imageViewCircle1);
+                ImageView imageViewCircle2 = (ImageView) foot.findViewById(R.id.imageViewCircle2);
+                ImageView imageViewCircle3 = (ImageView) foot.findViewById(R.id.imageViewCircle3);
+                startAlphaAnimation(imageViewCircle1, 0.8f, 0.2f);
+                startAlphaAnimation(imageViewCircle2, 0.5f, 0.8f);
+                startAlphaAnimation(imageViewCircle3, 0.2f, 0.8f);
                 if (i + i1 == i2) {
                     Log.d(TAG, "onScroll: Show refresh");
                     LifeLabActivity.this.foot.setVisibility(View.VISIBLE);
+                    startAlphaAnimation(imageViewCircle1, 0.8f, 0.2f);
+                    startAlphaAnimation(imageViewCircle2, 0.5f, 0.8f);
+                    startAlphaAnimation(imageViewCircle3, 0.2f, 0.8f);
                     LifeLabActivity.this.startDataLoading();
                 }
             }
@@ -519,4 +532,21 @@ public class LifeLabActivity extends BaseActivity {
         LifeLabAdapter adp = (LifeLabAdapter) (la instanceof LifeLabAdapter ? la : ((HeaderViewListAdapter) la).getWrappedAdapter());
         adp.notifyDataSetChanged();
     }
+
+    public void startAlphaAnimation(View view, float from, float to) {
+        /**
+         * @param fromAlpha 开始的透明度，取值是0.0f~1.0f，0.0f表示完全透明， 1.0f表示和原来一样
+         * @param toAlpha 结束的透明度，同上
+         */
+        AlphaAnimation alphaAnimation = new AlphaAnimation(from, to);
+        //设置动画持续时长
+        alphaAnimation.setDuration(300);
+
+        //设置动画播放次数
+        alphaAnimation.setRepeatCount(AlphaAnimation.INFINITE);
+        //开始动画
+        view.startAnimation(alphaAnimation);
+
+    }
+
 }

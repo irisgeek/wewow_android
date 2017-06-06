@@ -92,6 +92,10 @@ public class BaseActivity extends ActionBarActivity {
     private int[] iconResIcon = {R.drawable.selector_btn_home, R.drawable.selector_btn_all_artists, R.drawable.selector_btn_all_institutes, R.drawable.selector_btn_chat,
             R.drawable.selector_btn_favourite, R.drawable.selector_btn_lover_of_life_subscribed, R.drawable.selector_btn_life_about,
             R.drawable.selector_btn_share, R.drawable.selector_btn_clear_cache, R.drawable.selector_btn_logout};
+
+    private int[] iconResIconSelected = {R.drawable.home_b, R.drawable.lover_of_life_b, R.drawable.life_institute_b, R.drawable.chat_b,
+            R.drawable.my_favorites_b, R.drawable.lover_of_life_subscribed_b, R.drawable.about_b,
+            R.drawable.share_menu_b, R.drawable.clear_cache_b, R.drawable.logout_b};
     private NavigationView mainNavView;
 
     private TextView tvusername, tvuserdesc;
@@ -103,6 +107,7 @@ public class BaseActivity extends ActionBarActivity {
     private ListViewMenuAdapter adapter;
     private List<String> newIcons;
     public static final int REQUEST_CODE_MENU = 11;
+    private int menuselectedPosition=16;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,6 +136,10 @@ public class BaseActivity extends ActionBarActivity {
         setUpToolBar();
 
 
+    }
+    protected  void setMenuselectedPosition(int position)
+    {
+        this.menuselectedPosition=position;
     }
 
     private void getNewFeedsAndArtistInfo(String userId) {
@@ -224,7 +233,15 @@ public class BaseActivity extends ActionBarActivity {
                 map = new HashMap<String, Object>();
             }
 
-            map.put("icon", iconResIcon[i]);
+            if(i==menuselectedPosition)
+            {
+                map.put("icon", iconResIconSelected[i]);
+            }
+            else
+            {
+                map.put("icon", iconResIcon[i]);
+            }
+
             map.put("menuText", planetTitles[i]);
             if (i == 3) {
                 map.put("new", feedbackUpdate);
@@ -248,7 +265,7 @@ public class BaseActivity extends ActionBarActivity {
 //                //ids
 //                new int[]{R.id.imageViewIcon, R.id.textViewMenuItem}
 //        );
-        adapter = new ListViewMenuAdapter(this, listItem, newIcons);
+        adapter = new ListViewMenuAdapter(this, listItem, newIcons,menuselectedPosition);
         drawerList.setAdapter(adapter);
 
 
@@ -283,6 +300,7 @@ public class BaseActivity extends ActionBarActivity {
                     Intent edIntent = new Intent(BaseActivity.this, UserInfoActivity.class);
                     BaseActivity.this.startActivityForResult(edIntent, UserInfoActivity.REQUEST_CODE_MENU);
                 } else {
+                    drawerLayout.closeDrawer(GravityCompat.START);
                     LoginUtils.startLogin(BaseActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
                 }
             }
@@ -351,22 +369,26 @@ public class BaseActivity extends ActionBarActivity {
             String text = (String) map.get("menuText");
             int resid = (Integer) map.get("icon");
 //            Toast.makeText(BaseActivity.this, text, Toast.LENGTH_SHORT).show();
-            drawerLayout.closeDrawer(GravityCompat.START);
+
             switch (position - 1) {
                 case 0:
+                    drawerLayout.closeDrawer(GravityCompat.START);
                     Intent intentMain = new Intent(BaseActivity.this, MainActivity.class);
                     startActivity(intentMain);
+
                     break;
                 case 1:
+                    drawerLayout.closeDrawer(GravityCompat.START);
                     Intent intent = new Intent(BaseActivity.this, ListArtistActivity.class);
                     BaseActivity.this.startActivity(intent);
                     break;
                 case 2:
+                    drawerLayout.closeDrawer(GravityCompat.START);
                     Intent intentLab = new Intent(BaseActivity.this, LifeLabActivity.class);
                     BaseActivity.this.startActivity(intentLab);
                     break;
                 case 3:
-
+                    drawerLayout.closeDrawer(GravityCompat.START);
                     if (UserInfo.isUserLogged(BaseActivity.this)) {
                         Intent intentFeedback = new Intent(BaseActivity.this, FeedbackActivity.class);
                         BaseActivity.this.startActivityForResult(intentFeedback, BaseActivity.REQUEST_CODE_MENU);
@@ -376,6 +398,7 @@ public class BaseActivity extends ActionBarActivity {
                     break;
 
                 case 5:
+                    drawerLayout.closeDrawer(GravityCompat.START);
                     if (UserInfo.isUserLogged(BaseActivity.this)) {
                         Intent intentCollection = new Intent(BaseActivity.this, MyCollectionActivity.class);
                         BaseActivity.this.startActivity(intentCollection);
@@ -384,7 +407,7 @@ public class BaseActivity extends ActionBarActivity {
                     }
                     break;
                 case 6:
-
+                    drawerLayout.closeDrawer(GravityCompat.START);
                     if (UserInfo.isUserLogged(BaseActivity.this)) {
                         Intent intentSubscribedArtists = new Intent(BaseActivity.this, ListSubscribedArtistActivity.class);
                         BaseActivity.this.startActivity(intentSubscribedArtists);
@@ -393,11 +416,13 @@ public class BaseActivity extends ActionBarActivity {
                     }
                     break;
                 case 8:
+                    drawerLayout.closeDrawer(GravityCompat.START);
                     Intent intentAbout = new Intent(BaseActivity.this, AboutActivity.class);
                     BaseActivity.this.startActivity(intentAbout);
                     break;
 
                 case 9:
+                    drawerLayout.closeDrawer(GravityCompat.START);
                     ShareUtils su = new ShareUtils(BaseActivity.this);
                     su.setUrl(CommonUtilities.SHARE_URL);
                     su.setContent(getResources().getString(R.string.share_text));
@@ -407,6 +432,7 @@ public class BaseActivity extends ActionBarActivity {
                     break;
 
                 case 10:
+                    drawerLayout.closeDrawer(GravityCompat.START);
                     //clear cache
                     dialog = new MaterialDialog.Builder(BaseActivity.this)
 
@@ -440,6 +466,7 @@ public class BaseActivity extends ActionBarActivity {
                 case 11:
                     Log.d("BaseActivity", "Logout");
                     if(UserInfo.isUserLogged(BaseActivity.this)){
+                        drawerLayout.closeDrawer(GravityCompat.START);
                         MessageBoxUtils.messageBoxWithButtons(BaseActivity.this, getString(R.string.logout_content),
                                 new String[]{getString(R.string.confirm), getString(R.string.cancel)},
                                 new Object[]{0, 1},
@@ -453,10 +480,12 @@ public class BaseActivity extends ActionBarActivity {
                                             @Override
                                             public void onClick(Object tag) {
                                                 UserInfo.logout(BaseActivity.this);
+                                                adapter.notifyDataSetChanged();
                                                 BaseActivity.this.tvusername.setText(R.string.login_gologin);
                                                 BaseActivity.this.tvuserdesc.setText(R.string.login_to_see_more);
                                                 imageViewSetting.setVisibility(View.GONE);
                                                 imageViewUserCover.setImageResource(bgRes[1]);
+
                                             }
                                         },
                                         new MessageBoxUtils.MsgboxButtonListener() {
@@ -471,12 +500,12 @@ public class BaseActivity extends ActionBarActivity {
                                         }
                                 });
                     }else{
-                        UserInfo.logout(BaseActivity.this);
-                        BaseActivity.this.tvusername.setText(R.string.login_gologin);
-                        BaseActivity.this.tvuserdesc.setText(R.string.login_to_see_more);
-
-                        imageViewSetting.setVisibility(View.GONE);
-                        imageViewUserCover.setImageResource(bgRes[1]);
+//                        UserInfo.logout(BaseActivity.this);
+//                        BaseActivity.this.tvusername.setText(R.string.login_gologin);
+//                        BaseActivity.this.tvuserdesc.setText(R.string.login_to_see_more);
+//
+//                        imageViewSetting.setVisibility(View.GONE);
+//                        imageViewUserCover.setImageResource(bgRes[1]);
                     }
                 case 4:
                 default:

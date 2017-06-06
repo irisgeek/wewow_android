@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -42,6 +43,7 @@ public  class RecycleViewArtistsOfHomePageAdapter
         public TextView textViewDesc;
         public TextView textViewArticleCount;
         public TextView textViewFollowerCount;
+        public LinearLayout layoutRightMargin;
 
         public ViewHolder(View view) {
             super(view);
@@ -50,6 +52,7 @@ public  class RecycleViewArtistsOfHomePageAdapter
            textViewDesc= (TextView)view.findViewById(R.id.textViewDesc);
            textViewArticleCount=(TextView)view.findViewById(R.id.textViewRead);
             textViewFollowerCount=(TextView)view.findViewById(R.id.textViewCollection);
+            layoutRightMargin=(LinearLayout)view.findViewById(R.id.layout_rightMargin);
         }
 
         @Override
@@ -99,6 +102,14 @@ public  class RecycleViewArtistsOfHomePageAdapter
                     mOnItemClickListener.onItemClick(holder.itemView,position); // 2
                 }
             });
+        }
+        if(position==list.size()-1)
+        {
+            holder.layoutRightMargin.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            holder.layoutRightMargin.setVisibility(View.GONE);
         }
 
 

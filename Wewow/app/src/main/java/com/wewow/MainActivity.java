@@ -171,6 +171,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
 //        Utils.setActivityToBeFullscreen(this);
 
         setContentView(R.layout.activity_main);
+        setMenuselectedPosition(0);
         context = this;
 //        StatusBarUtil.setTranslucentForCoordinatorLayout(this, 100);
 

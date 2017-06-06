@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
-    android:layout_width="257dp"
+    android:layout_width="wrap_content"
     android:layout_height="86dp"
     android:background="#f7f7f7"
     android:gravity="center_vertical">
@@ -9,7 +9,7 @@
     <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
         card_view:cardBackgroundColor="#ffffff"
-        android:layout_width="match_parent"
+        android:layout_width="241dp"
         android:layout_height="80dp"
         android:layout_gravity="center"
         android:layout_marginLeft="14dp"
@@ -51,6 +51,7 @@
             android:textSize="10sp"
             android:text="寻找有趣的活法"
             android:maxLines="1"
+            android:ellipsize="end"
             android:textColor="#333631"
             android:layout_gravity="left"
             android:id="@+id/textViewDesc"/>
@@ -107,5 +108,14 @@
 
 
 </android.support.v7.widget.CardView>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:id="@+id/layout_rightMargin"
+        android:layout_width="12dp"
+        android:visibility="visible"
+        android:layout_height="match_parent">
+
+
+    </LinearLayout>
 
 </LinearLayout>

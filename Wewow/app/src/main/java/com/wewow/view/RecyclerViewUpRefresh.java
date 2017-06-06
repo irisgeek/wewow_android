@@ -7,15 +7,19 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 
+import com.wewow.R;
 import com.wewow.adapter.FooterAdapter;
 import com.wewow.utils.LoadMoreListener;
 
 /**
  * Created by iris on 17/5/9.
  */
+
 /**
  * zhangyao
  * 16/9/4
@@ -134,7 +138,7 @@ public class RecyclerViewUpRefresh extends RecyclerView {
     @Override
     public void setAdapter(Adapter adapter) {
         mAdapter = adapter;
-        mFooterAdapter = new FooterAdapter(this,loadingMoreFooter, adapter);
+        mFooterAdapter = new FooterAdapter(this, loadingMoreFooter, adapter);
         super.setAdapter(mFooterAdapter);
         mAdapter.registerAdapterDataObserver(mDataObserver);
     }
@@ -159,6 +163,13 @@ public class RecyclerViewUpRefresh extends RecyclerView {
                     && lastVisibleItemPosition >= layoutManager.getItemCount() - 1) {
                 if (loadingMoreFooter != null) {
                     loadingMoreFooter.setVisible();
+                    ImageView imageViewCircle1 = (ImageView) loadingMoreFooter.findViewById(R.id.imageViewCircle1);
+                    ImageView imageViewCircle2 = (ImageView) loadingMoreFooter.findViewById(R.id.imageViewCircle2);
+                    ImageView imageViewCircle3 = (ImageView) loadingMoreFooter.findViewById(R.id.imageViewCircle3);
+                    startAlphaAnimation(imageViewCircle1, 0.8f, 0.2f);
+                    startAlphaAnimation(imageViewCircle2, 0.5f, 0.8f);
+                    startAlphaAnimation(imageViewCircle3, 0.2f, 0.8f);
+
                 }
                 isLoadingData = true;
                 loadMoreListener.onLoadMore();
@@ -210,5 +221,21 @@ public class RecyclerViewUpRefresh extends RecyclerView {
             mFooterAdapter.notifyItemMoved(fromPosition, toPosition);
         }
     };
+
+    public void startAlphaAnimation(View view, float from, float to) {
+        /**
+         * @param fromAlpha 开始的透明度，取值是0.0f~1.0f，0.0f表示完全透明， 1.0f表示和原来一样
+         * @param toAlpha 结束的透明度，同上
+         */
+        AlphaAnimation alphaAnimation = new AlphaAnimation(from, to);
+        //设置动画持续时长
+        alphaAnimation.setDuration(300);
+
+        //设置动画播放次数
+        alphaAnimation.setRepeatCount(AlphaAnimation.INFINITE);
+        //开始动画
+        view.startAnimation(alphaAnimation);
+
+    }
 
 }
