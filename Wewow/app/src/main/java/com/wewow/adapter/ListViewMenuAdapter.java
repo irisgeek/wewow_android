@@ -25,12 +25,14 @@ public class ListViewMenuAdapter extends BaseAdapter
     private Context context;
     private ArrayList<HashMap<String, Object>> list;
     private List<String> newIcons;
+    private int menuselectedPosition;
 
-    public ListViewMenuAdapter(Context context, ArrayList<HashMap<String, Object>> list,List<String> newIcons)
+    public ListViewMenuAdapter(Context context, ArrayList<HashMap<String, Object>> list,List<String> newIcons,int menuselectedPosition)
     {
         this.context = context;
         this.list=list;
         this.newIcons=newIcons;
+        this.menuselectedPosition=menuselectedPosition;
 
     }
     @Override
@@ -55,7 +57,7 @@ public class ListViewMenuAdapter extends BaseAdapter
         if(convertView == null)
         {
             holder = new ViewHolder();
-            if(position==4||position==6)
+            if(position==4||position==7)
             {
                 convertView = inflater.inflate(R.layout.list_item_drawer_blank, null);
 
@@ -75,6 +77,11 @@ public class ListViewMenuAdapter extends BaseAdapter
         HashMap<String, Object> stringObjectHashMap = list.get(position);
         holder.imageView.setImageResource((int) stringObjectHashMap.get("icon"));
         holder.textViewTitle.setText(stringObjectHashMap.get("menuText").toString());
+        if((position==menuselectedPosition)&&(menuselectedPosition<=3)||(menuselectedPosition>3&&menuselectedPosition<6&&((position-1)==menuselectedPosition))||(menuselectedPosition>=6&&((position-2)==menuselectedPosition)))
+        {
+            holder.textViewTitle.setTextColor(context.getResources().getColor(R.color.menu_checked_color));
+        }
+        else
         if(position==list.size()-1) {
             if (!UserInfo.isUserLogged(context)) {
                 holder.textViewTitle.setTextColor(context.getResources().getColor(R.color.button_disabled_background));

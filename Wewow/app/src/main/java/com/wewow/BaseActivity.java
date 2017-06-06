@@ -92,6 +92,10 @@ public class BaseActivity extends ActionBarActivity {
     private int[] iconResIcon = {R.drawable.selector_btn_home, R.drawable.selector_btn_all_artists, R.drawable.selector_btn_all_institutes, R.drawable.selector_btn_chat,
             R.drawable.selector_btn_favourite, R.drawable.selector_btn_lover_of_life_subscribed, R.drawable.selector_btn_life_about,
             R.drawable.selector_btn_share, R.drawable.selector_btn_clear_cache, R.drawable.selector_btn_logout};
+
+    private int[] iconResIconSelected = {R.drawable.home_b, R.drawable.lover_of_life_b, R.drawable.life_institute_b, R.drawable.chat_b,
+            R.drawable.my_favorites_b, R.drawable.lover_of_life_subscribed_b, R.drawable.about_b,
+            R.drawable.share_menu_b, R.drawable.clear_cache_b, R.drawable.logout_b};
     private NavigationView mainNavView;
 
     private TextView tvusername, tvuserdesc;
@@ -103,6 +107,7 @@ public class BaseActivity extends ActionBarActivity {
     private ListViewMenuAdapter adapter;
     private List<String> newIcons;
     public static final int REQUEST_CODE_MENU = 11;
+    private int menuselectedPosition=16;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,6 +136,10 @@ public class BaseActivity extends ActionBarActivity {
         setUpToolBar();
 
 
+    }
+    protected  void setMenuselectedPosition(int position)
+    {
+        this.menuselectedPosition=position;
     }
 
     private void getNewFeedsAndArtistInfo(String userId) {
@@ -224,7 +233,15 @@ public class BaseActivity extends ActionBarActivity {
                 map = new HashMap<String, Object>();
             }
 
-            map.put("icon", iconResIcon[i]);
+            if(i==menuselectedPosition)
+            {
+                map.put("icon", iconResIconSelected[i]);
+            }
+            else
+            {
+                map.put("icon", iconResIcon[i]);
+            }
+
             map.put("menuText", planetTitles[i]);
             if (i == 3) {
                 map.put("new", feedbackUpdate);
@@ -248,7 +265,7 @@ public class BaseActivity extends ActionBarActivity {
 //                //ids
 //                new int[]{R.id.imageViewIcon, R.id.textViewMenuItem}
 //        );
-        adapter = new ListViewMenuAdapter(this, listItem, newIcons);
+        adapter = new ListViewMenuAdapter(this, listItem, newIcons,menuselectedPosition);
         drawerList.setAdapter(adapter);
 
 
