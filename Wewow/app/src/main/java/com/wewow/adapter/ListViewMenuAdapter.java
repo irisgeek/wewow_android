@@ -55,7 +55,14 @@ public class ListViewMenuAdapter extends BaseAdapter
         if(convertView == null)
         {
             holder = new ViewHolder();
-            convertView = inflater.inflate(R.layout.list_item_drawer, null);
+            if(position==4||position==6)
+            {
+                convertView = inflater.inflate(R.layout.list_item_drawer_blank, null);
+
+            }
+            else {
+                convertView = inflater.inflate(R.layout.list_item_drawer, null);
+            }
             holder.imageView = (ImageView)convertView.findViewById(R.id.imageViewIcon);
             holder.textViewTitle = (TextView)convertView.findViewById(R.id.textViewMenuItem);
             holder.imageNew=(ImageView)convertView.findViewById(R.id.imageNew);
