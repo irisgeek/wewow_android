@@ -22,7 +22,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.jaeger.library.StatusBarUtil;
 import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 import com.wewow.dto.LabCollection;
 import com.wewow.utils.BlurBuilder;
@@ -43,6 +42,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.wewow.LoginActivity.REQUEST_CODE_LOGIN;
 
 /**
  * Created by suncjs on 2017/4/8.
@@ -100,6 +101,11 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
 
         findViewById(R.id.layout_lifelab_fav).setOnClickListener(this);
 
+        getCollectionInfo(true);
+    }
+
+    private void getCollectionInfo(final boolean isFirst) {
+        progressBar.setVisibility(View.VISIBLE);
         ArrayList<Pair<String, String>> fields = new ArrayList<>();
         fields.add(new Pair<String, String>("collection_id", String.valueOf(this.lc.id)));
         if (UserInfo.isUserLogged(this)) {
@@ -115,35 +121,40 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
                         LabCollectionDetail x = LabCollectionDetail.parse(jobj);
                         if (x != null) {
                             LifeLabItemActivity.this.lcd = x;
+                            if(isFirst){
 //                            LifeLabItemActivity.this.adapter.notifyDataSetChanged();
 //                            LifeLabItemActivity.this.expandAll();
-                            LifeLabItemActivity.this.display();
+                                LifeLabItemActivity.this.display();
 //                            Glide.with(LifeLabItemActivity.this).load(x.collection_image).bitmapTransform(new BlurT(this, 15)).into()
-                            new RemoteImageLoader(LifeLabItemActivity.this, x.collection_image, new RemoteImageLoader.RemoteImageListener() {
-                                @Override
-                                public void onRemoteImageAcquired(Drawable dr) {
-                                    Bitmap bitmap = ((BitmapDrawable) dr).getBitmap();
-                                    Bitmap blurBitMap = BlurBuilder.blur(LifeLabItemActivity.this, bitmap);
-                                    bitmap.recycle();
-                                    LifeLabItemActivity.this.findViewById(R.id.lifelab_item_root).setBackground(new BitmapDrawable(getResources(), blurBitMap));
-                                    LifeLabItemActivity.this.findViewById(R.id.lifelab_item_root).post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            ValueAnimator va = ObjectAnimator.ofFloat(LifeLabItemActivity.this.container, "alpha", 0f, 1f);
-                                            va.setDuration(300);
-                                            va.start();
-                                        }
-                                    });
-                                }
-                            });
+                                new RemoteImageLoader(LifeLabItemActivity.this, x.collection_image, new RemoteImageLoader.RemoteImageListener() {
+                                    @Override
+                                    public void onRemoteImageAcquired(Drawable dr) {
+                                        Bitmap bitmap = ((BitmapDrawable) dr).getBitmap();
+                                        Bitmap blurBitMap = BlurBuilder.blur(LifeLabItemActivity.this, bitmap);
+                                        bitmap.recycle();
+                                        LifeLabItemActivity.this.findViewById(R.id.lifelab_item_root).setBackground(new BitmapDrawable(getResources(), blurBitMap));
+                                        LifeLabItemActivity.this.findViewById(R.id.lifelab_item_root).post(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                ValueAnimator va = ObjectAnimator.ofFloat(LifeLabItemActivity.this.container, "alpha", 0f, 1f);
+                                                va.setDuration(300);
+                                                va.start();
+                                            }
+                                        });
+                                    }
+                                });
+                            }else{ //update like
+                                like.setImageDrawable(getResources().getDrawable(lcd.liked ? R.drawable.marked : R.drawable.mark));
+                                lifelab_fav_count.setText(lcd.liked_count + "");
+                                lifelab_foot_collect.setImageDrawable(getResources().getDrawable(lcd.liked ? R.drawable.marked : R.drawable.mark_white));
+                                lifelab_foot_collect_count.setText(lcd.liked_count + "");
+                            }
                         }
                     }
                 },
                 WebAPIHelper.HttpMethod.GET
         };
         new HttpAsyncTask().execute(params);
-        //this.setArticles();
-        //this.setupPosts();
     }
 
     private void display() {
@@ -172,7 +183,7 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
             String g = this.lcd.getArticleGroup(i);
             this.addArticleView(g, groupParams);
         }
-        this.like.setImageDrawable(this.getResources().getDrawable(this.lcd.liked ? R.drawable.favourite : R.drawable.mark));
+        this.like.setImageDrawable(this.getResources().getDrawable(this.lcd.liked ? R.drawable.marked : R.drawable.mark));
     }
 
     private void addArticleView(String group, LinearLayout.LayoutParams groupParams) {
@@ -297,7 +308,7 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
         lifelab_foot_collect_count.setVisibility(lcd.liked_count == 0 ? View.GONE : View.VISIBLE);
         lifelab_foot_collect_count.setText(lcd.liked_count + "");
         lifelab_foot_collect = (ImageView) view.findViewById(R.id.lifelab_foot_collect);
-        lifelab_foot_collect.setImageResource(lcd.liked ? R.drawable.favourite : R.drawable.mark_white);
+        lifelab_foot_collect.setImageResource(lcd.liked ? R.drawable.marked : R.drawable.mark_white);
         this.container.addView(view);
 
         findViewById(R.id.layout_footer_feedback).setOnClickListener(this);
@@ -310,7 +321,7 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
         switch (v.getId()) {
             case R.id.layout_footer_feedback:
                 if (!UserInfo.isUserLogged(LifeLabItemActivity.this)) {
-                    LoginUtils.startLogin(LifeLabItemActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
+                    LoginUtils.startLogin(LifeLabItemActivity.this, REQUEST_CODE_LOGIN);
                 }else{
                     startActivity(new Intent(LifeLabItemActivity.this, FeedbackActivity.class));
                 }
@@ -331,8 +342,7 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
             case R.id.layout_lifelab_fav:
             case R.id.layout_lifelab_foot_collect:
                 if (!UserInfo.isUserLogged(LifeLabItemActivity.this)) {
-                    Intent logini = new Intent(LifeLabItemActivity.this, LoginActivity.class);
-                    LifeLabItemActivity.this.startActivity(logini);
+                    LoginUtils.startLogin(LifeLabItemActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
                     return;
                 }
                 Drawable.ConstantState notliked = LifeLabItemActivity.this.getResources().getDrawable(R.drawable.mark).getConstantState();
@@ -386,6 +396,14 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
                 new HttpAsyncTask().execute(params);
                 break;
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode != RESULT_CANCELED && requestCode == REQUEST_CODE_LOGIN){
+            getCollectionInfo(false);
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     /*
