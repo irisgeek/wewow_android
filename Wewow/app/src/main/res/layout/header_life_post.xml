@@ -3,16 +3,16 @@
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:orientation="vertical"
+              android:paddingBottom="3dp"
               android:paddingEnd="12dp"
               android:paddingStart="12dp"
-              android:paddingBottom="3dp"
-              android:paddingTop="70dp">
+              android:paddingTop="85dp">
 
     <TextView
         android:id="@+id/lifepost_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         android:gravity="right"
         android:textColor="#ffffff"
         android:textSize="20sp"
@@ -22,8 +22,10 @@
         android:id="@+id/lifepost_desc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
         android:layout_marginTop="15dp"
         android:gravity="right"
+        android:lineSpacingExtra="5dp"
         android:textColor="#ffffff"
         android:textSize="14sp"/>
 

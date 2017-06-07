@@ -11,13 +11,13 @@
         android:background="#ffffff"
         android:orientation="vertical">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="9dp"
             android:layout_marginLeft="12dp"
-            android:layout_marginTop="9dp"
-            android:orientation="horizontal">
+            android:layout_marginRight="12dp"
+            android:layout_marginTop="9dp">
 
             <ImageView
                 android:id="@+id/share_close"
@@ -26,13 +26,13 @@
                 android:src="@drawable/close" />
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
+                android:layout_centerInParent="true"
                 android:text="@string/share_title"
                 android:textColor="#333631"
                 android:textSize="20sp" />
-        </LinearLayout>
+        </RelativeLayout>
 
         <View
             android:layout_width="match_parent"

@@ -38,6 +38,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.wewow.LoginActivity.REQUEST_CODE_LOGIN;
+
 public class LifePostActivity extends AppCompatActivity implements AbsListView.OnScrollListener {
 
     private static final String TAG = "LifePostActivity";
@@ -64,7 +66,13 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
         this.setupUI();
         Intent i = this.getIntent();
         postId = i.getIntExtra(POST_ID, -1);
+
+        getDailyTopic(true);
+    }
+
+    private void getDailyTopic(final boolean isFirst) {
         this.user = UserInfo.isUserLogged(this) ? UserInfo.getCurrentUser(this) : UserInfo.getAnonymouUser();
+        progressBar.setVisibility(View.VISIBLE);
         Object[] params = new Object[]{
                 String.format("%s/daily_topic?user_id=%d&daily_topic_id=%d", CommonUtilities.WS_HOST, LifePostActivity.this.user.getId(), postId),
                 new HttpAsyncTask.TaskDelegate() {
@@ -73,7 +81,7 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
                         progressBar.setVisibility(View.GONE);
                         JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
                         if (jobj != null) {
-                            LifePostActivity.this.onDataLoad(jobj.optJSONObject("result").optJSONObject("data"));
+                            LifePostActivity.this.onDataLoad(jobj.optJSONObject("result").optJSONObject("data"), isFirst);
                         }
                     }
                 },
@@ -102,6 +110,10 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
         this.title = (TextView) header.findViewById(R.id.lifepost_title);
         this.desc = (TextView) header.findViewById(R.id.lifepost_desc);
         listComments.addHeaderView(header);
+        View footer = new View(this);
+        AbsListView.LayoutParams params = new AbsListView.LayoutParams(0, Utils.dipToPixel(this, 80));
+        footer.setLayoutParams(params);
+        listComments.addFooterView(footer);
         listComments.setAdapter(this.adapter);
         listComments.setOnScrollListener(this);
         this.addpost = (ImageView) this.findViewById(R.id.lifepost_newpost);
@@ -137,32 +149,43 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
         });
     }
 
-    private void onDataLoad(JSONObject jobj) {
+    private void onDataLoad(JSONObject jobj, boolean isFirst) {
         if (jobj == null) {
             return;
         }
         try {
-            this.daily_topic = jobj.getJSONObject("daily_topic");
-            this.title.setText(daily_topic.optString("title"));
-            this.desc.setText(daily_topic.optString("content"));
-            new RemoteImageLoader(this, daily_topic.optString("image"), new RemoteImageLoader.RemoteImageListener() {
-                @Override
-                public void onRemoteImageAcquired(Drawable dr) {
-                    BitmapDrawable bdr = (BitmapDrawable) dr;
-                    Bitmap bm = bdr.getBitmap();
-                    Bitmap blurMap = BlurBuilder.blur(LifePostActivity.this, bm);
-                    bm.recycle();
-                    LifePostActivity.this.contentView.setBackground(new BitmapDrawable(LifePostActivity.this.getResources(), blurMap));
-                }
-            });
+            if(isFirst){
+                this.daily_topic = jobj.getJSONObject("daily_topic");
+                this.title.setText(daily_topic.optString("title"));
+                this.desc.setText(daily_topic.optString("content"));
+                new RemoteImageLoader(this, daily_topic.optString("image"), new RemoteImageLoader.RemoteImageListener() {
+                    @Override
+                    public void onRemoteImageAcquired(Drawable dr) {
+                        BitmapDrawable bdr = (BitmapDrawable) dr;
+                        Bitmap bm = bdr.getBitmap();
+                        Bitmap blurMap = BlurBuilder.blur(LifePostActivity.this, bm);
+                        bm.recycle();
+                        LifePostActivity.this.contentView.setBackground(new BitmapDrawable(LifePostActivity.this.getResources(), blurMap));
+                    }
+                });
+            }
             this.comments = jobj.getJSONArray("comments");
             if (this.comments.length() > 0) {
                 this.findViewById(R.id.lifepost_nodata_area).setVisibility(View.GONE);
                 this.listComments.setVisibility(View.VISIBLE);
+                adapter.notifyDataSetChanged();
             }
         } catch (JSONException e) {
             Log.e(TAG, "onDataLoad: fail");
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode != RESULT_CANCELED && requestCode == REQUEST_CODE_LOGIN){
+            getDailyTopic(false);
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private BaseAdapter adapter = new BaseAdapter() {
@@ -246,6 +269,10 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
     private View.OnClickListener likeClick = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
+            if (!UserInfo.isUserLogged(LifePostActivity.this)) {
+                LoginUtils.startLogin(LifePostActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
+                return;
+            }
             final View likearea = (View) view.getTag();
             int id = (Integer) likearea.getTag();
             final ImageView iv = (ImageView) view;
@@ -328,6 +355,10 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
     private View.OnClickListener commentImpeachListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
+            if (!UserInfo.isUserLogged(LifePostActivity.this)) {
+                LoginUtils.startLogin(LifePostActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
+                return;
+            }
             JSONObject jobj = (JSONObject) view.getTag();
             String author = jobj.optString("user");
             Object[] params;
@@ -384,13 +415,13 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
                                 progressBar.setVisibility(View.GONE);
                                 JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
                                 try {
-                                    int code = jobj.getJSONObject("result").getInt("code");
-                                    if (code != 0) {
-                                        throw new Exception(String.format("delete comment returns %d", code));
+                                    JSONObject resultData = jobj.getJSONObject("result");
+                                    if (resultData.optInt("code") != 0) {
+                                        Toast.makeText(LifePostActivity.this, resultData.optString("message"), Toast.LENGTH_LONG).show();
+                                    }else{
+                                        Toast.makeText(LifePostActivity.this, R.string.lifepost_impeach_comment_success, Toast.LENGTH_LONG).show();
                                     }
-                                    Toast.makeText(LifePostActivity.this, R.string.lifepost_impeach_comment_success, Toast.LENGTH_LONG).show();
                                 } catch (Exception e) {
-                                    Log.e(TAG, String.format("impeach comment fail: %s", e.getMessage()));
                                     Toast.makeText(LifePostActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
                                 }
                             }
@@ -417,7 +448,7 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
         View child = view.getChildAt(0);
         if (firstVisibleItem == 0) {
             int top = child.getTop();
-            int height = child.getHeight() - Utils.dipToPixel(this, 59 + 25 - 15);
+            int height = child.getHeight() - Utils.dipToPixel(this, 59 + 25 - 10);
             title.setAlpha(1f - (float) -top * 1.2f / (float) height);
             desc.setAlpha(1f - (float) -top * 1.2f / (float) height);
             if(-top >= height){
