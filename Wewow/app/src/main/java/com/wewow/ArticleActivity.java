@@ -387,6 +387,8 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
                 tv.setText(comment.optString("content", "no content"));
                 tv = (TextView) itemView.findViewById(R.id.article_comment_liked_count);
                 tv.setText(String.format("%d", comment.optInt("liked_count", 0)));
+                ImageView iv = (ImageView) itemView.findViewById(R.id.iv_comment_liked);
+                iv.setImageDrawable(this.getResources().getDrawable(comment.optInt("liked", 0) == 1 ? R.drawable.liked : R.drawable.like));
                 this.discuzContainer.addView(itemView);
             }
         } catch (JSONException e) {
