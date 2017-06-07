@@ -44,6 +44,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -63,10 +64,12 @@ import com.wewow.netTask.ITask;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.DataCleanUtils;
 import com.wewow.utils.FileCacheUtil;
+import com.wewow.utils.HttpAsyncTask;
 import com.wewow.utils.LoginUtils;
 import com.wewow.utils.MessageBoxUtils;
 import com.wewow.utils.ShareUtils;
 import com.wewow.utils.Utils;
+import com.wewow.utils.WebAPIHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -356,6 +359,42 @@ public class BaseActivity extends ActionBarActivity {
 
     }
 
+    private void getShareData() {
+        List<Pair<String, String>> ps = new ArrayList<>();
+        Object[] params = new Object[]{
+                WebAPIHelper.addUrlParams(String.format("%s/share_app", CommonUtilities.WS_HOST), ps),
+                new HttpAsyncTask.TaskDelegate() {
+
+                    @Override
+                    public void taskCompletionResult(byte[] result) {
+                        JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
+                        if (jobj == null) {
+                            Toast.makeText(BaseActivity.this, R.string.networkError, Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        try {
+                            JSONObject r = jobj.getJSONObject("result");
+                            if (r.getInt("code") != 0) {
+                                Toast.makeText(BaseActivity.this, r.optString("message"), Toast.LENGTH_LONG).show();
+                            } else {
+                                String url = r.optJSONObject("data").optString("url");
+                                ShareUtils su = new ShareUtils(BaseActivity.this);
+                                su.setUrl(url);
+                                su.setContent(getResources().getString(R.string.share_text));
+                                Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+                                su.setPicture(bmp);
+                                su.share();
+                            }
+                        } catch (JSONException e) {
+                            Toast.makeText(BaseActivity.this, R.string.serverError, Toast.LENGTH_LONG).show();
+                        }
+                    }
+                },
+                WebAPIHelper.HttpMethod.GET
+        };
+        new HttpAsyncTask().execute(params);
+    }
+
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -424,12 +463,7 @@ public class BaseActivity extends ActionBarActivity {
 
                 case 9:
                     drawerLayout.closeDrawer(GravityCompat.START);
-                    ShareUtils su = new ShareUtils(BaseActivity.this);
-                    su.setUrl(CommonUtilities.SHARE_URL);
-                    su.setContent(getResources().getString(R.string.share_text));
-                    Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
-                    su.setPicture(bmp);
-                    su.share();
+                    getShareData();
                     break;
 
                 case 10:
