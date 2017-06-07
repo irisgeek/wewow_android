@@ -64,10 +64,8 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
         super.onCreate(savedInstanceState);
 //        Utils.setActivityToBeFullscreen(this);
 
-
-        setContentView(R.layout.activity_list_artist_subscribed);
         setMenuselectedPosition(5);
-
+        setContentView(R.layout.activity_list_artist_subscribed);
         StatusBarUtil.setColor(this, getResources().getColor(R.color.white), 50);
         initData();
 

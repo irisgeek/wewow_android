@@ -67,8 +67,9 @@ public class LifeLabActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_lifelab_list);
         setMenuselectedPosition(2);
+        setContentView(R.layout.activity_lifelab_list);
+
         StatusBarUtil.setColor(this, getResources().getColor(R.color.white), 50);
         this.getSupportActionBar().setTitle(R.string.lifelab_title);
         this.setupUI();

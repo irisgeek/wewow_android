@@ -16,6 +16,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -65,8 +66,8 @@ public class ListArtistActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list_artist);
         setMenuselectedPosition(1);
+        setContentView(R.layout.activity_list_artist);
         StatusBarUtil.setColor(this, getResources().getColor(R.color.white), 50);
         initData();
 
@@ -92,6 +93,8 @@ public class ListArtistActivity extends BaseActivity {
             @Override
             public void onRefresh(final MaterialRefreshLayout materialRefreshLayout) {
                 currentPage = 1;
+                LinearLayout layoutBottom=(LinearLayout)findViewById(R.id.layout_bottom);
+                layoutBottom.setVisibility(View.GONE);
                 if (Utils.isNetworkAvailable(ListArtistActivity.this)) {
 
 //                    checkcacheUpdatedOrNot();
@@ -128,7 +131,10 @@ public class ListArtistActivity extends BaseActivity {
                     getArtistListFromServer();
                 } else {
                     adapter.notifyDataSetChanged();
+
                     onfinish();
+                    LinearLayout layoutBottom=(LinearLayout)findViewById(R.id.layout_bottom);
+                    layoutBottom.setVisibility(View.VISIBLE);
                 }
 
 

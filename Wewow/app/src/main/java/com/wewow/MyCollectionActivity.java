@@ -50,8 +50,8 @@ public class MyCollectionActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_my_collection);
         setMenuselectedPosition(4);
+        setContentView(R.layout.activity_my_collection);
         StatusBarUtil.setColor(this, getResources().getColor(R.color.white), 50);
         this.getSupportActionBar().setTitle(R.string.my_collection);
         this.setupUI();

@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -57,6 +58,7 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
     private int postId;
     private JSONObject daily_topic;
     private ListView listComments;
+    private LinearLayout layout_bottom;
     private CircleProgressBar progressBar;
 
     @Override
@@ -106,13 +108,15 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
         this.lifepost_share = (ImageView) this.findViewById(R.id.lifepost_share);
         this.lifepost_title = (TextView) this.findViewById(R.id.tv_lifepost_title);
         listComments = (ListView) this.findViewById(R.id.lifepost_comments);
+        layout_bottom=(LinearLayout)this.findViewById(R.id.layout_bottom);
         header = View.inflate(this, R.layout.header_life_post, null);
         this.title = (TextView) header.findViewById(R.id.lifepost_title);
         this.desc = (TextView) header.findViewById(R.id.lifepost_desc);
         listComments.addHeaderView(header);
         View footer = new View(this);
-        AbsListView.LayoutParams params = new AbsListView.LayoutParams(0, Utils.dipToPixel(this, 80));
-        footer.setLayoutParams(params);
+//        AbsListView.LayoutParams params = new AbsListView.LayoutParams(0, Utils.dipToPixel(this, 80));
+//        footer.setLayoutParams(params);
+        footer=View.inflate(this,R.layout.layout_bottom_life_post,null);
         listComments.addFooterView(footer);
         listComments.setAdapter(this.adapter);
         listComments.setOnScrollListener(this);
@@ -173,6 +177,7 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
             if (this.comments.length() > 0) {
                 this.findViewById(R.id.lifepost_nodata_area).setVisibility(View.GONE);
                 this.listComments.setVisibility(View.VISIBLE);
+                this.layout_bottom.setVisibility(View.VISIBLE);
                 adapter.notifyDataSetChanged();
             }
         } catch (JSONException e) {

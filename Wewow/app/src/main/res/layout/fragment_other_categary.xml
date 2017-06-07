@@ -6,10 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -75,6 +71,7 @@
 
             <!--android:divider="@android:color/transparent"-->
             <!--android:dividerHeight="12dp" />-->
+
         <com.wewow.view.RecyclerViewUpRefresh xmlns:android="http://schemas.android.com/apk/res/android"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             android:id="@+id/recyclerview"
@@ -85,5 +82,4 @@
 
     </LinearLayout>
 
-</LinearLayout>
     </android.support.v4.widget.NestedScrollView>
