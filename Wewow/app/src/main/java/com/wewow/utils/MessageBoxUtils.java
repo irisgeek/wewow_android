@@ -29,6 +29,7 @@ public class MessageBoxUtils {
         ImageView iv = (ImageView) v.findViewById(R.id.hint_image);
         iv.setImageDrawable(cxt.getResources().getDrawable(state ? R.drawable.success : R.drawable.fail));
         final PopupWindow pw = new PopupWindow(v, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        pw.setAnimationStyle(R.style.message_box_anim_style);
         //pw.setContentView(v);
         View root = ((Activity) cxt).findViewById(android.R.id.content);
         pw.showAtLocation(root, Gravity.CENTER, 0, 0);
@@ -64,6 +65,7 @@ public class MessageBoxUtils {
             tv.setText(texts[1]);
         }
         final PopupWindow pw = new PopupWindow(v, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        pw.setAnimationStyle(R.style.message_box_anim_style);
         int max = cmds.length > 2 ? 2 : cmds.length;
         Resources rcs = cxt.getResources();
         for (int i = 0; i < max; i++) {

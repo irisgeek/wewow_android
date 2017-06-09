@@ -36,6 +36,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import static com.wewow.LoginActivity.REQUEST_CODE_LOGIN;
@@ -52,7 +53,7 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
     private View layout_title, lifepost_title_shadow;
     private ImageView lifepost_back, lifepost_share;
     private TextView lifepost_title;
-    private JSONArray comments = new JSONArray();
+    private LinkedList<JSONObject> comments = new LinkedList<>();
     private UserInfo user;
     private int postId;
     private JSONObject daily_topic;
@@ -170,8 +171,11 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
                     }
                 });
             }
-            this.comments = jobj.getJSONArray("comments");
-            if (this.comments.length() > 0) {
+            JSONArray jsonArray = jobj.getJSONArray("comments");
+            if (jsonArray.length() > 0) {
+                for (int i = 0; i < jsonArray.length(); i++){
+                    comments.add((JSONObject) jsonArray.get(i));
+                }
                 this.findViewById(R.id.lifepost_nodata_area).setVisibility(View.GONE);
                 this.listComments.setVisibility(View.VISIBLE);
                 adapter.notifyDataSetChanged();
@@ -185,8 +189,14 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode != RESULT_CANCELED && requestCode == REQUEST_CODE_LOGIN){
             getDailyTopic(false);
-        }else if(resultCode == RESULT_OK && requestCode == ADDPOST){
-            getDailyTopic(false);
+        }else if(resultCode == RESULT_OK && requestCode == ADDPOST && data != null){
+            try {
+                JSONObject jsonObject = new JSONObject(data.getStringExtra("new_comment"));
+                comments.addFirst(jsonObject);
+                adapter.notifyDataSetChanged();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -195,16 +205,12 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
 
         @Override
         public int getCount() {
-            return comments == null ? 0 : comments.length();
+            return comments == null ? 0 : comments.size();
         }
 
         @Override
         public Object getItem(int i) {
-            try {
-                return LifePostActivity.this.comments.get(i);
-            } catch (JSONException x) {
-                return null;
-            }
+            return LifePostActivity.this.comments.get(i);
         }
 
         @Override
@@ -385,8 +391,8 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
                                     if (code != 0) {
                                         throw new Exception(String.format("delete comment returns %d", code));
                                     }
-                                    for (int i = 0; i < LifePostActivity.this.comments.length(); i++) {
-                                        if (id == LifePostActivity.this.comments.getJSONObject(i).optInt("id")) {
+                                    for (int i = 0; i < LifePostActivity.this.comments.size(); i++) {
+                                        if (id == LifePostActivity.this.comments.get(i).optInt("id")) {
                                             LifePostActivity.this.comments.remove(i);
                                             LifePostActivity.this.adapter.notifyDataSetChanged();
                                             break;
