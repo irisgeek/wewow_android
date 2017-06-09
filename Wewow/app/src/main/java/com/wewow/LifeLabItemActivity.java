@@ -83,7 +83,7 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
 //        new RemoteImageLoader(this, this.lc.image, new RemoteImageLoader.RemoteImageListener() {
 //            @Override
 //            public void onRemoteImageAcquired(Drawable dr) {
-//                LifeLabItemActivity.this.findViewById(R.id.lifelab_item_root).setBackground(dr);
+//                LifeLabItemActivity.this.findViewById(R.id.lifelab_item_bg).setBackground(dr);
 //            }
 //        });
         TextView title = (TextView) this.findViewById(R.id.lifelab_item_title);
@@ -132,8 +132,8 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
                                         Bitmap bitmap = ((BitmapDrawable) dr).getBitmap();
                                         Bitmap blurBitMap = BlurBuilder.blur(LifeLabItemActivity.this, bitmap);
                                         bitmap.recycle();
-                                        LifeLabItemActivity.this.findViewById(R.id.lifelab_item_root).setBackground(new BitmapDrawable(getResources(), blurBitMap));
-                                        LifeLabItemActivity.this.findViewById(R.id.lifelab_item_root).post(new Runnable() {
+                                        LifeLabItemActivity.this.findViewById(R.id.lifelab_item_bg).setBackground(new BitmapDrawable(getResources(), blurBitMap));
+                                        LifeLabItemActivity.this.findViewById(R.id.lifelab_item_bg).post(new Runnable() {
                                             @Override
                                             public void run() {
                                                 ValueAnimator va = ObjectAnimator.ofFloat(LifeLabItemActivity.this.container, "alpha", 0f, 1f);
