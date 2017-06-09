@@ -95,6 +95,7 @@ public class AddPostActivity extends AppCompatActivity {
                                     }
                                     Toast.makeText(AddPostActivity.this, jobj.getJSONObject("result").optString("message"), Toast.LENGTH_LONG).show();
                                     Log.d(TAG, new String(result));
+                                    setResult(RESULT_OK);
                                     AddPostActivity.this.finish();
                                 } catch (Exception e) {
                                     Log.e(TAG, String.format("save post error: %s: ", e.getMessage()));
@@ -140,7 +141,7 @@ public class AddPostActivity extends AppCompatActivity {
         String max = this.getString(R.string.addpost_counter_max);
         int m = Integer.parseInt(max);
         SpannableString cn = new SpannableString(String.valueOf(l));
-        cn.setSpan(new ForegroundColorSpan(l <= m ? Color.GREEN : Color.RED), 0, cn.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        cn.setSpan(new ForegroundColorSpan(l <= m ? Color.parseColor("#69b076") : Color.RED), 0, cn.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
         this.counter.setText(cn);
     }
 

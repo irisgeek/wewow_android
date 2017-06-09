@@ -60,6 +60,7 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
     private ListView listComments;
     private LinearLayout layout_bottom;
     private CircleProgressBar progressBar;
+    private final int ADDPOST = 101;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,7 +134,7 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
                         i.putExtra(AddPostActivity.BACK_GROUND, Utils.getBitmapBytes(bdr.getBitmap()));
                     }
                     i.putExtra(AddPostActivity.TOPIC_ID, LifePostActivity.this.postId);
-                    LifePostActivity.this.startActivity(i);
+                    LifePostActivity.this.startActivityForResult(i, ADDPOST);
                 }
             }
         });
@@ -188,6 +189,8 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode != RESULT_CANCELED && requestCode == REQUEST_CODE_LOGIN){
+            getDailyTopic(false);
+        }else if(resultCode == RESULT_OK && requestCode == ADDPOST){
             getDailyTopic(false);
         }
         super.onActivityResult(requestCode, resultCode, data);
