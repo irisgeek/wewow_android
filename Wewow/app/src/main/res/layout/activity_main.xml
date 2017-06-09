@@ -204,6 +204,22 @@
         android:layout_height="match_parent"
         android:background="#9f000000"
         android:visibility="gone">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="52dp">
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:id="@+id/layoutMenuCover"
+                android:background="@color/transparent"/>
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"
+                android:id="@+id/layoutSearchCover"
+                android:background="@color/transparent"/>
+        </RelativeLayout>
+
 
     </RelativeLayout>
 
