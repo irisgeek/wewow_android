@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
@@ -25,6 +26,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -105,6 +107,7 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
     private TextView tvVerifyCountdown;
     private HuaweiApiClient huaweiClient = null;
     private SsoHandler ssohandler;
+    private LinearLayout layoutHuawei;
 
     private CountDownTimer verifyTimer = new CountDownTimer(30 * 1000, 1000) {
         @Override
@@ -146,6 +149,16 @@ public class LoginActivity extends ActionBarActivity implements OnConnectionFail
      * register event handlers
      */
     private void initView() {
+        this.layoutHuawei=(LinearLayout)this.findViewById(R.id.login_huawei_area);
+        String brand= Build.BRAND;
+        if(brand.toUpperCase().equals(CommonUtilities.BRAND_NAME_HUAWEI))
+        {
+            this.layoutHuawei.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            this.layoutHuawei.setVisibility(View.GONE);
+        }
         this.edtPhoneNo = (EditText) this.findViewById(R.id.login_phone_number);
         this.startView = this.findViewById(R.id.login_mobile_start_view);
         this.verifyView = this.findViewById(R.id.login_mobile_verify_view);

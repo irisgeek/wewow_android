@@ -289,7 +289,16 @@ public class BaseActivity extends ActionBarActivity {
 
             this.tvuserdesc.setText(UserInfo.getCurrentUser(this).getDesc());
             imageViewSetting.setVisibility(View.VISIBLE);
-            imageViewUserCover.setImageResource(bgRes[Integer.parseInt(UserInfo.getCurrentUser(this).getBackground_id()) - 1]);
+//            imageViewUserCover.setImageResource(bgRes[Integer.parseInt(UserInfo.getCurrentUser(this).getBackground_id()) - 1]);
+            int resId;
+            try {
+                resId = bgRes[Integer.parseInt(UserInfo.getCurrentUser(this).getBackground_id())  - 1];
+            } catch (NumberFormatException e) {
+                resId = bgRes[0];
+            } catch (IndexOutOfBoundsException e) {
+                resId = bgRes[0];
+            }
+            imageViewUserCover.setImageResource(resId);
         }
 
 
