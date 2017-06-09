@@ -424,6 +424,14 @@ public class homeFragment extends Fragment {
                         setUpAds(ads, view);
                     } else {
                         requestSentCount--;
+                        if (requestSentCount == 0 ) {
+                            progressBar.setVisibility(View.GONE);
+                            LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.layoutHome);
+                            linearLayout.setVisibility(View.VISIBLE);
+
+                            startAnimation();
+
+                        }
                     }
 
                 } catch (IOException e) {
@@ -631,6 +639,14 @@ public class homeFragment extends Fragment {
                     }
                     else{
                         requestSentCount--;
+                        if (requestSentCount == 0) {
+                            progressBar.setVisibility(View.GONE);
+                            LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.layoutHome);
+                            linearLayout.setVisibility(View.VISIBLE);
+
+                            startAnimation();
+
+                        }
                     }
 
                 } catch (IOException e) {

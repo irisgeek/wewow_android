@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v4.app.NotificationCompat;
@@ -79,7 +80,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                     default:
                         break;
                 }
-
+                long[] pattern = { 500, 500, 500, 500, 500, 500, 500, 500, 500 };
                 PendingIntent pendingIntent =
                         PendingIntent.getActivity(AVOSCloud.applicationContext, 0, resultIntent,
                                 PendingIntent.FLAG_UPDATE_CURRENT);
@@ -89,7 +90,8 @@ public class NotificationReceiver extends BroadcastReceiver {
                                 .setContentTitle(
                                         title)
                                 .setContentText(message)
-                                .setTicker(message);
+                                .setTicker(message).setLights(Color.BLUE, 500, 500).setVibrate(pattern)
+                        .setAutoCancel(true);
                 mBuilder.setContentIntent(pendingIntent);
                 mBuilder.setAutoCancel(true);
 
