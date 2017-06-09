@@ -140,13 +140,17 @@
         <!--</intent-filter>-->
         <!--</receiver>-->
 
-        <activity android:name=".ArticleActivity" />
+        <activity android:name=".ArticleActivity"
+            android:screenOrientation="portrait"
+            />
         <activity
             android:name=".LifePostActivity"
             android:label="@string/title_activity_life_post"
+            android:screenOrientation="portrait"
             android:theme="@style/TranslucentStatusTheme" />
         <activity
             android:name=".ShareActivity"
+            android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen">
             <intent-filter>
                 <action android:name="com.sina.weibo.sdk.action.ACTION_SDK_REQ_ACTIVITY" />
@@ -157,19 +161,23 @@
         <activity
             android:name=".UserInfoActivity"
             android:label="@string/title_activity_user_info"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".ShowImageActivity"
             android:label="@string/title_activity_show_image"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
             android:name=".MyCollectionActivity"
             android:label="@string/title_activity_my_collection"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
             android:name=".AddPostActivity"
             android:label="@string/title_activity_add_post"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"></activity>
         <activity
             android:name=".AllCommentActivity"
