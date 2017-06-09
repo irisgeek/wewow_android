@@ -9,12 +9,14 @@ import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -62,6 +64,8 @@ public class ListArtistActivity extends BaseActivity {
     private boolean isHeaderAdded = false;
     private ArrayList<String> followStatus;
     private int totalPages = 1;
+    private LinearLayout footerParent;
+    private View footer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +81,15 @@ public class ListArtistActivity extends BaseActivity {
     private void initData() {
 
         listView = (ListView) findViewById(R.id.listViewArtists);
+        footer=View.inflate(this,R.layout.layout_bottom,null);
+        footerParent = new LinearLayout(this);
+        footerParent.setGravity(Gravity.CENTER_HORIZONTAL);
+        footerParent.setOrientation(LinearLayout.VERTICAL);
+        footerParent.addView(footer);
+
+        listView.addFooterView(footerParent);
+
+        footer.setVisibility(View.GONE);
         followStatus = new ArrayList<String>();
         listItem = new ArrayList<HashMap<String, Object>>();
         allArtists = new ArrayList<Artist>();
@@ -93,8 +106,7 @@ public class ListArtistActivity extends BaseActivity {
             @Override
             public void onRefresh(final MaterialRefreshLayout materialRefreshLayout) {
                 currentPage = 1;
-                LinearLayout layoutBottom=(LinearLayout)findViewById(R.id.layout_bottom);
-                layoutBottom.setVisibility(View.GONE);
+                footer.setVisibility(View.GONE);
                 if (Utils.isNetworkAvailable(ListArtistActivity.this)) {
 
 //                    checkcacheUpdatedOrNot();
@@ -133,8 +145,7 @@ public class ListArtistActivity extends BaseActivity {
                     adapter.notifyDataSetChanged();
 
                     onfinish();
-                    LinearLayout layoutBottom=(LinearLayout)findViewById(R.id.layout_bottom);
-                    layoutBottom.setVisibility(View.VISIBLE);
+                    footer.setVisibility(View.VISIBLE);
                 }
 
 

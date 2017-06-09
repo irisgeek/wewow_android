@@ -9,6 +9,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -58,6 +60,8 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
     private ArrayList<String> read;
     private MaterialRefreshLayout refreshLayout;
     private int totalPages = 1;
+    private View footer;
+    private LinearLayout footerParent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +81,15 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
     private void initData() {
 
         listView = (ListView) findViewById(R.id.listViewArtists);
+        footer=View.inflate(this,R.layout.layout_bottom,null);
+        footerParent = new LinearLayout(this);
+        footerParent.setGravity(Gravity.CENTER_HORIZONTAL);
+        footerParent.setOrientation(LinearLayout.VERTICAL);
+        footerParent.addView(footer);
+
+        listView.addFooterView(footerParent);
+
+        footer.setVisibility(View.GONE);
 
         listItem = new ArrayList<HashMap<String, Object>>();
         read=new ArrayList<String>();
@@ -92,6 +105,7 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
         refreshLayout.setMaterialRefreshListener(new MaterialRefreshListener() {
             @Override
             public void onRefresh(final MaterialRefreshLayout materialRefreshLayout) {
+                footer.setVisibility(View.GONE);
                 currentPage = 1;
                 if (Utils.isNetworkAvailable(ListSubscribedArtistActivity.this)) {
 
@@ -129,6 +143,7 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
                     getArtistListFromServer();
                 } else {
                     adapter.notifyDataSetChanged();
+                    footer.setVisibility(View.VISIBLE);
                     onfinish();
                 }
 
@@ -493,7 +508,6 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
 
     @Override
     public void onRefresh() {
-
         boolean isLastPageLoaded = false;
         try {
             isLastPageLoaded = isLastPageLoaded();

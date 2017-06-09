@@ -341,11 +341,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
                     if (UserInfo.isUserLogged(DetailArtistActivity.this)) {
 
                         postReadToServer(artist.getArtist().getId(), Integer.parseInt(followed.equals("1") ? "0" : "1"));
-                        if (followed.equals("1")) {
-                            imageViewSubscribe.setImageResource(R.drawable.subscribe);
-                        } else {
-                            imageViewSubscribe.setImageResource(R.drawable.subscribed);
-                        }
+
                     } else {
                         LoginUtils.startLogin(DetailArtistActivity.this, LoginActivity.REQUEST_CODE_ARTIST_DETAIL);
                     }
@@ -445,10 +441,23 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
                     JSONObject responseObject = new JSONObject(realData);
 
                     if (!responseObject.getJSONObject("result").getString("code").equals("0")) {
-                        Toast.makeText(DetailArtistActivity.this, responseObject.getJSONObject("result").getString("message").toString(), Toast.LENGTH_SHORT).show();
+                        if(responseObject.getJSONObject("result").getString("code").equals("403"))
+                        {
+                            updateUIforLogout();
+                            LoginUtils.startLogin(DetailArtistActivity.this, LoginActivity.REQUEST_CODE_ARTIST_DETAIL);
+
+                        }
+                        else {
+                            Toast.makeText(DetailArtistActivity.this, responseObject.getJSONObject("result").getString("message").toString(), Toast.LENGTH_SHORT).show();
+                        }
 
 
                     } else {
+                        if (followed.equals("1")) {
+                            imageViewSubscribe.setImageResource(R.drawable.subscribe);
+                        } else {
+                            imageViewSubscribe.setImageResource(R.drawable.subscribed);
+                        }
                         updateArtistList = true;
                         if (read == 0) {
                             followed = "0";
@@ -456,6 +465,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
                         } else {
                             followed = "1";
                         }
+
                         MessageBoxUtils.messageBoxWithNoButton(DetailArtistActivity.this, true, read == 0 ? getResources()
                                 .getString(R.string.cancel_follow_artist_success) : getResources()
                                 .getString(R.string.follow_artist_success), 2500);
@@ -758,11 +768,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == LoginActivity.REQUEST_CODE_ARTIST_DETAIL&&resultCode!=LoginActivity.RESULT_CANCELED) {
             postReadToServer(artistCurrent.getArtist().getId(), Integer.parseInt(followed.equals("1") ? "0" : "1"));
-            if (followed.equals("1")) {
-                imageViewSubscribe.setImageResource(R.drawable.subscribe);
-            } else {
-                imageViewSubscribe.setImageResource(R.drawable.subscribed);
-            }
+
 
         }
     }

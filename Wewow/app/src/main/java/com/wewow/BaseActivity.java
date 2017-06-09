@@ -524,11 +524,8 @@ public class BaseActivity extends ActionBarActivity {
                                             @Override
                                             public void onClick(Object tag) {
                                                 UserInfo.logout(BaseActivity.this);
-                                                adapter.notifyDataSetChanged();
-                                                BaseActivity.this.tvusername.setText(R.string.login_gologin);
-                                                BaseActivity.this.tvuserdesc.setText(R.string.login_to_see_more);
-                                                imageViewSetting.setVisibility(View.GONE);
-                                                imageViewUserCover.setImageResource(bgRes[1]);
+
+                                                updateUIforLogout();
 
                                             }
                                         },
@@ -556,6 +553,14 @@ public class BaseActivity extends ActionBarActivity {
                     break;
             }
         }
+    }
+
+    protected void updateUIforLogout() {
+        adapter.notifyDataSetChanged();
+        BaseActivity.this.tvusername.setText(R.string.login_gologin);
+        BaseActivity.this.tvuserdesc.setText(R.string.login_to_see_more);
+        imageViewSetting.setVisibility(View.GONE);
+        imageViewUserCover.setImageResource(bgRes[1]);
     }
 
     private void showCacheClearedToast() {
@@ -623,6 +628,8 @@ public class BaseActivity extends ActionBarActivity {
         this.adapter.notifyDataSetChanged();
 
     }
+
+
 
 
 }

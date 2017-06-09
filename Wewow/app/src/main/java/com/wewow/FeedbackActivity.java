@@ -53,6 +53,7 @@ import com.wewow.netTask.ITask;
 import com.wewow.utils.BitmapUtils;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.FileCacheUtil;
+import com.wewow.utils.LoginUtils;
 import com.wewow.utils.SettingUtils;
 import com.wewow.utils.Utils;
 
@@ -519,7 +520,16 @@ public class FeedbackActivity extends AppCompatActivity implements IPickResult {
                         String code = result.get("code").toString();
                         String message = result.get("message").toString();
                         if (!code.equals("0")) {
-                            Toast.makeText(FeedbackActivity.this, message, Toast.LENGTH_SHORT).show();
+                            if(code.equals("403"))
+                            {
+                                LoginUtils.startLogin(FeedbackActivity.this, 0);
+
+                            }
+                            else
+                            {
+                                Toast.makeText(FeedbackActivity.this, message, Toast.LENGTH_SHORT).show();
+                            }
+
 
 
                         } else {
@@ -579,7 +589,16 @@ public class FeedbackActivity extends AppCompatActivity implements IPickResult {
                     String code = result.get("code").toString();
                     String message = result.get("message").toString();
                     if (!code.equals("0")) {
-                        Toast.makeText(FeedbackActivity.this, message, Toast.LENGTH_SHORT).show();
+                        if(code.equals("403"))
+                        {
+                            LoginUtils.startLogin(FeedbackActivity.this, 0);
+
+                        }
+                        else
+                        {
+                            Toast.makeText(FeedbackActivity.this, message, Toast.LENGTH_SHORT).show();
+                        }
+
 
 
                     } else {
