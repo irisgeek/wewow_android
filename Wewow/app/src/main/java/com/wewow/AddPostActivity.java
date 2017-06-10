@@ -1,19 +1,15 @@
 package com.wewow;
 
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AlertDialog;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
@@ -23,13 +19,11 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.sina.weibo.sdk.constant.WBPageConstants;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
 import com.wewow.utils.LoginUtils;
-import com.wewow.utils.PhotoUtils;
+import com.wewow.utils.MessageBoxUtils;
 import com.wewow.utils.ProgressDialogUtil;
 import com.wewow.utils.WebAPIHelper;
 
@@ -93,10 +87,16 @@ public class AddPostActivity extends AppCompatActivity {
                                     if (code != 0) {
                                         throw new Exception(String.format("add_comment returns %d", code));
                                     }
-                                    Toast.makeText(AddPostActivity.this, jobj.getJSONObject("result").optString("message"), Toast.LENGTH_LONG).show();
+                                    MessageBoxUtils.messageBoxWithNoButton(AddPostActivity.this, true, jobj.getJSONObject("result").optString("message"), 2500);
                                     Log.d(TAG, new String(result));
-                                    setResult(RESULT_OK);
-                                    AddPostActivity.this.finish();
+                                    Intent data = new Intent();
+                                    data.putExtra("new_comment", jobj.getJSONObject("result").getJSONObject("data").getJSONObject("new_comment").toString());
+                                    setResult(RESULT_OK, data);
+                                    new Handler().postDelayed(new Runnable() {
+                                        public void run() {
+                                            AddPostActivity.this.finish();
+                                        }
+                                    }, 2800);
                                 } catch (Exception e) {
                                     Log.e(TAG, String.format("save post error: %s: ", e.getMessage()));
                                 }
@@ -162,21 +162,31 @@ public class AddPostActivity extends AppCompatActivity {
             this.finish();
             return;
         }
-        new AlertDialog.Builder(this)
-                .setTitle(R.string.addpost_quit_prompt)
-                .setNegativeButton(R.string.prompt_denied, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                })
-                .setPositiveButton(R.string.prompt_comfirmd, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                        AddPostActivity.this.finish();
-                    }
-                })
-                .show();
+        MessageBoxUtils.messageBoxWithButtons(AddPostActivity.this, getString(R.string.addpost_quit_prompt),
+                new String[]{getString(R.string.confirm), getString(R.string.cancel)},
+                new Object[]{0, 1},
+                new MessageBoxUtils.MsgboxButtonListener[]{
+                        new MessageBoxUtils.MsgboxButtonListener() {
+                            @Override
+                            public boolean shouldCloseMessageBox(Object tag) {
+                                return true;
+                            }
+
+                            @Override
+                            public void onClick(Object tag) {
+                                AddPostActivity.this.finish();
+                            }
+                        },
+                        new MessageBoxUtils.MsgboxButtonListener() {
+                            @Override
+                            public boolean shouldCloseMessageBox(Object tag) {
+                                return true;
+                            }
+
+                            @Override
+                            public void onClick(Object tag) {
+                            }
+                        }
+                });
     }
 }

@@ -42,4 +42,9 @@
         <item name="colorControlActivated">#00ffffff</item>
     </style>
 
+    <style name="message_box_anim_style">
+        <item name="android:windowEnterAnimation">@anim/message_box_show</item>
+        <item name="android:windowExitAnimation">@anim/message_box_dismiss</item>
+    </style>
+
 </resources>

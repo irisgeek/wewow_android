@@ -247,17 +247,16 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
                                     if (like == 1) {
                                         likedCount += 1;
                                         s = ArticleActivity.this.getString(R.string.fav_succeed);
+                                        MessageBoxUtils.messageBoxWithNoButton(ArticleActivity.this, true, s, 2500);
                                     } else {
                                         likedCount -= 1;
-                                        s = ArticleActivity.this.getString(R.string.unfav_succeed);
                                     }
                                     article_fav_count.setText(likedCount + "");
-                                    MessageBoxUtils.messageBoxWithNoButton(ArticleActivity.this, true, s, 2500);
                                 } catch (Exception e) {
                                     Log.e(TAG, String.format("favourite fail: %s", e.getMessage()));
                                     //Toast.makeText(ArticleActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
                                     String s = ArticleActivity.this.getString(like == 1 ? R.string.fav_fail : R.string.unfav_fail);
-                                    MessageBoxUtils.messageBoxWithNoButton(ArticleActivity.this, true, s, 2500);
+                                    MessageBoxUtils.messageBoxWithNoButton(ArticleActivity.this, false, s, 2500);
                                 }
                             }
                         },
