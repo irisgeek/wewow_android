@@ -152,6 +152,7 @@ public class AllCommentActivity extends Activity implements View.OnClickListener
                             if (r.getInt("code") != 0) {
                                 Toast.makeText(context, R.string.serverError, Toast.LENGTH_LONG).show();
                             } else {
+                                dataChange = true;
                                 JSONObject data = r.getJSONObject("data");
                                 Comment comment = new Gson().fromJson(data.optString("new_comment"), Comment.class);
                                 commentList.add(comment);
@@ -159,7 +160,6 @@ public class AllCommentActivity extends Activity implements View.OnClickListener
                                 editTextContent.getText().clear();
                                 hideSoftInput(editTextContent);
                                 view_empty.setVisibility(View.GONE);
-                                dataChange = true;
                             }
                         } catch (JSONException e) {
                             Toast.makeText(context, R.string.serverError, Toast.LENGTH_LONG).show();
@@ -198,6 +198,7 @@ public class AllCommentActivity extends Activity implements View.OnClickListener
                             if (r.getInt("code") != 0) {
                                 Toast.makeText(context, R.string.serverError, Toast.LENGTH_LONG).show();
                             } else {
+                                dataChange = true;
                                 comment.setLiked(comment.getLiked() == 1 ? 0 : 1);
                                 if(comment.getLiked() == 1){
                                     comment.setLiked_count(comment.getLiked_count() + 1);
@@ -243,6 +244,9 @@ public class AllCommentActivity extends Activity implements View.OnClickListener
     private void onExit() {
         String s = editTextContent.getText().toString().trim();
         if (s.isEmpty()) {
+            if(dataChange){
+                setResult(RESULT_OK);
+            }
             this.finish();
             return;
         }

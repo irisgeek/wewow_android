@@ -64,6 +64,7 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
     private ArrayList<String> pictures = new ArrayList<>();
     private int id;
     private int likedCount;
+    private final int AllCOMMENT = 101;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,7 +116,7 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
                 } else {
                     Intent intent = new Intent(ArticleActivity.this, AllCommentActivity.class);
                     intent.putExtra("articleId", id + "");
-                    startActivity(intent);
+                    startActivityForResult(intent, AllCOMMENT);
                 }
                 break;
         }
@@ -465,6 +466,8 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode != RESULT_CANCELED && requestCode == REQUEST_CODE_LOGIN){
+            getArticleDetail(false);
+        }else if(resultCode == RESULT_OK && requestCode == AllCOMMENT){
             getArticleDetail(false);
         }
         super.onActivityResult(requestCode, resultCode, data);
