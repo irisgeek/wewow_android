@@ -41,8 +41,11 @@ import java.io.ByteArrayOutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.wewow.LoginActivity.REQUEST_CODE_LOGIN;
 
 
 public class ArticleActivity extends AppCompatActivity implements View.OnClickListener {
@@ -71,6 +74,11 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
         this.setupUI();
         Intent i = this.getIntent();
         this.id = i.getIntExtra(ARTICLE_ID, -1);
+
+        getArticleDetail(true);
+    }
+
+    private void getArticleDetail(final boolean isFirst) {
         ArrayList<Pair<String, String>> fields = new ArrayList<>();
         fields.add(new Pair<String, String>("article_id", String.valueOf(this.id)));
         if (UserInfo.isUserLogged(this)) {
@@ -85,7 +93,7 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
                         JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
                         if (jobj != null) {
                             try {
-                                ArticleActivity.this.fillContent(jobj.getJSONObject("result").getJSONObject("data"));
+                                ArticleActivity.this.fillContent(jobj.getJSONObject("result").getJSONObject("data"), isFirst);
                             } catch (JSONException e) {
                                 Log.e(TAG, "JSON error");
                             }
@@ -351,20 +359,68 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
         findViewById(R.id.tv_more_discuss).setOnClickListener(this);
     }
 
-    private void fillContent(JSONObject article) {
-        this.data = article;
-        this.title.setText(article.optString("title", "No title"));
+    private void postCommentLike(final ImageView iv, final TextView tv, final JSONObject comment){
+        UserInfo ui = UserInfo.getCurrentUser(this);
+        List<Pair<String, String>> fields = new ArrayList<>();
+        fields.add(new Pair<>("user_id", ui.getId() + ""));
+        fields.add(new Pair<>("token", ui.getToken()));
+        fields.add(new Pair<>("item_type", "comment"));
+        fields.add(new Pair<>("item_id", comment.optString("id")));
+        fields.add(new Pair<>("like", comment.optInt("liked", 0) == 1 ? "0" : "1"));
+        List<Pair<String, String>> headers = new ArrayList<>();
+        headers.add(new Pair<>("Content-Type", "application/x-www-form-urlencoded"));
+        Object[] params = new Object[]{
+                String.format("%s/like", CommonUtilities.WS_HOST),
+                new HttpAsyncTask.TaskDelegate() {
+                    @Override
+                    public void taskCompletionResult(byte[] result) {
+                        JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
+                        if (jobj == null) {
+                            Toast.makeText(ArticleActivity.this, R.string.networkError, Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        try {
+                            JSONObject r = jobj.getJSONObject("result");
+                            if (r.getInt("code") != 0) {
+                                Toast.makeText(ArticleActivity.this, R.string.serverError, Toast.LENGTH_LONG).show();
+                            } else {
+                                comment.put("liked", comment.optInt("liked", 0) == 1 ? 0 : 1);
+                                if(comment.optInt("liked", 0) == 1){
+                                    comment.put("liked_count", comment.optInt("liked_count", 0) + 1);
+                                } else{
+                                    comment.put("liked_count", comment.optInt("liked_count", 0) - 1);
+                                }
+                                iv.setImageResource(comment.optInt("liked", 0) == 1 ? R.drawable.liked : R.drawable.like);
+                                tv.setText(comment.optInt("liked_count", 0) + "");
+                            }
+                        } catch (JSONException e) {
+                            Toast.makeText(ArticleActivity.this, R.string.serverError, Toast.LENGTH_LONG).show();
+                        }
+                    }
+                },
+                WebAPIHelper.HttpMethod.POST,
+                WebAPIHelper.buildHttpQuery(fields).getBytes(),
+                headers
+        };
+        new HttpAsyncTask().execute(params);
+    }
+
+    private void fillContent(JSONObject article, boolean isFirst) {
+        if(isFirst){
+            this.data = article;
+            this.title.setText(article.optString("title", "No title"));
+            this.content.loadUrl(article.optString("content", "No content"));
+            new RemoteImageLoader(this, article.optString("image_750_1112"), new RemoteImageLoader.RemoteImageListener() {
+                @Override
+                public void onRemoteImageAcquired(Drawable dr) {
+                    ArticleActivity.this.logo.setImageDrawable(dr);
+                }
+            });
+        }
         this.like.setImageDrawable(this.getResources().getDrawable(article.optInt("liked", 0) == 1 ? R.drawable.marked_b : R.drawable.mark_b));
         likedCount = article.optInt("liked_count");
         article_fav_count.setText(likedCount + "");
         article_fav_count.setVisibility(likedCount == 0 ? View.GONE : View.VISIBLE);
-        this.content.loadUrl(article.optString("content", "No content"));
-        new RemoteImageLoader(this, article.optString("image_750_1112"), new RemoteImageLoader.RemoteImageListener() {
-            @Override
-            public void onRemoteImageAcquired(Drawable dr) {
-                ArticleActivity.this.logo.setImageDrawable(dr);
-            }
-        });
         this.fillComments(article.optJSONObject("rel_data").optJSONArray("comment_list"));
     }
 
@@ -372,10 +428,11 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
         if (comments == null) {
             return;
         }
+        discuzContainer.removeAllViews();
         int cc = comments.length() > 2 ? 2 : comments.length();
         try {
             for (int i = 0; i < cc; i++) {
-                JSONObject comment = comments.getJSONObject(i);
+                final JSONObject comment = comments.getJSONObject(i);
                 View itemView = View.inflate(this, R.layout.article_comment, null);
 //                itemView.setBackgroundColor(i % 2 == 0 ? Color.argb(255, 216, 219, 223) : Color.WHITE);
                 TextView tv = (TextView) itemView.findViewById(R.id.article_comment_author);
@@ -384,15 +441,33 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
                 tv.setText(comment.optString("time", "no time"));
                 tv = (TextView) itemView.findViewById(R.id.article_comment_content);
                 tv.setText(comment.optString("content", "no content"));
-                tv = (TextView) itemView.findViewById(R.id.article_comment_liked_count);
-                tv.setText(String.format("%d", comment.optInt("liked_count", 0)));
-                ImageView iv = (ImageView) itemView.findViewById(R.id.iv_comment_liked);
-                iv.setImageDrawable(this.getResources().getDrawable(comment.optInt("liked", 0) == 1 ? R.drawable.liked : R.drawable.like));
+                final TextView tv1 = (TextView) itemView.findViewById(R.id.article_comment_liked_count);
+                tv1.setText(String.format("%d", comment.optInt("liked_count", 0)));
+                final ImageView iv = (ImageView) itemView.findViewById(R.id.iv_comment_liked);
+                iv.setImageResource(comment.optInt("liked", 0) == 1 ? R.drawable.liked : R.drawable.like);
+                iv.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (!UserInfo.isUserLogged(ArticleActivity.this)) {
+                            LoginUtils.startLogin(ArticleActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
+                        } else {
+                            postCommentLike(iv, tv1, comment);
+                        }
+                    }
+                });
                 this.discuzContainer.addView(itemView);
             }
         } catch (JSONException e) {
             Log.e(TAG, "fillComments error");
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode != RESULT_CANCELED && requestCode == REQUEST_CODE_LOGIN){
+            getArticleDetail(false);
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void setupFeedback() {
