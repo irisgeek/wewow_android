@@ -483,7 +483,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
                     textTitle.setVisibility(View.GONE);
                     searchView.setVisibility(View.INVISIBLE);
                     imageViewUnderLine.setVisibility(View.INVISIBLE);
-                    imageViewUnderLine.setImageResource(R.color.search_text_view_hint_color);
+//                    imageViewUnderLine.setImageResource(R.color.search_text_view_hint_color);
                     isAppBarFolded = false;
                     toolbar.setBackgroundColor(getResources().getColor(R.color.transparent));
                     //展开状态
@@ -498,7 +498,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
                     resetDropdownOffset = true;
                     searchView.setVisibility(View.INVISIBLE);
                     imageViewUnderLine.setVisibility(View.INVISIBLE);
-                    imageViewUnderLine.setImageResource(R.color.search_hot_search);
+//                    imageViewUnderLine.setImageResource(R.color.search_hot_search);
                     toolbar.setBackgroundColor(getResources().getColor(R.color.white));
 
 
