@@ -57,6 +57,8 @@
     <string name="addpost_counter_max">140</string>
     <string name="lifepost_del_comment_success">删除成功</string>
     <string name="lifepost_impeach_comment_success">举报成功</string>
+    <string name="lifepost_impeach_comment">确定要举报此条吗</string>
+    <string name="lifepost_copy_success">复制成功</string>
 
     <string name="discuss_people_number">人参与讨论</string>
     <string name="lifelab_item_feedback">反馈</string>
@@ -93,6 +95,10 @@
     <string name="userinfo_update_fail">用户信息修改已失败</string>
     <string name="userinfo_leave">离开</string>
     <string name="userinfo_stay">留下</string>
+    <string name="userinfo_update_empty">昵称/个性签名最好不要空着哦</string>
+    <string name="userinfo_comfirm">好的</string>
+    <string name="userinfo_save_comfirm">确认</string>
+    <string name="userinfo_save_tips">确认修改信息？</string>
 
     <string name="prompt_comfirmd">好</string>
     <string name="prompt_denied">不</string>

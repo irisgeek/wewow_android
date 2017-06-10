@@ -1,14 +1,8 @@
 package com.wewow;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.text.TextUtils;
 import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.View;
@@ -77,7 +71,59 @@ public class UserInfoActivity extends Activity {
         this.findViewById(R.id.luserinfo_done).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                UserInfoActivity.this.updateUserInfo();
+                if (TextUtils.isEmpty(nickname.getText().toString()) || TextUtils.isEmpty(signature.getText().toString())) {
+                    MessageBoxUtils.messageBoxWithButtons(UserInfoActivity.this
+                            , getString(R.string.userinfo_update_empty)
+                            , new String[]{
+                                    getString(R.string.userinfo_comfirm)
+                            }
+                            , new Object[]{0}
+                            , new MessageBoxUtils.MsgboxButtonListener[]{
+                                    new MessageBoxUtils.MsgboxButtonListener() {
+                                        @Override
+                                        public boolean shouldCloseMessageBox(Object tag) {
+                                            return true;
+                                        }
+
+                                        @Override
+                                        public void onClick(Object tag) {
+                                        }
+                                    }
+                            }
+                    );
+                }else{
+                    MessageBoxUtils.messageBoxWithButtons(UserInfoActivity.this
+                            , getString(R.string.userinfo_save_tips)
+                            , new String[]{
+                                    getString(R.string.userinfo_save_comfirm), getString(R.string.cancel)
+                            }
+                            , new Object[]{0, 1}
+                            , new MessageBoxUtils.MsgboxButtonListener[]{
+                                    new MessageBoxUtils.MsgboxButtonListener() {
+                                        @Override
+                                        public boolean shouldCloseMessageBox(Object tag) {
+                                            return true;
+                                        }
+
+                                        @Override
+                                        public void onClick(Object tag) {
+                                            UserInfoActivity.this.updateUserInfo();
+                                        }
+                                    },
+                                    new MessageBoxUtils.MsgboxButtonListener() {
+                                        @Override
+                                        public boolean shouldCloseMessageBox(Object tag) {
+                                            return true;
+                                        }
+
+                                        @Override
+                                        public void onClick(Object tag) {
+
+                                        }
+                                    },
+                            }
+                    );
+                }
             }
         });
     }

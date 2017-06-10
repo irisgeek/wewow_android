@@ -27,6 +27,7 @@ import com.wewow.utils.BlurBuilder;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
 import com.wewow.utils.LoginUtils;
+import com.wewow.utils.MessageBoxUtils;
 import com.wewow.utils.RemoteImageLoader;
 import com.wewow.utils.ShareUtils;
 import com.wewow.utils.Utils;
@@ -346,8 +347,8 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
             ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
             ClipData clip = ClipData.newPlainText("", s);
             clipboard.setPrimaryClip(clip);
-            String msg = LifePostActivity.this.getString(R.string.share_copylink_result, LifePostActivity.this.getString(R.string.share_result_succeed));
-            Toast.makeText(LifePostActivity.this, msg, Toast.LENGTH_LONG).show();
+            String msg = getString(R.string.lifepost_copy_success);
+            MessageBoxUtils.messageBoxWithNoButton(LifePostActivity.this, true, msg, 2500);
         }
     };
 
@@ -373,10 +374,10 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
                 LoginUtils.startLogin(LifePostActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
                 return;
             }
-            JSONObject jobj = (JSONObject) view.getTag();
+            final JSONObject jobj = (JSONObject) view.getTag();
             String author = jobj.optString("user");
-            Object[] params;
             if (author.equals(LifePostActivity.this.user.getNickname())) {
+                Object[] params;
                 ArrayList<Pair<String, String>> fields = new ArrayList<>();
                 fields.add(new Pair<String, String>("user_id", LifePostActivity.this.user.getId().toString()));
                 final int id = jobj.optInt("id");
@@ -414,39 +415,68 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
                         WebAPIHelper.buildHttpQuery(fields).getBytes(),
                         headers
                 };
+                progressBar.setVisibility(View.VISIBLE);
+                new HttpAsyncTask().execute(params);
             } else {
-                ArrayList<Pair<String, String>> fields = new ArrayList<>();
-                fields.add(new Pair<String, String>("user_id", LifePostActivity.this.user.getId().toString()));
-                fields.add(new Pair<String, String>("comment_id", String.valueOf(jobj.optInt("id"))));
-                fields.add(new Pair<String, String>("token", LifePostActivity.this.user.getToken()));
-                ArrayList<Pair<String, String>> headers = new ArrayList<>();
-                headers.add(WebAPIHelper.getHttpFormUrlHeader());
-                params = new Object[]{
-                        String.format("%s/report", CommonUtilities.WS_HOST),
-                        new HttpAsyncTask.TaskDelegate() {
-                            @Override
-                            public void taskCompletionResult(byte[] result) {
-                                progressBar.setVisibility(View.GONE);
-                                JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
-                                try {
-                                    JSONObject resultData = jobj.getJSONObject("result");
-                                    if (resultData.optInt("code") != 0) {
-                                        Toast.makeText(LifePostActivity.this, resultData.optString("message"), Toast.LENGTH_LONG).show();
-                                    }else{
-                                        Toast.makeText(LifePostActivity.this, R.string.lifepost_impeach_comment_success, Toast.LENGTH_LONG).show();
+                MessageBoxUtils.messageBoxWithButtons(LifePostActivity.this, getString(R.string.lifepost_impeach_comment),
+                        new String[]{getString(R.string.confirm), getString(R.string.cancel)},
+                        new Object[]{0, 1},
+                        new MessageBoxUtils.MsgboxButtonListener[]{
+                                new MessageBoxUtils.MsgboxButtonListener() {
+                                    @Override
+                                    public boolean shouldCloseMessageBox(Object tag) {
+                                        return true;
                                     }
-                                } catch (Exception e) {
-                                    Toast.makeText(LifePostActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+
+                                    @Override
+                                    public void onClick(Object tag) {
+                                        Object[] params;
+                                        ArrayList<Pair<String, String>> fields = new ArrayList<>();
+                                        fields.add(new Pair<String, String>("user_id", LifePostActivity.this.user.getId().toString()));
+                                        fields.add(new Pair<String, String>("comment_id", String.valueOf(jobj.optInt("id"))));
+                                        fields.add(new Pair<String, String>("token", LifePostActivity.this.user.getToken()));
+                                        ArrayList<Pair<String, String>> headers = new ArrayList<>();
+                                        headers.add(WebAPIHelper.getHttpFormUrlHeader());
+                                        params = new Object[]{
+                                                String.format("%s/report", CommonUtilities.WS_HOST),
+                                                new HttpAsyncTask.TaskDelegate() {
+                                                    @Override
+                                                    public void taskCompletionResult(byte[] result) {
+                                                        progressBar.setVisibility(View.GONE);
+                                                        JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
+                                                        try {
+                                                            JSONObject resultData = jobj.getJSONObject("result");
+                                                            if (resultData.optInt("code") != 0) {
+                                                                Toast.makeText(LifePostActivity.this, resultData.optString("message"), Toast.LENGTH_LONG).show();
+                                                            }else{
+                                                                Toast.makeText(LifePostActivity.this, R.string.lifepost_impeach_comment_success, Toast.LENGTH_LONG).show();
+                                                            }
+                                                        } catch (Exception e) {
+                                                            Toast.makeText(LifePostActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                                                        }
+                                                    }
+                                                },
+                                                WebAPIHelper.HttpMethod.POST,
+                                                WebAPIHelper.buildHttpQuery(fields).getBytes(),
+                                                headers
+                                        };
+                                        progressBar.setVisibility(View.VISIBLE);
+                                        new HttpAsyncTask().execute(params);
+                                    }
+                                },
+                                new MessageBoxUtils.MsgboxButtonListener() {
+                                    @Override
+                                    public boolean shouldCloseMessageBox(Object tag) {
+                                        return true;
+                                    }
+
+                                    @Override
+                                    public void onClick(Object tag) {
+                                    }
                                 }
-                            }
-                        },
-                        WebAPIHelper.HttpMethod.POST,
-                        WebAPIHelper.buildHttpQuery(fields).getBytes(),
-                        headers
-                };
+                        });
+
             }
-            progressBar.setVisibility(View.VISIBLE);
-            new HttpAsyncTask().execute(params);
         }
     };
 
