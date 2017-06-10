@@ -125,22 +125,48 @@
 
         </RelativeLayout>
 
-        <RelativeLayout
+        <LinearLayout
             android:id="@+id/login_3party_area"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
             android:layout_alignParentBottom="true"
             android:layout_marginBottom="29dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toLeftOf="@+id/login_weibo_area"
+                    android:orientation="vertical">
+
+                    <ImageButton
+                        android:id="@+id/login_btn_wechat"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginBottom="8dp"
+                        android:background="@drawable/wechat" />
+
+                    <TextView
+                        android:id="@+id/login_tv_wechat"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="@string/login_wechat"
+                        android:textSize="10sp" />
+                </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/login_weibo_area"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
                 android:layout_marginLeft="40dp"
-                android:layout_marginRight="40dp"
                 android:gravity="center_horizontal"
                 android:orientation="vertical">
 
@@ -158,32 +184,14 @@
                     android:textSize="10sp" />
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toLeftOf="@+id/login_weibo_area"
-                android:orientation="vertical">
 
-                <ImageButton
-                    android:id="@+id/login_btn_wechat"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_marginBottom="8dp"
-                    android:background="@drawable/wechat" />
-
-                <TextView
-                    android:id="@+id/login_tv_wechat"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="@string/login_wechat"
-                    android:textSize="10sp" />
-            </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/login_huawei_area"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/login_weibo_area"
+                android:visibility="gone"
+                android:layout_marginLeft="40dp"
                 android:orientation="vertical">
 
                 <ImageButton
@@ -200,7 +208,8 @@
                     android:text="@string/login_huawei"
                     android:textSize="10sp" />
             </LinearLayout>
-        </RelativeLayout>
+            </LinearLayout>
+        </LinearLayout>
 
 
     </RelativeLayout>

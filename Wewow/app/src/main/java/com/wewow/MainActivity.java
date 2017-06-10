@@ -169,9 +169,9 @@ public class MainActivity extends BaseActivity implements TextWatcher {
         super.onCreate(savedInstanceState);
 //        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 //        Utils.setActivityToBeFullscreen(this);
-
-        setContentView(R.layout.activity_main);
         setMenuselectedPosition(0);
+        setContentView(R.layout.activity_main);
+
         context = this;
 //        StatusBarUtil.setTranslucentForCoordinatorLayout(this, 100);
 
@@ -538,6 +538,180 @@ public class MainActivity extends BaseActivity implements TextWatcher {
 //                    textTitle.setVisibility(View.VISIBLE);
 //                }
                 removeCover();
+            }
+        });
+        ImageView imageViewBack=(ImageView)findViewById(R.id.layoutMenuCover);
+        imageViewBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (!isSearchViewShown) {
+                    drawerLayout.openDrawer(GravityCompat.START);
+
+                } else {
+                    removeCover();
+                    searchView.setVisibility(View.INVISIBLE);
+                    imageViewUnderLine.setVisibility(View.INVISIBLE);
+                    searchView.setText("");
+                    resetDropdownOffset = true;
+                    imageViewHome.setImageResource(R.drawable.menu);
+                    isSearchViewShown = false;
+                    if (isAppBarFolded) {
+                        textTitle.setVisibility(View.VISIBLE);
+                        imageViewHome.setImageResource(R.drawable.menu_b);
+                    }
+                }
+
+            }
+        });
+
+        ImageView imageViewSearchBottom=(ImageView)findViewById(R.id.layoutSearchCover);
+        imageViewSearchBottom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String queryText = searchView.getText().toString().trim();
+                if (!isSearchViewShown) {
+                    if (isAppBarFolded) {
+                        imageViewHome.setImageResource(R.drawable.back_b);
+                    } else {
+                        imageViewHome.setImageResource(R.drawable.back);
+                    }
+
+                    ListSearchAdapter adapter = new ListSearchAdapter(hotWords, MainActivity.this);
+//
+//                    ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.list_item_search, R.id.text, hotWords);
+
+
+                    searchView.setAdapter(adapter);
+                    searchView.setHint(getResources().getString(R.string.search_hint));
+
+                    searchView.setThreshold(0);
+                    if (resetDropdownOffset) {
+//                        searchView.setDropDownVerticalOffset(40);
+//                        resetDropdownOffset = false;
+                    }
+                    showUnderLine();
+
+                    showCover();
+                    new Handler().postDelayed(new Runnable() {
+
+                        public void run() {
+                            //execute the task
+                            searchView.setVisibility(View.VISIBLE);
+                            textTitle.setVisibility(View.GONE);
+                            searchView.requestFocus();
+                            InputMethodManager inputManager =
+                                    (InputMethodManager) searchView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                            inputManager.showSoftInput(searchView, 0);
+                        }
+                    }, 100);
+
+                    new Handler().postDelayed(new Runnable() {
+
+                        public void run() {
+                            //execute the task
+                            searchView.showDropDown();
+                        }
+                    }, 200);
+
+                    searchView.addTextChangedListener(MainActivity.this);
+                    searchView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            if (position != 0) {
+                                searchView.setText(hotWords.get(position), true);
+                                layoutSearch.performClick();
+                            } else {
+                                searchView.setText("");
+                            }
+//
+
+                        }
+                    });
+                    searchView.setThreshold(0);
+
+                    isSearchViewShown = true;
+                } else {
+
+
+                    if (!queryText.equals("")) {
+                        searchView.setText("");
+                        searchView.setVisibility(View.INVISIBLE);
+                        imageViewUnderLine.setVisibility(View.INVISIBLE);
+                        Intent intentSearch = new Intent(MainActivity.this, SearchResultActivity.class);
+                        intentSearch.putExtra("key_word", queryText);
+                        startActivity(intentSearch);
+                        if (isAppBarFolded) {
+                            imageViewHome.setImageResource(R.drawable.menu_b);
+                        } else {
+                            imageViewHome.setImageResource(R.drawable.menu);
+                        }
+
+                        isSearchViewShown = false;
+                        if (isAppBarFolded) {
+                            textTitle.setVisibility(View.VISIBLE);
+                        }
+                    } else {
+
+                        if (isAppBarFolded) {
+                            imageViewHome.setImageResource(R.drawable.back_b);
+                        } else {
+                            imageViewHome.setImageResource(R.drawable.back);
+                        }
+                        searchView.setHint(getResources().getString(R.string.search_hint));
+
+                        final String[] testStrings = getResources().getStringArray(R.array.test_array);
+//                        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, R.layout.list_item_search, R.id.text, hotWords);
+                        ListSearchAdapter adapter = new ListSearchAdapter(hotWords, MainActivity.this);
+                        searchView.setAdapter(adapter);
+                        searchView.requestFocus();
+
+                        if (resetDropdownOffset) {
+//                            resetDropdownOffset = false;
+//                            searchView.setDropDownVerticalOffset(-40);
+                        }
+//                        searchView.setDropDownVerticalOffset(-40);
+                        showUnderLine();
+
+                        showCover();
+                        new Handler().postDelayed(new Runnable() {
+
+                            public void run() {
+                                //execute the task
+                                searchView.setVisibility(View.VISIBLE);
+                                textTitle.setVisibility(View.GONE);
+                                searchView.requestFocus();
+                                InputMethodManager inputManager =
+                                        (InputMethodManager) searchView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                                inputManager.showSoftInput(searchView, 0);
+                            }
+                        }, 100);
+
+                        new Handler().postDelayed(new Runnable() {
+
+                            public void run() {
+                                //execute the task
+                                searchView.showDropDown();
+                            }
+                        }, 200);
+                        searchView.addTextChangedListener(MainActivity.this);
+                        searchView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                if (position != 0) {
+                                    searchView.setText(hotWords.get(position), true);
+                                    imageViewSearch.performClick();
+                                }
+//
+
+                            }
+                        });
+                        searchView.setThreshold(0);
+
+                        isSearchViewShown = true;
+                    }
+
+                }
             }
         });
     }

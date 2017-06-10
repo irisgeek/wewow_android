@@ -16,6 +16,8 @@ import com.wewow.R;
 import com.wewow.adapter.FooterAdapter;
 import com.wewow.utils.LoadMoreListener;
 
+import java.util.Date;
+
 /**
  * Created by iris on 17/5/9.
  */
@@ -42,6 +44,8 @@ public class RecyclerViewUpRefresh extends RecyclerView {
     public boolean isLoadingData = false;
     //加载更多布局
     private LoadingMoreFooter loadingMoreFooter;
+    private long TimeFlag;
+    private int eview_height = 1;
 
     public RecyclerViewUpRefresh(Context context) {
         this(context, null);
@@ -236,6 +240,55 @@ public class RecyclerViewUpRefresh extends RecyclerView {
         //开始动画
         view.startAnimation(alphaAnimation);
 
+    }
+
+    private void resetEmptyView() {
+        final int dx = eview_height;
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                // TODO Auto-generated method stub
+                final int time = 500;
+                final long startTime = new Date().getTime();
+                TimeFlag = startTime;
+                long nowTime = new Date().getTime();
+                while (startTime + time > nowTime && TimeFlag == startTime) {
+                    nowTime = new Date().getTime();
+                    final int dt = (int) (nowTime - startTime);
+                    post(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            // TODO Auto-generated method stub
+                            eview_height = eview_height * (time - dt) / time;
+                            mFooterAdapter.notifyDataSetChanged();
+                        }
+                    });
+
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+               post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        // TODO Auto-generated method stub
+                        eview_height = 0;
+                        mFooterAdapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        }).start();
+    }
+
+    private void notifyEmptyView(int height) {
+        this.eview_height = height;
+        mFooterAdapter.notifyItemChanged(mFooterAdapter.getItemCount() - 1);
     }
 
 }

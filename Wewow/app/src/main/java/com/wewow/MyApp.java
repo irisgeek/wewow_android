@@ -4,8 +4,16 @@ import android.app.Application;
 import android.os.Environment;
 import android.util.Log;
 
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVInstallation;
+import com.avos.avoscloud.AVOSCloud;
+import com.avos.avoscloud.PushService;
+import com.avos.avoscloud.SaveCallback;
 import com.growingio.android.sdk.collection.Configuration;
 import com.growingio.android.sdk.collection.GrowingIO;
+import com.wewow.utils.CommonUtilities;
+import com.wewow.utils.FileCacheUtil;
+import com.wewow.utils.Utils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,7 +38,34 @@ public class MyApp extends Application implements Thread.UncaughtExceptionHandle
                 .useID()
                 .trackAllFragments()
                 .setChannel(getResources().getString(R.string.growingio_channel)));
+        setUpLeanCloud();
 
+    }
+
+    private void setUpLeanCloud() {
+        AVOSCloud.initialize(this, CommonUtilities.Leancloud_AppID,
+                CommonUtilities.Leancloud_AppKey);
+        // 启用崩溃错误统计
+//        AVAnalytics.enableCrashReport(this.getApplicationContext(), true);
+        AVOSCloud.setLastModifyEnabled(true);
+        AVOSCloud.setDebugLogEnabled(true);
+        if (!FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_NOTIFICATION_INSTALLATION_ID, this)) {
+
+            AVInstallation.getCurrentInstallation().saveInBackground(new SaveCallback() {
+                public void done(AVException e) {
+                    if (e == null) {
+                        // 保存成功
+                        String installationId = AVInstallation.getCurrentInstallation().getInstallationId();
+                        FileCacheUtil.setCache(installationId, MyApp.this, CommonUtilities.CACHE_FILE_NOTIFICATION_INSTALLATION_ID, 0);
+                        // 关联  installationId 到用户表等操作……
+                    } else {
+                        // 保存失败，输出错误信息
+                    }
+                }
+            });
+        }
+
+        PushService.setDefaultPushCallback(this, MainActivity.class);
     }
 
     @Override

@@ -51,9 +51,11 @@ public class LoadingMoreFooter extends LinearLayout {
                 null);
         addFootLoadingView(inflate);
 
-        TextView textView = new TextView(context);
-        textView.setText("已经到底啦~");
-        addFootEndView(textView);
+        View bottom = layoutInflater.inflate(R.layout.layout_bottom,
+                null);
+//        TextView textView = new TextView(context);
+//        textView.setText("已经到底啦~");
+        addFootEndView(bottom);
 
         addView(view);
     }

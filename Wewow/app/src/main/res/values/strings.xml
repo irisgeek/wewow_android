@@ -102,7 +102,7 @@
     <!-- Home page -->
     <!-- naivgation title -->
     <string name="notlogged">尚未登录</string>
-    <string name="home"> 首页 </string>
+    <string name="home">探索</string>
     <string name="test1">个人养成</string>
     <string name="test2">日常生活</string>
     <string name="test3">家的管理</string>
@@ -223,6 +223,7 @@
     <string name="hot_search_text">热门搜索</string>
     <string name="follow_artist_success">已成功订阅生活家</string>
     <string name="cancel_follow_artist_success">已成功取消订阅生活家</string>
+    <string name="bottom_line">我是有底线的</string>
 
 
 </resources>

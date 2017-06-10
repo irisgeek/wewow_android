@@ -144,8 +144,13 @@ public class ListViewArtistsAdapter extends BaseAdapter {
                     JSONObject responseObject = new JSONObject(realData);
 
                     if (!responseObject.getJSONObject("result").getString("code").equals("0")) {
-                        Toast.makeText(context, responseObject.getJSONObject("result").getString("message"), Toast.LENGTH_SHORT).show();
-
+                        if(responseObject.getJSONObject("result").getString("code").equals("403"))
+                        {
+                            LoginUtils.startLogin((Activity) context, LoginActivity.REQUEST_CODE_LOGIN);
+                        }
+                        else {
+                            Toast.makeText(context, responseObject.getJSONObject("result").getString("message"), Toast.LENGTH_SHORT).show();
+                        }
 
                     } else {
                         followStatus.set(position, read == 0 ? "0" : "1");

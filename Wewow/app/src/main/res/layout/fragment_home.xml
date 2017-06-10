@@ -374,11 +374,12 @@
                 android:id="@+id/listViewSelectedInstitute"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginBottom="12dp"
+
                 android:layout_marginTop="12dp"
                 android:choiceMode="singleChoice"
                 android:divider="@android:color/transparent"
                 android:dividerHeight="12dp" />
+            <include layout="@layout/layout_bottom"/>
         </LinearLayout>
 
         <LinearLayout

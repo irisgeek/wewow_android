@@ -89,6 +89,7 @@ public class categaryFragment  extends Fragment implements LoadMoreListener {
 
     private TextView textViewArtist;
     private TextView textViewInstitute;
+    private LinearLayout layoutBottom;
 
     public categaryFragment() {
 
@@ -162,6 +163,7 @@ public class categaryFragment  extends Fragment implements LoadMoreListener {
         textViewArtist=(TextView)view.findViewById(R.id.textViewArtist);
         textViewInstitute=(TextView)view.findViewById(R.id.textViewLifeLab);
 
+        layoutBottom=(LinearLayout)view.findViewById(R.id.layout_bottom);
         NestedScrollView scroller = (NestedScrollView) view.findViewById(R.id.scrollview);
 
         if (scroller != null) {
@@ -752,6 +754,8 @@ public class categaryFragment  extends Fragment implements LoadMoreListener {
             getDataFromServer(true);
         } else {
             rvInstitue.loadMoreComplete();
+            rvInstitue.loadMoreEnd();
+//            layoutBottom.setVisibility(View.VISIBLE);
         }
 
 
