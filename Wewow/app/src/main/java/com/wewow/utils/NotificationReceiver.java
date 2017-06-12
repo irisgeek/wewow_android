@@ -64,7 +64,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                     case 4:
                         //artist
                         resultIntent = new Intent(AVOSCloud.applicationContext, DetailArtistActivity.class);
-                        intent.putExtra("id", Integer.parseInt(target_id));
+                        intent.putExtra("id", target_id);
                         break;
                     case 5:
                         //subject

@@ -25,7 +25,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginBottom="12dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="8dp"
             android:orientation="horizontal"
 
             card_view:cardCornerRadius="2dp">
@@ -90,16 +90,15 @@
                     android:layout_marginTop="12dp"
                 android:text="@string/about_9"
                 />
+               <ImageView
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_marginTop="20dp"
+                   android:src="@drawable/square"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="@string/about_10"
-                    />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="20dp"
                     android:text="@string/about_11"
                     />
                 <TextView

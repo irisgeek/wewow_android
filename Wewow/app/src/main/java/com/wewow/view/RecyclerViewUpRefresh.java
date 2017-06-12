@@ -164,23 +164,30 @@ public class RecyclerViewUpRefresh extends RecyclerView {
             }
 
             if (layoutManager.getChildCount() > 0
-                    && lastVisibleItemPosition >= layoutManager.getItemCount() - 1) {
-                if (loadingMoreFooter != null) {
-                    loadingMoreFooter.setVisible();
-                    ImageView imageViewCircle1 = (ImageView) loadingMoreFooter.findViewById(R.id.imageViewCircle1);
-                    ImageView imageViewCircle2 = (ImageView) loadingMoreFooter.findViewById(R.id.imageViewCircle2);
-                    ImageView imageViewCircle3 = (ImageView) loadingMoreFooter.findViewById(R.id.imageViewCircle3);
-                    startAlphaAnimation(imageViewCircle1, 0.8f, 0.2f);
-                    startAlphaAnimation(imageViewCircle2, 0.5f, 0.8f);
-                    startAlphaAnimation(imageViewCircle3, 0.2f, 0.8f);
+                    && lastVisibleItemPosition >= layoutManager.getItemCount() - 2) {
+                setNestedScrollingEnabled(true);
+                showFooterAnimation();
 
-                }
-                isLoadingData = true;
-                loadMoreListener.onLoadMore();
             }
         }
     }
 
+    public void showFooterAnimation() {
+        if (loadingMoreFooter != null) {
+            loadingMoreFooter.setVisible();
+            ImageView imageViewCircle1 = (ImageView) loadingMoreFooter.findViewById(R.id.imageViewCircle1);
+            ImageView imageViewCircle2 = (ImageView) loadingMoreFooter.findViewById(R.id.imageViewCircle2);
+            ImageView imageViewCircle3 = (ImageView) loadingMoreFooter.findViewById(R.id.imageViewCircle3);
+            startAlphaAnimation(imageViewCircle1, 0.8f, 0.2f);
+            startAlphaAnimation(imageViewCircle2, 0.5f, 0.8f);
+            startAlphaAnimation(imageViewCircle3, 0.2f, 0.8f);
+
+        }
+        isLoadingData = true;
+//        mAdapter.notifyDataSetChanged();
+
+        loadMoreListener.onLoadMore();
+    }
 
     //取到最后的一个节点
     private int last(int[] lastPositions) {

@@ -159,6 +159,12 @@ public class categaryFragment  extends Fragment implements LoadMoreListener {
         rvInstitue.setNestedScrollingEnabled(false);
         rvInstitue.setCanloadMore(true);
         rvInstitue.setLoadMoreListener(this);
+        rvInstitue.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+            }
+        });
 
         textViewArtist=(TextView)view.findViewById(R.id.textViewArtist);
         textViewInstitute=(TextView)view.findViewById(R.id.textViewLifeLab);
@@ -180,8 +186,9 @@ public class categaryFragment  extends Fragment implements LoadMoreListener {
                     if (scrollY == 0) {
                     }
 
-                    if (scrollY == (v.getChildAt(0).getMeasuredHeight() - v.getMeasuredHeight())) {
+                    if (scrollY== (v.getChildAt(0).getMeasuredHeight() - v.getMeasuredHeight())) {
                        rvInstitue.setNestedScrollingEnabled(true);
+                        rvInstitue.showFooterAnimation();
                     }
                 }
             });
@@ -439,6 +446,16 @@ public class categaryFragment  extends Fragment implements LoadMoreListener {
 
         currentPage++;
         rvInstitue.loadMoreComplete();
+        boolean isLastPageLoaded = false;
+        try {
+            isLastPageLoaded = isLastPageLoaded();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if (isLastPageLoaded) {
+            rvInstitue.loadMoreEnd();
+        }
+
 
 
 //

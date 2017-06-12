@@ -7,6 +7,7 @@ import org.json.JSONObject;
 
 import retrofit.Callback;
 import retrofit.http.Field;
+import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
 import retrofit.http.Header;
 import retrofit.http.Multipart;
@@ -54,8 +55,9 @@ public interface ITask {
 
 
     @POST("/follow")
-    void followArtist(@Header("User-Agent") String headerContentType, @Query("user_id") String userId,
-                      @Query("artist_id") String artistId, @Query("token") String token, @Query("follow") int follow, Callback<JSONObject> callback);
+    @FormUrlEncoded
+    void followArtist(@Header("User-Agent") String headerContentType, @Field("user_id") String userId,
+                      @Field("artist_id") String artistId, @Field("token") String token, @Field("follow") int follow, Callback<JSONObject> callback);
 
     @GET("/index_category_collections")
     void categoryArtistsAndInstitutes(@Header("User-Agent") String headerContentType, @Query("collection_category_id") String id,@Query("page") int page,
@@ -67,16 +69,18 @@ public interface ITask {
                    Callback<JSONObject> callback);
 
     @POST("/feedback")
-    void feedbackText(@Header("User-Agent") String headerContentType, @Query("user_id") String id,
-                      @Query("token") String token, @Query("content") String content,
-                      @Query("content_type") String content_type, @Query("status") String status,
+    @FormUrlEncoded
+    void feedbackText(@Header("User-Agent") String headerContentType, @Field("user_id") String id,
+                      @Field("token") String token, @Field("content") String content,
+                      @Field("content_type") String content_type, @Field("status") String status,
                       Callback<JSONObject> callback);
 
     @POST("/feedback")
-    void feedbackImage(@Header("User-Agent") String headerContentType, @Query("user_id") String id,
-                       @Query("token") String token, @Query("content") String content,
-                       @Query("content_type") String content_type, @Query("image_width") String image_width,
-                       @Query("image_height") String image_height, @Query("status") String status,
+    @FormUrlEncoded
+    void feedbackImage(@Header("User-Agent") String headerContentType, @Field("user_id") String id,
+                       @Field("token") String token, @Field("content") String content,
+                       @Field("content_type") String content_type, @Field("image_width") String image_width,
+                       @Field("image_height") String image_height, @Field("status") String status,
                        Callback<JSONObject> callback);
 
     //search
@@ -99,8 +103,9 @@ public interface ITask {
 
 
     @POST("/artist_read")
-    void artist_read(@Header("User-Agent") String headerContentType, @Query("user_id") String id,
-                     @Query("token") String token, @Query("artist_id") String artist_id, @Query("read") String read,
+    @FormUrlEncoded
+    void artist_read(@Header("User-Agent") String headerContentType, @Field("user_id") String id,
+                     @Field("token") String token, @Field("artist_id") String artist_id, @Field("read") String read,
                      Callback<JSONObject> callback);
 
 
