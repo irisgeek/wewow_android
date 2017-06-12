@@ -100,7 +100,7 @@
                                 android:layout_width="244dp"
                                 android:layout_height="40dp"
                                 android:layout_gravity="bottom"
-                                android:layout_marginBottom="-7dp"
+                                android:layout_marginBottom="-3dp"
                                 android:layout_marginLeft="17dp"
                                 android:layout_marginRight="17dp"
                                 android:layout_weight="3"
@@ -120,7 +120,7 @@
                                 android:layout_gravity="bottom|left"
                                 android:layout_marginLeft="12dp"
                                 android:gravity="center_vertical"
-                                android:text="@string/home"
+                                android:text="@string/home_page"
                                 android:textColor="@color/font_color"
                                 android:visibility="visible" />
 
@@ -130,7 +130,8 @@
                                 android:layout_height="1dp"
                                 android:layout_gravity="bottom"
                                 android:layout_marginLeft="17dp"
-                                android:src="@color/search_text_view_hint_color"
+                                android:scaleType="fitXY"
+                                android:src="@color/search_hot_search"
                                 android:visibility="invisible" />
 
 

@@ -47,7 +47,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="22dp"
-                        android:layout_marginTop="8dp"
+                       android:layout_centerVertical="true"
                         android:text="我变秃了 我也变强了"
                         android:textColor="#333631"
                         android:layout_marginRight="22dp"

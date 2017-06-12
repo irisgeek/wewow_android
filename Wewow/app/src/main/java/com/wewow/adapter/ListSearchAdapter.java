@@ -35,7 +35,7 @@ public class ListSearchAdapter extends BaseAdapter implements Filterable {
     @Override
     public int getCount() {
 
-        return mList==null ? 0:mList.size();
+        return mList == null ? 0 : mList.size();
     }
 
     @Override
@@ -54,32 +54,33 @@ public class ListSearchAdapter extends BaseAdapter implements Filterable {
     public View getView(int position, View convertView, ViewGroup parent) {
         View view;
         ViewHolder holder;
-        if(convertView==null){
+        if (convertView == null) {
+
             view = View.inflate(context, R.layout.list_item_search, null);
 
             holder = new ViewHolder();
             holder.tv_name = (TextView) view.findViewById(R.id.text);
-
+            holder.imageViewTop=(ImageView)view.findViewById(R.id.imageViewTop);
             view.setTag(holder);
-        }else{
+        } else {
             view = convertView;
             holder = (ViewHolder) view.getTag();
         }
-        if(position==0)
-        {
+        if (position == 0) {
             holder.tv_name.setTextColor(context.getResources().getColor(R.color.search_hot_search));
-        }
-        else
-        {
+            holder.imageViewTop.setVisibility(View.VISIBLE);
+        } else {
             holder.tv_name.setTextColor(context.getResources().getColor(R.color.search_hot_search_words));
+            holder.imageViewTop.setVisibility(View.INVISIBLE);
         }
 
         holder.tv_name.setText(mList.get(position));
         return view;
     }
 
-    static class ViewHolder{
+    static class ViewHolder {
         public TextView tv_name;
+        public ImageView imageViewTop;
     }
 
     @Override
@@ -116,7 +117,7 @@ public class ListSearchAdapter extends BaseAdapter implements Filterable {
                     String pc = unfilteredValues.get(i);
                     if (pc != null) {
 
-                        if(pc.startsWith(prefixString)){
+                        if (pc.startsWith(prefixString)) {
 
                             newValues.add(pc);
                         }

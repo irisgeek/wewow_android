@@ -176,7 +176,8 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
 //        });
         lifelab_fav_count.setVisibility(lcd.liked_count == 0 ? View.GONE : View.VISIBLE);
         lifelab_fav_count.setText(lcd.liked_count + "");
-        int gc = this.lcd.getArticleGroupCount() > 2 ? 2 : this.lcd.getArticleGroupCount();
+        //int gc = this.lcd.getArticleGroupCount() > 2 ? 2 : this.lcd.getArticleGroupCount();
+        int gc = this.lcd.getArticleGroupCount();
         LinearLayout.LayoutParams groupParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         groupParams.setMargins(Utils.dipToPixel(this, 8), Utils.dipToPixel(this, 6), Utils.dipToPixel(this, 8), 0);
         for (int i = 0; i < gc; i++) {
@@ -193,7 +194,8 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
         View cardview = View.inflate(this, R.layout.cardview_lifelab_item, null);
         LinearLayout item_container = (LinearLayout) cardview.findViewById(R.id.item_container);
         item_container.addView(groupView);
-        int cc = this.lcd.getArticleCount(group) > 2 ? 2 : this.lcd.getArticleCount(group);
+        //int cc = this.lcd.getArticleCount(group) > 2 ? 2 : this.lcd.getArticleCount(group);
+        int cc = this.lcd.getArticleCount(group);
         for (int i = 0; i < cc; i++) {
             LabCollectionDetail.Article a = this.lcd.getArticle(group, i);
             View itemView = View.inflate(this, R.layout.lifelab_item_article, null);

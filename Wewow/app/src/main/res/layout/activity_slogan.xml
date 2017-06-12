@@ -8,11 +8,10 @@
     <android.support.v7.widget.CardView
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="454dp"
         android:layout_marginEnd="10dp"
         android:layout_marginStart="11dp"
         android:layout_marginTop="11dp"
-        android:layout_weight="1"
         card_view:cardCornerRadius="10dp">
 
         <RelativeLayout
@@ -23,7 +22,7 @@
                 android:id="@+id/slogan_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="centerCrop"/>
+                android:scaleType="fitXY"/>
 
             <ImageView
                 android:layout_width="match_parent"
@@ -55,12 +54,31 @@
         </RelativeLayout>
     </android.support.v7.widget.CardView>
 
-    <ImageView
-        android:layout_width="54dp"
-        android:layout_height="54dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="57dp"
-        android:layout_marginTop="57dp"
-        android:src="@drawable/slogan_logo"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="54dp"
+            android:layout_height="54dp"
+
+            android:src="@drawable/slogan_logo"/>
+                </LinearLayout>
+
+
+
+    </LinearLayout>
+
+
 
 </LinearLayout>
