@@ -408,7 +408,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
         if(currentPage==1)
         {
             collapsingToolbar.setVisibility(View.VISIBLE);
-            collapsingToolbar.startAnimation(moveToViewLocation(0));
+//            collapsingToolbar.startAnimation(moveToViewLocation(0));
 //            imageView.startAnimation(moveToViewLocation(0));
 
             rv.setVisibility(View.VISIBLE);
