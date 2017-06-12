@@ -302,7 +302,7 @@ public class ListArtistActivity extends BaseActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.menu_b);
-        getSupportActionBar().setTitle(getResources().getString(R.string.all_artists_title));
+        getSupportActionBar().setTitle(getResources().getString(R.string.artists_title));
 
     }
 
