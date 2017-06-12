@@ -298,16 +298,24 @@ public class MainActivity extends BaseActivity implements TextWatcher {
 
                 } else {
                     removeCover();
-                    searchView.setVisibility(View.INVISIBLE);
-                    imageViewUnderLine.setVisibility(View.INVISIBLE);
-                    searchView.setText("");
-                    resetDropdownOffset = true;
-                    imageViewHome.setImageResource(R.drawable.menu);
-                    isSearchViewShown = false;
-                    if (isAppBarFolded) {
-                        textTitle.setVisibility(View.VISIBLE);
-                        imageViewHome.setImageResource(R.drawable.menu_b);
-                    }
+
+                    new Handler().postDelayed(new Runnable() {
+
+                        public void run() {
+                            //execute the task
+                            searchView.setVisibility(View.INVISIBLE);
+                            imageViewUnderLine.setVisibility(View.INVISIBLE);
+                            RemoveUnderLine();
+                            searchView.setText("");
+                            resetDropdownOffset = true;
+                            imageViewHome.setImageResource(R.drawable.menu);
+                            isSearchViewShown = false;
+                            if (isAppBarFolded) {
+                                textTitle.setVisibility(View.VISIBLE);
+                                imageViewHome.setImageResource(R.drawable.menu_b);
+                            }
+                        }
+                    }, 200);
                 }
 
             }
@@ -483,6 +491,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
                     textTitle.setVisibility(View.GONE);
                     searchView.setVisibility(View.INVISIBLE);
                     imageViewUnderLine.setVisibility(View.INVISIBLE);
+
                     imageViewUnderLine.setImageResource(R.color.search_text_view_hint_color);
                     isAppBarFolded = false;
                     toolbar.setBackgroundColor(getResources().getColor(R.color.transparent));
@@ -497,7 +506,9 @@ public class MainActivity extends BaseActivity implements TextWatcher {
                     textTitle.setVisibility(View.VISIBLE);
                     resetDropdownOffset = true;
                     searchView.setVisibility(View.INVISIBLE);
+                    imageViewUnderLine.clearAnimation();
                     imageViewUnderLine.setVisibility(View.INVISIBLE);
+
                     imageViewUnderLine.setImageResource(R.color.search_hot_search);
                     toolbar.setBackgroundColor(getResources().getColor(R.color.white));
 
@@ -525,6 +536,15 @@ public class MainActivity extends BaseActivity implements TextWatcher {
 
     }
 
+    private void RemoveUnderLine() {
+
+        final Animation animation = AnimationUtils.loadAnimation(this, R.anim.search_view_underline_gone_anim);
+
+        imageViewUnderLine.setVisibility(View.VISIBLE);
+        imageViewUnderLine.startAnimation(animation);
+
+    }
+
     private void showCover() {
 
         RelativeLayout layoutCover = (RelativeLayout) findViewById(R.id.layoutCover);
@@ -538,6 +558,24 @@ public class MainActivity extends BaseActivity implements TextWatcher {
 //                    textTitle.setVisibility(View.VISIBLE);
 //                }
                 removeCover();
+
+                new Handler().postDelayed(new Runnable() {
+
+                    public void run() {
+                        //execute the task
+                        searchView.setVisibility(View.INVISIBLE);
+                        imageViewUnderLine.setVisibility(View.INVISIBLE);
+                        RemoveUnderLine();
+                        searchView.setText("");
+                        resetDropdownOffset = true;
+                        imageViewHome.setImageResource(R.drawable.menu);
+                        isSearchViewShown = false;
+                        if (isAppBarFolded) {
+                            textTitle.setVisibility(View.VISIBLE);
+                            imageViewHome.setImageResource(R.drawable.menu_b);
+                        }
+                    }
+                }, 200);
             }
         });
         ImageView imageViewBack=(ImageView)findViewById(R.id.layoutMenuCover);
@@ -550,16 +588,27 @@ public class MainActivity extends BaseActivity implements TextWatcher {
 
                 } else {
                     removeCover();
-                    searchView.setVisibility(View.INVISIBLE);
-                    imageViewUnderLine.setVisibility(View.INVISIBLE);
-                    searchView.setText("");
-                    resetDropdownOffset = true;
-                    imageViewHome.setImageResource(R.drawable.menu);
-                    isSearchViewShown = false;
-                    if (isAppBarFolded) {
-                        textTitle.setVisibility(View.VISIBLE);
-                        imageViewHome.setImageResource(R.drawable.menu_b);
-                    }
+
+                    new Handler().postDelayed(new Runnable() {
+
+                        public void run() {
+                            //execute the task
+
+                            if (isAppBarFolded) {
+                                textTitle.setVisibility(View.VISIBLE);
+                                imageViewHome.setImageResource(R.drawable.menu_b);
+
+                                imageViewUnderLine.setVisibility(View.INVISIBLE);
+                            }
+                            searchView.setVisibility(View.INVISIBLE);
+                            imageViewUnderLine.setVisibility(View.INVISIBLE);
+                            RemoveUnderLine();
+                            searchView.setText("");
+                            resetDropdownOffset = true;
+                            imageViewHome.setImageResource(R.drawable.menu);
+                            isSearchViewShown = false;
+                        }
+                    }, 200);
                 }
 
             }
@@ -721,9 +770,18 @@ public class MainActivity extends BaseActivity implements TextWatcher {
         RelativeLayout layoutCover = (RelativeLayout) findViewById(R.id.layoutCover);
         layoutCover.setVisibility(View.GONE);
 
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        new Handler().postDelayed(new Runnable() {
 
-        imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
+            public void run() {
+                //execute the task
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+
+                imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
+            }
+        }, 100);
+
+
+
 
 
     }
