@@ -120,18 +120,18 @@
                                 android:layout_gravity="bottom|left"
                                 android:layout_marginLeft="12dp"
                                 android:gravity="center_vertical"
-                                android:text="@string/home"
+                                android:text="@string/home_page"
                                 android:textColor="@color/font_color"
                                 android:visibility="visible" />
 
                             <ImageView
                                 android:id="@+id/imageViewUnderlineOfSearchView"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
+                                android:layout_height="1dp"
                                 android:layout_gravity="bottom"
                                 android:layout_marginLeft="17dp"
                                 android:scaleType="fitXY"
-                                android:src="@drawable/divider"
+                                android:src="@color/search_hot_search"
                                 android:visibility="invisible" />
 
 

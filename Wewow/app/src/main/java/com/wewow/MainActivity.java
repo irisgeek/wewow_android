@@ -208,7 +208,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
 //        Utils.regitsterNetSateBroadcastReceiver(this);
         collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setTitle(getResources().getString(R.string.home));
+        collapsingToolbar.setTitle(getResources().getString(R.string.home_page));
         collapsingToolbar.setExpandedTitleColor(getResources().getColor(R.color.transparent));
         collapsingToolbar.setCollapsedTitleTextColor(getResources().getColor(R.color.font_color));
 
@@ -483,7 +483,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
                     textTitle.setVisibility(View.GONE);
                     searchView.setVisibility(View.INVISIBLE);
                     imageViewUnderLine.setVisibility(View.INVISIBLE);
-//                    imageViewUnderLine.setImageResource(R.color.search_text_view_hint_color);
+                    imageViewUnderLine.setImageResource(R.color.search_text_view_hint_color);
                     isAppBarFolded = false;
                     toolbar.setBackgroundColor(getResources().getColor(R.color.transparent));
                     //展开状态
@@ -498,7 +498,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
                     resetDropdownOffset = true;
                     searchView.setVisibility(View.INVISIBLE);
                     imageViewUnderLine.setVisibility(View.INVISIBLE);
-//                    imageViewUnderLine.setImageResource(R.color.search_hot_search);
+                    imageViewUnderLine.setImageResource(R.color.search_hot_search);
                     toolbar.setBackgroundColor(getResources().getColor(R.color.white));
 
 
@@ -900,7 +900,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
     private void setUpNavigationTabTitle(List<collectionCategory> titles) {
         mTabLayout = (TabLayout) findViewById(R.id.tabs);
         mTabLayout.setTabMode(TabLayout.MODE_FIXED);
-        mTabLayout.addTab(mTabLayout.newTab().setText(" " + getResources().getString(R.string.home_page) + " "));
+        mTabLayout.addTab(mTabLayout.newTab().setText(" " + getResources().getString(R.string.home) + " "));
         for (int i = 0; i < titles.size(); i++) {
             mTabLayout.addTab(mTabLayout.newTab().setText(titles.get(i).getTitle()));
         }
