@@ -121,7 +121,7 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
                         LabCollectionDetail x = LabCollectionDetail.parse(jobj);
                         if (x != null) {
                             LifeLabItemActivity.this.lcd = x;
-                            if(isFirst){
+                            if (isFirst) {
 //                            LifeLabItemActivity.this.adapter.notifyDataSetChanged();
 //                            LifeLabItemActivity.this.expandAll();
                                 LifeLabItemActivity.this.display();
@@ -143,7 +143,7 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
                                         });
                                     }
                                 });
-                            }else{ //update like
+                            } else { //update like
                                 like.setImageDrawable(getResources().getDrawable(lcd.liked ? R.drawable.marked : R.drawable.mark));
                                 lifelab_fav_count.setText(lcd.liked_count + "");
                                 lifelab_foot_collect.setImageDrawable(getResources().getDrawable(lcd.liked ? R.drawable.marked : R.drawable.mark_white));
@@ -293,7 +293,7 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(LifeLabItemActivity.this, DetailArtistActivity.class);
-                    intent.putExtra("id", a.id+"");
+                    intent.putExtra("id", a.id + "");
                     startActivity(intent);
                 }
             });
@@ -324,7 +324,7 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
             case R.id.layout_footer_feedback:
                 if (!UserInfo.isUserLogged(LifeLabItemActivity.this)) {
                     LoginUtils.startLogin(LifeLabItemActivity.this, REQUEST_CODE_LOGIN);
-                }else{
+                } else {
                     startActivity(new Intent(LifeLabItemActivity.this, FeedbackActivity.class));
                 }
                 break;
@@ -401,7 +401,7 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode != RESULT_CANCELED && requestCode == REQUEST_CODE_LOGIN){
+        if (resultCode != RESULT_CANCELED && requestCode == REQUEST_CODE_LOGIN) {
             getCollectionInfo(false);
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -531,6 +531,7 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
 
         private List<Artist> artists = new ArrayList<Artist>();
         private Map<String, List<Article>> articles = new HashMap<String, List<Article>>();
+        private List<String> articleKeys = new ArrayList<String>();
         private List<Post> posts = new ArrayList<Post>();
 
         public String collection_desc;
@@ -564,6 +565,7 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
                         ArrayList<Article> l = new ArrayList<Article>();
                         l.add(article);
                         lcd.articles.put(k, l);
+                        lcd.articleKeys.add(k);
                     }
                 }
                 JSONArray jartists = data.getJSONArray("artist_list");
@@ -627,7 +629,7 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
 
         public String getArticleGroup(int i) {
             return i < 0 || i >= this.articles.size() ? null :
-                    this.articles.keySet().toArray()[i].toString();
+                    this.articleKeys.get(i);
         }
 
         public Article getArticle(String group, int i) {
