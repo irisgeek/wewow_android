@@ -350,7 +350,7 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
             ClipData clip = ClipData.newPlainText("", s);
             clipboard.setPrimaryClip(clip);
             String msg = getString(R.string.lifepost_copy_success);
-            MessageBoxUtils.messageBoxWithNoButton(LifePostActivity.this, true, msg, 2500);
+            MessageBoxUtils.messageBoxWithNoButton(LifePostActivity.this, true, msg, 1000);
         }
     };
 

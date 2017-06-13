@@ -479,7 +479,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
                         if(read==1) {
                             MessageBoxUtils.messageBoxWithNoButton(DetailArtistActivity.this, true, read == 0 ? getResources()
                                     .getString(R.string.cancel_follow_artist_success) : getResources()
-                                    .getString(R.string.follow_artist_success), 2500);
+                                    .getString(R.string.follow_artist_success), 1000);
                         }
                         FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_DETAIL + id, DetailArtistActivity.this);
                         FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_SUBSCRIBED_ARTISTS_LIST, DetailArtistActivity.this);
