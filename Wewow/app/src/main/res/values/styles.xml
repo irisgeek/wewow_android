@@ -23,6 +23,11 @@
         <item name="android:textColor">@color/tab_text_color</item>
     </style>
 
+    <style name="SearchResultTabLayoutTextAppearance" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/search_text_view_hint_color</item>
+    </style>
+
     <style name="TextAppearance" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
         <item name="android:textSize">18sp</item>
         <item name="android:textColor">@color/tab_text_color</item>

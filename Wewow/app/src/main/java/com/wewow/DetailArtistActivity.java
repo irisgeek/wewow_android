@@ -405,20 +405,21 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
             }
 
         });
+        progressBar.setVisibility(View.GONE);
         if(currentPage==1)
         {
             collapsingToolbar.setVisibility(View.VISIBLE);
 //            collapsingToolbar.startAnimation(moveToViewLocation(0));
-//            imageView.startAnimation(moveToViewLocation(0));
+            imageView.startAnimation(moveToViewLocation(0));
 
-            rv.setVisibility(View.VISIBLE);
-            rv.startAnimation(contentsMoveToViewLocation(200));
+//            rv.setVisibility(View.VISIBLE);
+            rv.startAnimation(contentsMoveToViewLocation(100));
 
         }
         currentPage++;
         rv.loadMoreComplete();
 
-        progressBar.setVisibility(View.GONE);
+
         boolean isLastPageLoaded = false;
         try {
             isLastPageLoaded = isLastPageLoaded();
@@ -764,16 +765,14 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
     }
 
     public static AnimationSet moveToViewLocation(long startOff) {
-        TranslateAnimation mHiddenAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,
-                Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
-                0.2f, Animation.RELATIVE_TO_SELF, 0.0f);
+
 
         AlphaAnimation alpha = new AlphaAnimation(0.0f, 1.0f);
 
         AnimationSet set = new AnimationSet(true);
-        set.addAnimation(mHiddenAction);
+
         set.addAnimation(alpha);
-        set.setDuration(400);
+        set.setDuration(300);
         set.setStartOffset(startOff);
         set.setFillAfter(true);
         set.setInterpolator(new AccelerateInterpolator());
@@ -785,14 +784,14 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
     public static AnimationSet contentsMoveToViewLocation(long startOff) {
         TranslateAnimation mHiddenAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,
                 Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
-                0.2f, Animation.RELATIVE_TO_SELF, 0.0f);
+                0.1f, Animation.RELATIVE_TO_SELF, 0.0f);
         AlphaAnimation alpha = new AlphaAnimation(0.0f, 1.0f);
         AnimationSet set = new AnimationSet(true);
 
         set.addAnimation(mHiddenAction);
         set.addAnimation(alpha);
         set.setStartOffset(startOff);
-        set.setDuration(300);
+        set.setDuration(200);
         set.setFillAfter(true);
         set.setInterpolator(new AccelerateInterpolator());
         return set;

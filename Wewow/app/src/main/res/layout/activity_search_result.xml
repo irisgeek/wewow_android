@@ -101,7 +101,8 @@
             android:layout_height="wrap_content"
             app:tabIndicatorColor="#ffffff"
             app:tabIndicatorHeight="4dp"
-            app:tabSelectedTextColor="#ffffff" />
+            app:tabSelectedTextColor="#ffffff"
+            app:tabTextAppearance="@style/SearchResultTabLayoutTextAppearance" />
 
     </android.support.design.widget.AppBarLayout>
 
