@@ -4,50 +4,43 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
-    <LinearLayout
+    <com.wewow.view.RecyclerViewUpRefresh xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="56dp"
-            android:scaleType="fitXY"
-            android:src="@drawable/divider_topbar" />
-
-
-        <com.cjj.MaterialRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/refresh"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/white"
-            app:isLoadMore="true"
-            app:overlay="false"
-            app:progress_size_type="normal"
-            app:wave_height_type="normal"
-            app:wave_show="false">
-
-            <ListView
-                android:id="@+id/listViewArtists"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginTop="1dp"
-                android:background="@drawable/bg_listview_artist"
-                android:choiceMode="singleChoice"
-                android:divider="#00ffffff"
-                android:scrollbars="none"
-                android:visibility="gone" />
-
-        </com.cjj.MaterialRefreshLayout>
-
-    </LinearLayout>
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="56dp"
+        android:visibility="invisible"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 
     <include layout="@layout/toolbar" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="56dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/divider_topbar" />
+
+    <LinearLayout
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_gravity="center_vertical"
+        android:orientation="vertical">
+
+        <com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar
+            android:id="@+id/progress1"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="2dp"
+            android:visibility="visible"
+            app:mlpb_progress_color="@color/font_color"
+            app:mlpb_progress_stoke_width="3dp" />
+    </LinearLayout>
+
 
 </FrameLayout>

@@ -417,7 +417,17 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
         }
         currentPage++;
         rv.loadMoreComplete();
+
         progressBar.setVisibility(View.GONE);
+        boolean isLastPageLoaded = false;
+        try {
+            isLastPageLoaded = isLastPageLoaded();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if (isLastPageLoaded) {
+            rv.loadMoreEnd();
+        }
 
 
     }
@@ -617,29 +627,6 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
         return super.onOptionsItemSelected(item);
     }
 
-    public void setUpListViewDummy() {
-
-        ListView listView = (ListView) findViewById(R.id.listViewArtists);
-
-        ArrayList<HashMap<String, Object>> listItem = new ArrayList<HashMap<String, Object>>();
-
-        for (int i = 0; i < 8; i++) {
-            HashMap<String, Object> map = new HashMap<String, Object>();
-
-            //
-
-            map.put("imageView", "https://wewow.wewow.com.cn/article/20170327/14513-amanda-kerr-39507.jpg?x-oss-process=image/resize,m_fill,h_384,w_720,,limit_0/quality,Q_40/format,jpg");
-
-            map.put("textViewName", "下厨房");
-            map.put("textViewDesc", "唯美食与爱不可辜负");
-            map.put("textViewArticleCount", "22");
-            map.put("textViewFollowerCount", "534");
-
-            listItem.add(map);
-        }
-
-//        listView.setAdapter(new ListViewArtistsAdapter(this, listItem));
-    }
 
     private void setUpToolBar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -742,6 +729,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
             getArtistFromServer(true);
         } else {
             rv.loadMoreComplete();
+            rv.loadMoreEnd();
         }
 
 

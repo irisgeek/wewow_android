@@ -192,7 +192,7 @@ public class SearchResultActivity extends BaseActivity {
 
             //
 
-            map.put("imageView", posts.get(i).getImage_642_320());
+            map.put("imageView", posts.get(i).getImage_160_160());
 
             map.put("textViewTitle", posts.get(i).getTitle());
             map.put("id",posts.get(i).getId());
@@ -249,7 +249,7 @@ public class SearchResultActivity extends BaseActivity {
 
             JSONObject result = array.getJSONObject(i);
             post.setId(result.getString("id"));
-            post.setImage_642_320(result.getString("image_642_320"));
+            post.setImage_160_160(result.getString("image_160_160"));
             post.setTitle(result.getString("title"));
 
             posts.add(post);

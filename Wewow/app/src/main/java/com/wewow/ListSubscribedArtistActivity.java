@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
@@ -26,12 +27,15 @@ import com.cjj.MaterialRefreshListener;
 import com.jaeger.library.StatusBarUtil;
 import com.wewow.adapter.ListViewArtistsAdapter;
 import com.wewow.adapter.ListViewSubscribedArtistsAdapter;
+import com.wewow.adapter.RecycleViewArtistOfSubscribedArtistList;
 import com.wewow.dto.Artist;
 import com.wewow.netTask.ITask;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.FileCacheUtil;
+import com.wewow.utils.LoadMoreListener;
 import com.wewow.utils.SettingUtils;
 import com.wewow.utils.Utils;
+import com.wewow.view.RecyclerViewUpRefresh;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,19 +53,17 @@ import retrofit.client.Response;
 /**
  * Created by iris on 17/3/24.
  */
-public class ListSubscribedArtistActivity extends BaseActivity implements SwipeRefreshLayout.OnRefreshListener {
+public class ListSubscribedArtistActivity extends BaseActivity implements LoadMoreListener {
 
 
     private int currentPage = 1;
-    private ListView listView;
     private ArrayList<HashMap<String, Object>> listItem;
-    private ListViewSubscribedArtistsAdapter adapter;
+    private RecycleViewArtistOfSubscribedArtistList adapter;
     private int selectedPosition=0;
     private ArrayList<String> read;
-    private MaterialRefreshLayout refreshLayout;
     private int totalPages = 1;
-    private View footer;
-    private LinearLayout footerParent;
+    private LinearLayout progressBar;
+    private RecyclerViewUpRefresh rv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,80 +81,35 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
     }
 
     private void initData() {
+        progressBar=(LinearLayout)findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
 
-        listView = (ListView) findViewById(R.id.listViewArtists);
-        footer=View.inflate(this,R.layout.layout_bottom,null);
-        footerParent = new LinearLayout(this);
-        footerParent.setGravity(Gravity.CENTER_HORIZONTAL);
-        footerParent.setOrientation(LinearLayout.VERTICAL);
-        footerParent.addView(footer);
+        rv = (RecyclerViewUpRefresh) findViewById(R.id.recyclerview);
+        rv.setLayoutManager(new LinearLayoutManager(rv.getContext()));
+        rv.setCanloadMore(true);
+        rv.setLoadMoreListener(this);
 
-        listView.addFooterView(footerParent);
-
-        footer.setVisibility(View.GONE);
 
         listItem = new ArrayList<HashMap<String, Object>>();
         read=new ArrayList<String>();
 
-        refreshLayout = (MaterialRefreshLayout) findViewById(R.id.refresh);
 
-        refreshLayout.setShowArrow(false);
-        int[] colors = {getResources().getColor(R.color.font_color)};
-        refreshLayout.setProgressColors(colors);
-        refreshLayout.setLoadMore(true);
-        refreshLayout.finishRefreshLoadMore();
-
-        refreshLayout.setMaterialRefreshListener(new MaterialRefreshListener() {
-            @Override
-            public void onRefresh(final MaterialRefreshLayout materialRefreshLayout) {
-                footer.setVisibility(View.GONE);
-                currentPage = 1;
-                if (Utils.isNetworkAvailable(ListSubscribedArtistActivity.this)) {
+        currentPage = 1;
+        if (Utils.isNetworkAvailable(ListSubscribedArtistActivity.this)) {
 
 //                    checkcacheUpdatedOrNot();
-                    getArtistListFromServer();
+            getArtistListFromServer();
 
-                } else {
-                    Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
-                    refreshLayout.finishRefresh();
+        } else {
+            Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
+            rv.loadMoreComplete();
+            progressBar.setVisibility(View.GONE);
 
-                    SettingUtils.set(ListSubscribedArtistActivity.this, CommonUtilities.NETWORK_STATE, false);
-                    setUpArtistsFromCache();
+            SettingUtils.set(ListSubscribedArtistActivity.this, CommonUtilities.NETWORK_STATE, false);
+            setUpArtistsFromCache();
 
-                }
+        }
 
-            }
-
-            @Override
-            public void onfinish() {
-
-                refreshLayout.finishRefreshLoadMore();
-            }
-
-            @Override
-            public void onRefreshLoadMore(MaterialRefreshLayout materialRefreshLayout) {
-
-                boolean isLastPageLoaded = false;
-                try {
-                    isLastPageLoaded = isLastPageLoaded();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                if (!isLastPageLoaded) {
-
-                    getArtistListFromServer();
-                } else {
-                    adapter.notifyDataSetChanged();
-                    footer.setVisibility(View.VISIBLE);
-                    onfinish();
-                }
-
-
-            }
-        });
-
-
-        refreshLayout.autoRefresh();
 
     }
 
@@ -191,30 +148,7 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
         return super.onOptionsItemSelected(item);
     }
 
-    public void setUpListViewDummy() {
 
-        ListView listView = (ListView) findViewById(R.id.listViewArtists);
-
-        ArrayList<HashMap<String, Object>> listItem = new ArrayList<HashMap<String, Object>>();
-
-        for (int i = 0; i < 8; i++) {
-            HashMap<String, Object> map = new HashMap<String, Object>();
-
-            //
-
-            map.put("imageView", "https://wewow.wewow.com.cn/article/20170327/14513-amanda-kerr-39507.jpg?x-oss-process=image/resize,m_fill,h_384,w_720,,limit_0/quality,Q_40/format,jpg");
-
-            map.put("textViewName", "下厨房");
-            map.put("textViewDesc", "唯美食与爱不可辜负");
-            map.put("textViewArticleCount", "22");
-            map.put("textViewFollowerCount", "534");
-
-
-            listItem.add(map);
-        }
-
-//        listView.setAdapter(new ListViewArtistsAdapter(this, listItem));
-    }
 
     private void setUpToolBar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -366,16 +300,16 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
 
         if (!refresh)
         {
-            adapter = new ListViewSubscribedArtistsAdapter(this, listItem,read);
+            adapter = new RecycleViewArtistOfSubscribedArtistList(this, listItem,read);
 
-            listView.setAdapter(adapter);
+            rv.setAdapter(adapter);
 
         }
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        rv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                             @Override
                                             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                                                HashMap<String, Object> stringObjectHashMap = (  HashMap<String, Object>)adapter.getItem(position);
+                                                HashMap<String, Object> stringObjectHashMap = (  HashMap<String, Object>)listItem.get(position);
                                                 String artistId=stringObjectHashMap.get("id").toString();
                                                 String read=stringObjectHashMap.get("read").toString();
                                                 if(read.equals("1"))
@@ -391,12 +325,19 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
                                         }
         );
         adapter.notifyDataSetChanged();
-        listView.setVisibility(View.VISIBLE);
+        rv.setVisibility(View.VISIBLE);
         currentPage++;
-        refreshLayout.finishRefresh();
-        refreshLayout.finishRefreshLoadMore();
-//        CardView view=(CardView)findViewById(R.id.refreshCardView);
-//        view.setVisibility(View.VISIBLE);
+        rv.loadMoreComplete();
+        progressBar.setVisibility(View.GONE);
+        boolean isLastPageLoaded = false;
+        try {
+            isLastPageLoaded = isLastPageLoaded();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if (isLastPageLoaded) {
+            rv.loadMoreEnd();
+        }
 
     }
 
@@ -447,7 +388,6 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
     }
 
     private void getArtistListFromServer() {
-        refreshLayout.finishRefresh();
         ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
         String userId = "0";
         //check user login or not
@@ -465,8 +405,8 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
                     String realData = Utils.convertStreamToString(response.getBody().in());
                     if (!realData.contains(CommonUtilities.SUCCESS)) {
                         Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                        refreshLayout.finishRefresh();
-                        refreshLayout.finishRefreshLoadMore();
+                        rv.loadMoreComplete();
+                        progressBar.setVisibility(View.GONE);
 
                     } else {
                         artists = parseArtistsListFromString(realData);
@@ -485,13 +425,13 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
                 } catch (IOException e) {
                     e.printStackTrace();
                     Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                    refreshLayout.finishRefresh();
-                    refreshLayout.finishRefreshLoadMore();
+                    rv.loadMoreComplete();
+                    progressBar.setVisibility(View.GONE);
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                    refreshLayout.finishRefresh();
-                    refreshLayout.finishRefreshLoadMore();
+                    rv.loadMoreComplete();
+                    progressBar.setVisibility(View.GONE);
                 }
 
             }
@@ -499,29 +439,14 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
             @Override
             public void failure(RetrofitError error) {
                 Toast.makeText(ListSubscribedArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                refreshLayout.finishRefresh();
-                refreshLayout.finishRefreshLoadMore();
+                rv.loadMoreComplete();
+                progressBar.setVisibility(View.GONE);
 
             }
         });
     }
 
-    @Override
-    public void onRefresh() {
-        boolean isLastPageLoaded = false;
-        try {
-            isLastPageLoaded = isLastPageLoaded();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        if (!isLastPageLoaded) {
 
-            getArtistListFromServer();
-        }
-        else {
-            refreshLayout.finishRefresh();
-        }
-    }
 
     private boolean isLastPageLoaded() throws JSONException {
 
@@ -555,6 +480,26 @@ public class ListSubscribedArtistActivity extends BaseActivity implements SwipeR
 
                 updateMenuForSubscribedAritstNotification();
             }
+        }
+
+    }
+
+    @Override
+    public void onLoadMore() {
+
+        boolean isLastPageLoaded = false;
+        try {
+            isLastPageLoaded = isLastPageLoaded();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if (!isLastPageLoaded) {
+
+            getArtistListFromServer();
+        } else {
+            adapter.notifyDataSetChanged();
+            rv.loadMoreComplete();
+            rv.loadMoreEnd();
         }
 
     }

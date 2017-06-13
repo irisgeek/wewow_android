@@ -9,7 +9,7 @@ import android.os.Parcelable;
 public class Post implements Parcelable {
 
 
-    private String image_642_320;
+    private String image_160_160;
     private String id;
     private String title;
 
@@ -41,12 +41,12 @@ public class Post implements Parcelable {
 
 
 
-    public String getImage_642_320() {
-        return image_642_320;
+    public String getImage_160_160() {
+        return image_160_160;
     }
 
-    public void setImage_642_320(String image_642_320) {
-        this.image_642_320 = image_642_320;
+    public void setImage_160_160(String image_160_160) {
+        this.image_160_160 = image_160_160;
     }
 
 
