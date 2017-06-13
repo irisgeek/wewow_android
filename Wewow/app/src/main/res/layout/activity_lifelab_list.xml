@@ -49,6 +49,6 @@
         android:scaleType="fitXY"
         android:layout_marginTop="56dp"
         android:background="@color/transparent"
-        android:src="@drawable/divider_top" />
+        android:src="@drawable/divider_topbar" />
 
 </FrameLayout>
