@@ -299,6 +299,40 @@ public class LifeLabActivity extends BaseActivity {
         }
     }
 
+    private void searchData(String keywords) {
+        List<Pair<String, String>> ps = new ArrayList<>();
+        ps.add(new Pair<>("keywords", keywords));
+        progressBar.setVisibility(View.VISIBLE);
+        Object[] params = new Object[]{
+                WebAPIHelper.addUrlParams(String.format("%s/search_mini", CommonUtilities.WS_HOST), ps),
+                new HttpAsyncTask.TaskDelegate() {
+
+                    @Override
+                    public void taskCompletionResult(byte[] result) {
+                        progressBar.setVisibility(View.GONE);
+                        JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
+                        if (jobj == null) {
+                            Toast.makeText(LifeLabActivity.this, R.string.networkError, Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        try {
+                            JSONObject r = jobj.getJSONObject("result");
+                            if (r.getInt("code") != 0) {
+                                Toast.makeText(LifeLabActivity.this, R.string.serverError, Toast.LENGTH_LONG).show();
+                            } else {
+                                JSONObject data = r.getJSONObject("data");
+                                searchDataLoad(data.getJSONArray("collections"));
+                            }
+                        } catch (JSONException e) {
+                            Toast.makeText(LifeLabActivity.this, R.string.serverError, Toast.LENGTH_LONG).show();
+                        }
+                    }
+                },
+                WebAPIHelper.HttpMethod.GET
+        };
+        new HttpAsyncTask().execute(params);
+    }
+
     private void startDataLoading() {
         if (this.hasLocalData()) {
             this.loadLocalData();
@@ -363,6 +397,35 @@ public class LifeLabActivity extends BaseActivity {
             this.pdlg = ProgressDialog.show(this, null, null, true, false);
         } else if (!isshow) {
             this.pdlg.dismiss();
+        }
+    }
+
+    private void searchDataLoad(JSONArray lst) {
+        try{
+            LabData ld = new LabData();
+            ArrayList<LabCollection> l = new ArrayList<>();
+            for (int i = 0; i < lst.length(); i++) {
+                JSONObject jj = lst.getJSONObject(i);
+                LabCollection lc = new LabCollection();
+                lc.id = jj.optLong("collection_id");
+                lc.image = jj.optString("collection_image");
+                lc.title = jj.optString("collection_title");
+                lc.date = jj.optString("date");
+                lc.liked_count = jj.optString("liked_count");
+                lc.order = jj.optInt("order");
+                lc.read_count = jj.optString("read_count");
+                lc.image_642_320 = jj.optString("image_642_320");
+                lc.image_688_316 = jj.optString("image_688_316");
+                l.add(lc);
+            }
+            ld.collections.addAll(l);
+            ld.collectionCount = ld.collections.size();
+            this.filteredLabData = ld;
+            ListAdapter la = this.lvlifelab.getAdapter();
+            LifeLabAdapter adp = (LifeLabAdapter) (la instanceof LifeLabAdapter ? la : ((HeaderViewListAdapter) la).getWrappedAdapter());
+            adp.notifyDataSetChanged();
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -515,7 +578,8 @@ public class LifeLabActivity extends BaseActivity {
 
             @Override
             public boolean onQueryTextSubmit(String query) {
-                LifeLabActivity.this.searchLab(query);
+//                LifeLabActivity.this.searchLab(query);
+                searchData(query);
                 return false;
             }
 

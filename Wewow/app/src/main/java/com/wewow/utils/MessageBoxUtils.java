@@ -47,7 +47,7 @@ public class MessageBoxUtils {
                     //
                 }
             }
-        }, 300);
+        }, 1000);
     }
 
     public static void messageBoxWithButtons(Context cxt, String text, String[] cmds, Object[] tags, MsgboxButtonListener[] btnHandlers) {
