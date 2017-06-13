@@ -243,7 +243,7 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
         tv.setText(p.comment_count + getString(R.string.discuss_people_number));
         final ImageView iv = (ImageView) view.findViewById(R.id.iv_lifelab_item_discuz);
         Glide.with(this)
-                .load(p.image_664_250)
+                .load(p.image_160_160)
                 .placeholder(R.drawable.banner_loading_spinner)
                 .crossFade()
                 .into(iv);
@@ -530,7 +530,7 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
         public static class Post {
             public int id;
             public String title;
-            public String image_664_250;
+            public String image_160_160;
             public int comment_count;
         }
 
@@ -617,7 +617,7 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
         public static Post parsePost(JSONObject jobj) throws JSONException {
             Post p = new Post();
             p.id = jobj.getInt("id");
-            p.image_664_250 = jobj.getString("image_664_250");
+            p.image_160_160 = jobj.getString("image_160_160");
             p.title = jobj.getString("title");
             p.comment_count = jobj.optInt("comment_count");
             return p;

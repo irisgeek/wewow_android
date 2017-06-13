@@ -21,6 +21,10 @@
             android:name="com.huawei.hms.client.appid"
             android:value="10862089" />
 
+        <meta-data
+            android:name="UMENG_CHANNEL"
+            android:value="${UMENG_CHANNEL_VALUE}" />
+
         <provider
             android:name="com.huawei.hms.update.provider.UpdateProvider"
             android:authorities="com.wewow.hms.update.provider"
@@ -140,9 +144,9 @@
         <!--</intent-filter>-->
         <!--</receiver>-->
 
-        <activity android:name=".ArticleActivity"
-            android:screenOrientation="portrait"
-            />
+        <activity
+            android:name=".ArticleActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".LifePostActivity"
             android:label="@string/title_activity_life_post"

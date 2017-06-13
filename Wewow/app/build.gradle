@@ -14,7 +14,7 @@ android {
     useLibrary 'org.apache.http.legacy'
     defaultConfig {
         applicationId "com.wewow"
-        minSdkVersion 19
+        minSdkVersion 16
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
@@ -47,6 +47,26 @@ android {
     defaultConfig {
         resValue("string", "growingio_project_id", "8da9efd1bec385ca")
         resValue("string", "growingio_url_scheme", "growing.148041ce16ffd79b")
+        manifestPlaceholders = [ UMENG_CHANNEL_VALUE:"default_channel" ]
+    }
+
+    productFlavors {
+        default_channel{}
+        _360{}
+        baidu{}
+        yingyongbao{}
+        sougou{}
+        xiaomi{}
+        lenovo{}
+        huawei{}
+        vivo{}
+        meizu{}
+        chuizi{}
+        oppo{}
+        jifeng{}
+    }
+    productFlavors.all { flavor ->
+        flavor.manifestPlaceholders = [ UMENG_CHANNEL_VALUE:name ]
     }
 }
 
