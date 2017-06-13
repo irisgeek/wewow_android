@@ -52,18 +52,42 @@ android {
 
     productFlavors {
         default_channel{}
-        _360{}
-        baidu{}
-        yingyongbao{}
-        sougou{}
-        xiaomi{}
-        lenovo{}
-        huawei{}
-        vivo{}
-        meizu{}
-        chuizi{}
-        oppo{}
-        jifeng{}
+        _360{
+            buildConfigField "String","AUTO_TYPE","\"1\""
+        }
+        baidu{
+            buildConfigField "String","AUTO_TYPE","\"2\""
+        }
+        yingyongbao{
+            buildConfigField "String","AUTO_TYPE","\"3\""
+        }
+        sougou{
+            buildConfigField "String","AUTO_TYPE","\"4\""
+        }
+        xiaomi{
+            buildConfigField "String","AUTO_TYPE","\"5\""
+        }
+        lenovo{
+            buildConfigField "String","AUTO_TYPE","\"6\""
+        }
+        huawei{
+            buildConfigField "String","AUTO_TYPE","\"7\""
+        }
+        vivo{
+            buildConfigField "String","AUTO_TYPE","\"8\""
+        }
+        meizu{
+            buildConfigField "String","AUTO_TYPE","\"9\""
+        }
+        chuizi{
+            buildConfigField "String","AUTO_TYPE","\"10\""
+        }
+        oppo{
+            buildConfigField "String","AUTO_TYPE","\"11\""
+        }
+        jifeng{
+            buildConfigField "String","AUTO_TYPE","\"12\""
+        }
     }
     productFlavors.all { flavor ->
         flavor.manifestPlaceholders = [ UMENG_CHANNEL_VALUE:name ]
