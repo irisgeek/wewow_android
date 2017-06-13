@@ -376,7 +376,7 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
                                     if (like == 1) {
                                         lcd.liked_count += 1;
                                         s = LifeLabItemActivity.this.getString(R.string.fav_succeed);
-                                        MessageBoxUtils.messageBoxWithNoButton(LifeLabItemActivity.this, true, s, 2500);
+                                        MessageBoxUtils.messageBoxWithNoButton(LifeLabItemActivity.this, true, s, 1000);
                                     } else {
                                         lcd.liked_count -= 1;
                                     }
@@ -386,7 +386,7 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
                                     Log.e(TAG, String.format("favourite fail: %s", e.getMessage()));
                                     Toast.makeText(LifeLabItemActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
                                     String s = LifeLabItemActivity.this.getString(like == 1 ? R.string.fav_fail : R.string.unfav_fail);
-                                    MessageBoxUtils.messageBoxWithNoButton(LifeLabItemActivity.this, false, s, 2500);
+                                    MessageBoxUtils.messageBoxWithNoButton(LifeLabItemActivity.this, false, s, 1000);
                                 }
                             }
                         },

@@ -87,7 +87,7 @@ public class AddPostActivity extends AppCompatActivity {
                                     if (code != 0) {
                                         throw new Exception(String.format("add_comment returns %d", code));
                                     }
-                                    MessageBoxUtils.messageBoxWithNoButton(AddPostActivity.this, true, jobj.getJSONObject("result").optString("message"), 2500);
+                                    MessageBoxUtils.messageBoxWithNoButton(AddPostActivity.this, true, jobj.getJSONObject("result").optString("message"), 1000);
                                     Log.d(TAG, new String(result));
                                     Intent data = new Intent();
                                     data.putExtra("new_comment", jobj.getJSONObject("result").getJSONObject("data").getJSONObject("new_comment").toString());
@@ -96,7 +96,7 @@ public class AddPostActivity extends AppCompatActivity {
                                         public void run() {
                                             AddPostActivity.this.finish();
                                         }
-                                    }, 2800);
+                                    }, 1200);
                                 } catch (Exception e) {
                                     Log.e(TAG, String.format("save post error: %s: ", e.getMessage()));
                                 }

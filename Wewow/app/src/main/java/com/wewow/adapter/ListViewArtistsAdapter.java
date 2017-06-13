@@ -158,7 +158,7 @@ public class ListViewArtistsAdapter extends BaseAdapter {
                         if(read==1) {
                             MessageBoxUtils.messageBoxWithNoButton(context, true, read == 0 ? context.getResources()
                                     .getString(R.string.cancel_follow_artist_success) : context.getResources()
-                                    .getString(R.string.follow_artist_success), 2500);
+                                    .getString(R.string.follow_artist_success), 1000);
                         }
                         notifyDataSetChanged();
                         FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_LIST, context);
