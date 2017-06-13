@@ -368,7 +368,12 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
                                 try {
                                     int i = jobj.getJSONObject("result").getInt("code");
                                     if (i != 0) {
-                                        throw new Exception(String.valueOf(i));
+                                        if(i==403){
+                                            LoginUtils.startLogin(LifeLabItemActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
+                                        }
+                                        else {
+                                            throw new Exception(String.valueOf(i));
+                                        }
                                     }
                                     String s;
                                     LifeLabItemActivity.this.like.setImageDrawable(LifeLabItemActivity.this.getResources().getDrawable(like == 1 ? R.drawable.marked : R.drawable.mark));

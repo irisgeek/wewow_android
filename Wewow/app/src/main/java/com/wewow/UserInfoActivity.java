@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.jaeger.library.StatusBarUtil;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
+import com.wewow.utils.LoginUtils;
 import com.wewow.utils.MessageBoxUtils;
 import com.wewow.utils.ProgressDialogUtil;
 import com.wewow.utils.WebAPIHelper;
@@ -240,7 +241,12 @@ public class UserInfoActivity extends Activity {
                         JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
                         try {
                             if (jobj.getJSONObject("result").getInt("code") != 0) {
-                                throw new Exception();
+                                if(jobj.getJSONObject("result").getInt("code")==403){
+                                    LoginUtils.startLogin(UserInfoActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
+                                }
+                                else {
+                                    throw new Exception();
+                                }
                             }
                             UserInfoActivity.this.updateLocalUserInfo();
                             Toast.makeText(UserInfoActivity.this, R.string.userinfo_update_success, Toast.LENGTH_LONG).show();

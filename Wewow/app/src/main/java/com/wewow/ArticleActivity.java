@@ -249,7 +249,12 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
                                 try {
                                     int i = jobj.getJSONObject("result").getInt("code");
                                     if (i != 0) {
-                                        throw new Exception(String.valueOf(i));
+                                        if(i==403){
+                                            LoginUtils.startLogin(ArticleActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
+                                        }
+                                        else {
+                                            throw new Exception(String.valueOf(i));
+                                        }
                                     }
                                     ArticleActivity.this.like.setImageDrawable(ArticleActivity.this.getResources().getDrawable(like == 1 ? R.drawable.marked_b : R.drawable.mark_b));
                                     String s;
@@ -383,7 +388,12 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
                         try {
                             JSONObject r = jobj.getJSONObject("result");
                             if (r.getInt("code") != 0) {
-                                Toast.makeText(ArticleActivity.this, R.string.serverError, Toast.LENGTH_LONG).show();
+                                if(r.getInt("code")==403){
+                                    LoginUtils.startLogin(ArticleActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
+                                }
+                                else {
+                                    Toast.makeText(ArticleActivity.this, R.string.serverError, Toast.LENGTH_LONG).show();
+                                }
                             } else {
                                 comment.put("liked", comment.optInt("liked", 0) == 1 ? 0 : 1);
                                 if(comment.optInt("liked", 0) == 1){
