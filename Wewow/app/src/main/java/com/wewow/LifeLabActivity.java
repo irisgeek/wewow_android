@@ -4,11 +4,13 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.app.ActionBar;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
@@ -24,6 +26,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.HeaderViewListAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -89,13 +92,24 @@ public class LifeLabActivity extends BaseActivity {
             }
         });
         this.lvlifelab = (ListView) this.findViewById(R.id.list_lifelab);
+
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, 12);
+        View view = getLayoutInflater().inflate(R.layout.list_header_life_labs,null);
+
+
+        this.lvlifelab.addHeaderView(view);
         this.lvlifelab.addFooterView(this.foot);
         this.lvlifelab.setAdapter(new LifeLabAdapter());
         this.lvlifelab.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 LabCollection lc = (LabCollection) adapterView.getAdapter().getItem(i);
-                LifeLabActivity.this.openLifeLab(adapterView, view, lc);
+                Intent intent = new Intent(LifeLabActivity.this, LifeLabItemActivity.class);
+                intent.putExtra(LifeLabItemActivity.LIFELAB_COLLECTION, lc);
+                LifeLabActivity.this.startActivityForResult(intent, 0);
+
+//                LifeLabActivity.this.openLifeLab(adapterView, view, lc);
             }
         });
         this.lvlifelab.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -146,7 +160,7 @@ public class LifeLabActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 0) {
-            this.revert();
+//            this.revert();
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
