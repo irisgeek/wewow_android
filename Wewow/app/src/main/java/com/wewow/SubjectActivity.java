@@ -275,13 +275,13 @@ public class SubjectActivity extends BaseActivity {
         rv.setAdapter(new RecycleViewInstitutesOfSubjectAdapter(this,
                 listItem));
         final ScrollView scrollView=(ScrollView)findViewById(R.id.root);
-        scrollView.post(new Runnable() {
+        scrollView.postDelayed(new Runnable() {
             @Override
             public void run() {
 
                 scrollView.fullScroll(ScrollView.FOCUS_UP);
             }
-        });
+        },300);
 
 
     }
