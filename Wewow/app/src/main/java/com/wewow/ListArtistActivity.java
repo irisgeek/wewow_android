@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
@@ -26,12 +27,15 @@ import com.cjj.MaterialRefreshLayout;
 import com.cjj.MaterialRefreshListener;
 import com.jaeger.library.StatusBarUtil;
 import com.wewow.adapter.ListViewArtistsAdapter;
+import com.wewow.adapter.RecycleViewArtistOfArtistList;
 import com.wewow.dto.Artist;
 import com.wewow.netTask.ITask;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.FileCacheUtil;
+import com.wewow.utils.LoadMoreListener;
 import com.wewow.utils.SettingUtils;
 import com.wewow.utils.Utils;
+import com.wewow.view.RecyclerViewUpRefresh;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,22 +54,20 @@ import retrofit.client.Response;
 /**
  * Created by iris on 17/3/24.
  */
-public class ListArtistActivity extends BaseActivity {
+public class ListArtistActivity extends BaseActivity implements LoadMoreListener {
 
 
     private int currentPage = 1;
-    private ListView listView;
     private ArrayList<HashMap<String, Object>> listItem;
-    private ListViewArtistsAdapter adapter;
-    private MaterialRefreshLayout refreshLayout;
+    private RecycleViewArtistOfArtistList adapter;
     private String artistId;
     private List<Artist> artistsTemp;
     private List<Artist> allArtists;
     private boolean isHeaderAdded = false;
     private ArrayList<String> followStatus;
     private int totalPages = 1;
-    private LinearLayout footerParent;
-    private View footer;
+    private RecyclerViewUpRefresh rv;
+    private LinearLayout progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,81 +81,34 @@ public class ListArtistActivity extends BaseActivity {
     }
 
     private void initData() {
+        progressBar=(LinearLayout)findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
 
-        listView = (ListView) findViewById(R.id.listViewArtists);
-        footer=View.inflate(this,R.layout.layout_bottom,null);
-        footerParent = new LinearLayout(this);
-        footerParent.setGravity(Gravity.CENTER_HORIZONTAL);
-        footerParent.setOrientation(LinearLayout.VERTICAL);
-        footerParent.addView(footer);
+        rv = (RecyclerViewUpRefresh) findViewById(R.id.recyclerview);
+        rv.setLayoutManager(new LinearLayoutManager(rv.getContext()));
+        rv.setCanloadMore(true);
+        rv.setLoadMoreListener(this);
 
-        listView.addFooterView(footerParent);
-
-        footer.setVisibility(View.GONE);
         followStatus = new ArrayList<String>();
         listItem = new ArrayList<HashMap<String, Object>>();
         allArtists = new ArrayList<Artist>();
-        refreshLayout = (MaterialRefreshLayout) findViewById(R.id.refresh);
 
 
-        refreshLayout.setShowArrow(false);
-        int[] colors = {getResources().getColor(R.color.font_color)};
-        refreshLayout.setProgressColors(colors);
-        refreshLayout.setLoadMore(true);
-        refreshLayout.finishRefreshLoadMore();
-
-        refreshLayout.setMaterialRefreshListener(new MaterialRefreshListener() {
-            @Override
-            public void onRefresh(final MaterialRefreshLayout materialRefreshLayout) {
-                currentPage = 1;
-                footer.setVisibility(View.GONE);
-                if (Utils.isNetworkAvailable(ListArtistActivity.this)) {
+            currentPage = 1;
+            if (Utils.isNetworkAvailable(ListArtistActivity.this)) {
 
 //                    checkcacheUpdatedOrNot();
-                    getArtistListFromServer();
+                getArtistListFromServer();
 
-                } else {
-                    Toast.makeText(ListArtistActivity.this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
-                    refreshLayout.finishRefresh();
-
-                    SettingUtils.set(ListArtistActivity.this, CommonUtilities.NETWORK_STATE, false);
-                    setUpArtistsFromCache();
-
-                }
+            } else {
+                Toast.makeText(ListArtistActivity.this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
+                rv.loadMoreComplete();
+                progressBar.setVisibility(View.GONE);
+                SettingUtils.set(ListArtistActivity.this, CommonUtilities.NETWORK_STATE, false);
+                setUpArtistsFromCache();
 
             }
 
-            @Override
-            public void onfinish() {
-
-                refreshLayout.finishRefreshLoadMore();
-            }
-
-            @Override
-            public void onRefreshLoadMore(MaterialRefreshLayout materialRefreshLayout) {
-
-                boolean isLastPageLoaded = false;
-                try {
-                    isLastPageLoaded = isLastPageLoaded();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                if (!isLastPageLoaded) {
-
-                    getArtistListFromServer();
-                } else {
-                    adapter.notifyDataSetChanged();
-
-                    onfinish();
-                    footer.setVisibility(View.VISIBLE);
-                }
-
-
-            }
-        });
-
-
-        refreshLayout.autoRefresh();
 
     }
 
@@ -273,36 +228,12 @@ public class ListArtistActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void setUpListViewDummy() {
-
-        ListView listView = (ListView) findViewById(R.id.listViewArtists);
-
-        ArrayList<HashMap<String, Object>> listItem = new ArrayList<HashMap<String, Object>>();
-
-        for (int i = 0; i < 8; i++) {
-            HashMap<String, Object> map = new HashMap<String, Object>();
-
-            //
-
-            map.put("imageView", "https://wewow.wewow.com.cn/article/20170327/14513-amanda-kerr-39507.jpg?x-oss-process=image/resize,m_fill,h_384,w_720,,limit_0/quality,Q_40/format,jpg");
-
-            map.put("textViewName", "下厨房");
-            map.put("textViewDesc", "唯美食与爱不可辜负");
-            map.put("textViewArticleCount", "22");
-            map.put("textViewFollowerCount", "534");
-
-
-            listItem.add(map);
-        }
-
-//        listView.setAdapter(new ListViewArtistsAdapter(this, listItem));
-    }
 
     private void setUpToolBar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.menu_b);
-        getSupportActionBar().setTitle(getResources().getString(R.string.all_artists_title));
+        getSupportActionBar().setTitle(getResources().getString(R.string.artists_title));
 
     }
 
@@ -341,7 +272,8 @@ public class ListArtistActivity extends BaseActivity {
                     if (!realData.contains(com.wewow.utils.CommonUtilities.SUCCESS)) {
                         Toast.makeText(ListArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
 
-                        refreshLayout.finishRefresh();
+                        rv.loadMoreComplete();
+                        progressBar.setVisibility(View.GONE);
 
                     } else {
                         JSONObject jsonObject = new JSONObject(realData);
@@ -366,11 +298,13 @@ public class ListArtistActivity extends BaseActivity {
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
-                    refreshLayout.finishRefresh();
+                   rv.loadMoreComplete();
+                    progressBar.setVisibility(View.GONE);
                     Toast.makeText(ListArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
 
                 } catch (JSONException e) {
-                    refreshLayout.finishRefresh();
+                    rv.loadMoreComplete();
+                    progressBar.setVisibility(View.GONE);
                     Toast.makeText(ListArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
 
@@ -450,9 +384,9 @@ public class ListArtistActivity extends BaseActivity {
         }
 
         if (!refresh) {
-            adapter = new ListViewArtistsAdapter(this, listItem, followStatus);
+            adapter = new RecycleViewArtistOfArtistList(this, listItem, followStatus);
 
-            listView.setAdapter(adapter);
+            rv.setAdapter(adapter);
 
 //            if(!isHeaderAdded) {
 //
@@ -462,11 +396,11 @@ public class ListArtistActivity extends BaseActivity {
 //            }
 
         }
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        rv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                             @Override
                                             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                                                HashMap<String, Object> stringObjectHashMap = (HashMap<String, Object>) adapter.getItem(position);
+                                                HashMap<String, Object> stringObjectHashMap = listItem.get(position);
                                                 artistId = stringObjectHashMap.get("id").toString();
                                                 Intent intent = new Intent(ListArtistActivity.this, DetailArtistActivity.class);
                                                 intent.putExtra("id", artistId);
@@ -475,12 +409,19 @@ public class ListArtistActivity extends BaseActivity {
                                         }
         );
         adapter.notifyDataSetChanged();
-        listView.setVisibility(View.VISIBLE);
+        rv.setVisibility(View.VISIBLE);
         currentPage++;
-        refreshLayout.finishRefresh();
-        refreshLayout.finishRefreshLoadMore();
-//        CardView view=(CardView)findViewById(R.id.refreshCardView);
-//        view.setVisibility(View.VISIBLE);
+        rv.loadMoreComplete();
+        progressBar.setVisibility(View.GONE);
+        boolean isLastPageLoaded = false;
+        try {
+            isLastPageLoaded = isLastPageLoaded();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if (isLastPageLoaded) {
+            rv.loadMoreEnd();
+        }
 
 
     }
@@ -542,9 +483,8 @@ public class ListArtistActivity extends BaseActivity {
                     String realData = Utils.convertStreamToString(response.getBody().in());
                     if (!realData.contains(CommonUtilities.SUCCESS)) {
                         Toast.makeText(ListArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                        refreshLayout.finishRefresh();
-                        refreshLayout.finishRefreshLoadMore();
-
+                        rv.loadMoreComplete();
+                        progressBar.setVisibility(View.GONE);
                     } else {
                         artistsTemp = parseArtistsListFromString(realData);
                         JSONObject objectData = new JSONObject(realData);
@@ -562,13 +502,13 @@ public class ListArtistActivity extends BaseActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                     Toast.makeText(ListArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                    refreshLayout.finishRefreshLoadMore();
-                    refreshLayout.finishRefresh();
+                    rv.loadMoreComplete();
+                    progressBar.setVisibility(View.GONE);
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Toast.makeText(ListArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                    refreshLayout.finishRefreshLoadMore();
-                    refreshLayout.finishRefresh();
+                   rv.loadMoreComplete();
+                    progressBar.setVisibility(View.GONE);
                 }
 
             }
@@ -576,8 +516,8 @@ public class ListArtistActivity extends BaseActivity {
             @Override
             public void failure(RetrofitError error) {
                 Toast.makeText(ListArtistActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
-                refreshLayout.finishRefreshLoadMore();
-                refreshLayout.finishRefresh();
+                rv.loadMoreComplete();
+                progressBar.setVisibility(View.GONE);
 
             }
         });
@@ -623,4 +563,26 @@ public class ListArtistActivity extends BaseActivity {
 
         }
     }
+
+    @Override
+    public void onLoadMore() {
+        boolean isLastPageLoaded = false;
+        try {
+            isLastPageLoaded = isLastPageLoaded();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if (!isLastPageLoaded) {
+
+            getArtistListFromServer();
+        } else {
+            adapter.notifyDataSetChanged();
+
+            rv.loadMoreComplete();
+            rv.loadMoreEnd();
+        }
+
+
+    }
+
 }

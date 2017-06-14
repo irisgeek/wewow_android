@@ -52,7 +52,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="17dp"
 
-                android:src="@drawable/selector_btn_back"/>
+                android:src="@drawable/back_white"/>
             <LinearLayout
                 android:layout_width="244dp"
                 android:layout_height="match_parent"
@@ -92,7 +92,7 @@
                 android:layout_weight="1"
                 android:layout_marginLeft="17dp"
                 android:layout_gravity="center_vertical"
-                android:src="@drawable/selector_btn_search"/>
+                android:src="@drawable/search_white"/>
         </LinearLayout>
 
         <android.support.design.widget.TabLayout
@@ -101,7 +101,8 @@
             android:layout_height="wrap_content"
             app:tabIndicatorColor="#ffffff"
             app:tabIndicatorHeight="4dp"
-            app:tabSelectedTextColor="#ffffff" />
+            app:tabSelectedTextColor="#ffffff"
+            app:tabTextAppearance="@style/SearchResultTabLayoutTextAppearance" />
 
     </android.support.design.widget.AppBarLayout>
 
@@ -124,6 +125,7 @@
 
             <com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar
                 android:id="@+id/progress1"
+                android:layout_marginTop="20dp"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_gravity="center_horizontal"

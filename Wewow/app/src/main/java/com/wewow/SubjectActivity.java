@@ -274,6 +274,14 @@ public class SubjectActivity extends BaseActivity {
         rv.setLayoutManager(new LinearLayoutManager(rv.getContext()));
         rv.setAdapter(new RecycleViewInstitutesOfSubjectAdapter(this,
                 listItem));
+        final ScrollView scrollView=(ScrollView)findViewById(R.id.root);
+        scrollView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                scrollView.fullScroll(ScrollView.FOCUS_UP);
+            }
+        },300);
 
 
     }

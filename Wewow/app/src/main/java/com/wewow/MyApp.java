@@ -29,15 +29,20 @@ import java.util.Date;
 public class MyApp extends Application implements Thread.UncaughtExceptionHandler {
 
     private final static String TAG = "WewowAPP";
+    private String[] channels = {"wewow_android", "360", "baidu", "yingyongbao", "sougou", "xiaomi", "lenovo", "huawei", "vivo",
+            "meizu", "chuizi", "oppo", "pp", "taobao", "aliyun", "wandoujia", "UC", "yingyonghui", "anzhi", "mumayi", "ifanr",
+            "appso", "zuimei", "shaoshupai", "haoqixin", "36kr", "apipi"
+    };
 
     @Override
     public void onCreate() {
         super.onCreate();
         Thread.setDefaultUncaughtExceptionHandler(this);
+        String channel=channels[Integer.parseInt(BuildConfig.AUTO_TYPE)];
         GrowingIO.startWithConfiguration(this, new Configuration()
                 .useID()
                 .trackAllFragments()
-                .setChannel(getResources().getString(R.string.growingio_channel)));
+                .setChannel(channel));
         setUpLeanCloud();
 
     }

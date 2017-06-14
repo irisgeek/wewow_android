@@ -85,7 +85,12 @@ public class AddPostActivity extends AppCompatActivity {
                                 try {
                                     int code = jobj.getJSONObject("result").getInt("code");
                                     if (code != 0) {
-                                        throw new Exception(String.format("add_comment returns %d", code));
+                                        if(code==403){
+                                            LoginUtils.startLogin(AddPostActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
+                                        }
+                                        else {
+                                            throw new Exception(String.format("add_comment returns %d", code));
+                                        }
                                     }
                                     MessageBoxUtils.messageBoxWithNoButton(AddPostActivity.this, true, jobj.getJSONObject("result").optString("message"), 1000);
                                     Log.d(TAG, new String(result));

@@ -24,6 +24,7 @@ import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 import com.wewow.dto.Comment;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.HttpAsyncTask;
+import com.wewow.utils.LoginUtils;
 import com.wewow.utils.WebAPIHelper;
 
 import org.json.JSONException;
@@ -150,7 +151,12 @@ public class AllCommentActivity extends Activity implements View.OnClickListener
                         try {
                             JSONObject r = jobj.getJSONObject("result");
                             if (r.getInt("code") != 0) {
-                                Toast.makeText(context, R.string.serverError, Toast.LENGTH_LONG).show();
+                                if(r.getInt("code")==403){
+                                    LoginUtils.startLogin(AllCommentActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
+                                }
+                                else {
+                                    Toast.makeText(context, R.string.serverError, Toast.LENGTH_LONG).show();
+                                }
                             } else {
                                 dataChange = true;
                                 JSONObject data = r.getJSONObject("data");
@@ -196,7 +202,12 @@ public class AllCommentActivity extends Activity implements View.OnClickListener
                         try {
                             JSONObject r = jobj.getJSONObject("result");
                             if (r.getInt("code") != 0) {
-                                Toast.makeText(context, R.string.serverError, Toast.LENGTH_LONG).show();
+                                if(r.getInt("code")==403){
+                                    LoginUtils.startLogin(AllCommentActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
+                                }
+                                else {
+                                    Toast.makeText(context, R.string.serverError, Toast.LENGTH_LONG).show();
+                                }
                             } else {
                                 dataChange = true;
                                 comment.setLiked(comment.getLiked() == 1 ? 0 : 1);

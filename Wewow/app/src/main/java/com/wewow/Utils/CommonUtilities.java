@@ -12,7 +12,7 @@ public class CommonUtilities {
     public static final String FILE_DIR="\"data/\"";
     public static final String REQUEST_HEADER_PREFIX="Wewow/Android";
     public static final String SUCCESS="success";
-    public static final String DATE="date";
+    public static final String ID="id";
 
     public static final String NETWORK_STATE="network_state";
 
@@ -38,6 +38,7 @@ public class CommonUtilities {
     public static final String CACHE_FILE_SUBJECT="cache_file_subject";
 
     public static final String CACHE_FILE_NOTIFICATION="cache_file_notification";
+    public static final String CACHE_FILE_UPDATE="cache_file_update";
     public static final String CACHE_FILE_HOT_WORDS="cache_file_hot_words";
     public static final String NOTIFICATION_READ="notification_read";
     public static final String CACHE_FILE_ADS="cache_file_ads";
@@ -62,7 +63,7 @@ public class CommonUtilities {
 
     public  static final String BRAND_NAME_HUAWEI="HUAWEI";
 
-
+    public static final String APK=".apk";
 
     public static final String Weibo_AppKey = "3768596648";
     public static final String Weibo_AppSecret = "0225c1f9f4b1a9858f64d9a7e865ef23";

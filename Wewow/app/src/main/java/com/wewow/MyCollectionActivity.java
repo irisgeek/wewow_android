@@ -366,7 +366,12 @@ public class MyCollectionActivity extends BaseActivity {
                             try {
                                 int i = jobj.getJSONObject("result").getInt("code");
                                 if (i != 0) {
-                                    throw new JSONException(String.format("result: %d", i));
+                                    if(i==403){
+                                        LoginUtils.startLogin(MyCollectionActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
+                                    }
+                                    else {
+                                        throw new JSONException(String.format("result: %d", i));
+                                    }
                                 }
                                 MyCollectionActivity.this.onCollectionDeleted(id);
                             } catch (JSONException e) {

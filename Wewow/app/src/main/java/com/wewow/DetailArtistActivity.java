@@ -150,6 +150,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
             public void onStateChanged(AppBarLayout appBarLayout, State state) {
                 Log.d("STATE", state.name());
                 if (state == State.EXPANDED) {
+                    imageView.clearAnimation();
                     imageView.setVisibility(View.VISIBLE);
                     textViewNickName.setVisibility(View.VISIBLE);
                     textViewDesc.setVisibility(View.VISIBLE);
@@ -157,7 +158,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
                     //展开状态
 
                 } else if (state == State.COLLAPSED) {
-
+                    imageView.clearAnimation();
                     imageView.setVisibility(View.GONE);
                     textViewNickName.setVisibility(View.GONE);
                     textViewDesc.setVisibility(View.GONE);
@@ -166,6 +167,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
                     //折叠状态
 
                 } else {
+                    imageView.clearAnimation();
                     imageView.setVisibility(View.GONE);
                     textViewNickName.setVisibility(View.GONE);
                     textViewDesc.setVisibility(View.GONE);
@@ -405,19 +407,30 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
             }
 
         });
+        progressBar.setVisibility(View.GONE);
         if(currentPage==1)
         {
             collapsingToolbar.setVisibility(View.VISIBLE);
-            collapsingToolbar.startAnimation(moveToViewLocation(0));
-//            imageView.startAnimation(moveToViewLocation(0));
+//            collapsingToolbar.startAnimation(moveToViewLocation(0));
+            imageView.startAnimation(moveToViewLocation(0));
 
-            rv.setVisibility(View.VISIBLE);
-            rv.startAnimation(contentsMoveToViewLocation(200));
+//            rv.setVisibility(View.VISIBLE);
+            rv.startAnimation(contentsMoveToViewLocation(100));
 
         }
         currentPage++;
         rv.loadMoreComplete();
-        progressBar.setVisibility(View.GONE);
+
+
+        boolean isLastPageLoaded = false;
+        try {
+            isLastPageLoaded = isLastPageLoaded();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if (isLastPageLoaded) {
+            rv.loadMoreEnd();
+        }
 
 
     }
@@ -617,29 +630,6 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
         return super.onOptionsItemSelected(item);
     }
 
-    public void setUpListViewDummy() {
-
-        ListView listView = (ListView) findViewById(R.id.listViewArtists);
-
-        ArrayList<HashMap<String, Object>> listItem = new ArrayList<HashMap<String, Object>>();
-
-        for (int i = 0; i < 8; i++) {
-            HashMap<String, Object> map = new HashMap<String, Object>();
-
-            //
-
-            map.put("imageView", "https://wewow.wewow.com.cn/article/20170327/14513-amanda-kerr-39507.jpg?x-oss-process=image/resize,m_fill,h_384,w_720,,limit_0/quality,Q_40/format,jpg");
-
-            map.put("textViewName", "下厨房");
-            map.put("textViewDesc", "唯美食与爱不可辜负");
-            map.put("textViewArticleCount", "22");
-            map.put("textViewFollowerCount", "534");
-
-            listItem.add(map);
-        }
-
-//        listView.setAdapter(new ListViewArtistsAdapter(this, listItem));
-    }
 
     private void setUpToolBar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -742,6 +732,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
             getArtistFromServer(true);
         } else {
             rv.loadMoreComplete();
+            rv.loadMoreEnd();
         }
 
 
@@ -776,16 +767,14 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
     }
 
     public static AnimationSet moveToViewLocation(long startOff) {
-        TranslateAnimation mHiddenAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,
-                Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
-                0.2f, Animation.RELATIVE_TO_SELF, 0.0f);
+
 
         AlphaAnimation alpha = new AlphaAnimation(0.0f, 1.0f);
 
         AnimationSet set = new AnimationSet(true);
-        set.addAnimation(mHiddenAction);
+
         set.addAnimation(alpha);
-        set.setDuration(400);
+        set.setDuration(300);
         set.setStartOffset(startOff);
         set.setFillAfter(true);
         set.setInterpolator(new AccelerateInterpolator());
@@ -797,14 +786,14 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
     public static AnimationSet contentsMoveToViewLocation(long startOff) {
         TranslateAnimation mHiddenAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,
                 Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
-                0.2f, Animation.RELATIVE_TO_SELF, 0.0f);
+                0.1f, Animation.RELATIVE_TO_SELF, 0.0f);
         AlphaAnimation alpha = new AlphaAnimation(0.0f, 1.0f);
         AnimationSet set = new AnimationSet(true);
 
         set.addAnimation(mHiddenAction);
         set.addAnimation(alpha);
         set.setStartOffset(startOff);
-        set.setDuration(300);
+        set.setDuration(200);
         set.setFillAfter(true);
         set.setInterpolator(new AccelerateInterpolator());
         return set;

@@ -154,15 +154,17 @@
     <com.wewow.view.RecyclerViewUpRefresh xmlns:android="http://schemas.android.com/apk/res/android"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:id="@+id/recyclerview"
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         />
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_marginTop="256dp"
         android:id="@+id/progressBar"
+        android:layout_height="match_parent">
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:layout_marginTop="256dp"
         android:orientation="vertical">
 
         <com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar
@@ -174,6 +176,7 @@
             android:visibility="visible"
             app:mlpb_progress_color="@color/font_color"
             app:mlpb_progress_stoke_width="3dp" />
+    </LinearLayout>
     </LinearLayout>
 
     <!--</com.cjj.MaterialRefreshLayout>-->

@@ -306,11 +306,13 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
                     new HttpAsyncTask.TaskDelegate() {
                         @Override
                         public void taskCompletionResult(byte[] result) {
+
                             JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
                             iv.setImageDrawable(isliking ? LifePostActivity.this.getResources().getDrawable(R.drawable.like) : drliked);
                             TextView tv = (TextView) likearea.findViewById(R.id.lifepost_comment_liked);
                             int likecount = Integer.parseInt(tv.getText().toString());
                             tv.setText(String.valueOf(isliking ? likecount - 1 : likecount + 1));
+
                         }
                     },
                     WebAPIHelper.HttpMethod.POST,
@@ -395,16 +397,23 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
                                 try {
                                     int code = jobj.getJSONObject("result").getInt("code");
                                     if (code != 0) {
-                                        throw new Exception(String.format("delete comment returns %d", code));
-                                    }
-                                    for (int i = 0; i < LifePostActivity.this.comments.size(); i++) {
-                                        if (id == LifePostActivity.this.comments.get(i).optInt("id")) {
-                                            LifePostActivity.this.comments.remove(i);
-                                            LifePostActivity.this.adapter.notifyDataSetChanged();
-                                            break;
+                                        if(code==403){
+                                            LoginUtils.startLogin(LifePostActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
+                                        }
+                                        else {
+                                            throw new Exception(String.format("delete comment returns %d", code));
                                         }
                                     }
-                                    Toast.makeText(LifePostActivity.this, R.string.lifepost_del_comment_success, Toast.LENGTH_LONG).show();
+                                    else {
+                                        for (int i = 0; i < LifePostActivity.this.comments.size(); i++) {
+                                            if (id == LifePostActivity.this.comments.get(i).optInt("id")) {
+                                                LifePostActivity.this.comments.remove(i);
+                                                LifePostActivity.this.adapter.notifyDataSetChanged();
+                                                break;
+                                            }
+                                        }
+                                        Toast.makeText(LifePostActivity.this, R.string.lifepost_del_comment_success, Toast.LENGTH_LONG).show();
+                                    }
                                 } catch (Exception e) {
                                     Log.e(TAG, String.format("delete comment fail: %s", e.getMessage()));
                                     Toast.makeText(LifePostActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
@@ -447,7 +456,12 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
                                                         try {
                                                             JSONObject resultData = jobj.getJSONObject("result");
                                                             if (resultData.optInt("code") != 0) {
-                                                                Toast.makeText(LifePostActivity.this, resultData.optString("message"), Toast.LENGTH_LONG).show();
+                                                                if(resultData.optInt("code")==403){
+                                                                    LoginUtils.startLogin(LifePostActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
+                                                                }
+                                                                else {
+                                                                    Toast.makeText(LifePostActivity.this, resultData.optString("message"), Toast.LENGTH_LONG).show();
+                                                                }
                                                             }else{
                                                                 Toast.makeText(LifePostActivity.this, R.string.lifepost_impeach_comment_success, Toast.LENGTH_LONG).show();
                                                             }

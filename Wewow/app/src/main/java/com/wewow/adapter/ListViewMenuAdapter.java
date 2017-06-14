@@ -95,7 +95,12 @@ public class ListViewMenuAdapter extends BaseAdapter
             holder.textViewTitle.setTextColor(context.getResources().getColor(R.color.font_color));
         }
         if(newIcons.get(position).equals("1")) {
-            holder.imageNew.setVisibility(View.VISIBLE);
+            if(UserInfo.isUserLogged(context)) {
+                holder.imageNew.setVisibility(View.VISIBLE);
+            }
+            else {
+                holder.imageNew.setVisibility(View.GONE);
+            }
         }
         else
         {

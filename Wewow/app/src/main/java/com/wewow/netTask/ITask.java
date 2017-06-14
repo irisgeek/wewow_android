@@ -92,7 +92,7 @@ public interface ITask {
 
     //new version notification
     @GET("/notification")
-    void notification(@Header("User-Agent") String headerContentType, Callback<JSONObject> callback);
+    void notification(@Header("User-Agent") String headerContentType,  @Query("current_version") String current_version, @Query("channel") int channel,Callback<JSONObject> callback);
 
     //get ads
     @GET("/ads")
