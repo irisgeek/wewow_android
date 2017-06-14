@@ -48,6 +48,7 @@ import com.wewow.dto.Institute;
 import com.wewow.dto.LabCollection;
 import com.wewow.dto.Notification;
 import com.wewow.netTask.ITask;
+import com.wewow.utils.AppInnerDownLoder;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.FileCacheUtil;
 import com.wewow.utils.SettingUtils;
@@ -99,7 +100,8 @@ public class homeFragment extends Fragment {
     private boolean isNotificationShow = false;
     private boolean isAdsShow = false;
 
-    public LinearLayout  progressBar;
+    public LinearLayout progressBar;
+
     public homeFragment() {
 
     }
@@ -117,9 +119,8 @@ public class homeFragment extends Fragment {
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_home, container, false);
         initData(view);
-        progressBar=(LinearLayout)view.findViewById(R.id.progressBar);
+        progressBar = (LinearLayout) view.findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
-
 
 
         if (Utils.isNetworkAvailable(getActivity())) {
@@ -206,12 +207,10 @@ public class homeFragment extends Fragment {
         rv.startAnimation(contentsMoveToViewLocation(100));
         listViewInstituteRecommended.startAnimation(contentsMoveToViewLocation(100));
 
-        if(isNotificationShow)
-        {
+        if (isNotificationShow) {
             cardViewNewVersionAvailable.startAnimation(contentsMoveToViewLocation(100));
         }
-        if(isAdsShow)
-        {
+        if (isAdsShow) {
             cardViewAds.startAnimation(contentsMoveToViewLocation(100));
         }
     }
@@ -226,7 +225,7 @@ public class homeFragment extends Fragment {
 
         cardViewNewVersionAvailable = (CardView) view.findViewById(R.id.cardViewNewVersionAvailable);
         cardViewAds = (CardView) view.findViewById(R.id.ads);
-        imageViewAdsTriangle=(ImageView)view.findViewById(R.id.imageViewAdsTriangle);
+        imageViewAdsTriangle = (ImageView) view.findViewById(R.id.imageViewAdsTriangle);
 
         rv = (RecyclerView) view.findViewById(R.id.recyclerview_artists);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
@@ -235,12 +234,12 @@ public class homeFragment extends Fragment {
 
 
         listViewInstituteRecommended = (ListView) view.findViewById(R.id.listViewSelectedInstitute);
-        if (android.os.Build.VERSION.SDK_INT >=21) {
+        if (android.os.Build.VERSION.SDK_INT >= 21) {
             listViewInstituteRecommended.setNestedScrollingEnabled(false);
         }
 
-        textViewAds=(LinearLayout) view.findViewById(R.id.textviewAds);
-        textViewAdsIgnore=(TextView) view.findViewById(R.id.textviewAdsIgnore);
+        textViewAds = (LinearLayout) view.findViewById(R.id.textviewAds);
+        textViewAdsIgnore = (TextView) view.findViewById(R.id.textviewAdsIgnore);
 
         textViewAds.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -266,7 +265,6 @@ public class homeFragment extends Fragment {
 
             }
         });
-
 
 
     }
@@ -400,32 +398,27 @@ public class homeFragment extends Fragment {
                     } else if (realData.contains("content")) {
                         if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_ADS, getActivity())) {
                             String fileContent = FileCacheUtil.getCache(getActivity(), CommonUtilities.CACHE_FILE_ADS);
-                            if(fileContent.equals(realData))
-                            {
-                                boolean result=SettingUtils.get(getActivity(), CommonUtilities.ADS_READ, false);
-                                if(!result)
-                                {
-                                    isAdsShow=true;
+                            if (fileContent.equals(realData)) {
+                                boolean result = SettingUtils.get(getActivity(), CommonUtilities.ADS_READ, false);
+                                if (!result) {
+                                    isAdsShow = true;
                                 }
 
-                            }
-                            else
-                            {
+                            } else {
                                 SettingUtils.set(getActivity(), CommonUtilities.ADS_READ, false);
-                                FileCacheUtil.setCache(realData,getActivity(), CommonUtilities.CACHE_FILE_ADS,0);
-                                isAdsShow=true;
+                                FileCacheUtil.setCache(realData, getActivity(), CommonUtilities.CACHE_FILE_ADS, 0);
+                                isAdsShow = true;
                             }
-                        }
-                        else {
+                        } else {
                             SettingUtils.set(getActivity(), CommonUtilities.ADS_READ, false);
-                            FileCacheUtil.setCache(realData,getActivity(), CommonUtilities.CACHE_FILE_ADS,0);
-                            isAdsShow=true;
+                            FileCacheUtil.setCache(realData, getActivity(), CommonUtilities.CACHE_FILE_ADS, 0);
+                            isAdsShow = true;
                         }
                         ads = parseAdsFromString(realData);
                         setUpAds(ads, view);
                     } else {
                         requestSentCount--;
-                        if (requestSentCount == 0 ) {
+                        if (requestSentCount == 0) {
                             progressBar.setVisibility(View.GONE);
                             LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.layoutHome);
                             linearLayout.setVisibility(View.VISIBLE);
@@ -458,10 +451,10 @@ public class homeFragment extends Fragment {
     }
 
     private void setUpAds(final Ads adsItem, View view) {
-        TextView textViewAdsTitle=(TextView)view.findViewById(R.id.textViewAdsTitle);
-        TextView textViewContent=(TextView)view.findViewById(R.id.textViewAdsContent);
+        TextView textViewAdsTitle = (TextView) view.findViewById(R.id.textViewAdsTitle);
+        TextView textViewContent = (TextView) view.findViewById(R.id.textViewAdsContent);
 
-        ImageView imageAdsBg=(ImageView)view.findViewById(R.id.imageViewAdsBg);
+        ImageView imageAdsBg = (ImageView) view.findViewById(R.id.imageViewAdsBg);
 
         textViewAdsTitle.setText(adsItem.getTitle());
         textViewContent.setText(adsItem.getContent());
@@ -470,7 +463,7 @@ public class homeFragment extends Fragment {
                 .placeholder(R.drawable.banner_loading_spinner)
                 .crossFade(300)
                 .into(imageAdsBg);
-        if(isAdsShow) {
+        if (isAdsShow) {
             cardViewAds.setVisibility(View.VISIBLE);
             textViewAds.setVisibility(View.VISIBLE);
         }
@@ -478,7 +471,7 @@ public class homeFragment extends Fragment {
 
         requestSentCount--;
 
-        if (requestSentCount == 0 ) {
+        if (requestSentCount == 0) {
             progressBar.setVisibility(View.GONE);
             LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.layoutHome);
             linearLayout.setVisibility(View.VISIBLE);
@@ -516,12 +509,12 @@ public class homeFragment extends Fragment {
         return ads;
     }
 
-    private void setUpNotification(final Notification notification, View view) {
+    private void setUpNotification(final Notification notification, View view, final boolean isUpdate) {
 
-        TextView textViewAdsTitle=(TextView)view.findViewById(R.id.textViewNewVersionTitle);
-        TextView textViewContent=(TextView)view.findViewById(R.id.textViewDownloadContent);
-        TextView textViewIgnore=(TextView)view.findViewById(R.id.textviewIgnore);
-        TextView textViewToDownload=(TextView)view.findViewById(R.id.textviewToDownload);
+        TextView textViewAdsTitle = (TextView) view.findViewById(R.id.textViewNewVersionTitle);
+        TextView textViewContent = (TextView) view.findViewById(R.id.textViewDownloadContent);
+        TextView textViewIgnore = (TextView) view.findViewById(R.id.textviewIgnore);
+        TextView textViewToDownload = (TextView) view.findViewById(R.id.textviewToDownload);
 
         textViewIgnore.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -534,11 +527,24 @@ public class homeFragment extends Fragment {
         textViewToDownload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SettingUtils.set(getActivity(), CommonUtilities.NOTIFICATION_READ, true);
-                Intent intent = new Intent(getActivity(), WebPageActivity.class);
-                intent.putExtra("url",notification.getAction_url());
-                startActivity(intent);
 
+//
+                if (!isUpdate) {
+                    SettingUtils.set(getActivity(), CommonUtilities.NOTIFICATION_READ, true);
+                    Intent intent = new Intent(getActivity(), WebPageActivity.class);
+                    intent.putExtra("url", notification.getAction_url());
+                    startActivity(intent);
+
+                } else {
+//                      String testUrl="http://shouji.360tpcdn.com/170602/f59f2f2910e505f940704030338254ca/com.taobao.taobao_155.apk";
+//
+//                AppInnerDownLoder.downLoadApk(getContext(),testUrl,getActivity().getResources().getString(R.string.app_name)+CommonUtilities.APK);
+                    AppInnerDownLoder.downLoadApk(getContext(), notification.getUpdate(), getActivity().getResources().getString(R.string.app_name) + CommonUtilities.APK);
+
+                    cardViewNewVersionAvailable.clearAnimation();
+
+                    cardViewNewVersionAvailable.setVisibility(View.GONE);
+                }
             }
         });
         textViewIgnore.setOnClickListener(new View.OnClickListener() {
@@ -552,7 +558,7 @@ public class homeFragment extends Fragment {
 
         textViewAdsTitle.setText(notification.getTitle());
         textViewContent.setText(notification.getText());
-        if(isNotificationShow) {
+        if (isNotificationShow) {
 
             cardViewNewVersionAvailable.setVisibility(View.VISIBLE);
         }
@@ -584,7 +590,6 @@ public class homeFragment extends Fragment {
         notification.setTitle(result.getString("title"));
         notification.setAction_url(result.getString("action_url"));
         notification.setText(result.getString("text"));
-        notification.setUpdate(result.getString("update"));
 
         return notification;
     }
@@ -603,7 +608,8 @@ public class homeFragment extends Fragment {
 
                 try {
                     String realData = Utils.convertStreamToString(response.getBody().in());
-                    if (!(realData.contains(CommonUtilities.SUCCESS)||realData.contains("sucess"))) {
+                    String update=new JSONObject(realData).getJSONObject("result").getString("update");
+                    if (!(realData.contains(CommonUtilities.SUCCESS) || realData.contains("sucess"))) {
                         Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
                         progressBar.setVisibility(View.GONE);
                     } else if (realData.contains(CommonUtilities.ID)) {
@@ -611,37 +617,43 @@ public class homeFragment extends Fragment {
                         if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_NOTIFICATION, getActivity())) {
                             String fileContent = FileCacheUtil.getCache(getActivity(), CommonUtilities.CACHE_FILE_NOTIFICATION);
 
-                            String savedId=new JSONObject(fileContent).getJSONObject("result").getJSONObject("data")
+                            String savedId = new JSONObject(fileContent).getJSONObject("result").getJSONObject("data")
                                     .get("id").toString();
-                            String newId=new JSONObject(realData).getJSONObject("result").getJSONObject("data")
+                            String newId = new JSONObject(realData).getJSONObject("result").getJSONObject("data")
                                     .get("id").toString();
-                            if(savedId.equals(newId))
-                            {
+                            if (savedId.equals(newId)) {
 //                                boolean result=SettingUtils.get(getActivity(), CommonUtilities.NOTIFICATION_READ, false);
 //                                if(!result)
 //                                {
 //                                   isNotificationShow=true;
 //                                }
 
-                            }
-                            else
-                            {
+                            } else {
                                 SettingUtils.set(getActivity(), CommonUtilities.NOTIFICATION_READ, false);
-                                FileCacheUtil.setCache(realData,getActivity(), CommonUtilities.CACHE_FILE_NOTIFICATION,0);
-                                isNotificationShow=true;
+                                FileCacheUtil.setCache(realData, getActivity(), CommonUtilities.CACHE_FILE_NOTIFICATION, 0);
+                                isNotificationShow = true;
                             }
-                        }
-                        else {
+                        } else {
                             SettingUtils.set(getActivity(), CommonUtilities.NOTIFICATION_READ, false);
-                            FileCacheUtil.setCache(realData,getActivity(), CommonUtilities.CACHE_FILE_NOTIFICATION,0);
-                            isNotificationShow=true;
+                            FileCacheUtil.setCache(realData, getActivity(), CommonUtilities.CACHE_FILE_NOTIFICATION, 0);
+                            isNotificationShow = true;
                         }
 
                         notification = parseNotificationFromString(realData);
-                        setUpNotification(notification, view);
+                        setUpNotification(notification, view,false);
 
                     }
-                    else{
+                    else if(!update.equals("null"))
+                    {
+                        notification.setUpdate(update);
+                        notification.setText("");
+                        notification.setTitle(getResources().getString(R.string.newVersionAvailable));
+                        isNotificationShow = true;
+                        setUpNotification(notification, view,true);
+
+
+                    }
+                    else {
                         requestSentCount--;
                         if (requestSentCount == 0) {
                             progressBar.setVisibility(View.GONE);
@@ -1035,8 +1047,6 @@ public class homeFragment extends Fragment {
 //        myAdapter.notifyDataSetChanged();
 
 
-
-
         ArrayList<HashMap<String, Object>> listItemArtist = new ArrayList<HashMap<String, Object>>();
 
 
@@ -1057,23 +1067,22 @@ public class homeFragment extends Fragment {
         }
 
 
-        RecycleViewArtistsOfHomePageAdapter adapterArtists= new RecycleViewArtistsOfHomePageAdapter(getActivity(), listItemArtist);
+        RecycleViewArtistsOfHomePageAdapter adapterArtists = new RecycleViewArtistsOfHomePageAdapter(getActivity(), listItemArtist);
         OverScrollDecoratorHelper.setUpOverScroll(rv, OverScrollDecoratorHelper.ORIENTATION_HORIZONTAL);
         rv.setNestedScrollingEnabled(false);
         adapterArtists.setOnItemClickListener(new RecycleViewArtistsOfHomePageAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                final String artistId=artists.get(position).getId();
+                final String artistId = artists.get(position).getId();
 
-                    Intent intent = new Intent(getActivity(),DetailArtistActivity.class);
-                    intent.putExtra("id",artistId);
-                    startActivity(intent);
+                Intent intent = new Intent(getActivity(), DetailArtistActivity.class);
+                intent.putExtra("id", artistId);
+                startActivity(intent);
 
             }
 
         });
         rv.setAdapter(adapterArtists);
-
 
 
     }
@@ -1114,7 +1123,6 @@ public class homeFragment extends Fragment {
     }
 
     public void setUpListViewInstituteRecommend(List<Institute> institutes, View rootView) {
-
 
 
         ArrayList<HashMap<String, Object>> listItem = new ArrayList<HashMap<String, Object>>();
@@ -1164,8 +1172,6 @@ public class homeFragment extends Fragment {
         //fix bug created by scrollview
         fixListViewHeight(listViewInstituteRecommended);
     }
-
-
 
 
     private class BouncePageChangeListener implements ViewPager.OnPageChangeListener {
@@ -1313,12 +1319,12 @@ public class homeFragment extends Fragment {
 
     @Override
     public void onResume() {
-        if(SettingUtils.get(getActivity(), CommonUtilities.NOTIFICATION_READ, false)) {
+        if (SettingUtils.get(getActivity(), CommonUtilities.NOTIFICATION_READ, false)) {
 
             cardViewNewVersionAvailable.clearAnimation();
             cardViewNewVersionAvailable.setVisibility(View.GONE);
         }
-        if(SettingUtils.get(getActivity(), CommonUtilities.ADS_READ, false)) {
+        if (SettingUtils.get(getActivity(), CommonUtilities.ADS_READ, false)) {
             cardViewAds.clearAnimation();
             textViewAds.clearAnimation();
             cardViewAds.setVisibility(View.GONE);
