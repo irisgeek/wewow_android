@@ -248,6 +248,7 @@ public class ShareActivity extends Activity implements IWeiboHandler.Response {
                 public void onWeiboException(WeiboException e) {
                     String s = ShareActivity.this.getString(R.string.share_weibo_error, e.getMessage());
                     MessageBoxUtils.messageBoxWithNoButton(ShareActivity.this, false, s, 1000);
+                    ShareActivity.this.finish();
                 }
             };
 
@@ -271,12 +272,14 @@ public class ShareActivity extends Activity implements IWeiboHandler.Response {
             public void onWeiboException(WeiboException e) {
                 String s = ShareActivity.this.getString(R.string.share_weibo_error, e.getMessage());
                 MessageBoxUtils.messageBoxWithNoButton(ShareActivity.this, false, s, 1000);
+                ShareActivity.this.finish();
             }
 
             @Override
             public void onCancel() {
                 String s = ShareActivity.this.getString(R.string.share_weibo_result, ShareActivity.this.getString(R.string.share_result_cancel));
                 MessageBoxUtils.messageBoxWithNoButton(ShareActivity.this, false, s, 1000);
+                ShareActivity.this.finish();
             }
         });
     }
