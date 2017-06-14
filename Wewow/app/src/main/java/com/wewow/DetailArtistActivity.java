@@ -150,6 +150,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
             public void onStateChanged(AppBarLayout appBarLayout, State state) {
                 Log.d("STATE", state.name());
                 if (state == State.EXPANDED) {
+                    imageView.clearAnimation();
                     imageView.setVisibility(View.VISIBLE);
                     textViewNickName.setVisibility(View.VISIBLE);
                     textViewDesc.setVisibility(View.VISIBLE);
@@ -157,7 +158,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
                     //展开状态
 
                 } else if (state == State.COLLAPSED) {
-
+                    imageView.clearAnimation();
                     imageView.setVisibility(View.GONE);
                     textViewNickName.setVisibility(View.GONE);
                     textViewDesc.setVisibility(View.GONE);
@@ -166,6 +167,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
                     //折叠状态
 
                 } else {
+                    imageView.clearAnimation();
                     imageView.setVisibility(View.GONE);
                     textViewNickName.setVisibility(View.GONE);
                     textViewDesc.setVisibility(View.GONE);

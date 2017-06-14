@@ -15,7 +15,7 @@ public class Notification implements Parcelable {
     private String title;
     private String action;
     private String action_url;
-
+    private String update;
 
 
     public static final Creator<Notification> CREATOR = new Creator<Notification>() {
@@ -98,5 +98,13 @@ public class Notification implements Parcelable {
 
     public void setAction_url(String action_url) {
         this.action_url = action_url;
+    }
+
+    public String getUpdate() {
+        return update;
+    }
+
+    public void setUpdate(String update) {
+        this.update = update;
     }
 }

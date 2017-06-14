@@ -35,6 +35,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.sina.weibo.sdk.constant.WBConstants;
+import com.wewow.BuildConfig;
 import com.wewow.DetailArtistActivity;
 import com.wewow.LifeLabItemActivity;
 import com.wewow.R;
@@ -583,6 +584,7 @@ public class homeFragment extends Fragment {
         notification.setTitle(result.getString("title"));
         notification.setAction_url(result.getString("action_url"));
         notification.setText(result.getString("text"));
+        notification.setUpdate(result.getString("update"));
 
         return notification;
     }
@@ -591,7 +593,9 @@ public class homeFragment extends Fragment {
 
         requestSentCount++;
         ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
-        iTask.notification(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(getActivity()), new Callback<JSONObject>() {
+        String appVersionName = Utils.getAppVersionName(getActivity());
+        int channel = Integer.parseInt(BuildConfig.AUTO_TYPE);
+        iTask.notification(CommonUtilities.REQUEST_HEADER_PREFIX + appVersionName, appVersionName, channel, new Callback<JSONObject>() {
 
             @Override
             public void success(JSONObject object, Response response) {
