@@ -602,7 +602,7 @@ public class homeFragment extends Fragment {
                     if (!(realData.contains(CommonUtilities.SUCCESS)||realData.contains("sucess"))) {
                         Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
                         progressBar.setVisibility(View.GONE);
-                    } else if (realData.contains(CommonUtilities.DATE)) {
+                    } else if (realData.contains(CommonUtilities.ID)) {
 
                         if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_NOTIFICATION, getActivity())) {
                             String fileContent = FileCacheUtil.getCache(getActivity(), CommonUtilities.CACHE_FILE_NOTIFICATION);

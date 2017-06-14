@@ -51,7 +51,9 @@ android {
     }
 
     productFlavors {
-        default_channel{}
+        default_channel{
+            buildConfigField "String","AUTO_TYPE","\"0\""
+        }
         _360{
             buildConfigField "String","AUTO_TYPE","\"1\""
         }
@@ -85,8 +87,50 @@ android {
         oppo{
             buildConfigField "String","AUTO_TYPE","\"11\""
         }
-        jifeng{
+        pp{
             buildConfigField "String","AUTO_TYPE","\"12\""
+        }
+        taobao{
+            buildConfigField "String","AUTO_TYPE","\"13\""
+        }
+        aliyun{
+            buildConfigField "String","AUTO_TYPE","\"14\""
+        }
+        wandoujia{
+            buildConfigField "String","AUTO_TYPE","\"15\""
+        }
+        UC{
+            buildConfigField "String","AUTO_TYPE","\"16\""
+        }
+        yingyonghui{
+            buildConfigField "String","AUTO_TYPE","\"17\""
+        }
+        anzhi{
+            buildConfigField "String","AUTO_TYPE","\"18\""
+        }
+        mumayi{
+            buildConfigField "String","AUTO_TYPE","\"19\""
+        }
+        ifanr{
+            buildConfigField "String","AUTO_TYPE","\"20\""
+        }
+        appso{
+            buildConfigField "String","AUTO_TYPE","\"21\""
+        }
+        zuimei{
+            buildConfigField "String","AUTO_TYPE","\"22\""
+        }
+        shaoshupai{
+            buildConfigField "String","AUTO_TYPE","\"23\""
+        }
+        haoqixin{
+            buildConfigField "String","AUTO_TYPE","\"24\""
+        }
+        _36kr{
+            buildConfigField "String","AUTO_TYPE","\"25\""
+        }
+        aipipi{
+            buildConfigField "String","AUTO_TYPE","\"26\""
         }
     }
     productFlavors.all { flavor ->
@@ -120,6 +164,7 @@ dependencies {
     compile 'com.afollestad.material-dialogs:core:0.9.4.4'
     compile 'com.jaeger.statusbarutil:library:1.4.0'
     compile 'me.everything:overscroll-decor-android:1.0.4'
+    compile 'com.github.traex.rippleeffect:library:1.3'
 
 
 

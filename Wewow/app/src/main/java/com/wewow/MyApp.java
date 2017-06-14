@@ -29,6 +29,10 @@ import java.util.Date;
 public class MyApp extends Application implements Thread.UncaughtExceptionHandler {
 
     private final static String TAG = "WewowAPP";
+    private String[] channels = {"wewow", "360", "baidu", "yingyongbao", "sougou", "xiaomi", "lenovo", "huawei", "vivo",
+            "meizu", "chuizi", "oppo", "pp", "taobao", "aliyun", "wandoujia", "UC", "yingyonghui", "anzhi", "mumayi", "ifanr",
+            "appso", "zuimei", "shaoshupai", "haoqixin", "36kr", "apipi"
+    };
 
     @Override
     public void onCreate() {

@@ -12,7 +12,7 @@ public class CommonUtilities {
     public static final String FILE_DIR="\"data/\"";
     public static final String REQUEST_HEADER_PREFIX="Wewow/Android";
     public static final String SUCCESS="success";
-    public static final String DATE="date";
+    public static final String ID="id";
 
     public static final String NETWORK_STATE="network_state";
 
