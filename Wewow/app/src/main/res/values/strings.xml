@@ -100,6 +100,8 @@
     <string name="userinfo_save_comfirm">确认</string>
     <string name="userinfo_save_tips">确认修改信息？</string>
 
+    <string name="share_weibo_error">分享到微博出错，%s</string>
+
     <string name="prompt_comfirmd">好</string>
     <string name="prompt_denied">不</string>
 
