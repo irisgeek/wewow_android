@@ -65,6 +65,7 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
     private int id;
     private int likedCount;
     private final int AllCOMMENT = 101;
+    private boolean likeStatusChange = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,6 +143,9 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
         this.findViewById(R.id.article_back).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(likeStatusChange){
+                    setResult(RESULT_OK);
+                }
                 ArticleActivity.this.finish();
             }
         });
@@ -255,17 +259,19 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
                                         else {
                                             throw new Exception(String.valueOf(i));
                                         }
+                                    }else{
+                                        likeStatusChange = true;
+                                        ArticleActivity.this.like.setImageDrawable(ArticleActivity.this.getResources().getDrawable(like == 1 ? R.drawable.marked_b : R.drawable.mark_b));
+                                        String s;
+                                        if (like == 1) {
+                                            likedCount += 1;
+                                            s = ArticleActivity.this.getString(R.string.fav_succeed);
+                                            MessageBoxUtils.messageBoxWithNoButton(ArticleActivity.this, true, s, 1000);
+                                        } else {
+                                            likedCount -= 1;
+                                        }
+                                        article_fav_count.setText(likedCount + "");
                                     }
-                                    ArticleActivity.this.like.setImageDrawable(ArticleActivity.this.getResources().getDrawable(like == 1 ? R.drawable.marked_b : R.drawable.mark_b));
-                                    String s;
-                                    if (like == 1) {
-                                        likedCount += 1;
-                                        s = ArticleActivity.this.getString(R.string.fav_succeed);
-                                        MessageBoxUtils.messageBoxWithNoButton(ArticleActivity.this, true, s, 1000);
-                                    } else {
-                                        likedCount -= 1;
-                                    }
-                                    article_fav_count.setText(likedCount + "");
                                 } catch (Exception e) {
                                     Log.e(TAG, String.format("favourite fail: %s", e.getMessage()));
                                     //Toast.makeText(ArticleActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
@@ -395,6 +401,7 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
                                     Toast.makeText(ArticleActivity.this, R.string.serverError, Toast.LENGTH_LONG).show();
                                 }
                             } else {
+                                likeStatusChange = true;
                                 comment.put("liked", comment.optInt("liked", 0) == 1 ? 0 : 1);
                                 if(comment.optInt("liked", 0) == 1){
                                     comment.put("liked_count", comment.optInt("liked_count", 0) + 1);
@@ -498,5 +505,13 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
                 }
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(likeStatusChange){
+            setResult(RESULT_OK);
+        }
+        finish();
     }
 }
