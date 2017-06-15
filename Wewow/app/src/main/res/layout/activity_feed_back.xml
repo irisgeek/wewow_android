@@ -101,12 +101,19 @@
                             android:textColorHint="#9b9b9b" />
                     </LinearLayout>
 
+                    <RelativeLayout
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+
+                        android:layout_marginRight="20dp"
+                        android:orientation="horizontal">
                     <ImageView
                         android:id="@+id/imageViewSend"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginRight="20dp"
+                        android:layout_centerInParent="true"
                         android:src="@drawable/send" />
+                    </RelativeLayout>
 
                 </LinearLayout>
 
