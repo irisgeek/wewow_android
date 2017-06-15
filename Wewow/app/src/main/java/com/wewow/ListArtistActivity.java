@@ -125,88 +125,88 @@ public class ListArtistActivity extends BaseActivity implements LoadMoreListener
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.toolbar, menu);
-        MenuItem menuItem = menu.findItem(R.id.search);
-        menuItem.setVisible(true);
-
-        SearchManager searchManager =
-                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        final SearchView searchView =
-                (SearchView) menu.findItem(R.id.search).getActionView();
-
-        searchView.setQueryHint(getResources().getString(R.string.search_hint));
-
-
-        ((ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_button)).setImageResource(R.drawable.search_b);
-
-
-        final String[] testStrings = getResources().getStringArray(R.array.test_array);
-//        int completeTextId = searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
-//        AutoCompleteTextView completeText = (AutoCompleteTextView) searchView
-//                .findViewById(completeTextId) ;
-
-
-        AutoCompleteTextView completeText = (SearchView.SearchAutoComplete) searchView.findViewById(R.id.search_src_text);
-//        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.list_item_search, R.id.text, testStrings);
-
-//        completeText.setAdapter(adapter);
-        completeText.setTextColor(getResources().getColor(R.color.search_hot_search_words));
-        completeText.setHintTextColor(getResources().getColor(R.color.search_text_view_hint_color_of_artist_list));
-        completeText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                searchView.setQuery(testStrings[position], true);
-            }
-        });
-        final Menu menuFinal = menu;
-        completeText.setThreshold(0);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-
-
-                MenuItem menuItem = menuFinal.findItem(R.id.search);
-                menuItem.collapseActionView();
-
-                List<Artist> artistsBySearch = new ArrayList<Artist>();
-                for (Artist artist : artistsTemp) {
-                    if (artist.getNickname().contains(query)) {
-                        artistsBySearch.add(artist);
-                    }
-                }
-                listItem.clear();
-
-                for (int i = 0; i < artistsBySearch.size(); i++) {
-                    HashMap<String, Object> map = new HashMap<String, Object>();
-
-                    //
-
-                    map.put("imageView", artistsBySearch.get(i).getImage());
-
-                    map.put("textViewName", artistsBySearch.get(i).getNickname());
-                    map.put("textViewDesc", artistsBySearch.get(i).getDesc());
-                    map.put("textViewArticleCount", artistsBySearch.get(i).getArticle_count());
-                    map.put("textViewFollowerCount", artistsBySearch.get(i).getFollower_count());
-                    map.put("imageViewFollowed", artistsBySearch.get(i).getFollowed());
-                    map.put("id", artistsBySearch.get(i).getId());
-
-                    listItem.add(map);
-                }
-                adapter.notifyDataSetChanged();
-
-//                LinearLayout layout = (LinearLayout) findViewById(R.id.layoutCover);
-//                layout.setVisibility(View.GONE);
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-        });
-
-        searchView.setSearchableInfo(
-                searchManager.getSearchableInfo(getComponentName()));
+//        getMenuInflater().inflate(R.menu.toolbar, menu);
+//        MenuItem menuItem = menu.findItem(R.id.search);
+//        menuItem.setVisible(true);
+//
+//        SearchManager searchManager =
+//                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+//        final SearchView searchView =
+//                (SearchView) menu.findItem(R.id.search).getActionView();
+//
+//        searchView.setQueryHint(getResources().getString(R.string.search_hint));
+//
+//
+//        ((ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_button)).setImageResource(R.drawable.search_b);
+//
+//
+//        final String[] testStrings = getResources().getStringArray(R.array.test_array);
+////        int completeTextId = searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
+////        AutoCompleteTextView completeText = (AutoCompleteTextView) searchView
+////                .findViewById(completeTextId) ;
+//
+//
+//        AutoCompleteTextView completeText = (SearchView.SearchAutoComplete) searchView.findViewById(R.id.search_src_text);
+////        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.list_item_search, R.id.text, testStrings);
+//
+////        completeText.setAdapter(adapter);
+//        completeText.setTextColor(getResources().getColor(R.color.search_hot_search_words));
+//        completeText.setHintTextColor(getResources().getColor(R.color.search_text_view_hint_color_of_artist_list));
+//        completeText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                searchView.setQuery(testStrings[position], true);
+//            }
+//        });
+//        final Menu menuFinal = menu;
+//        completeText.setThreshold(0);
+//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//            @Override
+//            public boolean onQueryTextSubmit(String query) {
+//
+//
+//                MenuItem menuItem = menuFinal.findItem(R.id.search);
+//                menuItem.collapseActionView();
+//
+//                List<Artist> artistsBySearch = new ArrayList<Artist>();
+//                for (Artist artist : artistsTemp) {
+//                    if (artist.getNickname().contains(query)) {
+//                        artistsBySearch.add(artist);
+//                    }
+//                }
+//                listItem.clear();
+//
+//                for (int i = 0; i < artistsBySearch.size(); i++) {
+//                    HashMap<String, Object> map = new HashMap<String, Object>();
+//
+//                    //
+//
+//                    map.put("imageView", artistsBySearch.get(i).getImage());
+//
+//                    map.put("textViewName", artistsBySearch.get(i).getNickname());
+//                    map.put("textViewDesc", artistsBySearch.get(i).getDesc());
+//                    map.put("textViewArticleCount", artistsBySearch.get(i).getArticle_count());
+//                    map.put("textViewFollowerCount", artistsBySearch.get(i).getFollower_count());
+//                    map.put("imageViewFollowed", artistsBySearch.get(i).getFollowed());
+//                    map.put("id", artistsBySearch.get(i).getId());
+//
+//                    listItem.add(map);
+//                }
+//                adapter.notifyDataSetChanged();
+//
+////                LinearLayout layout = (LinearLayout) findViewById(R.id.layoutCover);
+////                layout.setVisibility(View.GONE);
+//                return true;
+//            }
+//
+//            @Override
+//            public boolean onQueryTextChange(String newText) {
+//                return false;
+//            }
+//        });
+//
+//        searchView.setSearchableInfo(
+//                searchManager.getSearchableInfo(getComponentName()));
         return true;
     }
 

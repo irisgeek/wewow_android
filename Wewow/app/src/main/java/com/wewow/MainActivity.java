@@ -163,6 +163,8 @@ public class MainActivity extends BaseActivity implements TextWatcher {
     private final BroadcastReceiver mybroadcast = new NetStateUtils();
     private CollapsingToolbarLayout collapsingToolbar;
     private AppBarLayout mAppBarLayout ;
+    private ImageView imageViewLine;
+    private RelativeLayout layoutCoverTab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -202,7 +204,9 @@ public class MainActivity extends BaseActivity implements TextWatcher {
         progressBar = (LinearLayout) findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
 
-
+        mTabLayout = (TabLayout) findViewById(R.id.tabs);
+        imageViewLine=(ImageView)findViewById(R.id.imageViewLine);
+        layoutCoverTab=(RelativeLayout)findViewById(R.id.layoutCoverTab);
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         float density = Utils.getSceenDensity(this);
 //        Utils.regitsterNetSateBroadcastReceiver(this);
@@ -321,6 +325,13 @@ public class MainActivity extends BaseActivity implements TextWatcher {
             }
         });
 
+        mTabLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                removeCover();
+            }
+        });
+
 
         layoutSearch.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -377,7 +388,9 @@ public class MainActivity extends BaseActivity implements TextWatcher {
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                             if (position != 0) {
                                 searchView.setText(hotWords.get(position), true);
+                                removeCover();
                                 layoutSearch.performClick();
+
                             } else {
                                 searchView.setText("");
                             }
@@ -457,6 +470,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
                             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                                 if (position != 0) {
                                     searchView.setText(hotWords.get(position), true);
+                                    removeCover();
                                     imageViewSearch.performClick();
                                 }
 //
@@ -492,7 +506,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
                     searchView.setVisibility(View.INVISIBLE);
                     imageViewUnderLine.setVisibility(View.INVISIBLE);
 
-                    imageViewUnderLine.setImageResource(R.color.search_text_view_hint_color);
+                    imageViewUnderLine.setImageResource(R.color.white);
                     isAppBarFolded = false;
                     toolbar.setBackgroundColor(getResources().getColor(R.color.transparent));
                     //展开状态
@@ -547,6 +561,20 @@ public class MainActivity extends BaseActivity implements TextWatcher {
 
     private void showCover() {
 
+
+        toolbar.setBackgroundColor(getResources().getColor(R.color.cover));
+        if (isAppBarFolded)
+        {
+            imageViewLine.setBackgroundColor(getResources().getColor(R.color.cover));
+            mTabLayout.setBackgroundColor(getResources().getColor(R.color.cover));
+            layoutCoverTab.setVisibility(View.VISIBLE);
+            layoutCoverTab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    removeCover();
+                }
+            });
+        }
         RelativeLayout layoutCover = (RelativeLayout) findViewById(R.id.layoutCover);
         layoutCover.setVisibility(View.VISIBLE);
         layoutCover.setOnClickListener(new View.OnClickListener() {
@@ -669,6 +697,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                             if (position != 0) {
                                 searchView.setText(hotWords.get(position), true);
+                                removeCover();
                                 layoutSearch.performClick();
                             } else {
                                 searchView.setText("");
@@ -749,6 +778,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
                             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                                 if (position != 0) {
                                     searchView.setText(hotWords.get(position), true);
+                                    removeCover();
                                     imageViewSearch.performClick();
                                 }
 //
@@ -766,6 +796,17 @@ public class MainActivity extends BaseActivity implements TextWatcher {
     }
 
     private void removeCover() {
+        if(isAppBarFolded)
+        {
+            imageViewLine.setBackgroundColor(getResources().getColor(R.color.line_color));
+            toolbar.setBackgroundColor(getResources().getColor(R.color.white));
+            layoutCoverTab.setVisibility(View.GONE);
+            mTabLayout.setBackgroundColor(getResources().getColor(R.color.transparent));
+        }
+        else {
+            toolbar.setBackgroundColor(getResources().getColor(R.color.transparent));
+        }
+
 
         RelativeLayout layoutCover = (RelativeLayout) findViewById(R.id.layoutCover);
         layoutCover.setVisibility(View.GONE);
@@ -1479,24 +1520,21 @@ public class MainActivity extends BaseActivity implements TextWatcher {
     public void beforeTextChanged(CharSequence s, int start, int count,
                                   int after) {
         // TODO Auto-generated method stub
-        RelativeLayout layoutCover = (RelativeLayout) findViewById(R.id.layoutCover);
-        layoutCover.setVisibility(View.GONE);
+        removeCover();
 
     }
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
         // TODO Auto-generated method stub
-        RelativeLayout layoutCover = (RelativeLayout) findViewById(R.id.layoutCover);
-        layoutCover.setVisibility(View.GONE);
+       removeCover();
 
     }
 
     @Override
     public void afterTextChanged(Editable s) {
         // TODO Auto-generated method stub
-        RelativeLayout layoutCover = (RelativeLayout) findViewById(R.id.layoutCover);
-        layoutCover.setVisibility(View.GONE);
+       removeCover();
     }
 
 
