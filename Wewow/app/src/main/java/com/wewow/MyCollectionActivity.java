@@ -63,7 +63,6 @@ public class MyCollectionActivity extends BaseActivity {
         collection_man_area = findViewById(R.id.collection_man_area);
         iv_man_area = (ImageView) findViewById(R.id.iv_collection_man_area);
         this.mycollist = (ListView) this.findViewById(R.id.mycollection_list);
-        this.mycollist.setAdapter(this.listAdpater);
         this.mycollist.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -338,8 +337,7 @@ public class MyCollectionActivity extends BaseActivity {
         this.mycollist.getHandler().post(new Runnable() {
             @Override
             public void run() {
-                MyCollectionActivity.this.mycollist.smoothScrollToPosition(0);
-                MyCollectionActivity.this.listAdpater.notifyDataSetChanged();
+                mycollist.setAdapter(listAdpater);
             }
         });
     }
