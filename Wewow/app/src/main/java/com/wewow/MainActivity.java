@@ -166,6 +166,11 @@ public class MainActivity extends BaseActivity implements TextWatcher {
     private ImageView imageViewLine;
     private RelativeLayout layoutCoverTab;
 
+    private String[] channels = {"wewow_android", "360", "baidu", "yingyongbao", "sougou", "xiaomi", "lenovo", "huawei", "vivo",
+            "meizu", "chuizi", "oppo", "pp", "taobao", "aliyun", "wandoujia", "UC", "yingyonghui", "anzhi", "mumayi", "ifanr",
+            "appso", "zuimei", "shaoshupai", "haoqixin", "36kr", "apipi"
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -173,7 +178,8 @@ public class MainActivity extends BaseActivity implements TextWatcher {
 //        Utils.setActivityToBeFullscreen(this);
         setMenuselectedPosition(0);
         setContentView(R.layout.activity_main);
-
+        String channel=channels[Integer.parseInt(BuildConfig.AUTO_TYPE)];
+//        Toast.makeText(this,channel,Toast.LENGTH_LONG).show();
         context = this;
 //        StatusBarUtil.setTranslucentForCoordinatorLayout(this, 100);
 

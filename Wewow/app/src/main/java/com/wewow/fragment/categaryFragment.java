@@ -400,7 +400,7 @@ public class categaryFragment  extends Fragment implements LoadMoreListener {
         }
 
 
-        for (int i = 0; i < institutes.size(); i++) {
+        for (int i = institutes.size()-1; i >=0; i--) {
             HashMap<String, Object> map = new HashMap<String, Object>();
 
             //
