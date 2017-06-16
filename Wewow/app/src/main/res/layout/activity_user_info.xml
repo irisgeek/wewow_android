@@ -18,7 +18,7 @@
             android:layout_height="24dp"
             android:layout_centerVertical="true"
             android:layout_marginLeft="17dp"
-            android:layout_marginRight="17dp"
+            android:layout_marginRight="12dp"
             android:foregroundGravity="center"
             android:src="@drawable/back_b"/>
 
@@ -71,75 +71,65 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
                 android:baselineAligned="false"
+                android:gravity="center_horizontal"
                 android:orientation="horizontal">
 
                 <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1">
+                    android:layout_width="100dp"
+                    android:layout_height="100dp">
 
                     <ImageView
                         android:id="@+id/cover_1"
                         android:layout_width="match_parent"
-                        android:layout_height="100dp"
-                        android:layout_gravity="center"
+                        android:layout_height="match_parent"
                         android:scaleType="centerCrop"
                         android:src="@drawable/cover1"/>
 
                     <ImageView
                         android:id="@+id/cover_sel1"
                         android:layout_width="match_parent"
-                        android:layout_height="100dp"
-                        android:layout_gravity="center"
+                        android:layout_height="match_parent"
                         android:background="@drawable/selected"
                         android:visibility="invisible"/>
                 </FrameLayout>
 
                 <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="11dp"
-                    android:layout_weight="1">
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginLeft="11dp">
 
                     <ImageView
                         android:id="@+id/cover_2"
                         android:layout_width="match_parent"
-                        android:layout_height="100dp"
-                        android:layout_gravity="center"
+                        android:layout_height="match_parent"
                         android:scaleType="centerCrop"
                         android:src="@drawable/cover2"/>
 
                     <ImageView
                         android:id="@+id/cover_sel2"
                         android:layout_width="match_parent"
-                        android:layout_height="100dp"
-                        android:layout_gravity="center"
+                        android:layout_height="match_parent"
                         android:background="@drawable/selected"
                         android:visibility="invisible"/>
                 </FrameLayout>
 
                 <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="11dp"
-                    android:layout_weight="1">
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginLeft="11dp">
 
                     <ImageView
                         android:id="@+id/cover_3"
                         android:layout_width="match_parent"
-                        android:layout_height="100dp"
-                        android:layout_gravity="center"
+                        android:layout_height="match_parent"
                         android:scaleType="centerCrop"
                         android:src="@drawable/cover3"/>
 
                     <ImageView
                         android:id="@+id/cover_sel3"
                         android:layout_width="match_parent"
-                        android:layout_height="100dp"
-                        android:layout_gravity="center"
+                        android:layout_height="match_parent"
                         android:background="@drawable/selected"
                         android:visibility="invisible"/>
                 </FrameLayout>
@@ -149,76 +139,66 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
                 android:layout_marginTop="11dp"
                 android:baselineAligned="false"
+                android:gravity="center_horizontal"
                 android:orientation="horizontal">
 
                 <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1">
+                    android:layout_width="100dp"
+                    android:layout_height="100dp">
 
                     <ImageView
                         android:id="@+id/cover_4"
                         android:layout_width="match_parent"
-                        android:layout_height="100dp"
-                        android:layout_gravity="center"
+                        android:layout_height="match_parent"
                         android:scaleType="centerCrop"
                         android:src="@drawable/cover4"/>
 
                     <ImageView
                         android:id="@+id/cover_sel4"
                         android:layout_width="match_parent"
-                        android:layout_height="100dp"
-                        android:layout_gravity="center"
+                        android:layout_height="match_parent"
                         android:background="@drawable/selected"
                         android:visibility="invisible"/>
                 </FrameLayout>
 
                 <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="11dp"
-                    android:layout_weight="1">
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginLeft="11dp">
 
                     <ImageView
                         android:id="@+id/cover_5"
                         android:layout_width="match_parent"
-                        android:layout_height="100dp"
-                        android:layout_gravity="center"
+                        android:layout_height="match_parent"
                         android:scaleType="centerCrop"
                         android:src="@drawable/cover5"/>
 
                     <ImageView
                         android:id="@+id/cover_sel5"
                         android:layout_width="match_parent"
-                        android:layout_height="100dp"
-                        android:layout_gravity="center"
+                        android:layout_height="match_parent"
                         android:background="@drawable/selected"
                         android:visibility="invisible"/>
                 </FrameLayout>
 
                 <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="11dp"
-                    android:layout_weight="1">
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginLeft="11dp">
 
                     <ImageView
                         android:id="@+id/cover_6"
                         android:layout_width="match_parent"
-                        android:layout_height="100dp"
-                        android:layout_gravity="center"
+                        android:layout_height="match_parent"
                         android:scaleType="centerCrop"
                         android:src="@drawable/cover6"/>
 
                     <ImageView
                         android:id="@+id/cover_sel6"
                         android:layout_width="match_parent"
-                        android:layout_height="100dp"
-                        android:layout_gravity="center"
+                        android:layout_height="match_parent"
                         android:background="@drawable/selected"
                         android:visibility="invisible"/>
                 </FrameLayout>
