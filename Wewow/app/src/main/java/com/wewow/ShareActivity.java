@@ -178,6 +178,12 @@ public class ShareActivity extends Activity implements IWeiboHandler.Response {
                 ShareActivity.this.animShareArea();
             }
         });
+        findViewById(R.id.non_share_area).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     private void animShareArea() {
