@@ -89,10 +89,10 @@ public class ShareUtils {
     }
 
     public void share(ShareTypes type) {
-        if (!UserInfo.isUserLogged(this.context)) {
-            LoginUtils.startLogin((Activity) this.context, LoginActivity.REQUEST_CODE_LOGIN);
-            return;
-        }
+//        if (!UserInfo.isUserLogged(this.context)) {
+//            LoginUtils.startLogin((Activity) this.context, LoginActivity.REQUEST_CODE_LOGIN);
+//            return;
+//        }
         final Intent intent = new Intent(this.context, ShareActivity.class);
         intent.putExtra(ShareActivity.SHARE_TYPE, type.ordinal());
         intent.putExtra(ShareActivity.SHARE_CONTEXT, this.content);

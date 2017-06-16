@@ -57,7 +57,7 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
     private LabCollectionDetail lcd = new LabCollectionDetail();
     private ExpandableListView lvArticles;
     private LinearLayout container;
-    private BitmapDrawable picture;
+    private Drawable picture;
     private ImageView like, lifelab_foot_collect;
     private TextView lifelab_fav_count, lifelab_foot_collect_count;
     private CircleProgressBar progressBar;
@@ -130,6 +130,7 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
                                     @Override
                                     public void onRemoteImageAcquired(Drawable dr) {
                                         Bitmap bitmap = ((BitmapDrawable) dr).getBitmap();
+                                        picture=dr;
                                         Bitmap blurBitMap = BlurBuilder.blur(LifeLabItemActivity.this, bitmap);
                                         bitmap.recycle();
                                         LifeLabItemActivity.this.findViewById(R.id.lifelab_item_bg).setBackground(new BitmapDrawable(getResources(), blurBitMap));
@@ -337,7 +338,7 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
                 su.setContent(LifeLabItemActivity.this.lcd.share_title);
                 su.setUrl(LifeLabItemActivity.this.lcd.share_link);
                 if (LifeLabItemActivity.this.picture != null) {
-                    su.setPicture(LifeLabItemActivity.this.picture.getBitmap());
+//                    su.setPicture(((BitmapDrawable) LifeLabItemActivity.this.picture).getBitmap());
                 }
                 su.share();
                 break;

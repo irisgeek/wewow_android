@@ -386,18 +386,18 @@ public class categaryFragment  extends Fragment implements LoadMoreListener {
 
     public void setUpListViewInstituteRecommend(List<Institute> institutes,View rootView) {
 
-        ArrayList<HashMap<String, Object>> listItemCopy = new ArrayList<HashMap<String, Object>>();
-        listItemCopy.addAll(listItem);
-
-
-        if (listItem != null && listItem.size() > 0) {
-            listItem.clear();
-
-        }
-
-        if (currentPage != 1) {
-            listItem.addAll(listItemCopy);
-        }
+//        ArrayList<HashMap<String, Object>> listItemCopy = new ArrayList<HashMap<String, Object>>();
+//        listItemCopy.addAll(listItem);
+//
+//
+//        if (listItem != null && listItem.size() > 0) {
+//            listItem.clear();
+//
+//        }
+//
+//        if (currentPage != 1) {
+//            listItem.addAll(listItemCopy);
+//        }
 
 
         for (int i = institutes.size()-1; i >=0; i--) {
