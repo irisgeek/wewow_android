@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.Pair;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -57,6 +58,7 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
     private ImageView logo;
     private ImageView like;
     private TextView article_fav_count;
+    private TextView tv_more_discuss;
     private LinearLayout discuzContainer;
     CircleProgressBar progressBar;
     View layout_content;
@@ -196,7 +198,12 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
         this.logo = (ImageView) this.findViewById(R.id.article_logo);
+        float screenWidth = Utils.getScreenWidthPx(ArticleActivity.this) - Utils.dipToPixel(ArticleActivity.this, 16);
+        ViewGroup.LayoutParams params = logo.getLayoutParams();
+        params.height = (int)(screenWidth / 1112 * 750);
+        logo.setLayoutParams(params);
         this.discuzContainer = (LinearLayout) this.findViewById(R.id.article_discuss_container);
+        this.tv_more_discuss = (TextView) this.findViewById(R.id.tv_more_discuss);
         this.setupFeedback();
         this.findViewById(R.id.article_share).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -443,7 +450,8 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void fillComments(JSONArray comments) {
-        if (comments == null) {
+        if (comments == null || comments.length() == 0) {
+            tv_more_discuss.setText("去评论");
             return;
         }
         discuzContainer.removeAllViews();
