@@ -266,6 +266,11 @@ public class Utils {
         activity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 
+    public static boolean isFullScreen(Activity act) {
+        int v = act.getWindow().getAttributes().flags;
+        return (v & WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0;
+    }
+
     public static byte[] getBitmapBytes(Bitmap bm) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bm.compress(Bitmap.CompressFormat.PNG, 100, baos);
@@ -369,7 +374,7 @@ public class Utils {
 //                            return lastChildBottomOnScreen <= stickyNavLayoutBottomOnScreen;
 //                        }
 //                    } else {
-                        return true;
+                    return true;
 //                    }
                 }
             } else if (manager instanceof StaggeredGridLayoutManager) {

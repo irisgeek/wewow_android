@@ -1,5 +1,6 @@
 package com.wewow;
 
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
@@ -66,10 +67,10 @@ public class ShareActivity extends Activity implements IWeiboHandler.Response {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Utils.setActivityToBeFullscreen(this);
+        //Utils.setActivityToBeFullscreen(this);
         this.intent = this.getIntent();
         this.shareType = this.intent.getIntExtra(SHARE_TYPE, SHARE_TYPE_TOSELECT);
-        this.setContentView(this.shareType == SHARE_TYPE_TOSELECT ? R.layout.activity_share : R.layout.activity_share_empty);
+        //this.setContentView(this.shareType == SHARE_TYPE_TOSELECT ? R.layout.activity_share : R.layout.activity_share_empty);
         this.api = WeiboShareSDK.createWeiboAPI(this, CommonUtilities.Weibo_AppKey);
         switch (this.shareType) {
             case SHARE_TYPE_TOSELECT:
@@ -170,6 +171,12 @@ public class ShareActivity extends Activity implements IWeiboHandler.Response {
             Bitmap bm = BitmapFactory.decodeByteArray(buf, 0, buf.length);
             this.findViewById(android.R.id.content).setBackground(new BitmapDrawable(bm));
         }*/
+        this.findViewById(R.id.non_share_area).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ShareActivity.this.finish();
+            }
+        });
         View sv = this.findViewById(R.id.share_area);
         sv.setY(Utils.getScreenHeightPx(this));
         this.findViewById(R.id.share_area).post(new Runnable() {
@@ -183,14 +190,20 @@ public class ShareActivity extends Activity implements IWeiboHandler.Response {
     private void animShareArea() {
         View sv = this.findViewById(R.id.share_area);
         View nv = this.findViewById(R.id.non_share_area);
-        int sh = Utils.getScreenHeightPx(this);
-        float h = sv.getHeight();
+        //int sh = Utils.getScreenHeightPx(this) - (Utils.isFullScreen(this) ? 0 : Utils.dipToPixel(this, 20));
+        int h = sv.getHeight();
+        int sh = nv.getHeight();
+        Log.d(TAG, String.format("screen h: %d share h: %d", sh, h));
+        AnimatorSet as = new AnimatorSet();
         ValueAnimator va = ObjectAnimator.ofFloat(sv, "y", sh, sh - h);
-        va.setDuration(300);
+        //va.setDuration(300);
         ValueAnimator va1 = ObjectAnimator.ofFloat(nv, "alpha", 0, 0.7f);
-        va1.setDuration(300);
-        va.start();
-        va1.start();
+        //va1.setDuration(300);
+        //va.start();
+        //va1.start();
+        as.play(va1).with(va);
+        as.setDuration(100);
+        as.start();
     }
 
     private void shareWeibo() {
