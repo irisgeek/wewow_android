@@ -243,9 +243,9 @@ public class SubjectActivity extends BaseActivity {
                 ShareUtils su = new ShareUtils(SubjectActivity.this);
                 su.setContent(subject.getTitle());
                 su.setUrl(subject.getShare_link());
-//                if (shareBitmap != null) {
-//                    su.setPicture(((BitmapDrawable) shareBitmap).getBitmap());
-//                }
+                if (shareBitmap != null) {
+                    su.setPicture(((BitmapDrawable) shareBitmap).getBitmap());
+                }
                 su.share();
 
 
