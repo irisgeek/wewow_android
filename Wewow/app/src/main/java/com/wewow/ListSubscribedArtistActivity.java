@@ -477,8 +477,10 @@ public class ListSubscribedArtistActivity extends BaseActivity implements LoadMo
 
             if(!read.contains("1"))
             {
+                FileCacheUtil.setCache("0", ListSubscribedArtistActivity.this, CommonUtilities.CACHE_FILE_ARTIST_UPDATE, 0);
 
                 updateMenuForSubscribedAritstNotification();
+
             }
         }
 

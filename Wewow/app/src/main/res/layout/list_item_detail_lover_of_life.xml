@@ -49,9 +49,10 @@
                         android:layout_marginLeft="22dp"
                        android:layout_centerVertical="true"
                         android:text="我变秃了 我也变强了"
-                        android:textStyle="bold"
+
                         android:textColor="#333631"
                         android:layout_marginRight="22dp"
+                        android:textStyle="bold"
                         android:textSize="16sp" />
 
 

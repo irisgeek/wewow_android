@@ -941,6 +941,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
     protected void onResume() {
 
         super.onResume();
+
         regitsterNetSateBroadcastReceiver(this);
 
         if (!Utils.isNetworkAvailable(this) && onPauseCalled) {
@@ -1624,5 +1625,8 @@ public class MainActivity extends BaseActivity implements TextWatcher {
         context.registerReceiver(mybroadcast, filter);
     }
 
-
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+    }
 }

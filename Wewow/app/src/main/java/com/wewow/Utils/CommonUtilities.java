@@ -36,6 +36,7 @@ public class CommonUtilities {
 
 
     public static final String CACHE_FILE_SUBJECT="cache_file_subject";
+    public static final String CACHE_FILE_ARTIST_UPDATE="cache_file_artist_update";
 
     public static final String CACHE_FILE_NOTIFICATION="cache_file_notification";
     public static final String CACHE_FILE_UPDATE="cache_file_update";
