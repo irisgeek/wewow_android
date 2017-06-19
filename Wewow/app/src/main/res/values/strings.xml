@@ -234,6 +234,10 @@
     <string name="cancel_follow_artist_success">已成功取消订阅生活家</string>
     <string name="bottom_line">我是有底线的</string>
     <string name="please_wait">唯物正在处理您的反馈，请稍等一下~</string>
+<!--baidu autoudpate-->
+    <string name="no_auto_update_data">无可用更新</string>
+    <string name="auto_update">智能升级</string>
+    <string name="do_no_udpate">暂不升级</string>
 
 
 

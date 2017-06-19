@@ -14,6 +14,7 @@ import com.growingio.android.sdk.collection.GrowingIO;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.FileCacheUtil;
 import com.wewow.utils.Utils;
+import com.youzan.sdk.YouzanSDK;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,6 +45,7 @@ public class MyApp extends Application implements Thread.UncaughtExceptionHandle
                 .trackAllFragments()
                 .setChannel(channel));
         setUpLeanCloud();
+        YouzanSDK.init(this, CommonUtilities.Youzan_AppID);
 
     }
 
