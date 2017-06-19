@@ -111,6 +111,7 @@ public class BaseActivity extends ActionBarActivity {
     private List<String> newIcons;
     public static final int REQUEST_CODE_MENU = 11;
     private int menuselectedPosition = 16;
+    private boolean isOnPauseCalled = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -212,6 +213,7 @@ public class BaseActivity extends ActionBarActivity {
 
 
     private void setUpNavigation(String feedbackUpdate, String artistUpdate) {
+        FileCacheUtil.setCache(artistUpdate, BaseActivity.this, CommonUtilities.CACHE_FILE_ARTIST_UPDATE, 0);
         planetTitles = getResources().getStringArray(R.array.planets_array);
         drawerList = (ListView) findViewById(R.id.left_drawer);
         View VheandrView = LayoutInflater.from(this).inflate(R.layout.list_header_drawer, null);
@@ -292,7 +294,7 @@ public class BaseActivity extends ActionBarActivity {
 //            imageViewUserCover.setImageResource(bgRes[Integer.parseInt(UserInfo.getCurrentUser(this).getBackground_id()) - 1]);
             int resId;
             try {
-                resId = bgRes[Integer.parseInt(UserInfo.getCurrentUser(this).getBackground_id())  - 1];
+                resId = bgRes[Integer.parseInt(UserInfo.getCurrentUser(this).getBackground_id()) - 1];
             } catch (NumberFormatException e) {
                 resId = bgRes[0];
             } catch (IndexOutOfBoundsException e) {
@@ -629,7 +631,53 @@ public class BaseActivity extends ActionBarActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (isOnPauseCalled) {
+            if (FileCacheUtil.isCacheDataExist(CommonUtilities.CACHE_FILE_ARTIST_UPDATE, this)) {
+                String value = FileCacheUtil.getCache(this, CommonUtilities.CACHE_FILE_ARTIST_UPDATE);
+                if (value.equals("0")) {
+
+                    this.newIcons.set(6, "0");
+                }
+            }
 
 
+            this.adapter.notifyDataSetChanged();
+            if (UserInfo.isUserLogged(this)) {
 
+                this.tvusername.setText(UserInfo.getCurrentUser(this).getNickname());
+
+                this.tvuserdesc.setText(UserInfo.getCurrentUser(this).getDesc());
+                imageViewSetting.setVisibility(View.VISIBLE);
+//            imageViewUserCover.setImageResource(bgRes[Integer.parseInt(UserInfo.getCurrentUser(this).getBackground_id()) - 1]);
+                int resId;
+                try {
+                    resId = bgRes[Integer.parseInt(UserInfo.getCurrentUser(this).getBackground_id()) - 1];
+                } catch (NumberFormatException e) {
+                    resId = bgRes[0];
+                } catch (IndexOutOfBoundsException e) {
+                    resId = bgRes[0];
+                }
+                imageViewUserCover.setImageResource(resId);
+            } else {
+                BaseActivity.this.tvusername.setText(R.string.login_gologin);
+                BaseActivity.this.tvuserdesc.setText(R.string.login_to_see_more);
+                imageViewSetting.setVisibility(View.GONE);
+                imageViewUserCover.setImageResource(bgRes[1]);
+
+            }
+
+            isOnPauseCalled = false;
+        }
+
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        isOnPauseCalled = true;
+    }
 }

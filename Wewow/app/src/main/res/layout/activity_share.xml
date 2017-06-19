@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/non_share_area"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0"
+        android:background="#000000"
+        android:orientation="vertical" />
 
     <LinearLayout
         android:id="@+id/share_area"
@@ -13,17 +21,17 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="44dp" >
+            android:layout_height="44dp">
 
             <ImageView
                 android:id="@+id/share_close"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:paddingTop="5dp"
                 android:paddingBottom="5dp"
+                android:paddingEnd="12dp"
+                android:paddingStart="12dp"
+                android:paddingTop="5dp"
                 android:src="@drawable/close" />
 
             <TextView
@@ -38,7 +46,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="0.5dp"
-            android:background="#dbdbdb"/>
+            android:background="#dbdbdb" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -181,13 +189,4 @@
 
     </LinearLayout>
 
-
-    <LinearLayout
-        android:id="@+id/non_share_area"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/share_area"
-        android:alpha="0"
-        android:background="#000000"
-        android:orientation="vertical"/>
 </RelativeLayout>

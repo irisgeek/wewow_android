@@ -391,7 +391,8 @@ public class homeFragment extends Fragment {
 
                 try {
                     String realData = Utils.convertStreamToString(response.getBody().in());
-                    if (!realData.contains(CommonUtilities.SUCCESS)) {
+                    String code=new JSONObject(realData).getJSONObject("result").getString("code");
+                    if (!code.contains("0")) {
                         Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
                         progressBar.setVisibility(View.GONE);
 

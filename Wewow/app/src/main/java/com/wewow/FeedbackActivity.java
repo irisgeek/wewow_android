@@ -54,6 +54,7 @@ import com.wewow.utils.BitmapUtils;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.FileCacheUtil;
 import com.wewow.utils.LoginUtils;
+import com.wewow.utils.MessageBoxUtils;
 import com.wewow.utils.SettingUtils;
 import com.wewow.utils.Utils;
 
@@ -503,7 +504,8 @@ public class FeedbackActivity extends AppCompatActivity implements IPickResult {
                             }
                             else
                             {
-                                Toast.makeText(FeedbackActivity.this, message, Toast.LENGTH_SHORT).show();
+//                                Toast.makeText(FeedbackActivity.this, message, Toast.LENGTH_SHORT).show();
+                                MessageBoxUtils.messageBoxWithNoButton(FeedbackActivity.this,true,getResources().getString(R.string.please_wait),1000);
                             }
 
 

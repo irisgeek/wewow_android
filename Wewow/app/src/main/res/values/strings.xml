@@ -100,6 +100,8 @@
     <string name="userinfo_save_comfirm">确认</string>
     <string name="userinfo_save_tips">确认修改信息？</string>
 
+    <string name="share_weibo_error">分享到微博出错，%s</string>
+
     <string name="prompt_comfirmd">好</string>
     <string name="prompt_denied">不</string>
 
@@ -231,6 +233,9 @@
     <string name="follow_artist_success">已成功订阅生活家</string>
     <string name="cancel_follow_artist_success">已成功取消订阅生活家</string>
     <string name="bottom_line">我是有底线的</string>
+    <string name="please_wait">唯物正在处理您的反馈，请稍等一下~</string>
+
+
 
 
 </resources>

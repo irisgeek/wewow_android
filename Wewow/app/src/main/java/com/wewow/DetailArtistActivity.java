@@ -91,6 +91,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
     private String nickName;
     private CollapsingToolbarLayout collapsingToolbar;
     public LinearLayout progressBar;
+    private TextView textViewCount;
 
 
     @Override
@@ -135,7 +136,8 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
 
     private void initAppBar() {
         imageView = (ImageView) findViewById(R.id.imageViewIcon);
-
+        imageViewSubscribe=(ImageView)findViewById(R.id.imageViewSubscribe);
+        textViewCount=(TextView)findViewById(R.id.textViewCount);
         textViewNickName = (TextView) findViewById(R.id.textViewNickName);
         textViewDesc = (TextView) findViewById(R.id.textViewDesc);
        collapsingToolbar =
@@ -152,12 +154,16 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
                 if (state == State.EXPANDED) {
                     imageView.clearAnimation();
                     imageView.setVisibility(View.VISIBLE);
+                    imageViewSubscribe.setVisibility(View.VISIBLE);
+                    textViewCount.setVisibility(View.VISIBLE);
                     textViewNickName.setVisibility(View.VISIBLE);
                     textViewDesc.setVisibility(View.VISIBLE);
 //                    isAppBarFolded = false;
                     //展开状态
 
                 } else if (state == State.COLLAPSED) {
+                    imageViewSubscribe.setVisibility(View.GONE);
+                    textViewCount.setVisibility(View.GONE);
                     imageView.clearAnimation();
                     imageView.setVisibility(View.GONE);
                     textViewNickName.setVisibility(View.GONE);
@@ -171,6 +177,8 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
                     imageView.setVisibility(View.GONE);
                     textViewNickName.setVisibility(View.GONE);
                     textViewDesc.setVisibility(View.GONE);
+                    imageViewSubscribe.setVisibility(View.GONE);
+                    textViewCount.setVisibility(View.GONE);
                     //中间状态
 
                 }
@@ -352,7 +360,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
                 }
             });
 
-            TextView textViewCount = (TextView) findViewById(R.id.textViewCount);
+            textViewCount = (TextView) findViewById(R.id.textViewCount);
             textViewCount.setText(artist.getArtist().getFollower_count() + getResources().getString(R.string.subscriber));
         }
 

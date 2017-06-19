@@ -243,9 +243,9 @@ public class SubjectActivity extends BaseActivity {
                 ShareUtils su = new ShareUtils(SubjectActivity.this);
                 su.setContent(subject.getTitle());
                 su.setUrl(subject.getShare_link());
-//                if (shareBitmap != null) {
+                if (shareBitmap != null) {
 //                    su.setPicture(((BitmapDrawable) shareBitmap).getBitmap());
-//                }
+                }
                 su.share();
 
 
@@ -274,14 +274,7 @@ public class SubjectActivity extends BaseActivity {
         rv.setLayoutManager(new LinearLayoutManager(rv.getContext()));
         rv.setAdapter(new RecycleViewInstitutesOfSubjectAdapter(this,
                 listItem));
-        final ScrollView scrollView=(ScrollView)findViewById(R.id.root);
-        scrollView.postDelayed(new Runnable() {
-            @Override
-            public void run() {
 
-                scrollView.fullScroll(ScrollView.FOCUS_UP);
-            }
-        },300);
 
 
     }

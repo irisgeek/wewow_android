@@ -1,5 +1,6 @@
 package com.wewow;
 
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
@@ -23,7 +24,14 @@ import com.sina.weibo.sdk.api.share.IWeiboHandler;
 import com.sina.weibo.sdk.api.share.IWeiboShareAPI;
 import com.sina.weibo.sdk.api.share.SendMultiMessageToWeiboRequest;
 import com.sina.weibo.sdk.api.share.WeiboShareSDK;
+import com.sina.weibo.sdk.auth.AuthInfo;
+import com.sina.weibo.sdk.auth.Oauth2AccessToken;
+import com.sina.weibo.sdk.auth.WeiboAuthListener;
+import com.sina.weibo.sdk.auth.sso.SsoHandler;
 import com.sina.weibo.sdk.constant.WBConstants;
+import com.sina.weibo.sdk.exception.WeiboException;
+import com.sina.weibo.sdk.net.RequestListener;
+import com.sina.weibo.sdk.openapi.StatusesAPI;
 import com.tencent.mm.opensdk.modelmsg.SendMessageToWX;
 import com.tencent.mm.opensdk.modelmsg.WXMediaMessage;
 import com.tencent.mm.opensdk.modelmsg.WXTextObject;
@@ -31,6 +39,7 @@ import com.tencent.mm.opensdk.modelmsg.WXWebpageObject;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.wewow.utils.CommonUtilities;
+import com.wewow.utils.MessageBoxUtils;
 import com.wewow.utils.Utils;
 
 import java.text.SimpleDateFormat;
@@ -58,10 +67,10 @@ public class ShareActivity extends Activity implements IWeiboHandler.Response {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Utils.setActivityToBeFullscreen(this);
+        //Utils.setActivityToBeFullscreen(this);
         this.intent = this.getIntent();
         this.shareType = this.intent.getIntExtra(SHARE_TYPE, SHARE_TYPE_TOSELECT);
-        this.setContentView(this.shareType == SHARE_TYPE_TOSELECT ? R.layout.activity_share : R.layout.activity_share_empty);
+        //this.setContentView(this.shareType == SHARE_TYPE_TOSELECT ? R.layout.activity_share : R.layout.activity_share_empty);
         this.api = WeiboShareSDK.createWeiboAPI(this, CommonUtilities.Weibo_AppKey);
         switch (this.shareType) {
             case SHARE_TYPE_TOSELECT:
@@ -162,6 +171,12 @@ public class ShareActivity extends Activity implements IWeiboHandler.Response {
             Bitmap bm = BitmapFactory.decodeByteArray(buf, 0, buf.length);
             this.findViewById(android.R.id.content).setBackground(new BitmapDrawable(bm));
         }*/
+        this.findViewById(R.id.non_share_area).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ShareActivity.this.finish();
+            }
+        });
         View sv = this.findViewById(R.id.share_area);
         sv.setY(Utils.getScreenHeightPx(this));
         this.findViewById(R.id.share_area).post(new Runnable() {
@@ -175,33 +190,111 @@ public class ShareActivity extends Activity implements IWeiboHandler.Response {
     private void animShareArea() {
         View sv = this.findViewById(R.id.share_area);
         View nv = this.findViewById(R.id.non_share_area);
-        int sh = Utils.getScreenHeightPx(this);
-        float h = sv.getHeight();
+        //int sh = Utils.getScreenHeightPx(this) - (Utils.isFullScreen(this) ? 0 : Utils.dipToPixel(this, 20));
+        int h = sv.getHeight();
+        int sh = nv.getHeight();
+        Log.d(TAG, String.format("screen h: %d share h: %d", sh, h));
+        AnimatorSet as = new AnimatorSet();
         ValueAnimator va = ObjectAnimator.ofFloat(sv, "y", sh, sh - h);
-        va.setDuration(300);
+        //va.setDuration(300);
         ValueAnimator va1 = ObjectAnimator.ofFloat(nv, "alpha", 0, 0.7f);
-        va1.setDuration(300);
-        va.start();
-        va1.start();
+        //va1.setDuration(300);
+        //va.start();
+        //va1.start();
+        as.play(va1).with(va);
+        as.setDuration(100);
+        as.start();
     }
 
     private void shareWeibo() {
-        this.api.registerApp();
-        WeiboMultiMessage msg = new WeiboMultiMessage();
-        String url = this.intent.hasExtra(SHARE_URL) ? this.intent.getStringExtra(SHARE_URL) : "";
-        if (this.intent.hasExtra(SHARE_IMAGE)) {
-            byte[] buf = this.intent.getByteArrayExtra(SHARE_IMAGE);
-            Bitmap bm = BitmapFactory.decodeByteArray(buf, 0, buf.length);
-            ImageObject iobj = new ImageObject();
-            iobj.setImageObject(bm);
-            msg.imageObject = iobj;
+        if (this.api.isWeiboAppInstalled()) {
+            this.api.registerApp();
+            WeiboMultiMessage msg = new WeiboMultiMessage();
+            String url = this.intent.hasExtra(SHARE_URL) ? this.intent.getStringExtra(SHARE_URL) : "";
+            if (this.intent.hasExtra(SHARE_IMAGE)) {
+                byte[] buf = this.intent.getByteArrayExtra(SHARE_IMAGE);
+                Bitmap bm = BitmapFactory.decodeByteArray(buf, 0, buf.length);
+                ImageObject iobj = new ImageObject();
+                iobj.setImageObject(bm);
+                msg.imageObject = iobj;
+            }
+            msg.textObject = new TextObject();
+            msg.textObject.text = String.format("%s %s", this.intent.getStringExtra(SHARE_CONTEXT), url);
+            SendMultiMessageToWeiboRequest req = new SendMultiMessageToWeiboRequest();
+            req.transaction = String.valueOf(System.currentTimeMillis());
+            req.multiMessage = msg;
+            this.api.sendRequest(this, req);
+        } else {
+            this.shareWeiboH5();
         }
-        msg.textObject = new TextObject();
-        msg.textObject.text = String.format("%s %s", this.intent.getStringExtra(SHARE_CONTEXT), url);
-        SendMultiMessageToWeiboRequest req = new SendMultiMessageToWeiboRequest();
-        req.transaction = String.valueOf(System.currentTimeMillis());
-        req.multiMessage = msg;
-        this.api.sendRequest(this, req);
+    }
+
+    private void shareWeiboH5() {
+        AuthInfo authInfo = new AuthInfo(this, CommonUtilities.Weibo_AppKey, CommonUtilities.Weibo_Redirect_URL, CommonUtilities.Weibo_Scope);
+        SsoHandler sso = new SsoHandler(this, authInfo);
+        sso.authorize(new WeiboAuthListener() {
+
+            private RequestListener reql = new RequestListener() {
+                @Override
+                public void onComplete(String s) {
+                    String ss = ShareActivity.this.getString(R.string.share_weibo_result, ShareActivity.this.getString(R.string.share_result_succeed));
+                    MessageBoxUtils.messageBoxWithButtons(ShareActivity.this, ss,
+                            new String[]{ShareActivity.this.getString(R.string.userinfo_comfirm)},
+                            null,
+                            new MessageBoxUtils.MsgboxButtonListener[]{
+                                    new MessageBoxUtils.MsgboxButtonListener() {
+                                        @Override
+                                        public boolean shouldCloseMessageBox(Object tag) {
+                                            return true;
+                                        }
+
+                                        @Override
+                                        public void onClick(Object tag) {
+                                            ShareActivity.this.finish();
+                                        }
+                                    }
+                            }
+                    );
+                }
+
+                @Override
+                public void onWeiboException(WeiboException e) {
+                    String s = ShareActivity.this.getString(R.string.share_weibo_error, e.getMessage());
+                    MessageBoxUtils.messageBoxWithNoButton(ShareActivity.this, false, s, 1000);
+                    ShareActivity.this.finish();
+                }
+            };
+
+            @Override
+            public void onComplete(Bundle bundle) {
+                Oauth2AccessToken token = Oauth2AccessToken.parseAccessToken(bundle);
+                Intent x = ShareActivity.this.intent;
+                StatusesAPI sapi = new StatusesAPI(ShareActivity.this, CommonUtilities.Weibo_AppKey, token);
+                String url = x.hasExtra(SHARE_URL) ? x.getStringExtra(SHARE_URL) : "";
+                String text = String.format("%s %s", x.getStringExtra(SHARE_CONTEXT), url);
+                if (x.hasExtra(SHARE_IMAGE)) {
+                    byte[] buf = x.getByteArrayExtra(SHARE_IMAGE);
+                    Bitmap bm = BitmapFactory.decodeByteArray(buf, 0, buf.length);
+                    sapi.upload(text, bm, null, null, this.reql);
+                } else {
+                    sapi.update(text, null, null, this.reql);
+                }
+            }
+
+            @Override
+            public void onWeiboException(WeiboException e) {
+                String s = ShareActivity.this.getString(R.string.share_weibo_error, e.getMessage());
+                MessageBoxUtils.messageBoxWithNoButton(ShareActivity.this, false, s, 1000);
+                ShareActivity.this.finish();
+            }
+
+            @Override
+            public void onCancel() {
+                String s = ShareActivity.this.getString(R.string.share_weibo_result, ShareActivity.this.getString(R.string.share_result_cancel));
+                MessageBoxUtils.messageBoxWithNoButton(ShareActivity.this, false, s, 1000);
+                ShareActivity.this.finish();
+            }
+        });
     }
 
     @Override
