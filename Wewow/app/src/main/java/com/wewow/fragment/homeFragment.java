@@ -1,5 +1,7 @@
 package com.wewow.fragment;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -13,8 +15,10 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,7 +37,11 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.baidu.aiupdatesdk.AIUpdateSDK;
+import com.baidu.aiupdatesdk.CheckUpdateCallback;
+import com.baidu.aiupdatesdk.UpdateInfo;
 import com.bumptech.glide.Glide;
+import com.cjj.Util;
 import com.sina.weibo.sdk.constant.WBConstants;
 import com.wewow.BuildConfig;
 import com.wewow.DetailArtistActivity;
@@ -101,6 +109,10 @@ public class homeFragment extends Fragment {
     private boolean isAdsShow = false;
 
     public LinearLayout progressBar;
+    private String[] channels = {"wewow_android", "360", "baidu", "yingyongbao", "sougou", "xiaomi", "lenovo", "huawei", "vivo",
+            "meizu", "chuizi", "oppo", "pp", "taobao", "aliyun", "wandoujia", "UC", "yingyonghui", "anzhi", "mumayi", "ifanr",
+            "appso", "zuimei", "shaoshupai", "haoqixin", "36kr", "apipi"
+    };
 
     public homeFragment() {
 
@@ -125,6 +137,46 @@ public class homeFragment extends Fragment {
 
         if (Utils.isNetworkAvailable(getActivity())) {
 
+            String channel=channels[Integer.parseInt(BuildConfig.AUTO_TYPE)];
+//            if(channel.equals("baidu"))
+//            {
+                AIUpdateSDK.updateCheck(getActivity(), new CheckUpdateCallback() {
+                    @Override
+                    public void onCheckUpdateCallback(UpdateInfo info) {
+//                        if (info == null) {
+//                            //Toast.makeText(getActivity(), "无可用更新", Toast.LENGTH_SHORT).show();
+//                        } else {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                            builder.setTitle(info.getVersion() + ", " + Utils.byteToMb(info.getSize()))
+                                    .setMessage(Html.fromHtml(info.getChangeLog()))
+                                    .setPositiveButton(getActivity().getResources().getString(R.string.auto_update), null)
+                                    .setCancelable(!info.isForceUpdate())
+                                    .setOnKeyListener(new DialogInterface.OnKeyListener() {
+                                        @Override
+                                        public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+                                            if (keyCode == KeyEvent.KEYCODE_BACK) {
+                                                return true;
+                                            }
+                                            return false;
+                                        }
+                                    });
+                            if (!info.isForceUpdate()) {
+                                builder.setNegativeButton(getActivity().getResources().getString(R.string.do_no_udpate), null);
+                            }
+                            AlertDialog dialog = builder.show();
+                            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(
+                                    new View.OnClickListener() {
+
+                                        @Override
+                                        public void onClick(View v) {
+                                            AIUpdateSDK.updateDownload(getActivity());
+                                        }
+                                    });
+                        }
+//                    }
+                });
+
+//            }
             checkCacheUpdatedOrNot();
 
         } else {
@@ -349,7 +401,10 @@ public class homeFragment extends Fragment {
                             setUpRecommendedArtistsAndInstituesFromCache(view);
                         }
 
-                        getNotificationInfoFromServer();
+                        if(!channels.equals("baidu"))
+                        {
+                            getNotificationInfoFromServer();
+                        }
                         getAdsInfoFromServer();
 
 

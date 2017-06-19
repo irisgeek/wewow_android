@@ -76,5 +76,7 @@ public class CommonUtilities {
     public static final String Leancloud_AppID="cX6mVuXPagfc4JwSpYYM5jVY-gzGzoHsz";
     public static final String Leancloud_AppKey ="Ypt7bncxyS1XUuRRUg1gNPoP";
 
+    public  static final String Youzan_AppID="a3d472d6ff81f26f21";
+
     public static final String SHARE_URL="https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzI2MzEyOTkyNQ==&scene=110#wechat_redirect";
 }

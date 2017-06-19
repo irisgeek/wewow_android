@@ -142,10 +142,12 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar', '*.so'], dir: 'libs')
     compile project(':libraryMaterialRefreshLayout')
+    compile(name: 'aiupdatesdk-release', ext: 'aar')
     compile(name: 'HMS-SDK-2.4.0.300', ext: 'aar')
     compile files('libs/avoscloud-push-v4.2.0.jar')
     compile files('libs/avoscloud-sdk-v4.2.0.jar')
     compile files('libs/fastjson-1.2.30.jar')
+    compile files('libs/youzan-sdk-basic-v5.0.3-official.jar')
 
     compile 'com.growingio.android:vds-android-agent:0.9.104@aar'
     compile 'com.google.code.gson:gson:2.5'

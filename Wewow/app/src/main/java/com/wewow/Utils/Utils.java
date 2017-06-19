@@ -402,5 +402,10 @@ public class Utils {
 //        }
 //        return null;
 //    }
+
+    public static String byteToMb(long fileSize) {
+        float size = ((float) fileSize) / (1024f * 1024f);
+        return String.format("%.2fMB", size);
+    }
 }
 
