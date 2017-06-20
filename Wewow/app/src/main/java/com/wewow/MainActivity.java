@@ -33,9 +33,11 @@
 package com.wewow;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
@@ -56,6 +58,7 @@ import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -63,6 +66,7 @@ import android.util.TypedValue;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -87,6 +91,9 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.baidu.aiupdatesdk.AIUpdateSDK;
+import com.baidu.aiupdatesdk.CheckUpdateCallback;
+import com.baidu.aiupdatesdk.UpdateInfo;
 import com.bumptech.glide.Glide;
 import com.growingio.android.sdk.collection.GrowingIO;
 import com.jaeger.library.StatusBarUtil;
@@ -100,6 +107,7 @@ import com.wewow.netTask.ITask;
 import com.wewow.utils.AppBarStateChangeListener;
 import com.wewow.utils.CommonUtilities;
 import com.wewow.utils.FileCacheUtil;
+import com.wewow.utils.MessageBoxUtils;
 import com.wewow.utils.NetStateUtils;
 import com.wewow.utils.SettingUtils;
 import com.wewow.utils.Utils;
@@ -115,6 +123,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.jar.Manifest;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -162,7 +171,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
     private Field field;
     private final BroadcastReceiver mybroadcast = new NetStateUtils();
     private CollapsingToolbarLayout collapsingToolbar;
-    private AppBarLayout mAppBarLayout ;
+    private AppBarLayout mAppBarLayout;
     private ImageView imageViewLine;
     private RelativeLayout layoutCoverTab;
 
@@ -174,48 +183,25 @@ public class MainActivity extends BaseActivity implements TextWatcher {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//        Utils.setActivityToBeFullscreen(this);
         setMenuselectedPosition(0);
         setContentView(R.layout.activity_main);
-        String channel=channels[Integer.parseInt(BuildConfig.AUTO_TYPE)];
-//        Toast.makeText(this,channel,Toast.LENGTH_LONG).show();
+        String channel = channels[Integer.parseInt(BuildConfig.AUTO_TYPE)];
         context = this;
-//        StatusBarUtil.setTranslucentForCoordinatorLayout(this, 100);
 
         if (android.os.Build.VERSION.SDK_INT > 18) {
             Window window = getWindow();
             window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-//                         window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION, WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-            //设置根布局的内边距
-//                         CoordinatorLayout layout = (CoordinatorLayout) findViewById(R.id.main_content);
-//             if(checkDeviceHasNavigationBar(this))
-//             {
-//                 layout.setPadding(0,0, 0,getVirtualBarHeigh() );
-//             }
-//             else
-//             {
-//                 layout.setPadding(0, 0, 0, 0);
-//
-//             }
+
         }
 
-//        getWindow().getDecorView().setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
-//            @Override
-//            public void onSystemUiVisibilityChange(int visibility) {
-//                hideBottomUIMenu();
-//            }
-//        });
-//        this.hideBottomUIMenu();
         progressBar = (LinearLayout) findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
 
         mTabLayout = (TabLayout) findViewById(R.id.tabs);
-        imageViewLine=(ImageView)findViewById(R.id.imageViewLine);
-        layoutCoverTab=(RelativeLayout)findViewById(R.id.layoutCoverTab);
+        imageViewLine = (ImageView) findViewById(R.id.imageViewLine);
+        layoutCoverTab = (RelativeLayout) findViewById(R.id.layoutCoverTab);
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         float density = Utils.getSceenDensity(this);
-//        Utils.regitsterNetSateBroadcastReceiver(this);
         collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(getResources().getString(R.string.home_page));
@@ -224,9 +210,6 @@ public class MainActivity extends BaseActivity implements TextWatcher {
 
 
         initAppBar();
-//        setUpNavigationTabDummy(null);
-
-//        setUpNavigationTab();
 
         SettingUtils.set(this, CommonUtilities.NETWORK_STATE, false);
         //if banner data cached
@@ -259,6 +242,77 @@ public class MainActivity extends BaseActivity implements TextWatcher {
         }
         if (Utils.isNetworkAvailable(this)) {
             //if banner data never cached or outdated
+
+            if (channel.equals("baidu")) {
+                AIUpdateSDK.updateCheck(MainActivity.this, new CheckUpdateCallback() {
+                    @Override
+                    public void onCheckUpdateCallback(UpdateInfo info) {
+                        if (info != null) {
+
+                            String[] strings = {info.getVersion() + ", " + Utils.byteToMb(info.getSize()), info.getChangeLog()};
+                            if (info.isForceUpdate()) {
+                                MessageBoxUtils.messageBoxWithButtons(MainActivity.this
+                                        , strings
+                                        , new String[]{
+                                                getString(R.string.auto_update)
+                                        }
+                                        , new Object[]{0}
+                                        , new MessageBoxUtils.MsgboxButtonListener[]{
+                                                new MessageBoxUtils.MsgboxButtonListener() {
+                                                    @Override
+                                                    public boolean shouldCloseMessageBox(Object tag) {
+                                                        return true;
+                                                    }
+
+                                                    @Override
+                                                    public void onClick(Object tag) {
+                                                        AIUpdateSDK.updateDownload(MainActivity.this);
+                                                    }
+                                                }
+                                        }
+                                );
+
+                            } else {
+
+                                MessageBoxUtils.messageBoxWithButtons(MainActivity.this
+                                        , strings
+                                        , new String[]{
+                                                MainActivity.this.getString(R.string.auto_update),
+                                                MainActivity.this.getString(R.string.do_no_udpate)
+                                        }
+                                        , new Object[]{0, 1}
+                                        , new MessageBoxUtils.MsgboxButtonListener[]{
+                                                new MessageBoxUtils.MsgboxButtonListener() {
+                                                    @Override
+                                                    public boolean shouldCloseMessageBox(Object tag) {
+                                                        return true;
+                                                    }
+
+                                                    @Override
+                                                    public void onClick(Object tag) {
+                                                        AIUpdateSDK.updateDownload(MainActivity.this);
+                                                        //UserInfoActivity.this.updateUserInfo();
+                                                    }
+                                                },
+                                                new MessageBoxUtils.MsgboxButtonListener() {
+                                                    @Override
+                                                    public boolean shouldCloseMessageBox(Object tag) {
+                                                        return true;
+                                                    }
+
+                                                    @Override
+                                                    public void onClick(Object tag) {
+
+                                                    }
+                                                },
+                                        }
+                                );
+                            }
+                        }
+
+                    }
+                });
+            }
 
             checkcacheUpdatedOrNot();
         } else {
@@ -495,7 +549,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
 
 
         mAppBarLayout = (AppBarLayout) findViewById(R.id.appbar);
-        if(Build.VERSION.SDK_INT>=21) {
+        if (Build.VERSION.SDK_INT >= 21) {
             mAppBarLayout.setNestedScrollingEnabled(false);
         }
         mAppBarLayout.addOnOffsetChangedListener(new AppBarStateChangeListener() {
@@ -569,8 +623,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
 
 
         toolbar.setBackgroundColor(getResources().getColor(R.color.cover));
-        if (isAppBarFolded)
-        {
+        if (isAppBarFolded) {
             imageViewLine.setBackgroundColor(getResources().getColor(R.color.cover));
             mTabLayout.setBackgroundColor(getResources().getColor(R.color.cover));
             layoutCoverTab.setVisibility(View.VISIBLE);
@@ -612,7 +665,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
                 }, 200);
             }
         });
-        ImageView imageViewBack=(ImageView)findViewById(R.id.layoutMenuCover);
+        ImageView imageViewBack = (ImageView) findViewById(R.id.layoutMenuCover);
         imageViewBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -648,7 +701,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
             }
         });
 
-        ImageView imageViewSearchBottom=(ImageView)findViewById(R.id.layoutSearchCover);
+        ImageView imageViewSearchBottom = (ImageView) findViewById(R.id.layoutSearchCover);
         imageViewSearchBottom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -802,14 +855,12 @@ public class MainActivity extends BaseActivity implements TextWatcher {
     }
 
     private void removeCover() {
-        if(isAppBarFolded)
-        {
+        if (isAppBarFolded) {
             imageViewLine.setBackgroundColor(getResources().getColor(R.color.line_color));
             toolbar.setBackgroundColor(getResources().getColor(R.color.white));
             layoutCoverTab.setVisibility(View.GONE);
             mTabLayout.setBackgroundColor(getResources().getColor(R.color.transparent));
-        }
-        else {
+        } else {
             toolbar.setBackgroundColor(getResources().getColor(R.color.transparent));
         }
 
@@ -826,9 +877,6 @@ public class MainActivity extends BaseActivity implements TextWatcher {
                 imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
             }
         }, 100);
-
-
-
 
 
     }
@@ -1120,12 +1168,10 @@ public class MainActivity extends BaseActivity implements TextWatcher {
                         AppBarLayout.LayoutParams mParams = (AppBarLayout.LayoutParams) mAppBarLayout.getChildAt(0).getLayoutParams();
                         mParams.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED |
                                 AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP);
-                    }
-                    else
-                    {
+                    } else {
 
                         AppBarLayout.LayoutParams mParams = (AppBarLayout.LayoutParams) mAppBarLayout.getChildAt(0).getLayoutParams();
-                        mParams.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL |AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED |
+                        mParams.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL | AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED |
                                 AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP);
                     }
                 }
@@ -1216,7 +1262,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
 
         //set adapter
         viewPager.setAdapter(mPagerAdapter);
-        if(Build.VERSION.SDK_INT>=21) {
+        if (Build.VERSION.SDK_INT >= 21) {
             viewPager.setNestedScrollingEnabled(false);
         }
 
@@ -1534,14 +1580,14 @@ public class MainActivity extends BaseActivity implements TextWatcher {
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
         // TODO Auto-generated method stub
-       removeCover();
+        removeCover();
 
     }
 
     @Override
     public void afterTextChanged(Editable s) {
         // TODO Auto-generated method stub
-       removeCover();
+        removeCover();
     }
 
 
