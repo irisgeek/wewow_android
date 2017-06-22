@@ -117,6 +117,11 @@ public interface ITask {
     void getTokenToUploadFiles(@Header("User-Agent") String headerContentType,
                  Callback<JSONObject> callback);
 
+    @POST("/youzanlogin")
+    @FormUrlEncoded
+    void youzanLogin(@Header("User-Agent") String headerContentType, @Field("user_id") String id,
+                               Callback<JSONObject> callback);
+
 
 }
 

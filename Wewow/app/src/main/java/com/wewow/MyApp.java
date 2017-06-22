@@ -45,7 +45,7 @@ public class MyApp extends Application implements Thread.UncaughtExceptionHandle
                 .trackAllFragments()
                 .setChannel(channel));
         setUpLeanCloud();
-        YouzanSDK.init(this, CommonUtilities.Youzan_AppID);
+        YouzanSDK.init(getApplicationContext(), "a3d472d6ff81f26f21");
 
     }
 

@@ -1188,6 +1188,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
                         Intent intent = new Intent(MainActivity.this, SubjectActivity.class);
                         intent.putExtra("id", banner.getId());
                         startActivity(intent);
+
                     } else if (type.equals(CommonUtilities.BANNER_TYPE_COLLECTION)) {
                         LabCollection lc = new LabCollection();
                         lc.image = banner.getImage();
