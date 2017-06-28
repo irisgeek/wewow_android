@@ -38,23 +38,42 @@ import com.tencent.mm.opensdk.modelmsg.WXTextObject;
 import com.tencent.mm.opensdk.modelmsg.WXWebpageObject;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
+import com.wewow.dto.Banner;
+import com.wewow.netTask.ITask;
 import com.wewow.utils.CommonUtilities;
+import com.wewow.utils.FileCacheUtil;
 import com.wewow.utils.MessageBoxUtils;
 import com.wewow.utils.Utils;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 public class ShareActivity extends Activity implements IWeiboHandler.Response {
 
     private static final String TAG = "ShareActivity";
     public static final String SHARE_TYPE = "SHARE_TYPE";
+    public static final String ITEM_TYPE = "ITEM_TYPE";
+    public static final String ITEM_TYPE_ARTICLE = "article";
+    public static final String ITEM_TYPE_COLLECTION= "collection";
+    public static final String ITEM_TYPE_DAILY_TOPIC = "daily_topic";
+
+    public static final String ITEM_ID = "ITEM_ID";
     public static final int SHARE_TYPE_UNKNOWN = -1;
     public static final int SHARE_TYPE_TOSELECT = 0;
-    public static final int SHARE_TYPE_WEIBO = 1;
-    public static final int SHARE_TYPE_COPY_LINK = 2;
+    public static final int SHARE_TYPE_WEIBO = 2;
+    public static final int SHARE_TYPE_COPY_LINK = 4;
     public static final int SHARE_TYPE_WECHAT_CIRCLE = 3;
-    public static final int SHARE_TYPE_WECHAT_FRIEND = 4;
+    public static final int SHARE_TYPE_WECHAT_FRIEND = 1;
     public static final String SHARE_URL = "SHARE_URL";
     public static final String SHARE_CONTEXT = "SHARE_CONTEXT";
     public static final String SHARE_IMAGE = "SHARE_IMAGE";
@@ -62,6 +81,8 @@ public class ShareActivity extends Activity implements IWeiboHandler.Response {
     private IWeiboShareAPI api;
 
     private int shareType;
+    private String itemType;
+    private String itemId;
     private Intent intent;
 
     @Override
@@ -70,6 +91,8 @@ public class ShareActivity extends Activity implements IWeiboHandler.Response {
         //Utils.setActivityToBeFullscreen(this);
         this.intent = this.getIntent();
         this.shareType = this.intent.getIntExtra(SHARE_TYPE, SHARE_TYPE_TOSELECT);
+        this.itemType=this.intent.getStringExtra(ITEM_TYPE);
+        this.itemId=this.intent.getStringExtra(ITEM_ID);
         //this.setContentView(this.shareType == SHARE_TYPE_TOSELECT ? R.layout.activity_share : R.layout.activity_share_empty);
         this.api = WeiboShareSDK.createWeiboAPI(this, CommonUtilities.Weibo_AppKey);
         switch (this.shareType) {
@@ -279,6 +302,8 @@ public class ShareActivity extends Activity implements IWeiboHandler.Response {
                 } else {
                     sapi.update(text, null, null, this.reql);
                 }
+                shareType=2;
+                shareCount();
             }
 
             @Override
@@ -304,6 +329,9 @@ public class ShareActivity extends Activity implements IWeiboHandler.Response {
         switch (baseResponse.errCode) {
             case WBConstants.ErrorCode.ERR_OK:
                 resultmsg = this.getString(R.string.share_result_succeed);
+                shareType=2;
+                shareCount();
+
                 break;
             case WBConstants.ErrorCode.ERR_CANCEL:
                 resultmsg = this.getString(R.string.share_result_cancel);
@@ -369,7 +397,28 @@ public class ShareActivity extends Activity implements IWeiboHandler.Response {
         IWXAPI api = WXAPIFactory.createWXAPI(this, CommonUtilities.WX_AppID);
         api.registerApp(CommonUtilities.WX_AppID);
         api.sendReq(req);
+        shareType=(type==0?1:3);
+        shareCount();
         this.finish();
+    }
+
+    private void shareCount() {
+        ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
+        iTask.shareCount(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this),itemType,
+                itemId,shareType+"","1",new Callback<JSONObject>() {
+
+            @Override
+            public void success(JSONObject object, Response response) {
+
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.i("ShareActivity", "request sharecount failed: " + error.toString());
+
+            }
+        });
     }
 
     private String genWXTransaction() {

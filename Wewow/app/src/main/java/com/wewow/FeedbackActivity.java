@@ -91,6 +91,7 @@ public class FeedbackActivity extends AppCompatActivity implements IPickResult {
     private Token token;
     private PickImageDialog dialog;
     private OSSClient oss;
+    private String brand;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,7 +123,7 @@ public class FeedbackActivity extends AppCompatActivity implements IPickResult {
     }
 
     private void initData() {
-
+        brand= Build.BRAND;
         listView = (ListView) findViewById(R.id.listViewFeedbacks);
 
         listItem = new ArrayList<HashMap<String, Object>>();
@@ -832,6 +833,9 @@ public class FeedbackActivity extends AppCompatActivity implements IPickResult {
 
             //Setting the real returned image.
             //getImageView().setImageURI(r.getUri());
+            //
+
+
             String path = BitmapUtils.saveBitmap(FeedbackActivity.this, compressBySize(pickResult.getPath(), 720, 1280));
             asyncPutObjectFromLocalFile(path);
 //            putObjectFromLocalFile(path);
@@ -845,7 +849,7 @@ public class FeedbackActivity extends AppCompatActivity implements IPickResult {
         }
     }
 
-    public static Bitmap compressBySize(String pathName, int targetWidth,
+    public  Bitmap compressBySize(String pathName, int targetWidth,
                                         int targetHeight) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;// 不去真的解析图片，只是获取图片的头部信息，包含宽高等；
@@ -872,6 +876,13 @@ public class FeedbackActivity extends AppCompatActivity implements IPickResult {
         //设置好缩放比例后，加载图片进内容；
         options.inJustDecodeBounds = false; //
         bitmap = BitmapFactory.decodeFile(pathName, options);
+
+        if(brand.toUpperCase().equals(CommonUtilities.BRAND_NAME_SAMSUNG))
+        {
+            int angle=BitmapUtils.readPictureDegree(pathName);
+            bitmap=BitmapUtils.rotaingImageView(angle,bitmap);
+
+        }
         return bitmap;
     }
 

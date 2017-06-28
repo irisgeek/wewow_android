@@ -46,6 +46,7 @@ public class RecycleViewArtistOfArtistList
     private ArrayList<HashMap<String, Object>> list;
     private String id;
     private List<String> followStatus;
+    private List<Integer> followCount;
 
 
     public interface OnItemClickListener {
@@ -99,10 +100,11 @@ public class RecycleViewArtistOfArtistList
         return list.get(position);
     }
 
-    public RecycleViewArtistOfArtistList(Context context, ArrayList<HashMap<String, Object>> list, List<String> followStatus) {
+    public RecycleViewArtistOfArtistList(Context context, ArrayList<HashMap<String, Object>> list, List<String> followStatus,List<Integer> followCount) {
         this.context = context;
         this.list = list;
         this.followStatus = followStatus;
+        this.followCount = followCount;
     }
 
     @Override
@@ -125,7 +127,8 @@ public class RecycleViewArtistOfArtistList
         holder.textViewName.setText(stringObjectHashMap.get("textViewName").toString());
         holder.textViewDesc.setText(stringObjectHashMap.get("textViewDesc").toString());
         holder.textViewArticleCount.setText(stringObjectHashMap.get("textViewArticleCount").toString());
-        holder.textViewFollowerCount.setText(stringObjectHashMap.get("textViewFollowerCount").toString());
+
+        holder.textViewFollowerCount.setText(followCount.get(position)+"");
         if (followStatus.get(position).toString().equals("1")) {
             holder.imageViewFollowed.setImageResource(R.drawable.followed);
         } else {
@@ -205,6 +208,18 @@ public class RecycleViewArtistOfArtistList
                             MessageBoxUtils.messageBoxWithNoButton(context, true, read == 0 ? context.getResources()
                                     .getString(R.string.cancel_follow_artist_success) : context.getResources()
                                     .getString(R.string.follow_artist_success), 1000);
+                            int followC=followCount.get(position);
+
+                            followCount.set(position,followC+1);
+
+                            holder.textViewFollowerCount.setText(followCount.get(position)+"");
+
+                        }
+                        else {
+                            int followC=followCount.get(position);
+
+                            followCount.set(position,followC-1);
+                            holder.textViewFollowerCount.setText(followCount.get(position)+"");
                         }
                         notifyDataSetChanged();
                         FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_LIST, context);

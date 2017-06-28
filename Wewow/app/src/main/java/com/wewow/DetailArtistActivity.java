@@ -92,6 +92,7 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
     private CollapsingToolbarLayout collapsingToolbar;
     public LinearLayout progressBar;
     private TextView textViewCount;
+    private int followerCount;
 
 
     @Override
@@ -322,6 +323,8 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
     private void setUpArtist(final ArtistDetail artist, boolean refresh) {
 
         artistCurrent=artist;
+        followerCount=Integer.parseInt(artistCurrent.getArtist().getFollower_count());
+
 
         if (!refresh) {
 
@@ -491,6 +494,12 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
                             MessageBoxUtils.messageBoxWithNoButton(DetailArtistActivity.this, true, read == 0 ? getResources()
                                     .getString(R.string.cancel_follow_artist_success) : getResources()
                                     .getString(R.string.follow_artist_success), 1000);
+                            followerCount++;
+                            textViewCount.setText(followerCount + getResources().getString(R.string.subscriber));
+                        }
+                        else {
+                            followerCount--;
+                            textViewCount.setText(followerCount+ getResources().getString(R.string.subscriber));
                         }
                         FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_ARTISTS_DETAIL + id, DetailArtistActivity.this);
                         FileCacheUtil.clearCacheData(CommonUtilities.CACHE_FILE_SUBSCRIBED_ARTISTS_LIST, DetailArtistActivity.this);

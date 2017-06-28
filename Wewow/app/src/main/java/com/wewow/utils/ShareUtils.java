@@ -40,6 +40,9 @@ public class ShareUtils {
     private String content;
     private Bitmap picture;
     private String url;
+    private String itemType;
+    private String itemId;
+
 
     public String getContent() {
         return content;
@@ -63,6 +66,22 @@ public class ShareUtils {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getItemType() {
+        return itemType;
+    }
+
+    public void setItemType(String itemType) {
+        this.itemType = itemType;
+    }
+
+    public String getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(String itemId) {
+        this.itemId = itemId;
     }
 
     public enum ShareTypes {
@@ -97,6 +116,8 @@ public class ShareUtils {
         intent.putExtra(ShareActivity.SHARE_TYPE, type.ordinal());
         intent.putExtra(ShareActivity.SHARE_CONTEXT, this.content);
         intent.putExtra(ShareActivity.SHARE_URL, this.url == null ? "" : this.url);
+        intent.putExtra(ShareActivity.ITEM_TYPE,getItemType());
+        intent.putExtra(ShareActivity.ITEM_ID,getItemId());
         if (this.picture != null) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             this.picture.compress(Bitmap.CompressFormat.PNG, 100, baos);
