@@ -215,6 +215,8 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
                 intent.putExtra(ShareActivity.SHARE_TYPE, ShareActivity.SHARE_TYPE_TOSELECT);
                 intent.putExtra(ShareActivity.SHARE_CONTEXT, data.optString("title"));
                 intent.putExtra(ShareActivity.SHARE_URL, data.optString("share_link"));
+                intent.putExtra(ShareActivity.ITEM_TYPE,ShareActivity.ITEM_TYPE_ARTICLE);
+                intent.putExtra(ShareActivity.ITEM_ID,ArticleActivity.this.id+"");
                 BitmapDrawable bd = (BitmapDrawable) ArticleActivity.this.logo.getDrawable();
                 if (bd != null) {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();

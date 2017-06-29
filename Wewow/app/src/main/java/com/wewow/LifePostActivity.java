@@ -145,6 +145,8 @@ public class LifePostActivity extends AppCompatActivity implements AbsListView.O
             public void onClick(View view) {
                 ShareUtils su = new ShareUtils(LifePostActivity.this);
                 su.setContent(LifePostActivity.this.title.getText().toString());
+                su.setItemId(postId + "");
+                su.setItemType(ShareActivity.ITEM_TYPE_DAILY_TOPIC);
                 BitmapDrawable bd = (BitmapDrawable) LifePostActivity.this.contentView.getBackground();
                 if (bd != null) {
                     su.setPicture(bd.getBitmap());

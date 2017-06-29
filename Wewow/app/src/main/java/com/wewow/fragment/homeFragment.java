@@ -137,46 +137,6 @@ public class homeFragment extends Fragment {
 
         if (Utils.isNetworkAvailable(getActivity())) {
 
-            String channel=channels[Integer.parseInt(BuildConfig.AUTO_TYPE)];
-//            if(channel.equals("baidu"))
-//            {
-                AIUpdateSDK.updateCheck(getActivity(), new CheckUpdateCallback() {
-                    @Override
-                    public void onCheckUpdateCallback(UpdateInfo info) {
-//                        if (info == null) {
-//                            //Toast.makeText(getActivity(), "无可用更新", Toast.LENGTH_SHORT).show();
-//                        } else {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                            builder.setTitle(info.getVersion() + ", " + Utils.byteToMb(info.getSize()))
-                                    .setMessage(Html.fromHtml(info.getChangeLog()))
-                                    .setPositiveButton(getActivity().getResources().getString(R.string.auto_update), null)
-                                    .setCancelable(!info.isForceUpdate())
-                                    .setOnKeyListener(new DialogInterface.OnKeyListener() {
-                                        @Override
-                                        public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-                                            if (keyCode == KeyEvent.KEYCODE_BACK) {
-                                                return true;
-                                            }
-                                            return false;
-                                        }
-                                    });
-                            if (!info.isForceUpdate()) {
-                                builder.setNegativeButton(getActivity().getResources().getString(R.string.do_no_udpate), null);
-                            }
-                            AlertDialog dialog = builder.show();
-                            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(
-                                    new View.OnClickListener() {
-
-                                        @Override
-                                        public void onClick(View v) {
-                                            AIUpdateSDK.updateDownload(getActivity());
-                                        }
-                                    });
-                        }
-//                    }
-                });
-
-//            }
             checkCacheUpdatedOrNot();
 
         } else {
@@ -401,10 +361,10 @@ public class homeFragment extends Fragment {
                             setUpRecommendedArtistsAndInstituesFromCache(view);
                         }
 
-                        if(!channels.equals("baidu"))
-                        {
+//                        if(!channels.equals("baidu"))
+//                        {
                             getNotificationInfoFromServer();
-                        }
+//                        }
                         getAdsInfoFromServer();
 
 
@@ -653,9 +613,10 @@ public class homeFragment extends Fragment {
     private void getNotificationInfoFromServer() {
 
         requestSentCount++;
+        final String channelString = channels[Integer.parseInt(BuildConfig.AUTO_TYPE)];
         ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
         String appVersionName = Utils.getAppVersionName(getActivity());
-        int channel = Integer.parseInt(BuildConfig.AUTO_TYPE);
+        final int channel = Integer.parseInt(BuildConfig.AUTO_TYPE);
         iTask.notification(CommonUtilities.REQUEST_HEADER_PREFIX + appVersionName, appVersionName, channel, new Callback<JSONObject>() {
 
             @Override

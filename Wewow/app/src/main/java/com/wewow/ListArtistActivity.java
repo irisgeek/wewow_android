@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -68,6 +69,7 @@ public class ListArtistActivity extends BaseActivity implements LoadMoreListener
     private int totalPages = 1;
     private RecyclerViewUpRefresh rv;
     private LinearLayout progressBar;
+    private List<Integer> followCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +92,7 @@ public class ListArtistActivity extends BaseActivity implements LoadMoreListener
         rv.setLoadMoreListener(this);
 
         followStatus = new ArrayList<String>();
+        followCount=new ArrayList<Integer>();
         listItem = new ArrayList<HashMap<String, Object>>();
         allArtists = new ArrayList<Artist>();
 
@@ -378,13 +381,20 @@ public class ListArtistActivity extends BaseActivity implements LoadMoreListener
         if (followStatus != null && followStatus.size() > 0) {
             followStatus.clear();
         }
+        if (followCount != null && followCount.size() > 0) {
+            followCount.clear();
+        }
+
         for (HashMap<String, Object> objectHashMap : listItem) {
             String status = objectHashMap.get("imageViewFollowed").toString();
+            int count=Integer.parseInt(objectHashMap.get("textViewFollowerCount").toString());
             followStatus.add(status);
+            followCount.add(count);
+
         }
 
         if (!refresh) {
-            adapter = new RecycleViewArtistOfArtistList(this, listItem, followStatus);
+            adapter = new RecycleViewArtistOfArtistList(this, listItem, followStatus,followCount);
 
             rv.setAdapter(adapter);
 

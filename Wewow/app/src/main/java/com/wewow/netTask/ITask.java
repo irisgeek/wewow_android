@@ -117,6 +117,18 @@ public interface ITask {
     void getTokenToUploadFiles(@Header("User-Agent") String headerContentType,
                  Callback<JSONObject> callback);
 
+    @POST("/youzanlogin")
+    @FormUrlEncoded
+    void youzanLogin(@Header("User-Agent") String headerContentType, @Field("user_id") String id,
+                               Callback<JSONObject> callback);
+
+    @GET("/share_count")
+    void shareCount(@Header("User-Agent") String headerContentType, @Query("item_type") String itemType,
+                    @Query("item_id") String itemId,
+                    @Query("share_type") String shareType,
+                    @Query("share") String share,
+                               Callback<JSONObject> callback);
+
 
 }
 

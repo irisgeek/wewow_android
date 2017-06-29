@@ -8,19 +8,32 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:orientation="horizontal">
+            <ImageView
+                android:id="@+id/imageViewBack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="17dp"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/back_b"/>
+
+        </LinearLayout>
+
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="58dp"
         android:scaleType="fitXY"
         android:src="@drawable/divider" />
 
-    <WebView android:id="@+id/Toweb"
+    <LinearLayout android:id="@+id/Toweb"
         android:layout_width="fill_parent"
+        android:orientation="vertical"
         android:layout_height="fill_parent" />
 
     </LinearLayout>
 
-    <include layout="@layout/toolbar" />
 
 </FrameLayout>

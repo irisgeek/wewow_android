@@ -38,27 +38,28 @@
             android:value="kE96bvfZ2npUIwSzGwtnK50BCsm4xCYH" />
 
 
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.wewow.fileprovider"
+
+            android:exported="false"
+            android:grantUriPermissions="true"
+            tools:replace="name,authorities,exported,grantUriPermissions">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/bdp_update_filepaths" />
+        </provider>
+
         <!--<provider-->
             <!--android:name="android.support.v4.content.FileProvider"-->
-            <!--android:authorities="com.wewow.fileprovider"-->
-
+            <!--android:authorities="${applicationId}.com.vansuita.pickimage.provider"-->
             <!--android:exported="false"-->
-            <!--android:grantUriPermissions="true">-->
+            <!--android:grantUriPermissions="true"-->
+            <!--tools:replace="android:authorities">-->
             <!--<meta-data-->
                 <!--android:name="android.support.FILE_PROVIDER_PATHS"-->
                 <!--android:resource="@xml/bdp_update_filepaths" />-->
         <!--</provider>-->
-
-        <provider
-            android:name="android.support.v4.content.FileProvider"
-            android:authorities="${applicationId}.com.vansuita.pickimage.provider"
-            android:exported="false"
-            android:grantUriPermissions="true"
-            tools:replace="android:authorities">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/picker_provider_paths" />
-        </provider>
 
         <activity
             android:name=".SplashActivity"

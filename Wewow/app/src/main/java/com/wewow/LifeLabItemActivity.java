@@ -337,6 +337,8 @@ public class LifeLabItemActivity extends Activity implements View.OnClickListene
                 ShareUtils su = new ShareUtils(LifeLabItemActivity.this);
                 su.setContent(LifeLabItemActivity.this.lcd.share_title);
                 su.setUrl(LifeLabItemActivity.this.lcd.share_link);
+                su.setItemId(this.lc.id + "");
+                su.setItemType(ShareActivity.ITEM_TYPE_COLLECTION);
                 if (LifeLabItemActivity.this.picture != null) {
 //                    su.setPicture(((BitmapDrawable) LifeLabItemActivity.this.picture).getBitmap());
                 }

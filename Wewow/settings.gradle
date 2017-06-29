@@ -1,2 +1,3 @@
-include ':app', ':libraryMaterialRefreshLayout'
+include ':app', ':libraryMaterialRefreshLayout', ':library_pickImage_module'
 project(':libraryMaterialRefreshLayout').projectDir = new File('library')
+project(':library_pickImage_module').projectDir = new File('library_pickImage')

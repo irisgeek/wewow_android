@@ -63,6 +63,7 @@ public class CommonUtilities {
 
 
     public  static final String BRAND_NAME_HUAWEI="HUAWEI";
+    public  static final String BRAND_NAME_SAMSUNG="SAMSUNG";
 
     public static final String APK=".apk";
 
