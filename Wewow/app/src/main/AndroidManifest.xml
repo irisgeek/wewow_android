@@ -206,10 +206,8 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
-        android:name=".SloganActivity"
-        android:screenOrientation="portrait" />
-        <activity
-            android:name=".YouzanActivity" />
+            android:name=".SloganActivity"
+            android:screenOrientation="portrait" />
 
         <!--    leanCloud config    -->
         <service android:name="com.avos.avoscloud.PushService" />
