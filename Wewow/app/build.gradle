@@ -142,7 +142,7 @@ android {
             def outputFile = output.outputFile
             if (outputFile != null && outputFile.name.endsWith('release.apk')) {
 
-                def fileName = "app-wewow-${variant.productFlavors[0].name}-release-${defaultConfig.versionName}-${releaseTime() }.apk"
+                def fileName = "app-wewow-${variant.productFlavors[0].name}-${defaultConfig.versionName}-${releaseTime() }-release.apk"
                 output.outputFile = new File(outputFile.parent, fileName)
             }
         }
