@@ -323,11 +323,9 @@ public class DetailArtistActivity extends BaseActivity implements LoadMoreListen
     private void setUpArtist(final ArtistDetail artist, boolean refresh) {
 
         artistCurrent=artist;
-        followerCount=Integer.parseInt(artistCurrent.getArtist().getFollower_count());
-
-
         if (!refresh) {
 
+            followerCount=Integer.parseInt(artistCurrent.getArtist().getFollower_count());
             Glide.with(this)
 
                     .load(artist.getArtist().getImage()).crossFade().fitCenter().placeholder(R.drawable.artist_loading_spinner).into(imageView);
