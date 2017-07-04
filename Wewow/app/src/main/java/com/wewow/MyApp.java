@@ -32,7 +32,7 @@ public class MyApp extends Application implements Thread.UncaughtExceptionHandle
     private final static String TAG = "WewowAPP";
     private String[] channels = {"wewow_android", "360", "baidu", "yingyongbao", "sougou", "xiaomi", "lenovo", "huawei", "vivo",
             "meizu", "chuizi", "oppo", "pp", "taobao", "aliyun", "wandoujia", "UC", "yingyonghui", "anzhi", "mumayi", "ifanr",
-            "appso", "zuimei", "shaoshupai", "haoqixin", "36kr", "apipi"
+            "appso", "zuimei", "shaoshupai", "haoqixin", "36kr", "apipi","oneplus"
     };
 
     @Override

@@ -132,6 +132,9 @@ android {
         aipipi{
             buildConfigField "String","AUTO_TYPE","\"26\""
         }
+        oneplus{
+            buildConfigField "String","AUTO_TYPE","\"27\""
+        }
     }
     productFlavors.all { flavor ->
         flavor.manifestPlaceholders = [ UMENG_CHANNEL_VALUE:name ]
