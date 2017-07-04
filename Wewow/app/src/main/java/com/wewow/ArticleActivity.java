@@ -24,8 +24,11 @@ import com.jaeger.library.StatusBarUtil;
 import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
+import com.wewow.dto.Banner;
+import com.wewow.netTask.ITask;
 import com.wewow.utils.BlurBuilder;
 import com.wewow.utils.CommonUtilities;
+import com.wewow.utils.FileCacheUtil;
 import com.wewow.utils.HttpAsyncTask;
 import com.wewow.utils.LoginUtils;
 import com.wewow.utils.MessageBoxUtils;
@@ -39,12 +42,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 import static com.wewow.LoginActivity.REQUEST_CODE_LOGIN;
 
@@ -83,31 +91,69 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void getArticleDetail(final boolean isFirst) {
-        ArrayList<Pair<String, String>> fields = new ArrayList<>();
-        fields.add(new Pair<String, String>("article_id", String.valueOf(this.id)));
-        if (UserInfo.isUserLogged(this)) {
-            fields.add(new Pair<String, String>("user_id", UserInfo.getCurrentUser(this).getId().toString()));
+//        ArrayList<Pair<String, String>> fields = new ArrayList<>();
+//        fields.add(new Pair<String, String>("article_id", String.valueOf(this.id)));
+//        if (UserInfo.isUserLogged(this)) {
+//            fields.add(new Pair<String, String>("user_id", UserInfo.getCurrentUser(this).getId().toString()));
+//        }
+//        Object[] params = new Object[]{
+//                WebAPIHelper.addUrlParams(String.format("%s/article_detail", CommonUtilities.WS_HOST), fields),
+//                new HttpAsyncTask.TaskDelegate() {
+//                    @Override
+//                    public void taskCompletionResult(byte[] result) {
+//                        ProgressDialogUtil.getInstance(ArticleActivity.this).finishProgressDialog();
+//                        JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
+//                        if (jobj != null) {
+//                            try {
+//                                ArticleActivity.this.fillContent(jobj.getJSONObject("result").getJSONObject("data"), isFirst);
+//                            } catch (JSONException e) {
+//                                Log.e(TAG, "JSON error");
+//                            }
+//                        }
+//                    }
+//                },
+//                WebAPIHelper.HttpMethod.GET,
+//        };
+//        new HttpAsyncTask().execute(params);
+
+        //optimize data loading speed
+        String userId = "0";
+        if (UserInfo.isUserLogged(ArticleActivity.this)) {
+            userId = UserInfo.getCurrentUser(ArticleActivity.this).getId().toString();
+
         }
-        Object[] params = new Object[]{
-                WebAPIHelper.addUrlParams(String.format("%s/article_detail", CommonUtilities.WS_HOST), fields),
-                new HttpAsyncTask.TaskDelegate() {
-                    @Override
-                    public void taskCompletionResult(byte[] result) {
-                        ProgressDialogUtil.getInstance(ArticleActivity.this).finishProgressDialog();
-                        JSONObject jobj = HttpAsyncTask.bytearray2JSON(result);
-                        if (jobj != null) {
-                            try {
-                                ArticleActivity.this.fillContent(jobj.getJSONObject("result").getJSONObject("data"), isFirst);
-                            } catch (JSONException e) {
-                                Log.e(TAG, "JSON error");
-                            }
+        ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
+        iTask.articleDetail(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this),this.id+"",userId, new Callback<JSONObject>() {
+
+            @Override
+            public void success(JSONObject object, Response response) {
+                ProgressDialogUtil.getInstance(ArticleActivity.this).finishProgressDialog();
+                try {
+                    String realData = Utils.convertStreamToString(response.getBody().in());
+                    JSONObject jobj = new JSONObject(realData);
+                    if (jobj != null) {
+                        try {
+                            ArticleActivity.this.fillContent(jobj.getJSONObject("result").getJSONObject("data"), isFirst);
+                        } catch (JSONException e) {
+                            Log.e(TAG, "JSON error");
                         }
                     }
-                },
-                WebAPIHelper.HttpMethod.GET,
-        };
-        new HttpAsyncTask().execute(params);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.i("ArticleActivity", "request article failed: " + error.toString());
+
+            }
+        });
     }
+
 
     @Override
     public void onClick(View v) {
