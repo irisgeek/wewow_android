@@ -12,6 +12,7 @@ public class Post implements Parcelable {
     private String image_160_160;
     private String id;
     private String title;
+    private String count;
 
 
     public static final Creator<Post> CREATOR = new Creator<Post>() {
@@ -65,5 +66,13 @@ public class Post implements Parcelable {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getCount() {
+        return count;
+    }
+
+    public void setCount(String count) {
+        this.count = count;
     }
 }
