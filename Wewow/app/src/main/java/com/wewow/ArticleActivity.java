@@ -87,7 +87,14 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
         Intent i = this.getIntent();
         this.id = i.getIntExtra(ARTICLE_ID, -1);
 
-        getArticleDetail(true);
+        if (Utils.isNetworkAvailable(this)) {
+
+            getArticleDetail(true);
+
+        } else {
+            Toast.makeText(this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
+
+        }
     }
 
     private void getArticleDetail(final boolean isFirst) {
@@ -123,7 +130,7 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
 
         }
         ITask iTask = Utils.getItask(CommonUtilities.WS_HOST);
-        iTask.articleDetail(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this),this.id+"",userId, new Callback<JSONObject>() {
+        iTask.articleDetail(CommonUtilities.REQUEST_HEADER_PREFIX + Utils.getAppVersionName(this), this.id + "", userId, new Callback<JSONObject>() {
 
             @Override
             public void success(JSONObject object, Response response) {
@@ -149,6 +156,7 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             public void failure(RetrofitError error) {
                 Log.i("ArticleActivity", "request article failed: " + error.toString());
+                Toast.makeText(ArticleActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -191,7 +199,7 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
         this.findViewById(R.id.article_back).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(likeStatusChange){
+                if (likeStatusChange) {
                     setResult(RESULT_OK);
                 }
                 ArticleActivity.this.finish();
@@ -246,7 +254,7 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
         this.logo = (ImageView) this.findViewById(R.id.article_logo);
         float screenWidth = Utils.getScreenWidthPx(ArticleActivity.this) - Utils.dipToPixel(ArticleActivity.this, 16);
         ViewGroup.LayoutParams params = logo.getLayoutParams();
-        params.height = (int)(screenWidth / 1112 * 750);
+        params.height = (int) (screenWidth / 1112 * 750);
         logo.setLayoutParams(params);
         this.discuzContainer = (LinearLayout) this.findViewById(R.id.article_discuss_container);
         this.tv_more_discuss = (TextView) this.findViewById(R.id.tv_more_discuss);
@@ -261,8 +269,8 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
                 intent.putExtra(ShareActivity.SHARE_TYPE, ShareActivity.SHARE_TYPE_TOSELECT);
                 intent.putExtra(ShareActivity.SHARE_CONTEXT, data.optString("title"));
                 intent.putExtra(ShareActivity.SHARE_URL, data.optString("share_link"));
-                intent.putExtra(ShareActivity.ITEM_TYPE,ShareActivity.ITEM_TYPE_ARTICLE);
-                intent.putExtra(ShareActivity.ITEM_ID,ArticleActivity.this.id+"");
+                intent.putExtra(ShareActivity.ITEM_TYPE, ShareActivity.ITEM_TYPE_ARTICLE);
+                intent.putExtra(ShareActivity.ITEM_ID, ArticleActivity.this.id + "");
                 BitmapDrawable bd = (BitmapDrawable) ArticleActivity.this.logo.getDrawable();
                 if (bd != null) {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -308,13 +316,12 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
                                 try {
                                     int i = jobj.getJSONObject("result").getInt("code");
                                     if (i != 0) {
-                                        if(i==403){
+                                        if (i == 403) {
                                             LoginUtils.startLogin(ArticleActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
-                                        }
-                                        else {
+                                        } else {
                                             throw new Exception(String.valueOf(i));
                                         }
-                                    }else{
+                                    } else {
                                         likeStatusChange = true;
                                         ArticleActivity.this.like.setImageDrawable(ArticleActivity.this.getResources().getDrawable(like == 1 ? R.drawable.marked_b : R.drawable.mark_b));
                                         String s;
@@ -426,7 +433,7 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
         findViewById(R.id.tv_more_discuss).setOnClickListener(this);
     }
 
-    private void postCommentLike(final ImageView iv, final TextView tv, final JSONObject comment){
+    private void postCommentLike(final ImageView iv, final TextView tv, final JSONObject comment) {
         UserInfo ui = UserInfo.getCurrentUser(this);
         List<Pair<String, String>> fields = new ArrayList<>();
         fields.add(new Pair<>("user_id", ui.getId() + ""));
@@ -449,18 +456,17 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
                         try {
                             JSONObject r = jobj.getJSONObject("result");
                             if (r.getInt("code") != 0) {
-                                if(r.getInt("code")==403){
+                                if (r.getInt("code") == 403) {
                                     LoginUtils.startLogin(ArticleActivity.this, LoginActivity.REQUEST_CODE_LOGIN);
-                                }
-                                else {
+                                } else {
                                     Toast.makeText(ArticleActivity.this, R.string.serverError, Toast.LENGTH_LONG).show();
                                 }
                             } else {
                                 likeStatusChange = true;
                                 comment.put("liked", comment.optInt("liked", 0) == 1 ? 0 : 1);
-                                if(comment.optInt("liked", 0) == 1){
+                                if (comment.optInt("liked", 0) == 1) {
                                     comment.put("liked_count", comment.optInt("liked_count", 0) + 1);
-                                } else{
+                                } else {
                                     comment.put("liked_count", comment.optInt("liked_count", 0) - 1);
                                 }
                                 iv.setImageResource(comment.optInt("liked", 0) == 1 ? R.drawable.liked : R.drawable.like);
@@ -479,7 +485,7 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void fillContent(JSONObject article, boolean isFirst) {
-        if(isFirst){
+        if (isFirst) {
             this.data = article;
             this.title.setText(article.optString("title", "No title"));
             this.content.loadUrl(article.optString("content", "No content"));
@@ -538,9 +544,9 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode != RESULT_CANCELED && requestCode == REQUEST_CODE_LOGIN){
+        if (resultCode != RESULT_CANCELED && requestCode == REQUEST_CODE_LOGIN) {
             getArticleDetail(false);
-        }else if(resultCode == RESULT_OK && requestCode == AllCOMMENT){
+        } else if (resultCode == RESULT_OK && requestCode == AllCOMMENT) {
             getArticleDetail(false);
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -565,7 +571,7 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onBackPressed() {
-        if(likeStatusChange){
+        if (likeStatusChange) {
             setResult(RESULT_OK);
         }
         finish();

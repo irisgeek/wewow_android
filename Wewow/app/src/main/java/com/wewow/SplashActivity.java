@@ -48,6 +48,7 @@ public class SplashActivity extends Activity {
         }
         else
         {
+            skipHome();
             Toast.makeText(this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
         }
     }
@@ -120,12 +121,14 @@ public class SplashActivity extends Activity {
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
+                    skipHome();
                 }
 
             }
 
             @Override
             public void failure(RetrofitError error) {
+                skipHome();
                 Log.i("ArticleActivity", "request article failed: " + error.toString());
                 Toast.makeText(SplashActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
 
