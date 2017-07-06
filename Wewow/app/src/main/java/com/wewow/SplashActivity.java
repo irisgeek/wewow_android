@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.util.Pair;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
@@ -30,6 +31,7 @@ import java.util.List;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
+import retrofit.http.Headers;
 
 /**
  * Created by iris on 17/4/16.
@@ -41,7 +43,13 @@ public class SplashActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         StatusBarUtil.setColor(this, getResources().getColor(R.color.white), 50);
-        getSloganData();
+        if (Utils.isNetworkAvailable(this)) {
+            getSloganData();
+        }
+        else
+        {
+            Toast.makeText(this, getResources().getString(R.string.networkError), Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void getSloganData() {
@@ -83,6 +91,7 @@ public class SplashActivity extends Activity {
 
             @Override
             public void success(JSONObject object, Response response) {
+                String StatusCode = response.getHeaders().toString();
                 String realData = null;
                 try {
                     realData = Utils.convertStreamToString(response.getBody().in());
@@ -118,6 +127,7 @@ public class SplashActivity extends Activity {
             @Override
             public void failure(RetrofitError error) {
                 Log.i("ArticleActivity", "request article failed: " + error.toString());
+                Toast.makeText(SplashActivity.this, getResources().getString(R.string.serverError), Toast.LENGTH_SHORT).show();
 
             }
         });
