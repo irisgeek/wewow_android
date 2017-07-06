@@ -217,8 +217,8 @@ public class Utils {
 
 
         final OkHttpClient okHttpClient = new OkHttpClient();
-        okHttpClient.setReadTimeout(5, TimeUnit.SECONDS);
-        okHttpClient.setConnectTimeout(5, TimeUnit.SECONDS);
+        okHttpClient.setReadTimeout(2, TimeUnit.SECONDS);
+        okHttpClient.setConnectTimeout(2, TimeUnit.SECONDS);
 //        okHttpClient.setReadTimeout(60, TimeUnit.SECONDS);
 //        okHttpClient.setConnectTimeout(60, TimeUnit.SECONDS);
         RestAdapter restAdapter = new RestAdapter.Builder()

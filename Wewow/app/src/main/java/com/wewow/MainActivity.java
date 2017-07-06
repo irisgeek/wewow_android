@@ -962,6 +962,8 @@ public class MainActivity extends BaseActivity implements TextWatcher {
             @Override
             public void failure(RetrofitError error) {
 
+                checkcacheUpdatedOrNot();
+
             }
 
         });
@@ -1304,6 +1306,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
 
             @Override
             public void failure(RetrofitError error) {
+                getTabTitlesFromServer();
                 Log.i("MainActivity", "request banner failed: " + error.toString());
 
             }
@@ -1344,6 +1347,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
             @Override
             public void failure(RetrofitError error) {
                 Log.i("MainActivity", "request banner failed: " + error.toString());
+                getBannerInfoFromServer();
 
             }
         });
@@ -1544,6 +1548,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
 
             @Override
             public void failure(RetrofitError error) {
+                getSearhHotWordsFromServer();
                 Log.i("MainActivity", "request banner failed: " + error.toString());
 
             }
