@@ -3,6 +3,8 @@ package com.wewow.utils;
 import android.util.Log;
 import android.util.Pair;
 
+import com.wewow.MyApp;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,7 +68,7 @@ public class WebAPIHelper {
     public static WebAPIHelper getWewowWebAPIHelper(boolean sslcheck) {
         if ((WebAPIHelper.instance == null) || (WebAPIHelper.instance.ignoreSslCheck != sslcheck)) {
             WebAPIHelper.instance = new WebAPIHelper(sslcheck);
-            WebAPIHelper.instance.addDefaultHeader("User-Agent", "Wewow/Android1.0");
+            WebAPIHelper.instance.addDefaultHeader("User-Agent", "Wewow/Android"+Utils.getAppVersionName(MyApp.getContext()));
         }
         return WebAPIHelper.instance;
     }

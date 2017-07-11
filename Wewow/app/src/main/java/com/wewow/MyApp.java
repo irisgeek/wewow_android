@@ -1,6 +1,7 @@
 package com.wewow;
 
 import android.app.Application;
+import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
@@ -34,6 +35,11 @@ public class MyApp extends Application implements Thread.UncaughtExceptionHandle
             "meizu", "chuizi", "oppo", "pp", "taobao", "aliyun", "wandoujia", "UC", "yingyonghui", "anzhi", "mumayi", "ifanr",
             "appso", "zuimei", "shaoshupai", "haoqixin", "36kr", "apipi","oneplus"
     };
+    private static Context mContext;
+
+    public static Context getContext(){
+        return mContext;
+    }
 
     @Override
     public void onCreate() {
@@ -46,6 +52,7 @@ public class MyApp extends Application implements Thread.UncaughtExceptionHandle
                 .setChannel(channel));
         setUpLeanCloud();
         YouzanSDK.init(getApplicationContext(), "a3d472d6ff81f26f21");
+        mContext = getApplicationContext();
 
     }
 
