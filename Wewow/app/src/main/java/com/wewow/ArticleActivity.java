@@ -277,12 +277,12 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
                     bd.getBitmap().compress(Bitmap.CompressFormat.PNG, 100, baos);
                     intent.putExtra(ShareActivity.SHARE_IMAGE, baos.toByteArray());
                 }
-                View v = findViewById(android.R.id.content);
-                if (v != null) {
-                    Bitmap bm = BlurBuilder.blur(v);
-                    byte[] buf = Utils.getBitmapBytes(bm);
-                    intent.putExtra(ShareActivity.BACK_GROUND, buf);
-                }
+//                View v = findViewById(android.R.id.content);
+//                if (v != null) {
+//                    Bitmap bm = BlurBuilder.blur(v);
+//                    byte[] buf = Utils.getBitmapBytes(bm);
+//                    intent.putExtra(ShareActivity.BACK_GROUND, buf);
+//                }
                 startActivity(intent);
             }
         });
