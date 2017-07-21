@@ -12,6 +12,7 @@ import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -213,7 +214,8 @@ public class ArticleActivity extends AppCompatActivity implements View.OnClickLi
         ws.setJavaScriptEnabled(true);
         ws.setAllowContentAccess(true);
         this.content.addJavascriptInterface(this.js, "articlejs");
-        this.content.setWebViewClient(new WebViewClient() {
+        this.content.setWebChromeClient(new WebChromeClient());
+         this.content.setWebViewClient(new WebViewClient() {
 
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
