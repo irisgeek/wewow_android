@@ -239,6 +239,10 @@
     <string name="auto_update">智能升级</string>
     <string name="do_no_udpate">暂不升级</string>
 
+    <string name="network_connection_retry">网络连接失败，按“确认”尝试重新连接。</string>
+
+
+
 
 
 

@@ -177,7 +177,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
 
     private String[] channels = {"wewow_android", "360", "baidu", "yingyongbao", "sougou", "xiaomi", "lenovo", "huawei", "vivo",
             "meizu", "chuizi", "oppo", "pp", "taobao", "aliyun", "wandoujia", "UC", "yingyonghui", "anzhi", "mumayi", "ifanr",
-            "appso", "zuimei", "shaoshupai", "haoqixin", "36kr", "apipi"
+            "appso", "zuimei", "shaoshupai", "haoqixin", "36kr", "apipi","oneplus"
     };
 
     @Override
@@ -962,10 +962,32 @@ public class MainActivity extends BaseActivity implements TextWatcher {
             @Override
             public void failure(RetrofitError error) {
 
+                MessageBoxUtils.messageBoxWithButtons(MainActivity.this
+                        , getString(R.string.network_connection_retry)
+                        , new String[]{
+                                getString(R.string.userinfo_save_comfirm)
+                        }
+                        , new Object[]{0}
+                        , new MessageBoxUtils.MsgboxButtonListener[]{
+                                new MessageBoxUtils.MsgboxButtonListener() {
+                                    @Override
+                                    public boolean shouldCloseMessageBox(Object tag) {
+                                        return true;
+                                    }
+
+                                    @Override
+                                    public void onClick(Object tag) {
+                                        checkcacheUpdatedOrNot();
+                                    }
+                                }
+                        }
+                );
+
             }
 
         });
     }
+
 
 
     private List<collectionCategory> parseCategoriesFromString(String fileContent) throws JSONException {
@@ -1304,6 +1326,30 @@ public class MainActivity extends BaseActivity implements TextWatcher {
 
             @Override
             public void failure(RetrofitError error) {
+                {
+
+                    MessageBoxUtils.messageBoxWithButtons(MainActivity.this
+                            , getString(R.string.network_connection_retry)
+                            , new String[]{
+                                    getString(R.string.userinfo_save_comfirm)
+                            }
+                            , new Object[]{0}
+                            , new MessageBoxUtils.MsgboxButtonListener[]{
+                                    new MessageBoxUtils.MsgboxButtonListener() {
+                                        @Override
+                                        public boolean shouldCloseMessageBox(Object tag) {
+                                            return true;
+                                        }
+
+                                        @Override
+                                        public void onClick(Object tag) {
+                                            getTabTitlesFromServer();
+                                        }
+                                    }
+                            }
+                    );
+
+                }
                 Log.i("MainActivity", "request banner failed: " + error.toString());
 
             }
@@ -1344,7 +1390,30 @@ public class MainActivity extends BaseActivity implements TextWatcher {
             @Override
             public void failure(RetrofitError error) {
                 Log.i("MainActivity", "request banner failed: " + error.toString());
+                {
 
+                    MessageBoxUtils.messageBoxWithButtons(MainActivity.this
+                            , getString(R.string.network_connection_retry)
+                            , new String[]{
+                                    getString(R.string.userinfo_save_comfirm)
+                            }
+                            , new Object[]{0}
+                            , new MessageBoxUtils.MsgboxButtonListener[]{
+                                    new MessageBoxUtils.MsgboxButtonListener() {
+                                        @Override
+                                        public boolean shouldCloseMessageBox(Object tag) {
+                                            return true;
+                                        }
+
+                                        @Override
+                                        public void onClick(Object tag) {
+                                            getBannerInfoFromServer();
+                                        }
+                                    }
+                            }
+                    );
+
+                }
             }
         });
     }
@@ -1544,6 +1613,30 @@ public class MainActivity extends BaseActivity implements TextWatcher {
 
             @Override
             public void failure(RetrofitError error) {
+                {
+
+                    MessageBoxUtils.messageBoxWithButtons(MainActivity.this
+                            , getString(R.string.network_connection_retry)
+                            , new String[]{
+                                    getString(R.string.userinfo_save_comfirm)
+                            }
+                            , new Object[]{0}
+                            , new MessageBoxUtils.MsgboxButtonListener[]{
+                                    new MessageBoxUtils.MsgboxButtonListener() {
+                                        @Override
+                                        public boolean shouldCloseMessageBox(Object tag) {
+                                            return true;
+                                        }
+
+                                        @Override
+                                        public void onClick(Object tag) {
+                                            getSearhHotWordsFromServer();
+                                        }
+                                    }
+                            }
+                    );
+
+                }
                 Log.i("MainActivity", "request banner failed: " + error.toString());
 
             }

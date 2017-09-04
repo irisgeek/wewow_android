@@ -111,7 +111,7 @@ public class homeFragment extends Fragment {
     public LinearLayout progressBar;
     private String[] channels = {"wewow_android", "360", "baidu", "yingyongbao", "sougou", "xiaomi", "lenovo", "huawei", "vivo",
             "meizu", "chuizi", "oppo", "pp", "taobao", "aliyun", "wandoujia", "UC", "yingyonghui", "anzhi", "mumayi", "ifanr",
-            "appso", "zuimei", "shaoshupai", "haoqixin", "36kr", "apipi"
+            "appso", "zuimei", "shaoshupai", "haoqixin", "36kr", "apipi","oneplus"
     };
 
     public homeFragment() {

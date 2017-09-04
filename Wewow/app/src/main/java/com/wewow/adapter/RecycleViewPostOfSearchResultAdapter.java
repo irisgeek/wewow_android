@@ -81,7 +81,7 @@ public  class RecycleViewPostOfSearchResultAdapter
                 .crossFade()
                 .into(holder.imageView);
         holder.textViewTitle.setText(stringObjectHashMap.get("textViewTitle").toString());
-//        holder.textViewNum.setText(stringObjectHashMap.get("textViewNum").toString());
+        holder.textViewNum.setText(stringObjectHashMap.get("textViewNum").toString());
         if(mOnItemClickListener != null){
             //为ItemView设置监听器
             holder.itemView.setOnClickListener(new View.OnClickListener() {

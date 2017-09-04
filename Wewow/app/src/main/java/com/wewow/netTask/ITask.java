@@ -129,6 +129,14 @@ public interface ITask {
                     @Query("share") String share,
                                Callback<JSONObject> callback);
 
+    @GET("/article_detail")
+    void articleDetail(@Header("User-Agent") String headerContentType, @Query("article_id") String articleId,
+                    @Query("user_id") String userId,
+                    Callback<JSONObject> callback);
+
+    @GET("/slogan")
+    void slogan(@Header("User-Agent") String headerContentType,
+                       Callback<JSONObject> callback);
 
 }
 

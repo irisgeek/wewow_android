@@ -193,7 +193,7 @@ public class SearchResultActivity extends BaseActivity {
             //
 
             map.put("imageView", posts.get(i).getImage_160_160());
-
+            map.put("textViewNum", posts.get(i).getCount()+getResources().getString(R.string.discuss_people_number));
             map.put("textViewTitle", posts.get(i).getTitle());
             map.put("id",posts.get(i).getId());
 
@@ -251,7 +251,7 @@ public class SearchResultActivity extends BaseActivity {
             post.setId(result.getString("id"));
             post.setImage_160_160(result.getString("image_160_160"));
             post.setTitle(result.getString("title"));
-
+post.setCount(result.getString("comment_count"));
             posts.add(post);
         }
         return  posts;
