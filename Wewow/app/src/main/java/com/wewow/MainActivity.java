@@ -361,7 +361,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
                     drawerLayout.openDrawer(GravityCompat.START);
 
                 } else {
-                    removeCover();
+                    removeCover(true);
 
                     new Handler().postDelayed(new Runnable() {
 
@@ -388,7 +388,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
         mTabLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                removeCover();
+                removeCover(true);
             }
         });
 
@@ -448,7 +448,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                             if (position != 0) {
                                 searchView.setText(hotWords.get(position), true);
-                                removeCover();
+                                removeCover(true);
                                 layoutSearch.performClick();
 
                             } else {
@@ -530,7 +530,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
                             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                                 if (position != 0) {
                                     searchView.setText(hotWords.get(position), true);
-                                    removeCover();
+                                    removeCover(true);
                                     imageViewSearch.performClick();
                                 }
 //
@@ -630,7 +630,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
             layoutCoverTab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    removeCover();
+                    removeCover(true);
                 }
             });
         }
@@ -644,7 +644,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
 //                {
 //                    textTitle.setVisibility(View.VISIBLE);
 //                }
-                removeCover();
+                removeCover(true);
 
                 new Handler().postDelayed(new Runnable() {
 
@@ -674,7 +674,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
                     drawerLayout.openDrawer(GravityCompat.START);
 
                 } else {
-                    removeCover();
+                    removeCover(true);
 
                     new Handler().postDelayed(new Runnable() {
 
@@ -756,7 +756,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                             if (position != 0) {
                                 searchView.setText(hotWords.get(position), true);
-                                removeCover();
+                                removeCover(true);
                                 layoutSearch.performClick();
                             } else {
                                 searchView.setText("");
@@ -837,7 +837,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
                             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                                 if (position != 0) {
                                     searchView.setText(hotWords.get(position), true);
-                                    removeCover();
+                                    removeCover(true);
                                     imageViewSearch.performClick();
                                 }
 //
@@ -854,7 +854,7 @@ public class MainActivity extends BaseActivity implements TextWatcher {
         });
     }
 
-    private void removeCover() {
+    private void removeCover(boolean isHideSoftInput) {
         if (isAppBarFolded) {
             imageViewLine.setBackgroundColor(getResources().getColor(R.color.line_color));
             toolbar.setBackgroundColor(getResources().getColor(R.color.white));
@@ -868,17 +868,17 @@ public class MainActivity extends BaseActivity implements TextWatcher {
         RelativeLayout layoutCover = (RelativeLayout) findViewById(R.id.layoutCover);
         layoutCover.setVisibility(View.GONE);
 
-        new Handler().postDelayed(new Runnable() {
+        if(isHideSoftInput){
+            new Handler().postDelayed(new Runnable() {
 
-            public void run() {
-                //execute the task
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                public void run() {
+                    //execute the task
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 
-                imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
-            }
-        }, 100);
-
-
+                    imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
+                }
+            }, 100);
+        }
     }
 
 
@@ -1666,22 +1666,19 @@ public class MainActivity extends BaseActivity implements TextWatcher {
     @Override
     public void beforeTextChanged(CharSequence s, int start, int count,
                                   int after) {
-        // TODO Auto-generated method stub
-        removeCover();
+        removeCover(false);
 
     }
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-        // TODO Auto-generated method stub
-        removeCover();
+        removeCover(false);
 
     }
 
     @Override
     public void afterTextChanged(Editable s) {
-        // TODO Auto-generated method stub
-        removeCover();
+        removeCover(false);
     }
 
 
